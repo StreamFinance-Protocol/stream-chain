@@ -285,6 +285,7 @@ test-unit-and-integration:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestPlaceOrderIntegrationTestSuite ./x/clob/client/cli/...
 >>>>>>> a7ea3cc25 (genesis fic)
 =======
@@ -304,6 +305,9 @@ test-unit-and-integration:
 =======
 	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -run 'TestCmdGetBlockRateLimitConfiguration|TestPlaceOrderIntegrationTestSuite' ./x/clob/client/cli/...
 >>>>>>> e17ba4b7e (run two tests)
+=======
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -timeout 45m ./x/clob/client/cli/...
+>>>>>>> 4ab509a65 (increase timeout)
 
 test-unit-and-integration-linux: e2e-setup-linux 
 	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' ./...

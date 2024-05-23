@@ -1,5 +1,5 @@
 cd ../protocol
-make e2etest-build-image
+make build-e2e-ethos-test
 cd ../e2e-testing
 <<<<<<< HEAD
 

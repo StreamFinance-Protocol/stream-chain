@@ -234,6 +234,7 @@ custom-e2e-setup: compile-testing-files
 
 test: test-unit
 
+
 test-ci: test-unit-and-integration
 
 test-all: test-unit test-race test-cover test-unit-and-integration
@@ -254,6 +255,7 @@ test-race:
 test-cover:
 	@VERSION=$(VERSION) go test -mod=readonly -timeout 12m -coverprofile=coverage.out -covermode=atomic -coverpkg=github.com/dydxprotocol/v4-chain/protocol/... -tags='test_ledger_mock $(build_tags)' ./...
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -335,6 +337,13 @@ test-unit-and-integration-linux: e2e-setup-linux
 =======
 	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -count=1 -timeout 30m ./...
 >>>>>>> 05fe955eb (Add MsgQueryModuleSafe and MsgQueryModuleSafeResponse from latest IBC upgrade. DB unit test error left.)
+=======
+test-unit-and-integration:
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -timeout 30m ./...
+
+test-unit-and-integration-linux: e2e-setup-linux 
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' ./...
+>>>>>>> 0accc833e (conflict resolve)
 
 benchmark:
 	@VERSION=$(VERSION) go test -mod=readonly -tags='$(build_tags)' -bench=. ./...

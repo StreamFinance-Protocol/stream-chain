@@ -260,6 +260,7 @@ test-cover:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 test-unit-and-integration: 
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -339,6 +340,9 @@ test-unit-and-integration-linux: e2e-setup-linux
 >>>>>>> 05fe955eb (Add MsgQueryModuleSafe and MsgQueryModuleSafeResponse from latest IBC upgrade. DB unit test error left.)
 =======
 test-unit-and-integration:
+=======
+test-unit-and-integration: e2e-setup
+>>>>>>> 675e5fb7f (add proper set up)
 	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -timeout 30m ./...
 
 test-unit-and-integration-linux: e2e-setup-linux 

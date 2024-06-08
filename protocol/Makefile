@@ -276,8 +276,12 @@ test-unit-and-integration:
 >>>>>>> acb443f2c (make file change)
 =======
 test-unit-and-integration:
+<<<<<<< HEAD
 	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestPlaceOrderIntegrationTestSuite ./x/clob/client/cli/...
 >>>>>>> a7ea3cc25 (genesis fic)
+=======
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestLiquidationOrderIntegrationTestSuite ./x/clob/client/cli/...
+>>>>>>> 4ec54f014 (update supply for stake)
 
 test-unit-and-integration-linux: e2e-setup-linux 
 	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' ./...

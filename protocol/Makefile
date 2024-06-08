@@ -232,6 +232,10 @@ custom-e2e-setup: compile-testing-files
 	echo $(GENESIS)
 	@cd ethos/ethos-chain && ./e2e-setup -setup true $(GENESIS)
 
+delete-anvil:
+	@echo "deleting anvil"
+	cd ethos/ethos-chain/tests/e2e/testnet-scripts && ./delete-anvil.sh 
+
 test: test-unit
 
 
@@ -255,6 +259,7 @@ test-race:
 test-cover:
 	@VERSION=$(VERSION) go test -mod=readonly -timeout 12m -coverprofile=coverage.out -covermode=atomic -coverpkg=github.com/dydxprotocol/v4-chain/protocol/... -tags='test_ledger_mock $(build_tags)' ./...
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -344,6 +349,10 @@ test-unit-and-integration:
 test-unit-and-integration: e2e-setup
 >>>>>>> 675e5fb7f (add proper set up)
 	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -timeout 30m ./...
+=======
+test-unit-and-integration: e2e-setup delete-anvil
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -timeout 30m -run TestShowEpochInfo ./x/epochs/client/cli/...
+>>>>>>> 510133d13 (solal dummy)
 
 test-unit-and-integration-linux: e2e-setup-linux 
 	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' ./...

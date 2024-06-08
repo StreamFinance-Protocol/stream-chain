@@ -283,6 +283,7 @@ test-unit-and-integration:
 =======
 test-unit-and-integration:
 <<<<<<< HEAD
+<<<<<<< HEAD
 	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestPlaceOrderIntegrationTestSuite ./x/clob/client/cli/...
 >>>>>>> a7ea3cc25 (genesis fic)
 =======
@@ -296,6 +297,9 @@ test-unit-and-integration:
 =======
 	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestCancelOrderIntegrationTestSuite -p 1 ./x/clob/client/cli/...
 >>>>>>> 904e8880b (single clob test only)
+=======
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 ./x/clob/client/cli/...
+>>>>>>> 95c7c823e (run all clob tests)
 
 test-unit-and-integration-linux: e2e-setup-linux 
 	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' ./...

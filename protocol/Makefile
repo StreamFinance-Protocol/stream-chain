@@ -244,6 +244,7 @@ test-cover:
 	@VERSION=$(VERSION) go test -mod=readonly -timeout 12m -coverprofile=coverage.out -covermode=atomic -coverpkg=github.com/dydxprotocol/v4-chain/protocol/... -tags='test_ledger_mock $(build_tags)' ./...
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 test-unit-and-integration: 
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -282,6 +283,10 @@ test-unit-and-integration:
 =======
 	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestLiquidationOrderIntegrationTestSuite ./x/clob/client/cli/...
 >>>>>>> 4ec54f014 (update supply for stake)
+=======
+test-unit-and-integration:
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' ./...
+>>>>>>> fe40f7c87 (all tests)
 
 test-unit-and-integration-linux: e2e-setup-linux 
 	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' ./...

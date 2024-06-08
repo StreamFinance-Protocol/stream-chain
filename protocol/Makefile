@@ -322,6 +322,7 @@ test-unit-and-integration:
 >>>>>>> c51ac6e76 (subaccount test)
 =======
 test-unit-and-integration: e2e-setup
+<<<<<<< HEAD
 	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -timeout 30m ./...
 >>>>>>> df0e72f36 (test all integration tests)
 =======
@@ -331,6 +332,9 @@ test-unit-and-integration: e2e-setup
 
 test-unit-and-integration-linux: e2e-setup-linux 
 	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' ./...
+=======
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -count=1 -timeout 30m ./...
+>>>>>>> 05fe955eb (Add MsgQueryModuleSafe and MsgQueryModuleSafeResponse from latest IBC upgrade. DB unit test error left.)
 
 benchmark:
 	@VERSION=$(VERSION) go test -mod=readonly -tags='$(build_tags)' -bench=. ./...

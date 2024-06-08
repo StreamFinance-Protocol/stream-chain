@@ -290,8 +290,12 @@ test-unit-and-integration:
 >>>>>>> 4ec54f014 (update supply for stake)
 =======
 test-unit-and-integration:
+<<<<<<< HEAD
 	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' ./...
 >>>>>>> fe40f7c87 (all tests)
+=======
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestCancelOrderIntegrationTestSuite -p 1 ./x/clob/client/cli/...
+>>>>>>> 904e8880b (single clob test only)
 
 test-unit-and-integration-linux: e2e-setup-linux 
 	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' ./...

@@ -213,7 +213,31 @@ clean:
 include sims.mk
 include ./mocks/Makefile
 
+GO_BIN_DIR := $(HOME)/go/bin
+SCRIPT_DIR := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
+compile-e2e-setup:
+	cd $(SCRIPT_DIR)/ethos/ethos-chain/tests/e2e && go install
+	mv $(GO_BIN_DIR)/e2e $(SCRIPT_DIR)/ethos/ethos-chain/e2e-setup
+
+compile-testing-files: compile-e2e-setup
+	make -f ethos/ethos-chain/Makefile install-ics-cd
+
+e2e-setup: compile-testing-files
+	@echo "Setting up environment..."
+	@cd ethos/ethos-chain && ./e2e-setup -setup 
+	
+custom-e2e-setup: compile-testing-files
+	@echo "Setting up environment..."
+	echo "logging custom genesis"
+	echo $(GENESIS)
+	@cd ethos/ethos-chain && ./e2e-setup -setup true $(GENESIS)
+
+delete-anvil:
+	@echo "deleting anvil"
+	cd ethos/ethos-chain/tests/e2e/testnet-scripts && chmod +x delete-anvil.sh && ./delete-anvil.sh 
+
 test: test-unit
+
 
 test-ci: test-unit-and-integration
 
@@ -235,11 +259,104 @@ test-race:
 test-cover:
 	@VERSION=$(VERSION) go test -mod=readonly -timeout 12m -coverprofile=coverage.out -covermode=atomic -coverpkg=github.com/dydxprotocol/v4-chain/protocol/... -tags='test_ledger_mock $(build_tags)' ./...
 
-test-exchanges:
-	@VERSION=$(VERSION) go test -mod=readonly -tags='test_ledger_mock exchange_tests $(build_tags)' github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/pricefeed/client/handler -run "TestQueryingActualExchanges"
-
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+test-unit-and-integration: 
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestListEpochInfo ./x/epochs/client/cli/query_epoch_info_test.go
+=======
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestPlaceOrderIntegrationTestSuite  ./x/clob/client/cli/place_order_cli_test.go
+>>>>>>> 73a8115ea (place order tests)
+=======
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestCancelOrderIntegrationTestSuite ./x/clob/client/cli/cancel_order_cli_test.go
+>>>>>>> e6d2f3c76 (more testtss)
+=======
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestListMarketPrice ./x/prices/client/cli/...
+>>>>>>> 29c4f64a9 (util helpers)
+=======
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestLiquidationOrderIntegrationTestSuite ./x/clob/client/cli/...
+>>>>>>> f75885648 (prices and liquidation base)
+=======
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestQueryNextDelayedMessageId ./x/delaymsg/client/cli/...
+>>>>>>> 6747b894d (solal changes)
+=======
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestPricesIntegrationTestSuite ./x/prices/client/cli/...
+>>>>>>> 67934457f (price tests)
+=======
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestLiquidationOrderIntegrationTestSuite ./x/clob/client/cli/...
+>>>>>>> acb443f2c (make file change)
+=======
 test-unit-and-integration:
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestPlaceOrderIntegrationTestSuite ./x/clob/client/cli/...
+>>>>>>> a7ea3cc25 (genesis fic)
+=======
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestLiquidationOrderIntegrationTestSuite ./x/clob/client/cli/...
+>>>>>>> 4ec54f014 (update supply for stake)
+=======
+test-unit-and-integration:
+<<<<<<< HEAD
 	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' ./...
+>>>>>>> fe40f7c87 (all tests)
+=======
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestCancelOrderIntegrationTestSuite -p 1 ./x/clob/client/cli/...
+>>>>>>> 904e8880b (single clob test only)
+=======
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 ./x/clob/client/cli/...
+>>>>>>> 95c7c823e (run all clob tests)
+=======
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -run 'TestCmdGetBlockRateLimitConfiguration|TestPlaceOrderIntegrationTestSuite' ./x/clob/client/cli/...
+>>>>>>> e17ba4b7e (run two tests)
+=======
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -timeout 45m ./x/clob/client/cli/...
+>>>>>>> 4ab509a65 (increase timeout)
+=======
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -timeout 30m -run TestShowSubaccount ./x/subaccounts/client/cli/...
+>>>>>>> c51ac6e76 (subaccount test)
+=======
+test-unit-and-integration: e2e-setup
+<<<<<<< HEAD
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -timeout 30m ./...
+>>>>>>> df0e72f36 (test all integration tests)
+=======
+test-unit-and-integration: e2e-setup
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -timeout 30m ./...
+>>>>>>> 9cfe85576 (test all integration tests)
+
+test-unit-and-integration-linux: e2e-setup-linux 
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' ./...
+=======
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -count=1 -timeout 30m ./...
+>>>>>>> 05fe955eb (Add MsgQueryModuleSafe and MsgQueryModuleSafeResponse from latest IBC upgrade. DB unit test error left.)
+=======
+test-unit-and-integration:
+=======
+test-unit-and-integration: e2e-setup
+>>>>>>> 675e5fb7f (add proper set up)
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -timeout 30m ./...
+=======
+test-unit-and-integration: e2e-setup delete-anvil
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -timeout 30m -run TestShowEpochInfo ./x/epochs/client/cli/...
+>>>>>>> 510133d13 (solal dummy)
+
+test-unit-and-integration-linux: e2e-setup-linux 
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' ./...
+>>>>>>> 0accc833e (conflict resolve)
 
 benchmark:
 	@VERSION=$(VERSION) go test -mod=readonly -tags='$(build_tags)' -bench=. ./...
@@ -373,6 +490,9 @@ localnet-init:
 	# Build the base image.
 	make localnet-build
 
+build-e2e-ethos-test:
+	cd ethos/ethos-chain && docker build -t cosmos-ics:local -f Dockerfile.ics ../
+	docker run -d --name interchain-security-instance --cap-add=NET_ADMIN --privileged cosmos-ics:local /bin/bash /testnet-scripts/beacon.sh
 localnet-compose-up:
 	@echo "Launching localnet at commit ${GIT_COMMIT_HASH}"
 	@docker build . -t local:dydxprotocol -f testing/testnet-local/Dockerfile --no-cache

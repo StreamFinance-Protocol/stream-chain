@@ -286,6 +286,7 @@ test-unit-and-integration:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestPlaceOrderIntegrationTestSuite ./x/clob/client/cli/...
 >>>>>>> a7ea3cc25 (genesis fic)
 =======
@@ -308,6 +309,9 @@ test-unit-and-integration:
 =======
 	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -timeout 45m ./x/clob/client/cli/...
 >>>>>>> 4ab509a65 (increase timeout)
+=======
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -timeout 30m -run TestShowSubaccount ./x/subaccounts/client/cli/...
+>>>>>>> c51ac6e76 (subaccount test)
 
 test-unit-and-integration-linux: e2e-setup-linux 
 	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' ./...

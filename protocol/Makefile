@@ -250,6 +250,7 @@ test-unit-and-integration:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestListEpochInfo ./x/epochs/client/cli/query_epoch_info_test.go
 =======
 	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestPlaceOrderIntegrationTestSuite  ./x/clob/client/cli/place_order_cli_test.go
@@ -269,6 +270,9 @@ test-unit-and-integration:
 =======
 	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestPricesIntegrationTestSuite ./x/prices/client/cli/...
 >>>>>>> 67934457f (price tests)
+=======
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestLiquidationOrderIntegrationTestSuite ./x/clob/client/cli/...
+>>>>>>> acb443f2c (make file change)
 
 test-unit-and-integration-linux: e2e-setup-linux 
 	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' ./...

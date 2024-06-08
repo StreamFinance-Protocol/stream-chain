@@ -245,10 +245,14 @@ test-cover:
 
 test-unit-and-integration: 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestListEpochInfo ./x/epochs/client/cli/query_epoch_info_test.go
 =======
 	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestPlaceOrderIntegrationTestSuite  ./x/clob/client/cli/place_order_cli_test.go
 >>>>>>> 73a8115ea (place order tests)
+=======
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestCancelOrderIntegrationTestSuite ./x/clob/client/cli/cancel_order_cli_test.go
+>>>>>>> e6d2f3c76 (more testtss)
 
 test-unit-and-integration-linux: e2e-setup-linux 
 	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' ./...

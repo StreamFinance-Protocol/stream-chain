@@ -257,6 +257,7 @@ test-cover:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 test-unit-and-integration: 
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -323,6 +324,10 @@ test-unit-and-integration:
 test-unit-and-integration: e2e-setup
 	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -timeout 30m ./...
 >>>>>>> df0e72f36 (test all integration tests)
+=======
+test-unit-and-integration: e2e-setup
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -timeout 30m ./...
+>>>>>>> 9cfe85576 (test all integration tests)
 
 test-unit-and-integration-linux: e2e-setup-linux 
 	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' ./...

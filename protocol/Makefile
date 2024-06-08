@@ -244,11 +244,11 @@ test-ci: test-unit-and-integration
 test-all: test-unit test-race test-cover test-unit-and-integration
 
 test-slow:
-        @VERSION=$(VERSION) go test -mod=readonly -tags='test_ledger_mock $(build_tags)' -p 1 -count=1 ./...
-        @VERSION=$(VERSION) go test -mod=readonly -timeout 20m -race -tags='test_ledger_mock $(build_tags)' -p 1 -count=1 ./...
-        @VERSION=$(VERSION) go test -mod=readonly -timeout 12m -coverprofile=coverage.out -covermode=atomic -coverpkg=github.com/dydxprotocol/v4-chain/protocol/... -tags='test_ledger_mock $(build_tags)' -p 1 -count=1 ./...
-        @VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -count=1 ./...
-        @VERSION=$(VERSION) go test -mod=readonly -tags='test_ledger_mock exchange_tests $(build_tags)' -p 1 -count=1 github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/pricefeed/client/handler -run "TestQueryingActualExchanges"
+	@VERSION=$(VERSION) go test -mod=readonly -tags='test_ledger_mock $(build_tags)' -p 1 -count=1 ./...
+	@VERSION=$(VERSION) go test -mod=readonly -timeout 20m -race -tags='test_ledger_mock $(build_tags)' -p 1 -count=1 ./...
+	@VERSION=$(VERSION) go test -mod=readonly -timeout 12m -coverprofile=coverage.out -covermode=atomic -coverpkg=github.com/dydxprotocol/v4-chain/protocol/... -tags='test_ledger_mock $(build_tags)' -p 1 -count=1 ./...
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -count=1 ./...
+	@VERSION=$(VERSION) go test -mod=readonly -tags='test_ledger_mock exchange_tests $(build_tags)' -p 1 -count=1 github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/pricefeed/client/handler -run "TestQueryingActualExchanges"
 
 test-unit:
 	@VERSION=$(VERSION) go test -mod=readonly -tags='test_ledger_mock $(build_tags)' ./...
@@ -259,11 +259,111 @@ test-race:
 test-cover:
 	@VERSION=$(VERSION) go test -mod=readonly -timeout 12m -coverprofile=coverage.out -covermode=atomic -coverpkg=github.com/dydxprotocol/v4-chain/protocol/... -tags='test_ledger_mock $(build_tags)' ./...
 
+<<<<<<< HEAD
 test-unit-and-integration: e2e-setup delete-anvil
 	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -timeout 30m -run TestShowEpochInfo ./x/epochs/client/cli/...
 
 test-unit-and-integration-linux: e2e-setup-linux 
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+test-unit-and-integration: 
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestListEpochInfo ./x/epochs/client/cli/query_epoch_info_test.go
+=======
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestPlaceOrderIntegrationTestSuite  ./x/clob/client/cli/place_order_cli_test.go
+>>>>>>> 73a8115ea (place order tests)
+=======
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestCancelOrderIntegrationTestSuite ./x/clob/client/cli/cancel_order_cli_test.go
+>>>>>>> e6d2f3c76 (more testtss)
+=======
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestListMarketPrice ./x/prices/client/cli/...
+>>>>>>> 29c4f64a9 (util helpers)
+=======
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestLiquidationOrderIntegrationTestSuite ./x/clob/client/cli/...
+>>>>>>> f75885648 (prices and liquidation base)
+=======
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestQueryNextDelayedMessageId ./x/delaymsg/client/cli/...
+>>>>>>> 6747b894d (solal changes)
+=======
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestPricesIntegrationTestSuite ./x/prices/client/cli/...
+>>>>>>> 67934457f (price tests)
+=======
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestLiquidationOrderIntegrationTestSuite ./x/clob/client/cli/...
+>>>>>>> acb443f2c (make file change)
+=======
+test-unit-and-integration:
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestPlaceOrderIntegrationTestSuite ./x/clob/client/cli/...
+>>>>>>> a7ea3cc25 (genesis fic)
+=======
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestLiquidationOrderIntegrationTestSuite ./x/clob/client/cli/...
+>>>>>>> 4ec54f014 (update supply for stake)
+=======
+test-unit-and-integration:
+<<<<<<< HEAD
+>>>>>>> v4-stable
 	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' ./...
+>>>>>>> fe40f7c87 (all tests)
+=======
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -run TestCancelOrderIntegrationTestSuite -p 1 ./x/clob/client/cli/...
+>>>>>>> 904e8880b (single clob test only)
+=======
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 ./x/clob/client/cli/...
+>>>>>>> 95c7c823e (run all clob tests)
+=======
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -run 'TestCmdGetBlockRateLimitConfiguration|TestPlaceOrderIntegrationTestSuite' ./x/clob/client/cli/...
+>>>>>>> e17ba4b7e (run two tests)
+=======
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -timeout 45m ./x/clob/client/cli/...
+>>>>>>> 4ab509a65 (increase timeout)
+=======
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -timeout 30m -run TestShowSubaccount ./x/subaccounts/client/cli/...
+>>>>>>> c51ac6e76 (subaccount test)
+=======
+test-unit-and-integration: e2e-setup
+<<<<<<< HEAD
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -timeout 30m ./...
+>>>>>>> df0e72f36 (test all integration tests)
+=======
+test-unit-and-integration: e2e-setup
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -timeout 30m ./...
+>>>>>>> 9cfe85576 (test all integration tests)
+
+test-unit-and-integration-linux: e2e-setup-linux 
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' ./...
+=======
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -count=1 -timeout 30m ./...
+>>>>>>> 05fe955eb (Add MsgQueryModuleSafe and MsgQueryModuleSafeResponse from latest IBC upgrade. DB unit test error left.)
+=======
+test-unit-and-integration:
+=======
+test-unit-and-integration: e2e-setup
+>>>>>>> 675e5fb7f (add proper set up)
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -timeout 30m ./...
+=======
+test-unit-and-integration: e2e-setup delete-anvil
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -timeout 30m -run TestShowEpochInfo ./x/epochs/client/cli/...
+>>>>>>> 510133d13 (solal dummy)
+
+test-unit-and-integration-linux: e2e-setup-linux 
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' ./...
+>>>>>>> 0accc833e (conflict resolve)
 
 benchmark:
 	@VERSION=$(VERSION) go test -mod=readonly -tags='$(build_tags)' -bench=. ./...
@@ -278,7 +378,7 @@ test-container-build:
 	$(MAKE) localnet-build
 	@docker build . -t dydxprotocol-container-test -f testing/containertest/Dockerfile --no-cache
 
-.PHONY: test test-all test-cover test-unit test-race test-container
+.PHONY: test test-all test-cover test-unit test-race test-container test-slow
 	\ container-test-build-base container-test-build-local
 
 ###############################################################################

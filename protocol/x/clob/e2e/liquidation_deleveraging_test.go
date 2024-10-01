@@ -1,13 +1,16 @@
 package clob_test
 
 import (
+	"math/big"
 	"testing"
 
+	"github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/deleveraging/api"
+	sdaiservertypes "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/server/types/sdaioracle"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/dtypes"
 
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/cometbft/cometbft/types"
 
-	"github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/deleveraging/api"
 	testapp "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/app"
 	clobtest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/clob"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/constants"
@@ -16,6 +19,7 @@ import (
 	feetiertypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	prices "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
+	ratelimitkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/keeper"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
 	"github.com/stretchr/testify/require"
 )
@@ -86,8 +90,10 @@ func TestLiquidationConfig(t *testing.T) {
 							PerpetualId:  0,
 							Quantums:     dtypes.NewInt(-90_000_000), // -0.9 BTC
 							FundingIndex: dtypes.NewInt(0),
+							YieldIndex:   big.NewRat(0, 1).String(),
 						},
 					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Dave_Num0,
@@ -102,8 +108,10 @@ func TestLiquidationConfig(t *testing.T) {
 							PerpetualId:  0,
 							Quantums:     dtypes.NewInt(-10_000_000), // -0.1 BTC
 							FundingIndex: dtypes.NewInt(0),
+							YieldIndex:   big.NewRat(0, 1).String(),
 						},
 					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
 				},
 			},
 		},
@@ -154,8 +162,10 @@ func TestLiquidationConfig(t *testing.T) {
 							PerpetualId:  0,
 							Quantums:     dtypes.NewInt(10_000_000), // 0.1 BTC
 							FundingIndex: dtypes.NewInt(0),
+							YieldIndex:   big.NewRat(0, 1).String(),
 						},
 					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Dave_Num1,
@@ -170,8 +180,10 @@ func TestLiquidationConfig(t *testing.T) {
 							PerpetualId:  0,
 							Quantums:     dtypes.NewInt(90_000_000), // 0.9 BTC
 							FundingIndex: dtypes.NewInt(0),
+							YieldIndex:   big.NewRat(0, 1).String(),
 						},
 					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
 				},
 			},
 		},
@@ -185,7 +197,7 @@ func TestLiquidationConfig(t *testing.T) {
 					&genesis,
 					func(genesisState *assettypes.GenesisState) {
 						genesisState.Assets = []assettypes.Asset{
-							*constants.Usdc,
+							*constants.TDai,
 						}
 					},
 				)
@@ -246,7 +258,24 @@ func TestLiquidationConfig(t *testing.T) {
 				return genesis
 			}).Build()
 
-			ctx := tApp.AdvanceToBlock(2, testapp.AdvanceToBlockOptions{})
+			rateString := sdaiservertypes.TestSDAIEventRequest.ConversionRate
+			rate, conversionErr := ratelimitkeeper.ConvertStringToBigInt(rateString)
+
+			require.NoError(t, conversionErr)
+
+			tApp.App.RatelimitKeeper.SetSDAIPrice(tApp.App.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.App.RatelimitKeeper.SetAssetYieldIndex(tApp.App.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+
+			tApp.CrashingApp.RatelimitKeeper.SetSDAIPrice(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.CrashingApp.RatelimitKeeper.SetAssetYieldIndex(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+
+			tApp.NoCheckTxApp.RatelimitKeeper.SetSDAIPrice(tApp.NoCheckTxApp.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.NoCheckTxApp.RatelimitKeeper.SetAssetYieldIndex(tApp.NoCheckTxApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+
+			tApp.ParallelApp.RatelimitKeeper.SetSDAIPrice(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.ParallelApp.RatelimitKeeper.SetAssetYieldIndex(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+
+			ctx := tApp.InitChain()
 
 			// Seed insurance fund
 			if len(tc.placedMatchableOrders) > 0 {
@@ -329,6 +358,7 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 							Quantums: dtypes.NewInt(50_499_000_000 - 50_000_000_000 - 250_000_000),
 						},
 					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Dave_Num0,
@@ -338,6 +368,7 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 							Quantums: dtypes.NewInt(100_000_000_000), // $100,000
 						},
 					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
 				},
 			},
 		},
@@ -367,6 +398,7 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 							Quantums: dtypes.NewInt(124500000), // 50_499_000_000 - 50_000_000_000 - 250_000_000 / 2
 						},
 					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Dave_Num0,
@@ -376,6 +408,7 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 							Quantums: dtypes.NewInt(100_000_000_000), // $100,000
 						},
 					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
 				},
 			},
 		},
@@ -413,8 +446,10 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 							PerpetualId:  0,
 							Quantums:     dtypes.NewInt(-75_000_000), // -0.75 BTC
 							FundingIndex: dtypes.NewInt(0),
+							YieldIndex:   big.NewRat(0, 1).String(),
 						},
 					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Dave_Num0,
@@ -429,8 +464,10 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 							PerpetualId:  0,
 							Quantums:     dtypes.NewInt(75_000_000), // 0.75 BTC
 							FundingIndex: dtypes.NewInt(0),
+							YieldIndex:   big.NewRat(0, 1).String(),
 						},
 					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
 				},
 			},
 		},
@@ -459,7 +496,8 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 
 			expectedSubaccounts: []satypes.Subaccount{
 				{
-					Id: &constants.Carl_Num0,
+					Id:              &constants.Carl_Num0,
+					AssetYieldIndex: big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Dave_Num1,
@@ -469,6 +507,7 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 							Quantums: dtypes.NewInt(50_000_000_000 + 50_499_000_000),
 						},
 					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
 				},
 			},
 		},
@@ -511,8 +550,10 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 							PerpetualId:  0,
 							Quantums:     dtypes.NewInt(-75_000_000), // -0.75 BTC
 							FundingIndex: dtypes.NewInt(0),
+							YieldIndex:   big.NewRat(0, 1).String(),
 						},
 					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Dave_Num0,
@@ -527,8 +568,10 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 							PerpetualId:  0,
 							Quantums:     dtypes.NewInt(75_000_000), // 0.75 BTC
 							FundingIndex: dtypes.NewInt(0),
+							YieldIndex:   big.NewRat(0, 1).String(),
 						},
 					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
 				},
 			},
 		},
@@ -599,8 +642,10 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 							PerpetualId:  0,
 							Quantums:     dtypes.NewInt(-75_000_000), // -0.75 BTC
 							FundingIndex: dtypes.NewInt(0),
+							YieldIndex:   big.NewRat(0, 1).String(),
 						},
 					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
 				},
 				// Dave's bankruptcy price to close 1 BTC long is $50,000, and deleveraging can not be
 				// performed due to non overlapping bankruptcy prices.
@@ -614,6 +659,7 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 							Quantums: dtypes.NewInt(50_000_000_000 + 12_499_750_000),
 						},
 					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
 				},
 			},
 		},
@@ -654,8 +700,10 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 							// Deleveraging fails for remaining amount.
 							Quantums:     dtypes.NewInt(-50_000_000), // -0.5 BTC
 							FundingIndex: dtypes.NewInt(0),
+							YieldIndex:   big.NewRat(0, 1).String(),
 						},
 					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
 				},
 				// Dave_Num0 does not change since deleveraging against this subaccount failed.
 				constants.Dave_Num0_1BTC_Long_50000USD_Short,
@@ -667,6 +715,7 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 							Quantums: dtypes.NewInt(50_000_000_000 + 24_999_500_000),
 						},
 					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
 				},
 			},
 		},
@@ -703,7 +752,8 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 
 			expectedSubaccounts: []satypes.Subaccount{
 				{
-					Id: &constants.Carl_Num0,
+					Id:              &constants.Carl_Num0,
+					AssetYieldIndex: big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Dave_Num0,
@@ -713,6 +763,7 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 							Quantums: dtypes.NewInt(50_000_000_000 + 50_499_000_000),
 						},
 					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
 				},
 			},
 		},
@@ -736,7 +787,8 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 
 			expectedSubaccounts: []satypes.Subaccount{
 				{
-					Id: &constants.Carl_Num0,
+					Id:              &constants.Carl_Num0,
+					AssetYieldIndex: big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Dave_Num0,
@@ -746,6 +798,7 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 							Quantums: dtypes.NewInt(50_000_000_000 + 50_499_000_000),
 						},
 					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
 				},
 			},
 		},
@@ -771,6 +824,7 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 							Quantums: dtypes.NewInt(100_000_000_000 - 50_000_000_000),
 						},
 					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Dave_Num0,
@@ -780,6 +834,7 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 							Quantums: dtypes.NewInt(50_000_000_000 + 50_000_000_000),
 						},
 					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
 				},
 			},
 		},
@@ -793,7 +848,7 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 					&genesis,
 					func(genesisState *assettypes.GenesisState) {
 						genesisState.Assets = []assettypes.Asset{
-							*constants.Usdc,
+							*constants.TDai,
 						}
 					},
 				)
@@ -853,6 +908,23 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 				)
 				return genesis
 			}).Build()
+
+			rateString := sdaiservertypes.TestSDAIEventRequest.ConversionRate
+			rate, conversionErr := ratelimitkeeper.ConvertStringToBigInt(rateString)
+
+			require.NoError(t, conversionErr)
+
+			tApp.App.RatelimitKeeper.SetSDAIPrice(tApp.App.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.App.RatelimitKeeper.SetAssetYieldIndex(tApp.App.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+
+			tApp.CrashingApp.RatelimitKeeper.SetSDAIPrice(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.CrashingApp.RatelimitKeeper.SetAssetYieldIndex(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+
+			tApp.NoCheckTxApp.RatelimitKeeper.SetSDAIPrice(tApp.NoCheckTxApp.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.NoCheckTxApp.RatelimitKeeper.SetAssetYieldIndex(tApp.NoCheckTxApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+
+			tApp.ParallelApp.RatelimitKeeper.SetSDAIPrice(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.ParallelApp.RatelimitKeeper.SetAssetYieldIndex(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
 			ctx := tApp.AdvanceToBlock(2, testapp.AdvanceToBlockOptions{})
 

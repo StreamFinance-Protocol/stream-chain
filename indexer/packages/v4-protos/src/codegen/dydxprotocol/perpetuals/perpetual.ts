@@ -60,6 +60,13 @@ export interface Perpetual {
 
   openInterest: Uint8Array;
   lastFundingRate: Uint8Array;
+  /**
+   * The current yield index is determined by the cumulative
+   * all-time history of the yield mechanism. Starts at 0.
+   * This string should always be converted big.Rat.
+   */
+
+  yieldIndex: string;
 }
 /** Perpetual represents a perpetual on the dYdX exchange. */
 
@@ -76,6 +83,13 @@ export interface PerpetualSDKType {
 
   open_interest: Uint8Array;
   last_funding_rate: Uint8Array;
+  /**
+   * The current yield index is determined by the cumulative
+   * all-time history of the yield mechanism. Starts at 0.
+   * This string should always be converted big.Rat.
+   */
+
+  yield_index: string;
 }
 /**
  * PerpetualParams represents the parameters of a perpetual on the dYdX
@@ -278,7 +292,7 @@ export interface LiquidityTier {
   basePositionNotional: Long;
   /**
    * The impact notional amount (in quote quantums) is used to determine impact
-   * bid/ask prices and its recommended value is 500 USDC / initial margin
+   * bid/ask prices and its recommended value is 500 TDAI / initial margin
    * fraction.
    * - Impact bid price = average execution price for a market sell of the
    * impact notional value.
@@ -334,7 +348,7 @@ export interface LiquidityTierSDKType {
   base_position_notional: Long;
   /**
    * The impact notional amount (in quote quantums) is used to determine impact
-   * bid/ask prices and its recommended value is 500 USDC / initial margin
+   * bid/ask prices and its recommended value is 500 TDAI / initial margin
    * fraction.
    * - Impact bid price = average execution price for a market sell of the
    * impact notional value.
@@ -363,7 +377,8 @@ function createBasePerpetual(): Perpetual {
     params: undefined,
     fundingIndex: new Uint8Array(),
     openInterest: new Uint8Array(),
-    lastFundingRate: new Uint8Array()
+    lastFundingRate: new Uint8Array(),
+    yieldIndex: ""
   };
 }
 
@@ -383,6 +398,10 @@ export const Perpetual = {
 
     if (message.lastFundingRate.length !== 0) {
       writer.uint32(34).bytes(message.lastFundingRate);
+    }
+
+    if (message.yieldIndex !== "") {
+      writer.uint32(42).string(message.yieldIndex);
     }
 
     return writer;
@@ -413,6 +432,10 @@ export const Perpetual = {
           message.lastFundingRate = reader.bytes();
           break;
 
+        case 5:
+          message.yieldIndex = reader.string();
+          break;
+
         default:
           reader.skipType(tag & 7);
           break;
@@ -428,6 +451,7 @@ export const Perpetual = {
     message.fundingIndex = object.fundingIndex ?? new Uint8Array();
     message.openInterest = object.openInterest ?? new Uint8Array();
     message.lastFundingRate = object.lastFundingRate ?? new Uint8Array();
+    message.yieldIndex = object.yieldIndex ?? "";
     return message;
   }
 

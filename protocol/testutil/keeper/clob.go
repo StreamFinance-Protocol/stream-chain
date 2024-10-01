@@ -23,6 +23,7 @@ import (
 	feetierskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers/keeper"
 	perpkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/keeper"
 	priceskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/keeper"
+	ratelimitkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/keeper"
 	statskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/stats/keeper"
 	subkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/keeper"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
@@ -41,6 +42,7 @@ type ClobKeepersTestContext struct {
 	AssetsKeeper      *asskeeper.Keeper
 	BlockTimeKeeper   *blocktimekeeper.Keeper
 	FeeTiersKeeper    *feetierskeeper.Keeper
+	RatelimitKeeper   *ratelimitkeeper.Keeper
 	PerpetualsKeeper  *perpkeeper.Keeper
 	StatsKeeper       *statskeeper.Keeper
 	SubaccountsKeeper *subkeeper.Keeper
@@ -111,6 +113,17 @@ func NewClobKeepersTestContextWithUninitializedMemStore(
 			db,
 			cdc,
 		)
+		ks.RatelimitKeeper, _ = createRatelimitKeeper(
+			stateStore,
+			db,
+			cdc,
+			ks.BlockTimeKeeper,
+			bankKeeper,
+			ks.PerpetualsKeeper,
+			ks.AssetsKeeper,
+			indexerEventsTransientStoreKey,
+			true,
+		)
 		ks.SubaccountsKeeper, _ = createSubaccountsKeeper(
 			stateStore,
 			db,
@@ -118,6 +131,7 @@ func NewClobKeepersTestContextWithUninitializedMemStore(
 			ks.AssetsKeeper,
 			bankKeeper,
 			ks.PerpetualsKeeper,
+			ks.RatelimitKeeper,
 			ks.BlockTimeKeeper,
 			indexerEventsTransientStoreKey,
 			true,

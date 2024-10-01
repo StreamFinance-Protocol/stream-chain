@@ -250,7 +250,14 @@ test-slow:
 	$(MAKE) test-exchange-slow
 
 test-unit:
-	@VERSION=$(VERSION) go test -mod=readonly -tags='test_ledger_mock $(build_tags)' -run "TestExtendVoteHandler" ./app/ve/...
+	@VERSION=$(VERSION) go test -mod=readonly -timeout 20m -tags='test_ledger_mock $(build_tags)' ./...
+
+test-unit-verbose:
+	@VERSION=$(VERSION) go test -mod=readonly -timeout 20m -tags='test_ledger_mock $(build_tags)' -v -count=1 -failfast -cover ./...
+
+specific-unit: 
+	@VERSION=$(VERSION) go test -mod=readonly -tags='test_ledger_mock $(build_tags)' -p 1 -timeout 20m -run "TestGetNetCollateralAndMarginRequirements" ./x/subaccounts/keeper/...
+
 
 test-race:
 	@VERSION=$(VERSION) go test -mod=readonly -timeout 20m -race -tags='test_ledger_mock $(build_tags)' ./...
@@ -268,7 +275,7 @@ test-exchange-slow:
 	@VERSION=$(VERSION) go test -mod=readonly -tags='test_ledger_mock exchange_tests $(build_tags)' -p 1 -count=1 github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/pricefeed/client/handler -run "TestQueryingActualExchanges"
 
 test-unit-and-integration: e2e-setup delete-anvil
-	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -timeout 80m ./x/clob/client/cli/place_order_cli_test.go -run "TestCLIPlaceOrder"
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -timeout 80m ./...
 	$(MAKE) remove-container
 
 specific-test: 

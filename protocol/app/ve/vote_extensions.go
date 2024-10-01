@@ -9,8 +9,10 @@ import (
 	codec "github.com/StreamFinance-Protocol/stream-chain/protocol/app/ve/codec"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/app/ve/types"
 	veutils "github.com/StreamFinance-Protocol/stream-chain/protocol/app/ve/utils"
+	sdaiserver "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/server/types/sdaioracle"
 	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
+	ratelimittypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
 	abci "github.com/cometbft/cometbft/abci/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -30,8 +32,12 @@ type VoteExtensionHandler struct {
 	// fetching mid price for price calc
 	clobKeeper ExtendVoteClobKeeper
 
+	rateLimitKeeper VoteExtensionRateLimitKeeper
+
+	sDAIEventManager *sdaiserver.SDAIEventManager
+
 	// writing prices to the prices module store
-	priceApplier VEPriceApplier
+	veApplier VEApplierInterface
 }
 
 type VEPricePair struct {
@@ -51,7 +57,9 @@ func NewVoteExtensionHandler(
 	pricesKeeper PreBlockExecPricesKeeper,
 	perpetualsKeeper ExtendVotePerpetualsKeeper,
 	clobKeeper ExtendVoteClobKeeper,
-	priceApplier VEPriceApplier,
+	rateLimitKeeper VoteExtensionRateLimitKeeper,
+	sDAIEventManager *sdaiserver.SDAIEventManager,
+	veApplier VEApplierInterface,
 ) *VoteExtensionHandler {
 	return &VoteExtensionHandler{
 		logger:           logger,
@@ -59,7 +67,9 @@ func NewVoteExtensionHandler(
 		pricesKeeper:     pricesKeeper,
 		perpetualsKeeper: perpetualsKeeper,
 		clobKeeper:       clobKeeper,
-		priceApplier:     priceApplier,
+		rateLimitKeeper:  rateLimitKeeper,
+		sDAIEventManager: sDAIEventManager,
+		veApplier:        veApplier,
 	}
 }
 
@@ -95,7 +105,7 @@ func (h *VoteExtensionHandler) ExtendVoteHandler() sdk.ExtendVoteHandler {
 		}
 
 		// apply prices from prev block to ensure that the prices are up to date
-		if err := h.priceApplier.ApplyPricesFromVE(ctx, reqFinalizeBlock, true); err != nil {
+		if err := h.veApplier.ApplyVE(ctx, reqFinalizeBlock, true); err != nil {
 			h.logger.Error(
 				"failed to aggregate oracle votes",
 				"height", request.Height,
@@ -105,7 +115,8 @@ func (h *VoteExtensionHandler) ExtendVoteHandler() sdk.ExtendVoteHandler {
 
 			return &abci.ResponseExtendVote{VoteExtension: []byte{}}, err
 		}
-		veBytes, err := h.GetVEBytesFromCurrPrices(ctx)
+
+		veBytes, err := h.GetVEBytes(ctx)
 		if err != nil {
 			h.logger.Error(
 				"failed to get vote extension bytes from current prices",
@@ -149,35 +160,46 @@ func (h *VoteExtensionHandler) VerifyVoteExtensionHandler() sdk.VerifyVoteExtens
 			return acceptResponse, nil
 		}
 
-		if err := ValidateVEMarketsAndPrices(
-			ctx,
-			h.pricesKeeper,
-			req.VoteExtension,
-			h.voteCodec,
-		); err != nil {
-			h.logger.Error(
-				"failed to decode and validate vote extension",
-				"height", req.Height,
-				"err", err,
-			)
-			return rejectResponse, err
-		}
-
-		return acceptResponse, nil
+		return h.ValidateVE(ctx, req.VoteExtension, req.Height)
 	}
 }
 
-func (h *VoteExtensionHandler) GetVEBytesFromCurrPrices(ctx sdk.Context) ([]byte, error) {
-	priceUpdates := h.getCurrentPricesForEachMarket(ctx)
-	if len(priceUpdates) == 0 {
-		return nil, fmt.Errorf("no valid prices")
+func (h *VoteExtensionHandler) ValidateVE(
+	ctx sdk.Context,
+	veBytes []byte,
+	blockHeight int64,
+) (resp *abci.ResponseVerifyVoteExtension, err error) {
+
+	if err := ValidateVEMarketsAndPrices(ctx, h.pricesKeeper, veBytes, h.voteCodec); err != nil {
+		h.logger.Error(
+			"failed to decode and validate vote extension",
+			"height", blockHeight,
+			"err", err,
+		)
+		return rejectResponse, err
 	}
 
-	// turn prices from daemon into a VE
-	voteExt, err := h.transformDaemonPricesToVE(priceUpdates)
-	if err != nil {
-		return nil, err
+	if err := ValidateVeSDaiConversionRate(ctx, h.rateLimitKeeper, veBytes, h.voteCodec); err != nil {
+		h.logger.Error(
+			"failed to validate sDAI conversion rate in vote extension",
+			"height", blockHeight,
+			"err", err,
+		)
+		return rejectResponse, err
 	}
+
+	return acceptResponse, nil
+}
+
+func (h *VoteExtensionHandler) GetVEBytes(ctx sdk.Context) ([]byte, error) {
+	priceUpdates := h.getCurrentPricesForEachMarket(ctx)
+	sDAIConversionRate := h.getSDAIPriceUpdate(ctx)
+
+	if len(priceUpdates) == 0 && sDAIConversionRate == "" {
+		return nil, fmt.Errorf("no prices or conversion rate available")
+	}
+
+	voteExt := h.createVE(priceUpdates, sDAIConversionRate)
 
 	veBytes, err := h.voteCodec.Encode(voteExt)
 	if err != nil {
@@ -187,9 +209,22 @@ func (h *VoteExtensionHandler) GetVEBytesFromCurrPrices(ctx sdk.Context) ([]byte
 	return veBytes, nil
 }
 
-func (h *VoteExtensionHandler) transformDaemonPricesToVE(
+func (h *VoteExtensionHandler) getSDAIPriceUpdate(ctx sdk.Context) string {
+
+	lastBlockUpdated, found := h.rateLimitKeeper.GetSDAILastBlockUpdated(ctx)
+	if found {
+		if ctx.BlockHeight()-lastBlockUpdated.Int64() < ratelimittypes.SDAI_UPDATE_BLOCK_DELAY {
+			return ""
+		}
+	}
+
+	return h.sDAIEventManager.GetSDaiPrice().ConversionRate
+}
+
+func (h *VoteExtensionHandler) createVE(
 	priceupdates map[uint32]VEPricePair,
-) (types.DaemonVoteExtension, error) {
+	sDAIConversionRate string,
+) types.DaemonVoteExtension {
 	var vePrices []types.PricePair
 
 	for marketId, priceUpdate := range priceupdates {
@@ -203,8 +238,9 @@ func (h *VoteExtensionHandler) transformDaemonPricesToVE(
 	}
 
 	return types.DaemonVoteExtension{
-		Prices: vePrices,
-	}, nil
+		Prices:             vePrices,
+		SDaiConversionRate: sDAIConversionRate,
+	}
 }
 
 func (h *VoteExtensionHandler) getEncodedPriceFromPriceUpdate(
@@ -256,7 +292,6 @@ func (h *VoteExtensionHandler) getCurrentPricesForEachMarket(
 			PnlPrice:  medianPnlPrice.Uint64(),
 		}
 	}
-
 	return vePrices
 }
 

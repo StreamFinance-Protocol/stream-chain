@@ -261,8 +261,8 @@ func TestIncrementCumulativeInsuranceFundDelta(t *testing.T) {
 			// Create liquidity tiers.
 			keepertest.CreateTestLiquidityTiers(t, ctx, ks.PerpetualsKeeper)
 
-			// Set up USDC asset in assets module.
-			err := keepertest.CreateUsdcAsset(ctx, ks.AssetsKeeper)
+			// Set up TDai asset in assets module.
+			err := keepertest.CreateTDaiAsset(ctx, ks.AssetsKeeper)
 			require.NoError(t, err)
 
 			// Create perpetuals.
@@ -278,6 +278,7 @@ func TestIncrementCumulativeInsuranceFundDelta(t *testing.T) {
 					p.Params.MarketType,
 					p.Params.DangerIndexPpm,
 					p.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
+					p.YieldIndex,
 				)
 				require.NoError(t, err)
 			}

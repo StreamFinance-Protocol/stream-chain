@@ -7,10 +7,13 @@ import (
 	"testing"
 
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/app/config"
+	"github.com/StreamFinance-Protocol/stream-chain/protocol/app/ve"
 
+	sdaiservertypes "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/server/types/sdaioracle"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/dtypes"
 	testapp "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/app"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/constants"
+	vetesting "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/ve"
 	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	sendingtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
@@ -59,7 +62,7 @@ func TestParallelAnteHandler_ClobAndOther(t *testing.T) {
 							Number: 0,
 						},
 						AssetPositions: []*satypes.AssetPosition{
-							&constants.Usdc_Asset_500_000,
+							&constants.TDai_Asset_500_000,
 						},
 					})
 				}
@@ -72,8 +75,8 @@ func TestParallelAnteHandler_ClobAndOther(t *testing.T) {
 					genesisState.Balances = append(genesisState.Balances, banktypes.Balance{
 						Address: sdktypes.AccAddress(simAccount.PubKey.Address()).String(),
 						Coins: sdktypes.NewCoins(sdktypes.NewInt64Coin(
-							constants.Usdc.Denom,
-							constants.Usdc_Asset_500_000.Quantums.BigInt().Int64(),
+							constants.TDai.Denom,
+							constants.TDai_Asset_500_000.Quantums.BigInt().Int64(),
 						)),
 					})
 				}
@@ -82,6 +85,21 @@ func TestParallelAnteHandler_ClobAndOther(t *testing.T) {
 		return genesis
 	}).WithNonDeterminismChecksEnabled(false).Build()
 	ctx := tApp.InitChain()
+
+	rate := sdaiservertypes.TestSDAIEventRequest.ConversionRate
+
+	_, extCommitBz, err := vetesting.GetInjectedExtendedCommitInfoForTestApp(
+		&tApp.App.ConsumerKeeper,
+		ctx,
+		map[uint32]ve.VEPricePair{},
+		rate,
+		tApp.GetHeader().Height,
+	)
+	require.NoError(t, err)
+
+	ctx = tApp.AdvanceToBlock(2, testapp.AdvanceToBlockOptions{
+		DeliverTxsOverride: [][]byte{extCommitBz},
+	})
 
 	accounts := make([]sdktypes.AccountI, len(simAccounts))
 	for i, simAccount := range simAccounts {
@@ -98,13 +116,14 @@ func TestParallelAnteHandler_ClobAndOther(t *testing.T) {
 	// Start a block advancement thread.
 	wg.Add(1)
 	blockHeight := atomic.Uint64{}
-	blockHeight.Store(1)
+	blockHeight.Store(2)
+
 	go func() {
 		defer wg.Done()
 		defer func() {
 			blockLimitReached.Store(true)
 		}()
-		for i := uint32(2); i < 50; i++ {
+		for i := uint32(3); i < 50; i++ {
 			tApp.AdvanceToBlock(i, testapp.AdvanceToBlockOptions{})
 			blockHeight.Store(uint64(i))
 		}
@@ -133,8 +152,8 @@ func TestParallelAnteHandler_ClobAndOther(t *testing.T) {
 								Number: 0,
 							},
 							Recipient: simAccount.Address.String(),
-							AssetId:   constants.Usdc.Id,
-							Quantums:  constants.Usdc_Asset_1.Quantums.BigInt().Uint64(),
+							AssetId:   constants.TDai.Id,
+							Quantums:  constants.TDai_Asset_1.Quantums.BigInt().Uint64(),
 						},
 					},
 					constants.TestFeeCoins_5Cents,
@@ -261,10 +280,10 @@ func TestParallelAnteHandler_ClobAndOther(t *testing.T) {
 		require.Equal(
 			t,
 			[]*satypes.AssetPosition{{
-				AssetId: constants.Usdc.Id,
+				AssetId: constants.TDai.Id,
 				Quantums: dtypes.NewIntFromUint64(
-					constants.Usdc_Asset_500_000.Quantums.BigInt().Uint64() -
-						transferCounts[i].Load()*constants.Usdc_Asset_1.Quantums.BigInt().Uint64()),
+					constants.TDai_Asset_500_000.Quantums.BigInt().Uint64() -
+						transferCounts[i].Load()*constants.TDai_Asset_1.Quantums.BigInt().Uint64()),
 			}},
 			subAccount.AssetPositions,
 		)

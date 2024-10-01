@@ -213,7 +213,7 @@ func (k Keeper) GetSubaccountPriority(
 
 	_, marketPricesMap, perpetualsMap, liquidityTiersMap := k.FetchInformationForLiquidations(ctx)
 
-	isLiquidatable, _, priority, err = k.GetSubaccountCollateralizationInfo(subaccount, marketPricesMap, perpetualsMap, liquidityTiersMap)
+	isLiquidatable, _, priority, err = k.GetSubaccountCollateralizationInfo(ctx, subaccount, marketPricesMap, perpetualsMap, liquidityTiersMap)
 
 	return isLiquidatable, priority, err
 
@@ -1115,8 +1115,9 @@ func (k Keeper) SimulatePriorityWithClosedPosition(
 func deepCopySubaccount(subaccount satypes.Subaccount) satypes.Subaccount {
 
 	copySubaccount := satypes.Subaccount{
-		Id:            subaccount.Id,
-		MarginEnabled: subaccount.MarginEnabled,
+		Id:              subaccount.Id,
+		MarginEnabled:   subaccount.MarginEnabled,
+		AssetYieldIndex: subaccount.AssetYieldIndex,
 	}
 
 	// Deep copy AssetPositions if not nil
@@ -1186,18 +1187,18 @@ func (k Keeper) SimulateClosePerpetualPosition(
 	}
 	bigNetCollateralQuoteQuantums := perpkeeper.GetNetNotionalInQuoteQuantums(perpetual, price, position.GetBigQuantums())
 
-	err = UpdateUSDCPosition(&subaccount, bigNetCollateralQuoteQuantums)
+	err = UpdateTDaiPosition(&subaccount, bigNetCollateralQuoteQuantums)
 	if err != nil {
 		return satypes.Subaccount{}, err
 	}
 	return subaccount, nil
 }
 
-func UpdateUSDCPosition(subaccount *satypes.Subaccount, quantumsDelta *big.Int) (err error) {
+func UpdateTDaiPosition(subaccount *satypes.Subaccount, quantumsDelta *big.Int) (err error) {
 
 	assetPosition := subaccount.AssetPositions[0]
-	if assetPosition.AssetId != assetstypes.AssetUsdc.Id {
-		return errors.New("first asset position must be USDC")
+	if assetPosition.AssetId != assetstypes.AssetTDai.Id {
+		return errors.New("first asset position must be TDai")
 	}
 
 	assetPosition.Quantums = dtypes.NewIntFromBigInt(new(big.Int).Add(assetPosition.Quantums.BigInt(), quantumsDelta))

@@ -1,15 +1,22 @@
 package keeper_test
 
 import (
-	"errors"
 	"math/big"
 	"testing"
+
+	sdkmath "cosmossdk.io/math"
+	sdaiservertypes "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/server/types/sdaioracle"
+	vetesting "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/ve"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+
+	"errors"
 
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/indexer/indexer_manager"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/mocks"
 	keepertest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/keeper"
 	perptest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/perpetuals"
-	vetesting "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/ve"
 
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/app/ve"
 	testapp "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/app"
@@ -21,8 +28,10 @@ import (
 	feetypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	prices "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
+	ratelimitkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/keeper"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
 	"github.com/cometbft/cometbft/types"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
 
@@ -94,7 +103,7 @@ func TestChangePriceVE_CauseNegativeTNC(t *testing.T) {
 					&genesis,
 					func(genesisState *assettypes.GenesisState) {
 						genesisState.Assets = []assettypes.Asset{
-							*constants.Usdc,
+							*constants.TDai,
 						}
 					},
 				)
@@ -155,6 +164,23 @@ func TestChangePriceVE_CauseNegativeTNC(t *testing.T) {
 				return genesis
 			}).Build()
 
+			rateString := sdaiservertypes.TestSDAIEventRequest.ConversionRate
+			rate, conversionErr := ratelimitkeeper.ConvertStringToBigInt(rateString)
+
+			require.NoError(t, conversionErr)
+
+			tApp.App.RatelimitKeeper.SetSDAIPrice(tApp.App.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.App.RatelimitKeeper.SetAssetYieldIndex(tApp.App.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+
+			tApp.CrashingApp.RatelimitKeeper.SetSDAIPrice(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.CrashingApp.RatelimitKeeper.SetAssetYieldIndex(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+
+			tApp.NoCheckTxApp.RatelimitKeeper.SetSDAIPrice(tApp.NoCheckTxApp.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.NoCheckTxApp.RatelimitKeeper.SetAssetYieldIndex(tApp.NoCheckTxApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+
+			tApp.ParallelApp.RatelimitKeeper.SetSDAIPrice(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.ParallelApp.RatelimitKeeper.SetAssetYieldIndex(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+
 			ctx := tApp.AdvanceToBlock(2, testapp.AdvanceToBlockOptions{})
 
 			// Add the price update.
@@ -163,6 +189,7 @@ func TestChangePriceVE_CauseNegativeTNC(t *testing.T) {
 				&tApp.App.ConsumerKeeper,
 				ctx,
 				tc.priceUpdate,
+				"",
 				tApp.GetHeader().Height,
 			)
 			require.NoError(t, err)
@@ -204,14 +231,14 @@ func TestGetSubaccountCollateralizationInfo(t *testing.T) {
 				"0: Perpetual does not exist",
 			),
 		},
-		"Non USDC asset in subaccount returns error": {
-			subaccount: constants.Carl_Num0_1BTC_short_50000_non_USDC,
+		"Non TDai asset in subaccount returns error": {
+			subaccount: constants.Carl_Num0_1BTC_short_50000_non_TDai,
 			perpetuals: []perptypes.Perpetual{
 				constants.BtcUsd_NoMarginRequirement,
 			},
 			feeParams: constants.PerpetualFeeParams,
 			expectedError: errors.New(
-				"Asset 1 is not supported: Not Implemented: Multi-Collateral",
+				"Not Implemented: Multi-Collateral",
 			),
 		},
 	}
@@ -220,7 +247,17 @@ func TestGetSubaccountCollateralizationInfo(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			memClob := memclob.NewMemClobPriceTimePriority(false)
 			mockBankKeeper := &mocks.BankKeeper{}
+			mockBankKeeper.On(
+				"GetBalance",
+				mock.Anything,
+				mock.Anything,
+				constants.TDai.Denom,
+			).Return(
+				sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int))),
+			)
+
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, mockBankKeeper, indexer_manager.NewIndexerEventManagerNoop())
+			ks.RatelimitKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
 
 			ctx := ks.Ctx.WithIsCheckTx(true)
 			// Create the default markets.
@@ -231,11 +268,11 @@ func TestGetSubaccountCollateralizationInfo(t *testing.T) {
 
 			require.NoError(t, ks.FeeTiersKeeper.SetPerpetualFeeParams(ctx, tc.feeParams))
 
-			// Set up USDC asset in assets module.
-			err := keepertest.CreateUsdcAsset(ctx, ks.AssetsKeeper)
+			// Set up TDai asset in assets module.
+			err := keepertest.CreateTDaiAsset(ctx, ks.AssetsKeeper)
 			require.NoError(t, err)
 
-			err = keepertest.CreateNonUSDCAsset(ctx, ks.AssetsKeeper)
+			err = keepertest.CreateNonTDaiAsset(ctx, ks.AssetsKeeper)
 			require.NoError(t, err)
 
 			// Create all perpetuals.
@@ -251,6 +288,7 @@ func TestGetSubaccountCollateralizationInfo(t *testing.T) {
 					p.Params.MarketType,
 					p.Params.DangerIndexPpm,
 					p.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
+					"0/1",
 				)
 				require.NoError(t, err)
 			}
@@ -270,6 +308,7 @@ func TestGetSubaccountCollateralizationInfo(t *testing.T) {
 			)
 			_, marketPriceMap, perpetualMap, liquidityTierMap := ks.ClobKeeper.FetchInformationForLiquidations(ctx)
 			isLiquidatable, hasNegativeTnc, liquidationPriority, err := ks.ClobKeeper.GetSubaccountCollateralizationInfo(
+				ctx,
 				tc.subaccount,
 				marketPriceMap,
 				perpetualMap,

@@ -25,6 +25,7 @@ import {
   TransferFromDatabase,
   TransferType,
   parentSubaccountHelpers,
+  YieldParamsFromDatabase,
 } from '@dydxprotocol-indexer/postgres';
 import { OrderbookLevels, PriceLevel } from '@dydxprotocol-indexer/redis';
 import { RedisOrder } from '@dydxprotocol-indexer/v4-protos';
@@ -55,7 +56,9 @@ import {
   SubaccountResponseObject,
   TradeResponseObject,
   TransferResponseObject,
+  YieldParamsResponseObject,
 } from '../types';
+import { oneAssetYieldIndex } from '@dydxprotocol-indexer/postgres/build/__tests__/helpers/constants';
 
 /**
  * @description Converts perpetual position objects from the database into response objects.
@@ -101,6 +104,7 @@ export function perpetualPositionToResponseObject(
     sumOpen: position.sumOpen,
     sumClose: position.sumClose,
     netFunding: netFunding.toFixed(),
+    perpYieldIndex: position.perpYieldIndex,
   };
 }
 
@@ -323,6 +327,7 @@ export function subaccountToResponseObject({
     assetPositions,
     // TODO(DEC-687): Track `marginEnabled` for subaccounts.
     marginEnabled: true,
+    assetYieldIndex: subaccount.assetYieldIndex,
   };
 }
 
@@ -362,6 +367,7 @@ export function perpetualMarketToResponseObject(
     openInterestLowerCap: liquidityTier.openInterestLowerCap,
     openInterestUpperCap: liquidityTier.openInterestUpperCap,
     baseOpenInterest: perpetualMarket.baseOpenInterest,
+    perpYieldIndex: perpetualMarket.perpYieldIndex,
   };
 }
 
@@ -529,4 +535,16 @@ export function candlesToSparklineResponseObject(
       return accumulator;
     }, response,
   );
+}
+
+export function yieldParamsToResponseObject(
+  yieldParams: YieldParamsFromDatabase,
+): YieldParamsResponseObject {
+  return {
+    id: yieldParams.id,
+    sDAIPrice: yieldParams.sDAIPrice,
+    assetYieldIndex: yieldParams.assetYieldIndex,
+    createdAt: yieldParams.createdAt,
+    createdAtHeight: yieldParams.createdAtHeight,
+  }
 }

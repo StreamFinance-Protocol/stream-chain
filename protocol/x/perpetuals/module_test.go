@@ -278,7 +278,8 @@ func TestAppModule_InitExportGenesis(t *testing.T) {
 				 "market_type": "PERPETUAL_MARKET_TYPE_CROSS",
 				 "danger_index_ppm": 0,
 				 "isolated_market_max_cumulative_insurance_fund_delta_per_block": 1000000
-			  }
+			  },
+			  "yield_index":"0/1"
 		   }
 		],
 		"liquidity_tiers":[
@@ -324,7 +325,8 @@ func TestAppModule_InitExportGenesis(t *testing.T) {
 			  },
 			  "funding_index":"0",
 			  "open_interest":"0",
-			  "last_funding_rate":"0"
+			  "last_funding_rate":"0",
+			  "yield_index":"0/1"
 		   }
 		],
 		"liquidity_tiers":[

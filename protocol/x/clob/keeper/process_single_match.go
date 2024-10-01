@@ -379,7 +379,7 @@ func (k Keeper) persistMatchedOrders(
 		{
 			AssetUpdates: []satypes.AssetUpdate{
 				{
-					AssetId:          assettypes.AssetUsdc.Id,
+					AssetId:          assettypes.AssetTDai.Id,
 					BigQuantumsDelta: bigTakerQuoteBalanceDelta,
 				},
 			},
@@ -395,7 +395,7 @@ func (k Keeper) persistMatchedOrders(
 		{
 			AssetUpdates: []satypes.AssetUpdate{
 				{
-					AssetId:          assettypes.AssetUsdc.Id,
+					AssetId:          assettypes.AssetTDai.Id,
 					BigQuantumsDelta: bigMakerQuoteBalanceDelta,
 				},
 			},
@@ -455,7 +455,7 @@ func (k Keeper) persistMatchedOrders(
 	bigTotalFeeQuoteQuantums := new(big.Int).Add(bigTakerFeeQuoteQuantums, bigMakerFeeQuoteQuantums)
 	if err := k.subaccountsKeeper.TransferFeesToFeeCollectorModule(
 		ctx,
-		assettypes.AssetUsdc.Id,
+		assettypes.AssetTDai.Id,
 		bigTotalFeeQuoteQuantums,
 		perpetualId,
 	); err != nil {

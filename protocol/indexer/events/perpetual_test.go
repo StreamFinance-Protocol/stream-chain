@@ -15,6 +15,7 @@ func TestNewUpdatePerpetualEventV1_Success(t *testing.T) {
 		2,
 		1000000,
 		"0",
+		"0/1",
 	)
 	expectedUpdatePerpetualEventV1Proto := &UpdatePerpetualEventV1{
 		Id:               5,
@@ -24,6 +25,7 @@ func TestNewUpdatePerpetualEventV1_Success(t *testing.T) {
 		LiquidityTier:    2,
 		DangerIndexPpm:   1000000,
 		IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: "0",
+		PerpYieldIndex: "0/1",
 	}
 	require.Equal(t, expectedUpdatePerpetualEventV1Proto, updatePerpetualEventV1)
 }

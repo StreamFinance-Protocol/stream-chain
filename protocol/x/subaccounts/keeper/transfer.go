@@ -36,14 +36,14 @@ func (k Keeper) getValidSubaccountUpdatesForTransfer(
 				SubaccountId: subaccountId,
 				AssetUpdates: []types.AssetUpdate{
 					{
-						AssetId:          assettypes.AssetUsdc.Id,
+						AssetId:          assettypes.AssetTDai.Id,
 						BigQuantumsDelta: bigBalanceDelta,
 					},
 				},
 			},
 		}
 	} else {
-		// TODO(DEC-715): Support non-USDC assets.
+		// TODO(DEC-715): Support non-TDai assets.
 		return nil, types.ErrAssetTransferThroughBankNotImplemented
 	}
 
@@ -93,8 +93,8 @@ func (k Keeper) DepositFundsFromAccountToSubaccount(
 	assetId uint32,
 	quantums *big.Int,
 ) error {
-	// TODO(DEC-715): Support non-USDC assets.
-	if assetId != assettypes.AssetUsdc.Id {
+	// TODO(DEC-715): Support non-TDai assets.
+	if assetId != assettypes.AssetTDai.Id {
 		return types.ErrAssetTransferThroughBankNotImplemented
 	}
 
@@ -156,8 +156,8 @@ func (k Keeper) WithdrawFundsFromSubaccountToAccount(
 	assetId uint32,
 	quantums *big.Int,
 ) error {
-	// TODO(DEC-715): Support non-USDC assets.
-	if assetId != assettypes.AssetUsdc.Id {
+	// TODO(DEC-715): Support non-TDai assets.
+	if assetId != assettypes.AssetTDai.Id {
 		return types.ErrAssetTransferThroughBankNotImplemented
 	}
 
@@ -218,8 +218,8 @@ func (k Keeper) TransferFeesToFeeCollectorModule(
 	quantums *big.Int,
 	perpetualId uint32,
 ) error {
-	// TODO(DEC-715): Support non-USDC assets.
-	if assetId != assettypes.AssetUsdc.Id {
+	// TODO(DEC-715): Support non-TDai assets.
+	if assetId != assettypes.AssetTDai.Id {
 		return types.ErrAssetTransferThroughBankNotImplemented
 	}
 
@@ -282,11 +282,11 @@ func (k Keeper) TransferInsuranceFundPayments(
 
 	_, coinToTransfer, err := k.assetsKeeper.ConvertAssetToCoin(
 		ctx,
-		assettypes.AssetUsdc.Id,
+		assettypes.AssetTDai.Id,
 		new(big.Int).Abs(insuranceFundDelta),
 	)
 	if err != nil {
-		// Panic if USDC does not exist.
+		// Panic if TDai does not exist.
 		panic(err)
 	}
 
@@ -330,11 +330,11 @@ func (k Keeper) TransferLiquidityFee(
 
 	_, coinToTransfer, err := k.assetsKeeper.ConvertAssetToCoin(
 		ctx,
-		assettypes.AssetUsdc.Id,
+		assettypes.AssetTDai.Id,
 		new(big.Int).Abs(liquidityFeeQuoteQuantums),
 	)
 	if err != nil {
-		// Panic if USDC does not exist.
+		// Panic if TDai does not exist.
 		panic(err)
 	}
 
@@ -368,11 +368,11 @@ func (k Keeper) TransferValidatorFee(
 
 	_, coinToTransfer, err := k.assetsKeeper.ConvertAssetToCoin(
 		ctx,
-		assettypes.AssetUsdc.Id,
+		assettypes.AssetTDai.Id,
 		new(big.Int).Abs(validatorFeeQuoteQuantums),
 	)
 	if err != nil {
-		// Panic if USDC does not exist.
+		// Panic if TDai does not exist.
 		panic(err)
 	}
 
@@ -398,8 +398,8 @@ func (k Keeper) TransferFundsFromSubaccountToSubaccount(
 	assetId uint32,
 	quantums *big.Int,
 ) error {
-	// TODO(DEC-715): Support non-USDC assets.
-	if assetId != assettypes.AssetUsdc.Id {
+	// TODO(DEC-715): Support non-TDai assets.
+	if assetId != assettypes.AssetTDai.Id {
 		return types.ErrAssetTransferThroughBankNotImplemented
 	}
 
@@ -408,7 +408,7 @@ func (k Keeper) TransferFundsFromSubaccountToSubaccount(
 			SubaccountId: senderSubaccountId,
 			AssetUpdates: []types.AssetUpdate{
 				{
-					AssetId:          assettypes.AssetUsdc.Id,
+					AssetId:          assettypes.AssetTDai.Id,
 					BigQuantumsDelta: new(big.Int).Neg(quantums),
 				},
 			},
@@ -417,7 +417,7 @@ func (k Keeper) TransferFundsFromSubaccountToSubaccount(
 			SubaccountId: recipientSubaccountId,
 			AssetUpdates: []types.AssetUpdate{
 				{
-					AssetId:          assettypes.AssetUsdc.Id,
+					AssetId:          assettypes.AssetTDai.Id,
 					BigQuantumsDelta: new(big.Int).Set(quantums),
 				},
 			},

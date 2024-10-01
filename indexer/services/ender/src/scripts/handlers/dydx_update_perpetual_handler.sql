@@ -19,6 +19,7 @@ BEGIN
     perpetual_market_record."liquidityTierId" = (event_data->'liquidityTier')::integer;
     perpetual_market_record."dangerIndexPpm" = (event_data->'dangerIndexPpm')::integer;
     perpetual_market_record."isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock" = (event_data->>'isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock')::bigint;
+    perpetual_market_record."perpYieldIndex" = jsonb_extract_path_text(event_data, 'perpYieldIndex');
 
     UPDATE perpetual_markets
     SET
@@ -27,7 +28,9 @@ BEGIN
         "atomicResolution" = perpetual_market_record."atomicResolution",
         "liquidityTierId" = perpetual_market_record."liquidityTierId",
         "dangerIndexPpm" = perpetual_market_record."dangerIndexPpm",
-        "isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock" = perpetual_market_record."isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock"
+        "isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock" = perpetual_market_record."isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock",
+        "perpYieldIndex" = perpetual_market_record."perpYieldIndex"
+
     WHERE "id" = perpetual_market_id
     RETURNING * INTO perpetual_market_record;
 

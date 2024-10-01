@@ -3,14 +3,13 @@ package prepare_test
 import (
 	"errors"
 	"fmt"
+	"math/big"
 	"testing"
 
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/app/prepare"
-	ve "github.com/StreamFinance-Protocol/stream-chain/protocol/app/ve"
 	vecodec "github.com/StreamFinance-Protocol/stream-chain/protocol/app/ve/codec"
 	vetypes "github.com/StreamFinance-Protocol/stream-chain/protocol/app/ve/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/mocks"
-	prepareutils "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/app"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/constants"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/encoding"
 	keepertest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/keeper"
@@ -199,7 +198,7 @@ func TestPrepareProposalHandler(t *testing.T) {
 			pricesParamsResp:              constants.TestMarketParams,
 			pricesMarketPriceFromByesResp: constants.ValidMarketPriceUpdates[0],
 
-			expectedPrices: constants.ValidVEPrice,
+			expectedPrices: constants.ValidVEPrices,
 
 			expectedTxs: [][]byte{
 				{1, 2, 3, 4},               // order.
@@ -213,7 +212,8 @@ func TestPrepareProposalHandler(t *testing.T) {
 				valVoteInfo, err := vetesting.CreateSignedExtendedVoteInfo(
 					vetesting.NewDefaultSignedVeInfo(
 						constants.AliceConsAddress,
-						constants.ValidVEPrice,
+						constants.ValidVEPrices,
+						"",
 					),
 				)
 
@@ -246,7 +246,7 @@ func TestPrepareProposalHandler(t *testing.T) {
 			pricesParamsResp:              constants.TestMarketParams,
 			pricesMarketPriceFromByesResp: constants.ValidMarketPriceUpdates[0],
 
-			expectedPrices: constants.ValidVEPrice,
+			expectedPrices: constants.ValidVEPrices,
 
 			clobResp:    &clobtypes.MsgProposedOperations{},
 			clobEncoder: passingTxEncoderFour,
@@ -262,7 +262,8 @@ func TestPrepareProposalHandler(t *testing.T) {
 				valVoteInfo, err := vetesting.CreateSignedExtendedVoteInfo(
 					vetesting.NewDefaultSignedVeInfo(
 						constants.AliceConsAddress,
-						constants.ValidVEPrice,
+						constants.ValidVEPrices,
+						"",
 					),
 				)
 
@@ -326,13 +327,14 @@ func TestPrepareProposalHandler(t *testing.T) {
 			veEnabled: true,
 			height:    3,
 
-			expectedPrices: constants.ValidVEPrice,
+			expectedPrices: constants.ValidVEPrices,
 
 			request: func() *cometabci.RequestPrepareProposal {
 				valVoteInfo, err := vetesting.CreateSignedExtendedVoteInfo(
 					vetesting.NewDefaultSignedVeInfo(
 						constants.AliceConsAddress,
-						constants.ValidVEPrice,
+						constants.ValidVEPrices,
+						"",
 					),
 				)
 
@@ -372,7 +374,7 @@ func TestPrepareProposalHandler(t *testing.T) {
 			veEnabled: true,
 			height:    3,
 
-			expectedPrices: constants.ValidVEPrice,
+			expectedPrices: constants.ValidVEPrices,
 
 			request: func() *cometabci.RequestPrepareProposal {
 				proposal := [][]byte{
@@ -383,7 +385,8 @@ func TestPrepareProposalHandler(t *testing.T) {
 				valVoteInfo, err := vetesting.CreateSignedExtendedVoteInfo(
 					vetesting.NewDefaultSignedVeInfo(
 						constants.AliceConsAddress,
-						constants.ValidVEPrice,
+						constants.ValidVEPrices,
+						"",
 					),
 				)
 
@@ -425,7 +428,7 @@ func TestPrepareProposalHandler(t *testing.T) {
 			veEnabled: true,
 			height:    3,
 
-			expectedPrices: constants.ValidVEPrice,
+			expectedPrices: constants.ValidVEPrices,
 
 			request: func() *cometabci.RequestPrepareProposal {
 				proposal := [][]byte{
@@ -436,7 +439,8 @@ func TestPrepareProposalHandler(t *testing.T) {
 				valVoteInfoAlice, err := vetesting.CreateSignedExtendedVoteInfo(
 					vetesting.NewDefaultSignedVeInfo(
 						constants.AliceConsAddress,
-						constants.ValidVEPrice,
+						constants.ValidVEPrices,
+						"",
 					),
 				)
 				require.NoError(t, err)
@@ -444,7 +448,8 @@ func TestPrepareProposalHandler(t *testing.T) {
 				valVoteInfoBob, err := vetesting.CreateSignedExtendedVoteInfo(
 					vetesting.NewDefaultSignedVeInfo(
 						constants.BobConsAddress,
-						constants.ValidVEPrice,
+						constants.ValidVEPrices,
+						"",
 					),
 				)
 
@@ -486,7 +491,7 @@ func TestPrepareProposalHandler(t *testing.T) {
 			veEnabled: true,
 			height:    3,
 
-			expectedPrices: constants.ValidVEPrice,
+			expectedPrices: constants.ValidVEPrices,
 
 			request: func() *cometabci.RequestPrepareProposal {
 				proposal := [][]byte{
@@ -497,7 +502,8 @@ func TestPrepareProposalHandler(t *testing.T) {
 				valVoteInfoAlice, err := vetesting.CreateSignedExtendedVoteInfo(
 					vetesting.NewDefaultSignedVeInfo(
 						constants.AliceConsAddress,
-						constants.ValidVEPrice,
+						constants.ValidVEPrices,
+						"",
 					),
 				)
 				require.NoError(t, err)
@@ -505,7 +511,8 @@ func TestPrepareProposalHandler(t *testing.T) {
 				valVoteInfoBob, err := vetesting.CreateSignedExtendedVoteInfo(
 					vetesting.NewDefaultSignedVeInfo(
 						constants.BobConsAddress,
-						constants.ValidVEPrice,
+						constants.ValidVEPrices,
+						"",
 					),
 				)
 
@@ -544,9 +551,9 @@ func TestPrepareProposalHandler(t *testing.T) {
 			)
 
 			// necessary mock keepers
-			mPricesKeeper, mClobKeeper, mPerpKeeper := buildMockKeepers()
+			mPricesKeeper, mClobKeeper, mPerpKeeper, mRatelimitKeeper := buildMockKeepers()
 
-			setMockResponses(mPricesKeeper, mClobKeeper, mPerpKeeper, tc)
+			setMockResponses(mPricesKeeper, mRatelimitKeeper, mClobKeeper, mPerpKeeper, tc)
 
 			ctx, _, _, _, _, _ := keepertest.PricesKeepers(t)
 
@@ -559,9 +566,9 @@ func TestPrepareProposalHandler(t *testing.T) {
 				mClobKeeper,
 				mPerpKeeper,
 				mPricesKeeper,
+				mRatelimitKeeper,
 				votecodec,
 				extcodec,
-				prepareutils.NoOpValidateVoteExtensionsFn,
 			)
 
 			req := tc.request()
@@ -633,6 +640,12 @@ func TestPrepareProposalHandler_OtherTxs(t *testing.T) {
 			mockPricesKeeper.On("GetAllMarketParams", mock.Anything).
 				Return(constants.ValidEmptyMarketParams)
 
+			mockRatelimitKeeper := mocks.VoteExtensionRateLimitKeeper{}
+			mockRatelimitKeeper.On("GetSDAILastBlockUpdated", mock.Anything).
+				Return(new(big.Int), false)
+			mockRatelimitKeeper.On("GetSDAIPrice", mock.Anything).
+				Return(new(big.Int), false)
+
 			mockPerpKeeper := mocks.PreparePerpetualsKeeper{}
 			mockPerpKeeper.On("GetAddPremiumVotes", mock.Anything).
 				Return(constants.ValidMsgAddPremiumVotes)
@@ -656,9 +669,9 @@ func TestPrepareProposalHandler_OtherTxs(t *testing.T) {
 				&mockClobKeeper,
 				&mockPerpKeeper,
 				&mockPricesKeeper,
+				&mockRatelimitKeeper,
 				vecodec.NewDefaultVoteExtensionCodec(),
 				vecodec.NewDefaultExtendedCommitCodec(),
-				ve.NewValidateVEConsensusInfo(&mockConsumerKeeper),
 			)
 
 			req := cometabci.RequestPrepareProposal{
@@ -874,16 +887,18 @@ func createRequestPrepareProposal(
 	}
 }
 
-func buildMockKeepers() (*mocks.PreBlockExecPricesKeeper, *mocks.PrepareClobKeeper, *mocks.PreparePerpetualsKeeper) {
+func buildMockKeepers() (*mocks.PreBlockExecPricesKeeper, *mocks.PrepareClobKeeper, *mocks.PreparePerpetualsKeeper, *mocks.VoteExtensionRateLimitKeeper) {
 	mPricesk := &mocks.PreBlockExecPricesKeeper{}
 	mClobk := &mocks.PrepareClobKeeper{}
 	mPerpk2 := &mocks.PreparePerpetualsKeeper{}
+	mRatelimitk := &mocks.VoteExtensionRateLimitKeeper{}
 
-	return mPricesk, mClobk, mPerpk2
+	return mPricesk, mClobk, mPerpk2, mRatelimitk
 }
 
 func setMockResponses(
 	mPricesKeeper *mocks.PreBlockExecPricesKeeper,
+	mRatelimitKeeper *mocks.VoteExtensionRateLimitKeeper,
 	mClobKeeper *mocks.PrepareClobKeeper,
 	mPerpKeeper *mocks.PreparePerpetualsKeeper,
 	tc PerpareProposalHandlerTC,
@@ -896,6 +911,10 @@ func setMockResponses(
 		Return(tc.fundingResp)
 	mClobKeeper.On("GetOperations", mock.Anything, mock.Anything).
 		Return(tc.clobResp)
+	mRatelimitKeeper.On("GetSDAILastBlockUpdated", mock.Anything).
+		Return(new(big.Int), false)
+	mRatelimitKeeper.On("GetSDAIPrice", mock.Anything).
+		Return(new(big.Int), false)
 }
 
 func getResponseTransactionsWithoutExtInfo(txs [][]byte) [][]byte {

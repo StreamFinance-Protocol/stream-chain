@@ -140,37 +140,46 @@ func (k Keeper) GetInsuranceFundBalanceInQuoteQuantums(
 ) (
 	balance *big.Int,
 ) {
-	usdcAsset, exists := k.assetsKeeper.GetAsset(ctx, assettypes.AssetUsdc.Id)
+	tdaiAsset, exists := k.assetsKeeper.GetAsset(ctx, assettypes.AssetTDai.Id)
 	if !exists {
-		panic("GetInsuranceFundBalanceInQuoteQuantums: Usdc asset not found in state")
+		panic("GetInsuranceFundBalanceInQuoteQuantums: TDai asset not found in state")
 	}
 	insuranceFundAddr, err := k.perpetualsKeeper.GetInsuranceFundModuleAddress(ctx, perpetualId)
 	if err != nil {
 		return nil
 	}
-	insuranceFundBalance := k.bankKeeper.GetBalance(
+	insuranceFundBalanceCoin := k.bankKeeper.GetBalance(
 		ctx,
 		insuranceFundAddr,
-		usdcAsset.Denom,
+		tdaiAsset.Denom,
 	)
 
-	// Return as big.Int.
-	return insuranceFundBalance.Amount.BigInt()
+	balance, _, err = k.assetsKeeper.ConvertCoinToAsset(ctx, tdaiAsset.Id, insuranceFundBalanceCoin)
+
+	if err != nil {
+		return nil
+	}
+
+	return balance
 }
 
 func (k Keeper) GetCrossInsuranceFundBalance(ctx sdk.Context) (balance *big.Int) {
-	usdcAsset, exists := k.assetsKeeper.GetAsset(ctx, assettypes.AssetUsdc.Id)
+	tdaiAsset, exists := k.assetsKeeper.GetAsset(ctx, assettypes.AssetTDai.Id)
 	if !exists {
-		panic("GetCrossInsuranceFundBalance: Usdc asset not found in state")
+		panic("GetCrossInsuranceFundBalance: TDai asset not found in state")
 	}
-	insuranceFundBalance := k.bankKeeper.GetBalance(
+	insuranceFundBalanceCoin := k.bankKeeper.GetBalance(
 		ctx,
 		perptypes.InsuranceFundModuleAddress,
-		usdcAsset.Denom,
+		tdaiAsset.Denom,
 	)
 
-	// Return as big.Int.
-	return insuranceFundBalance.Amount.BigInt()
+	balance, _, err := k.assetsKeeper.ConvertCoinToAsset(ctx, tdaiAsset.Id, insuranceFundBalanceCoin)
+	if err != nil {
+		return nil
+	}
+
+	return balance
 }
 
 // CanDeleverageSubaccount returns true if a subaccount can be deleveraged.
@@ -559,7 +568,7 @@ func (k Keeper) ProcessDeleveraging(
 		{
 			AssetUpdates: []satypes.AssetUpdate{
 				{
-					AssetId:          assettypes.AssetUsdc.Id,
+					AssetId:          assettypes.AssetTDai.Id,
 					BigQuantumsDelta: deleveragedSubaccountQuoteBalanceDelta,
 				},
 			},
@@ -575,7 +584,7 @@ func (k Keeper) ProcessDeleveraging(
 		{
 			AssetUpdates: []satypes.AssetUpdate{
 				{
-					AssetId:          assettypes.AssetUsdc.Id,
+					AssetId:          assettypes.AssetTDai.Id,
 					BigQuantumsDelta: offsettingSubaccountQuoteBalanceDelta,
 				},
 			},

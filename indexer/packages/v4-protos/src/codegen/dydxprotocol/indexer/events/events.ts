@@ -414,11 +414,11 @@ export interface OrderFillEventV1 {
   /** Fill amount in base quantums. */
 
   fillAmount: Long;
-  /** Maker fee in USDC quantums. */
+  /** Maker fee in TDAI quantums. */
 
   makerFee: Long;
   /**
-   * Taker fee in USDC quantums. If the taker order is a liquidation, then this
+   * Taker fee in TDAI quantums. If the taker order is a liquidation, then this
    * represents the special liquidation fee, not the standard taker fee.
    */
 
@@ -443,11 +443,11 @@ export interface OrderFillEventV1SDKType {
   /** Fill amount in base quantums. */
 
   fill_amount: Long;
-  /** Maker fee in USDC quantums. */
+  /** Maker fee in TDAI quantums. */
 
   maker_fee: Long;
   /**
-   * Taker fee in USDC quantums. If the taker order is a liquidation, then this
+   * Taker fee in TDAI quantums. If the taker order is a liquidation, then this
    * represents the special liquidation fee, not the standard taker fee.
    */
 
@@ -610,6 +610,7 @@ export interface SubaccountUpdateEventV1 {
   subaccountId?: IndexerSubaccountId;
   updatedPerpetualPositions: IndexerPerpetualPosition[];
   updatedAssetPositions: IndexerAssetPosition[];
+  yieldIndex: string;
 }
 /**
  * SubaccountUpdateEvent message contains information about an update to a
@@ -624,6 +625,7 @@ export interface SubaccountUpdateEventV1SDKType {
   subaccount_id?: IndexerSubaccountIdSDKType;
   updated_perpetual_positions: IndexerPerpetualPositionSDKType[];
   updated_asset_positions: IndexerAssetPositionSDKType[];
+  yield_index: string;
 }
 /**
  * StatefulOrderEvent message contains information about a change to a stateful
@@ -732,7 +734,7 @@ export interface AssetCreateEventV1 {
   /** Unique, sequentially-generated. */
   id: number;
   /**
-   * The human readable symbol of the `Asset` (e.g. `USDC`, `ATOM`).
+   * The human readable symbol of the `Asset` (e.g. `TDAI`, `ATOM`).
    * Must be uppercase, unique and correspond to the canonical symbol of the
    * full coin.
    */
@@ -766,7 +768,7 @@ export interface AssetCreateEventV1SDKType {
   /** Unique, sequentially-generated. */
   id: number;
   /**
-   * The human readable symbol of the `Asset` (e.g. `USDC`, `ATOM`).
+   * The human readable symbol of the `Asset` (e.g. `TDAI`, `ATOM`).
    * Must be uppercase, unique and correspond to the canonical symbol of the
    * full coin.
    */
@@ -1395,6 +1397,9 @@ export interface UpdatePerpetualEventV1 {
   /** The maximum cumulative insurance fund delta per block for isolated markets. */
 
   isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: string;
+  /** The perp yield index of this perpetual market */
+
+  perpYieldIndex: string;
 }
 /**
  * UpdatePerpetualEventV1 message contains all the information about an update
@@ -1440,6 +1445,33 @@ export interface UpdatePerpetualEventV1SDKType {
   /** The maximum cumulative insurance fund delta per block for isolated markets. */
 
   isolated_market_max_cumulative_insurance_fund_delta_per_block: string;
+  /** The perp yield index of this perpetual market */
+
+  perp_yield_index: string;
+}
+/**
+ * UpdateYieldParamsV1 message contains all the information about an update
+ * to the yield params on the Stream Chain.
+ */
+
+export interface UpdateYieldParamsEventV1 {
+  /** The current price of sDAI in tDAI as seen by the protocol */
+  sdaiPrice: string;
+  /** The current generalized asset yield index in the protocol. */
+
+  assetYieldIndex: string;
+}
+/**
+ * UpdateYieldParamsV1 message contains all the information about an update
+ * to the yield params on the Stream Chain.
+ */
+
+export interface UpdateYieldParamsEventV1SDKType {
+  /** The current price of sDAI in tDAI as seen by the protocol */
+  sdai_price: string;
+  /** The current generalized asset yield index in the protocol. */
+
+  asset_yield_index: string;
 }
 
 function createBaseFundingUpdateV1(): FundingUpdateV1 {
@@ -2316,7 +2348,8 @@ function createBaseSubaccountUpdateEventV1(): SubaccountUpdateEventV1 {
   return {
     subaccountId: undefined,
     updatedPerpetualPositions: [],
-    updatedAssetPositions: []
+    updatedAssetPositions: [],
+    yieldIndex: ""
   };
 }
 
@@ -2332,6 +2365,10 @@ export const SubaccountUpdateEventV1 = {
 
     for (const v of message.updatedAssetPositions) {
       IndexerAssetPosition.encode(v!, writer.uint32(34).fork()).ldelim();
+    }
+
+    if (message.yieldIndex !== "") {
+      writer.uint32(42).string(message.yieldIndex);
     }
 
     return writer;
@@ -2358,6 +2395,10 @@ export const SubaccountUpdateEventV1 = {
           message.updatedAssetPositions.push(IndexerAssetPosition.decode(reader, reader.uint32()));
           break;
 
+        case 5:
+          message.yieldIndex = reader.string();
+          break;
+
         default:
           reader.skipType(tag & 7);
           break;
@@ -2372,6 +2413,7 @@ export const SubaccountUpdateEventV1 = {
     message.subaccountId = object.subaccountId !== undefined && object.subaccountId !== null ? IndexerSubaccountId.fromPartial(object.subaccountId) : undefined;
     message.updatedPerpetualPositions = object.updatedPerpetualPositions?.map(e => IndexerPerpetualPosition.fromPartial(e)) || [];
     message.updatedAssetPositions = object.updatedAssetPositions?.map(e => IndexerAssetPosition.fromPartial(e)) || [];
+    message.yieldIndex = object.yieldIndex ?? "";
     return message;
   }
 
@@ -3465,7 +3507,8 @@ function createBaseUpdatePerpetualEventV1(): UpdatePerpetualEventV1 {
     atomicResolution: 0,
     liquidityTier: 0,
     dangerIndexPpm: 0,
-    isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: ""
+    isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: "",
+    perpYieldIndex: ""
   };
 }
 
@@ -3497,6 +3540,10 @@ export const UpdatePerpetualEventV1 = {
 
     if (message.isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock !== "") {
       writer.uint32(58).string(message.isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock);
+    }
+
+    if (message.perpYieldIndex !== "") {
+      writer.uint32(66).string(message.perpYieldIndex);
     }
 
     return writer;
@@ -3539,6 +3586,10 @@ export const UpdatePerpetualEventV1 = {
           message.isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock = reader.string();
           break;
 
+        case 8:
+          message.perpYieldIndex = reader.string();
+          break;
+
         default:
           reader.skipType(tag & 7);
           break;
@@ -3557,6 +3608,62 @@ export const UpdatePerpetualEventV1 = {
     message.liquidityTier = object.liquidityTier ?? 0;
     message.dangerIndexPpm = object.dangerIndexPpm ?? 0;
     message.isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock = object.isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock ?? "";
+    message.perpYieldIndex = object.perpYieldIndex ?? "";
+    return message;
+  }
+
+};
+
+function createBaseUpdateYieldParamsEventV1(): UpdateYieldParamsEventV1 {
+  return {
+    sdaiPrice: "",
+    assetYieldIndex: ""
+  };
+}
+
+export const UpdateYieldParamsEventV1 = {
+  encode(message: UpdateYieldParamsEventV1, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.sdaiPrice !== "") {
+      writer.uint32(10).string(message.sdaiPrice);
+    }
+
+    if (message.assetYieldIndex !== "") {
+      writer.uint32(18).string(message.assetYieldIndex);
+    }
+
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): UpdateYieldParamsEventV1 {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdateYieldParamsEventV1();
+
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+
+      switch (tag >>> 3) {
+        case 1:
+          message.sdaiPrice = reader.string();
+          break;
+
+        case 2:
+          message.assetYieldIndex = reader.string();
+          break;
+
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+
+    return message;
+  },
+
+  fromPartial(object: DeepPartial<UpdateYieldParamsEventV1>): UpdateYieldParamsEventV1 {
+    const message = createBaseUpdateYieldParamsEventV1();
+    message.sdaiPrice = object.sdaiPrice ?? "";
+    message.assetYieldIndex = object.assetYieldIndex ?? "";
     return message;
   }
 

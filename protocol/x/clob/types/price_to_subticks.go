@@ -12,12 +12,12 @@ import (
 // `sizeQuoteQuantums = subticks * baseQuantums * 10^quantumConversionExponent`
 // Substituting `baseQuantums` with a full coin of the base currency:
 //
-// `usdcPrice * 10^(-quoteAtomicResolution) = subticks * 10^(-baseAtomicResolution) *
+// `tdaiPrice * 10^(-quoteAtomicResolution) = subticks * 10^(-baseAtomicResolution) *
 // 10^quantumConversionExponent` (A)
 //
 // By construction of Prices module:
 //
-// `usdcPrice = marketPrice.Price * 10^marketPrice.Exponent` (B)
+// `tdaiPrice = marketPrice.Price * 10^marketPrice.Exponent` (B)
 //
 // Combining equations (A) & (B), we get:
 //
@@ -64,12 +64,12 @@ func SpotPriceToSubticks(
 // `sizeQuoteQuantums = subticks * baseQuantums * 10^quantumConversionExponent`
 // Substituting `baseQuantums` with a full coin of the base currency:
 //
-// `usdcPrice * 10^(-quoteAtomicResolution) = subticks * 10^(-baseAtomicResolution) *
+// `tdaiPrice * 10^(-quoteAtomicResolution) = subticks * 10^(-baseAtomicResolution) *
 // 10^quantumConversionExponent` (A)
 //
 // By construction of Prices module:
 //
-// `usdcPrice = marketPrice.Price * 10^marketPrice.Exponent` (B)
+// `tdaiPrice = marketPrice.Price * 10^marketPrice.Exponent` (B)
 //
 // Combining equations (A) & (B), we get:
 //

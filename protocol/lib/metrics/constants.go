@@ -233,6 +233,9 @@ const (
 	UpdateMarketPrices                           = "update_market_prices"
 	UpdateSmoothedPrices                         = "update_smoothed_prices"
 
+	// sDAI Oracle
+	SDAIDaemon = "sDAI_daemon"
+
 	// Sending.
 	Account                       = "account"
 	New                           = "new"

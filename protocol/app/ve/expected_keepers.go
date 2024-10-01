@@ -32,6 +32,11 @@ type PreBlockExecPricesKeeper interface {
 	GetSmoothedSpotPrice(markedId uint32) (uint64, bool)
 }
 
+type VoteExtensionRateLimitKeeper interface {
+	GetSDAIPrice(ctx sdk.Context) (price *big.Int, found bool)
+	GetSDAILastBlockUpdated(ctx sdk.Context) (blockHeight *big.Int, found bool)
+}
+
 type ExtendVoteClobKeeper interface {
 	GetSingleMarketClobMetadata(ctx sdk.Context, clobPair clobtypes.ClobPair) clobtypes.ClobMetadata
 	GetClobPair(ctx sdk.Context, id clobtypes.ClobPairId) (val clobtypes.ClobPair, found bool)
@@ -44,10 +49,6 @@ type ExtendVotePerpetualsKeeper interface {
 	) (val perptypes.Perpetual, err error)
 }
 
-type ExtendVoteDaemonPriceCache interface {
-	GetVEEncodedPrice(price *big.Int) ([]byte, error)
-}
-
-type VEPriceApplier interface {
-	ApplyPricesFromVE(ctx sdk.Context, req *abci.RequestFinalizeBlock, writeToCache bool) error
+type VEApplierInterface interface {
+	ApplyVE(ctx sdk.Context, req *abci.RequestFinalizeBlock, writeToCache bool) error
 }

@@ -8,7 +8,7 @@ import (
 	preblocker "github.com/StreamFinance-Protocol/stream-chain/protocol/app/preblocker"
 	ve "github.com/StreamFinance-Protocol/stream-chain/protocol/app/ve"
 	veaggregator "github.com/StreamFinance-Protocol/stream-chain/protocol/app/ve/aggregator"
-	priceapplier "github.com/StreamFinance-Protocol/stream-chain/protocol/app/ve/applier"
+	veapplier "github.com/StreamFinance-Protocol/stream-chain/protocol/app/ve/applier"
 	vecodec "github.com/StreamFinance-Protocol/stream-chain/protocol/app/ve/codec"
 	voteweighted "github.com/StreamFinance-Protocol/stream-chain/protocol/app/ve/math"
 	vetypes "github.com/StreamFinance-Protocol/stream-chain/protocol/app/ve/types"
@@ -21,6 +21,7 @@ import (
 	vetesting "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/ve"
 	pk "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/keeper"
 	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
+	ratelimitkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/keeper"
 	cometabci "github.com/cometbft/cometbft/abci/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	ccvtypes "github.com/ethos-works/ethos/ethos-chain/x/ccv/consumer/types"
@@ -34,8 +35,9 @@ type PreBlockTestSuite struct {
 	ctx               sdk.Context
 	marketParamPrices []pricestypes.MarketParamPrice
 	pricesKeeper      *pk.Keeper
+	ratelimitKeeper   *ratelimitkeeper.Keeper
 	daemonPriceCache  *pricefeedtypes.MarketToExchangePrices
-	priceApplier      *priceapplier.PriceApplier
+	veApplier         *veapplier.VEApplier
 	handler           *preblocker.PreBlockHandler
 	ccvStore          *mocks.CCValidatorStore
 	voteCodec         vecodec.VoteExtensionCodec
@@ -50,11 +52,14 @@ func TestPreBlockTestSuite(t *testing.T) {
 func (s *PreBlockTestSuite) SetupTest() {
 	s.validator = constants.AliceEthosConsAddress
 
-	ctx, pricesKeeper, _, daemonPriceCahce, _, mockTimeProvider := keepertest.PricesKeepers(s.T())
+	ctx, _, pricesKeeper, _, _, _, _, ratelimitKeeper, _, _ := keepertest.SubaccountsKeepers(s.T(), true)
+
+	mockTimeProvider := &mocks.TimeProvider{}
 	mockTimeProvider.On("Now").Return(constants.TimeT)
 	s.ctx = ctx
 	s.pricesKeeper = pricesKeeper
-	s.daemonPriceCache = daemonPriceCahce
+	s.ratelimitKeeper = ratelimitKeeper
+	s.daemonPriceCache = pricesKeeper.DaemonPriceCache
 
 	s.voteCodec = vecodec.NewDefaultVoteExtensionCodec()
 	s.extCodec = vecodec.NewDefaultExtendedCommitCodec()
@@ -64,7 +69,13 @@ func (s *PreBlockTestSuite) SetupTest() {
 	mCCVStore := &mocks.CCValidatorStore{}
 	s.ccvStore = mCCVStore
 
-	aggregationFn := voteweighted.Median(
+	pricesAggregatorFn := voteweighted.MedianPrices(
+		s.logger,
+		s.ccvStore,
+		voteweighted.DefaultPowerThreshold,
+	)
+
+	conversionRateAggregatorFn := voteweighted.MedianConversionRate(
 		s.logger,
 		s.ccvStore,
 		voteweighted.DefaultPowerThreshold,
@@ -72,15 +83,16 @@ func (s *PreBlockTestSuite) SetupTest() {
 
 	aggregator := veaggregator.NewVeAggregator(
 		s.logger,
-		s.daemonPriceCache,
 		*s.pricesKeeper,
-		aggregationFn,
+		pricesAggregatorFn,
+		conversionRateAggregatorFn,
 	)
 
-	s.priceApplier = priceapplier.NewPriceApplier(
+	s.veApplier = veapplier.NewVEApplier(
 		s.logger,
 		aggregator,
 		*s.pricesKeeper,
+		*s.ratelimitKeeper,
 		s.voteCodec,
 		s.extCodec,
 	)
@@ -95,7 +107,7 @@ func (s *PreBlockTestSuite) TestPreBlocker() {
 		s.ctx = vetesting.GetVeEnabledCtx(s.ctx, 3)
 		s.handler = preblocker.NewDaemonPreBlockHandler(
 			s.logger,
-			s.priceApplier,
+			s.veApplier,
 		)
 		s.daemonPriceCache.UpdatePrices(constants.MixedTimePriceUpdate)
 
@@ -112,7 +124,7 @@ func (s *PreBlockTestSuite) TestPreBlocker() {
 
 		s.handler = preblocker.NewDaemonPreBlockHandler(
 			s.logger,
-			s.priceApplier,
+			s.veApplier,
 		)
 
 		s.daemonPriceCache.UpdatePrices(constants.MixedTimePriceUpdate)
@@ -130,7 +142,7 @@ func (s *PreBlockTestSuite) TestPreBlocker() {
 
 		s.handler = preblocker.NewDaemonPreBlockHandler(
 			s.logger,
-			s.priceApplier,
+			s.veApplier,
 		)
 
 		s.daemonPriceCache.UpdatePrices(constants.MixedTimePriceUpdate)
@@ -149,6 +161,7 @@ func (s *PreBlockTestSuite) TestPreBlocker() {
 		extCommitBz := s.getVoteExtensionsForValidatorsWithSamePrices(
 			[]string{"alice", "bob"},
 			prices,
+			"",
 		)
 
 		s.mockCCVStoreGetAllValidatorsCall([]string{"alice", "bob"})
@@ -168,7 +181,7 @@ func (s *PreBlockTestSuite) TestPreBlocker() {
 
 		s.handler = preblocker.NewDaemonPreBlockHandler(
 			s.logger,
-			s.priceApplier,
+			s.veApplier,
 		)
 
 		s.daemonPriceCache.UpdatePrices(constants.MixedTimePriceUpdate)
@@ -205,6 +218,7 @@ func (s *PreBlockTestSuite) TestPreBlocker() {
 		extCommitBz := s.getVoteExtensionsForValidatorsWithSamePrices(
 			[]string{"alice", "bob"},
 			prices,
+			"",
 		)
 
 		s.mockCCVStoreGetAllValidatorsCall([]string{"alice", "bob"})
@@ -237,7 +251,7 @@ func (s *PreBlockTestSuite) TestPreBlocker() {
 
 		s.handler = preblocker.NewDaemonPreBlockHandler(
 			s.logger,
-			s.priceApplier,
+			s.veApplier,
 		)
 
 		s.daemonPriceCache.UpdatePrices(constants.MixedTimePriceUpdate)
@@ -283,6 +297,7 @@ func (s *PreBlockTestSuite) TestPreBlocker() {
 		extCommitBz := s.getVoteExtensionsForValidatorsWithSamePrices(
 			[]string{"alice", "bob"},
 			prices,
+			"",
 		)
 
 		s.mockCCVStoreGetAllValidatorsCall([]string{"alice", "bob"})
@@ -315,7 +330,7 @@ func (s *PreBlockTestSuite) TestPreBlocker() {
 
 		s.handler = preblocker.NewDaemonPreBlockHandler(
 			s.logger,
-			s.priceApplier,
+			s.veApplier,
 		)
 
 		s.daemonPriceCache.UpdatePrices(constants.MixedTimePriceUpdate)
@@ -392,16 +407,18 @@ func (s *PreBlockTestSuite) createTestMarkets() {
 
 func (s *PreBlockTestSuite) getVoteExtension(
 	prices []vetypes.PricePair,
+	sdaiConversionRate string,
 	val sdk.ConsAddress,
 ) cometabci.ExtendedVoteInfo {
 	ve, err := vetesting.CreateSignedExtendedVoteInfo(
 		vetesting.SignedVEInfo{
-			Val:     val,
-			Power:   500,
-			Prices:  prices,
-			Height:  3,
-			Round:   0,
-			ChainId: "localdydxprotocol",
+			Val:                val,
+			Power:              500,
+			Prices:             prices,
+			SDaiConversionRate: sdaiConversionRate,
+			Height:             3,
+			Round:              0,
+			ChainId:            "localdydxprotocol",
 		},
 	)
 	s.Require().NoError(err)
@@ -459,10 +476,11 @@ func (s *PreBlockTestSuite) mockCCVStoreGetAllValidatorsCall(validators []string
 func (s *PreBlockTestSuite) getVoteExtensionsForValidatorsWithSamePrices(
 	validators []string,
 	prices []vetypes.PricePair,
+	sdaiConversionRate string,
 ) []byte {
 	var votes []cometabci.ExtendedVoteInfo
 	for _, valName := range validators {
-		ve := s.getVoteExtension(prices, s.getValidatorConsAddr(valName))
+		ve := s.getVoteExtension(prices, sdaiConversionRate, s.getValidatorConsAddr(valName))
 		votes = append(votes, ve)
 	}
 	return s.getExtendedCommitInfoBz(votes)

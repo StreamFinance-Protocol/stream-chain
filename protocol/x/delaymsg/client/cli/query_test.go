@@ -3,7 +3,6 @@
 package cli_test
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 	"testing"
@@ -92,6 +91,7 @@ func TestQueryMessage(t *testing.T) {
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
+
 			genesisChanges := getGenesisChanges(name)
 
 			network.DeployCustomNetwork(genesisChanges)
@@ -102,7 +102,6 @@ func TestQueryMessage(t *testing.T) {
 			data, stdQueryErr, err := network.QueryCustomNetwork(delaymsgQuery)
 
 			if name == "Default: 0" {
-				fmt.Println("Printing error", stdQueryErr)
 				require.True(t, strings.Contains(stdQueryErr, GrpcNotFoundError))
 			} else {
 				require.NoError(t, err)

@@ -79,6 +79,7 @@ type PerpetualsKeeper interface {
 		marketType PerpetualMarketType,
 		dangerIndexPpm uint32,
 		isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock uint64,
+		yieldIndex string,
 	) (Perpetual, error)
 	ModifyPerpetual(
 		ctx sdk.Context,

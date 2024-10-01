@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/dtypes"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/mocks"
 	testutil_bank "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/bank"
@@ -15,6 +16,7 @@ import (
 	blocktimetypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/blocktime/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
+	ratelimittypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -43,11 +45,18 @@ func TestProcessProposerMatches_LongTerm_Success(t *testing.T) {
 					satypes.ModuleAddress,
 					authtypes.NewModuleAddress(authtypes.FeeCollectorName),
 					mock.MatchedBy(
-						testutil_bank.MatchUsdcOfAmount(
+						testutil_bank.MatchTDaiOfAmount(
 							25_000_000+10_000_000,
 						),
 					),
 				).Return(nil).Once()
+				bk.On(
+					"GetBalance",
+					mock.Anything,
+					authtypes.NewModuleAddress(ratelimittypes.TDaiPoolAccount),
+					constants.TDai.Denom,
+				).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
+
 			},
 			preExistingStatefulOrders: []types.Order{
 				constants.LongTermOrder_Carl_Num0_Id0_Clob0_Buy1BTC_Price50000_GTBT10,
@@ -112,11 +121,17 @@ func TestProcessProposerMatches_LongTerm_Success(t *testing.T) {
 					satypes.ModuleAddress,
 					authtypes.NewModuleAddress(authtypes.FeeCollectorName),
 					mock.MatchedBy(
-						testutil_bank.MatchUsdcOfAmount(
+						testutil_bank.MatchTDaiOfAmount(
 							25_000_000+10_000_000,
 						),
 					),
 				).Return(nil).Once()
+				bk.On(
+					"GetBalance",
+					mock.Anything,
+					authtypes.NewModuleAddress(ratelimittypes.TDaiPoolAccount),
+					constants.TDai.Denom,
+				).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 			},
 			perpetualFeeParams: &constants.PerpetualFeeParams,
 			clobPairs: []types.ClobPair{
@@ -192,11 +207,17 @@ func TestProcessProposerMatches_LongTerm_Success(t *testing.T) {
 					satypes.ModuleAddress,
 					authtypes.NewModuleAddress(authtypes.FeeCollectorName),
 					mock.MatchedBy(
-						testutil_bank.MatchUsdcOfAmount(
+						testutil_bank.MatchTDaiOfAmount(
 							25_000_000+10_000_000,
 						),
 					),
 				).Return(nil).Once()
+				bk.On(
+					"GetBalance",
+					mock.Anything,
+					authtypes.NewModuleAddress(ratelimittypes.TDaiPoolAccount),
+					constants.TDai.Denom,
+				).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 			},
 			setupState: func(ctx sdk.Context, ks keepertest.ClobKeepersTestContext) {
 				ks.BlockTimeKeeper.SetPreviousBlockInfo(ks.Ctx, &blocktimetypes.BlockInfo{
@@ -265,11 +286,17 @@ func TestProcessProposerMatches_LongTerm_Success(t *testing.T) {
 					satypes.ModuleAddress,
 					authtypes.NewModuleAddress(authtypes.FeeCollectorName),
 					mock.MatchedBy(
-						testutil_bank.MatchUsdcOfAmount(
+						testutil_bank.MatchTDaiOfAmount(
 							25_000_000+10_000_000,
 						),
 					),
 				).Return(nil).Once()
+				bk.On(
+					"GetBalance",
+					mock.Anything,
+					authtypes.NewModuleAddress(ratelimittypes.TDaiPoolAccount),
+					constants.TDai.Denom,
+				).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 			},
 			setupState: func(ctx sdk.Context, ks keepertest.ClobKeepersTestContext) {
 				ks.BlockTimeKeeper.SetPreviousBlockInfo(ks.Ctx, &blocktimetypes.BlockInfo{
@@ -339,11 +366,17 @@ func TestProcessProposerMatches_LongTerm_Success(t *testing.T) {
 					satypes.ModuleAddress,
 					authtypes.NewModuleAddress(authtypes.FeeCollectorName),
 					mock.MatchedBy(
-						testutil_bank.MatchUsdcOfAmount(
+						testutil_bank.MatchTDaiOfAmount(
 							25_000_000+10_000_000,
 						),
 					),
 				).Return(nil).Once()
+				bk.On(
+					"GetBalance",
+					mock.Anything,
+					authtypes.NewModuleAddress(ratelimittypes.TDaiPoolAccount),
+					constants.TDai.Denom,
+				).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 			},
 			setupState: func(ctx sdk.Context, ks keepertest.ClobKeepersTestContext) {
 				ks.BlockTimeKeeper.SetPreviousBlockInfo(ks.Ctx, &blocktimetypes.BlockInfo{
@@ -412,11 +445,17 @@ func TestProcessProposerMatches_LongTerm_Success(t *testing.T) {
 					satypes.ModuleAddress,
 					authtypes.NewModuleAddress(authtypes.FeeCollectorName),
 					mock.MatchedBy(
-						testutil_bank.MatchUsdcOfAmount(
+						testutil_bank.MatchTDaiOfAmount(
 							12_500_000+5_000_000,
 						),
 					),
 				).Return(nil).Once()
+				bk.On(
+					"GetBalance",
+					mock.Anything,
+					authtypes.NewModuleAddress(ratelimittypes.TDaiPoolAccount),
+					constants.TDai.Denom,
+				).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 			},
 			setupState: func(ctx sdk.Context, ks keepertest.ClobKeepersTestContext) {
 				ks.BlockTimeKeeper.SetPreviousBlockInfo(ks.Ctx, &blocktimetypes.BlockInfo{
@@ -457,6 +496,7 @@ func TestProcessProposerMatches_LongTerm_Success(t *testing.T) {
 						PerpetualId:  0,
 						Quantums:     dtypes.NewInt(-50_000_000), // .5 BTC
 						FundingIndex: dtypes.ZeroInt(),
+						YieldIndex:   big.NewRat(0, 1).String(),
 					},
 				},
 				constants.Dave_Num0: {
@@ -464,6 +504,7 @@ func TestProcessProposerMatches_LongTerm_Success(t *testing.T) {
 						PerpetualId:  0,
 						Quantums:     dtypes.NewInt(50_000_000), // .5 BTC
 						FundingIndex: dtypes.ZeroInt(),
+						YieldIndex:   big.NewRat(0, 1).String(),
 					},
 				},
 			},
@@ -490,11 +531,17 @@ func TestProcessProposerMatches_LongTerm_Success(t *testing.T) {
 					satypes.ModuleAddress,
 					authtypes.NewModuleAddress(authtypes.FeeCollectorName),
 					mock.MatchedBy(
-						testutil_bank.MatchUsdcOfAmount(
+						testutil_bank.MatchTDaiOfAmount(
 							12_500_000+5_000_000,
 						),
 					),
 				).Return(nil).Twice()
+				bk.On(
+					"GetBalance",
+					mock.Anything,
+					authtypes.NewModuleAddress(ratelimittypes.TDaiPoolAccount),
+					constants.TDai.Denom,
+				).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 			},
 			setupState: func(ctx sdk.Context, ks keepertest.ClobKeepersTestContext) {
 				ks.BlockTimeKeeper.SetPreviousBlockInfo(ks.Ctx, &blocktimetypes.BlockInfo{
@@ -576,7 +623,7 @@ func TestProcessProposerMatches_LongTerm_Success(t *testing.T) {
 					mock.Anything,
 					satypes.ModuleAddress,
 					authtypes.NewModuleAddress(authtypes.FeeCollectorName),
-					mock.MatchedBy(testutil_bank.MatchUsdcOfAmount(10_000_000)),
+					mock.MatchedBy(testutil_bank.MatchTDaiOfAmount(10_000_000)),
 				).Return(nil)
 				bk.On(
 					"SendCoins",
@@ -584,8 +631,14 @@ func TestProcessProposerMatches_LongTerm_Success(t *testing.T) {
 					satypes.ModuleAddress,
 					perptypes.InsuranceFundModuleAddress,
 					// Subaccount pays $250 to insurance fund for liquidating 1 BTC.
-					mock.MatchedBy(testutil_bank.MatchUsdcOfAmount(250_000_000)),
+					mock.MatchedBy(testutil_bank.MatchTDaiOfAmount(250_000_000)),
 				).Return(nil).Once()
+				bk.On(
+					"GetBalance",
+					mock.Anything,
+					authtypes.NewModuleAddress(ratelimittypes.TDaiPoolAccount),
+					constants.TDai.Denom,
+				).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 			},
 			setupState: func(ctx sdk.Context, ks keepertest.ClobKeepersTestContext) {
 				ks.BlockTimeKeeper.SetPreviousBlockInfo(ks.Ctx, &blocktimetypes.BlockInfo{
@@ -663,7 +716,7 @@ func TestProcessProposerMatches_LongTerm_Success(t *testing.T) {
 					mock.Anything,
 					satypes.ModuleAddress,
 					authtypes.NewModuleAddress(authtypes.FeeCollectorName),
-					mock.MatchedBy(testutil_bank.MatchUsdcOfAmount(10_000_000)),
+					mock.MatchedBy(testutil_bank.MatchTDaiOfAmount(10_000_000)),
 				).Return(nil)
 				bk.On(
 					"SendCoins",
@@ -671,8 +724,14 @@ func TestProcessProposerMatches_LongTerm_Success(t *testing.T) {
 					satypes.ModuleAddress,
 					perptypes.InsuranceFundModuleAddress,
 					// Subaccount pays $250 to insurance fund for liquidating 1 BTC.
-					mock.MatchedBy(testutil_bank.MatchUsdcOfAmount(250_000_000)),
+					mock.MatchedBy(testutil_bank.MatchTDaiOfAmount(250_000_000)),
 				).Return(nil).Once()
+				bk.On(
+					"GetBalance",
+					mock.Anything,
+					authtypes.NewModuleAddress(ratelimittypes.TDaiPoolAccount),
+					constants.TDai.Denom,
+				).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 			},
 			setupState: func(ctx sdk.Context, ks keepertest.ClobKeepersTestContext) {
 				ks.BlockTimeKeeper.SetPreviousBlockInfo(ks.Ctx, &blocktimetypes.BlockInfo{
@@ -751,11 +810,17 @@ func TestProcessProposerMatches_LongTerm_Success(t *testing.T) {
 					satypes.ModuleAddress,
 					authtypes.NewModuleAddress(authtypes.FeeCollectorName),
 					mock.MatchedBy(
-						testutil_bank.MatchUsdcOfAmount(
+						testutil_bank.MatchTDaiOfAmount(
 							12_500_000+5_000_000,
 						),
 					),
 				).Return(nil).Once()
+				bk.On(
+					"GetBalance",
+					mock.Anything,
+					authtypes.NewModuleAddress(ratelimittypes.TDaiPoolAccount),
+					constants.TDai.Denom,
+				).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 			},
 			setupState: func(ctx sdk.Context, ks keepertest.ClobKeepersTestContext) {
 				ks.BlockTimeKeeper.SetPreviousBlockInfo(ks.Ctx, &blocktimetypes.BlockInfo{
@@ -809,6 +874,7 @@ func TestProcessProposerMatches_LongTerm_Success(t *testing.T) {
 						PerpetualId:  0,
 						Quantums:     dtypes.NewInt(-50_000_000), // .5 BTC
 						FundingIndex: dtypes.ZeroInt(),
+						YieldIndex:   big.NewRat(0, 1).String(),
 					},
 				},
 				constants.Dave_Num0: {
@@ -816,6 +882,7 @@ func TestProcessProposerMatches_LongTerm_Success(t *testing.T) {
 						PerpetualId:  0,
 						Quantums:     dtypes.NewInt(50_000_000), // .5 BTC
 						FundingIndex: dtypes.ZeroInt(),
+						YieldIndex:   big.NewRat(0, 1).String(),
 					},
 				},
 			},
@@ -842,11 +909,17 @@ func TestProcessProposerMatches_LongTerm_Success(t *testing.T) {
 					satypes.ModuleAddress,
 					authtypes.NewModuleAddress(authtypes.FeeCollectorName),
 					mock.MatchedBy(
-						testutil_bank.MatchUsdcOfAmount(
+						testutil_bank.MatchTDaiOfAmount(
 							12_500_000+5_000_000,
 						),
 					),
 				).Return(nil).Once()
+				bk.On(
+					"GetBalance",
+					mock.Anything,
+					authtypes.NewModuleAddress(ratelimittypes.TDaiPoolAccount),
+					constants.TDai.Denom,
+				).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 			},
 			setupState: func(ctx sdk.Context, ks keepertest.ClobKeepersTestContext) {
 				ks.BlockTimeKeeper.SetPreviousBlockInfo(ks.Ctx, &blocktimetypes.BlockInfo{
@@ -901,6 +974,7 @@ func TestProcessProposerMatches_LongTerm_Success(t *testing.T) {
 						PerpetualId:  0,
 						Quantums:     dtypes.NewInt(-50_000_000), // .5 BTC
 						FundingIndex: dtypes.ZeroInt(),
+						YieldIndex:   big.NewRat(0, 1).String(),
 					},
 				},
 				constants.Dave_Num0: {
@@ -908,6 +982,7 @@ func TestProcessProposerMatches_LongTerm_Success(t *testing.T) {
 						PerpetualId:  0,
 						Quantums:     dtypes.NewInt(50_000_000), // .5 BTC
 						FundingIndex: dtypes.ZeroInt(),
+						YieldIndex:   big.NewRat(0, 1).String(),
 					},
 				},
 			},

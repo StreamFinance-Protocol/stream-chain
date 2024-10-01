@@ -37,15 +37,16 @@ mock-gen:
 	@go run github.com/vektra/mockery/v2 --name=ProcessStakingKeeper --dir=./app/process --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=ProcessPerpetualKeeper --dir=./app/process --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=ProcessConsumerKeeper --dir=./app/process --recursive --output=./mocks
-	@go run github.com/vektra/mockery/v2 --name=ProcessProposalPriceApplier --dir=./app/process --recursive --output=./mocks
+	@go run github.com/vektra/mockery/v2 --name=ProcessProposalVEApplier --dir=./app/process --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=ProcessConsumerKeeper --dir=./app/process --recursive --output=./mocks
-	@go run github.com/vektra/mockery/v2 --name=ExtendVoteDaemonPriceCache --dir=./app/ve --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=ExtendVotePerpetualsKeeper --dir=./app/ve --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=ExtendVoteClobKeeper --dir=./app/ve --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=CCValidatorStore --dir=./app/ve/math --recursive --output=./mocks
-	@go run github.com/vektra/mockery/v2 --name=PriceApplierPricesKeeper --dir=./app/ve/applier --recursive --output=./mocks
+	@go run github.com/vektra/mockery/v2 --name=VEApplierPricesKeeper --dir=./app/ve/applier --recursive --output=./mocks
+	@go run github.com/vektra/mockery/v2 --name=VEApplierRatelimitKeeper --dir=./app/ve/applier --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=VoteAggregator --dir=./app/ve/aggregator --recursive --output=./mocks
-	@go run github.com/vektra/mockery/v2 --name=VEPriceApplier --dir=./app/ve --recursive --output=./mocks
+	@go run github.com/vektra/mockery/v2 --name=VEApplierInterface --dir=./app/ve --recursive --output=./mocks
+	@go run github.com/vektra/mockery/v2 --name=VoteExtensionRateLimitKeeper --dir=./app/ve --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=MemClob --dir=./x/clob/types --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=DelayMsgKeeper --dir=./x/delaymsg/types --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=ClobKeeper --dir=./x/clob/types --recursive --output=./mocks
@@ -68,3 +69,6 @@ mock-gen:
 	@go run github.com/vektra/mockery/v2 --name=IndexerEventManager --dir=./indexer/indexer_manager --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=PricefeedMutableMarketConfigs --dir=./daemons/pricefeed/client/types --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=ExchangeConfigUpdater --dir=./daemons/pricefeed/client/types --recursive --output=./mocks
+	@go run github.com/vektra/mockery/v2 --name=EthQueryClient --dir=./daemons/sdaioracle/client/eth_query_client --recursive --output=./mocks
+	@go run github.com/vektra/mockery/v2 --name=SDAIServiceClient --dir=./daemons/sdaioracle/api --recursive --output=./mocks
+	@go run github.com/vektra/mockery/v2 --name=ICS4Wrapper --dir=x/ratelimit/types --recursive --output=./mocks --replace-type github.com/cosmos/ibc-go/v8/modules/core/02-client/types=clienttypes:github.com/cosmos/ibc-go/v8/modules/core/02-client/types

@@ -4,9 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math/big"
 	"testing"
 	"time"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/dtypes"
 	indexerevents "github.com/StreamFinance-Protocol/stream-chain/protocol/indexer/events"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/indexer/indexer_manager"
@@ -18,7 +20,10 @@ import (
 	blocktimetypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/blocktime/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
+	ratelimittypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
@@ -90,7 +95,17 @@ func TestPlaceOrder_Error(t *testing.T) {
 			memClob.On("CreateOrderbook", mock.Anything, mock.Anything, mock.Anything)
 			indexerEventManager := &mocks.IndexerEventManager{}
 
-			ks := keepertest.NewClobKeepersTestContext(t, memClob, &mocks.BankKeeper{}, indexerEventManager)
+			bankMock := &mocks.BankKeeper{}
+			bankMock.On(
+				"GetBalance",
+				mock.Anything,
+				authtypes.NewModuleAddress(ratelimittypes.TDaiPoolAccount),
+				constants.TDai.Denom,
+			).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
+
+			ks := keepertest.NewClobKeepersTestContext(t, memClob, bankMock, indexerEventManager)
+			ks.RatelimitKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+
 			msgServer := keeper.NewMsgServerImpl(ks.ClobKeeper)
 
 			mockLogger := &mocks.Logger{}
@@ -114,7 +129,7 @@ func TestPlaceOrder_Error(t *testing.T) {
 			}
 			ks.Ctx = ks.Ctx.WithLogger(mockLogger)
 
-			require.NoError(t, keepertest.CreateUsdcAsset(ks.Ctx, ks.AssetsKeeper))
+			require.NoError(t, keepertest.CreateTDaiAsset(ks.Ctx, ks.AssetsKeeper))
 			// Create test markets.
 			keepertest.CreateTestMarkets(t, ks.Ctx, ks.PricesKeeper)
 
@@ -136,6 +151,7 @@ func TestPlaceOrder_Error(t *testing.T) {
 				perpetual.Params.MarketType,
 				perpetual.Params.DangerIndexPpm,
 				perpetual.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
+				perpetual.YieldIndex,
 			)
 			require.NoError(t, err)
 
@@ -244,7 +260,7 @@ func TestPlaceOrder_Success(t *testing.T) {
 				{
 					Id: &constants.Alice_Num0,
 					AssetPositions: []*satypes.AssetPosition{
-						&constants.Usdc_Asset_100_000,
+						&constants.TDai_Asset_100_000,
 					},
 				},
 			},
@@ -255,7 +271,7 @@ func TestPlaceOrder_Success(t *testing.T) {
 				{
 					Id: &constants.Alice_Num0,
 					AssetPositions: []*satypes.AssetPosition{
-						&constants.Usdc_Asset_100_000,
+						&constants.TDai_Asset_100_000,
 					},
 				},
 			},
@@ -271,10 +287,20 @@ func TestPlaceOrder_Success(t *testing.T) {
 			memClob.On("CreateOrderbook", mock.Anything, mock.Anything, mock.Anything)
 			indexerEventManager := &mocks.IndexerEventManager{}
 
-			ks := keepertest.NewClobKeepersTestContext(t, memClob, &mocks.BankKeeper{}, indexerEventManager)
+			bankMock := &mocks.BankKeeper{}
+			bankMock.On(
+				"GetBalance",
+				mock.Anything,
+				authtypes.NewModuleAddress(ratelimittypes.TDaiPoolAccount),
+				constants.TDai.Denom,
+			).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
+
+			ks := keepertest.NewClobKeepersTestContext(t, memClob, bankMock, indexerEventManager)
+			ks.RatelimitKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+
 			msgServer := keeper.NewMsgServerImpl(ks.ClobKeeper)
 
-			require.NoError(t, keepertest.CreateUsdcAsset(ks.Ctx, ks.AssetsKeeper))
+			require.NoError(t, keepertest.CreateTDaiAsset(ks.Ctx, ks.AssetsKeeper))
 
 			ctx := ks.Ctx.WithBlockHeight(2)
 			ctx = ctx.WithBlockTime(time.Unix(int64(2), 0))
@@ -309,6 +335,7 @@ func TestPlaceOrder_Success(t *testing.T) {
 				perpetual.Params.MarketType,
 				perpetual.Params.DangerIndexPpm,
 				perpetual.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
+				perpetual.YieldIndex,
 			)
 			require.NoError(t, err)
 

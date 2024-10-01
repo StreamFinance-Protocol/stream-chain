@@ -14,6 +14,7 @@ const (
 	// which we have sometimes seen to take up to ~10s to respond.
 	MaximumLoopDelayMultiple = 8
 
+	SDAIDaemonServiceName         = "sDAI-daemon"
 	DeleveragingDaemonServiceName = "deleveraging-daemon"
 	PricefeedDaemonServiceName    = "pricefeed-daemon"
 	MetricsDaemonServiceName      = "metrics-daemon"

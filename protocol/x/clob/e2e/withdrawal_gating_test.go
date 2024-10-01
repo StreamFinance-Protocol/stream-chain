@@ -1,12 +1,15 @@
 package clob_test
 
 import (
+	"math/big"
 	"testing"
 
 	abcitypes "github.com/cometbft/cometbft/abci/types"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/gogoproto/proto"
 
+	sdaiservertypes "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/server/types/sdaioracle"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/dtypes"
 	vetesting "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/ve"
 
@@ -20,6 +23,7 @@ import (
 	feetiertypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	prices "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
+	ratelimitkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/keeper"
 	sendingtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
 	"github.com/stretchr/testify/require"
@@ -140,8 +144,10 @@ func TestWithdrawalGating_NegativeTncSubaccount_BlocksThenUnblocks(t *testing.T)
 							PerpetualId:  0,
 							Quantums:     dtypes.NewInt(-75_000_000), // -0.75 BTC
 							FundingIndex: dtypes.NewInt(0),
+							YieldIndex:   big.NewRat(0, 1).String(),
 						},
 					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
 				},
 				// Dave's bankruptcy price to close 1 BTC long is $50,000, and deleveraging can not be
 				// performed due to non overlapping bankruptcy prices.
@@ -155,6 +161,7 @@ func TestWithdrawalGating_NegativeTncSubaccount_BlocksThenUnblocks(t *testing.T)
 							Quantums: dtypes.NewInt(50_000_000_000 + 12_500_000_000),
 						},
 					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
 				},
 			},
 			expectedWithdrawalsGated:                 true,
@@ -178,7 +185,7 @@ func TestWithdrawalGating_NegativeTncSubaccount_BlocksThenUnblocks(t *testing.T)
 					&genesis,
 					func(genesisState *assettypes.GenesisState) {
 						genesisState.Assets = []assettypes.Asset{
-							*constants.Usdc,
+							*constants.TDai,
 						}
 					},
 				)
@@ -240,7 +247,24 @@ func TestWithdrawalGating_NegativeTncSubaccount_BlocksThenUnblocks(t *testing.T)
 				return genesis
 			}).Build()
 
-			ctx := tApp.AdvanceToBlock(2, testapp.AdvanceToBlockOptions{})
+			rateString := sdaiservertypes.TestSDAIEventRequest.ConversionRate
+			rate, conversionErr := ratelimitkeeper.ConvertStringToBigInt(rateString)
+
+			require.NoError(t, conversionErr)
+
+			tApp.App.RatelimitKeeper.SetSDAIPrice(tApp.App.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.App.RatelimitKeeper.SetAssetYieldIndex(tApp.App.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+
+			tApp.CrashingApp.RatelimitKeeper.SetSDAIPrice(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.CrashingApp.RatelimitKeeper.SetAssetYieldIndex(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+
+			tApp.NoCheckTxApp.RatelimitKeeper.SetSDAIPrice(tApp.NoCheckTxApp.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.NoCheckTxApp.RatelimitKeeper.SetAssetYieldIndex(tApp.NoCheckTxApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+
+			tApp.ParallelApp.RatelimitKeeper.SetSDAIPrice(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.ParallelApp.RatelimitKeeper.SetAssetYieldIndex(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+
+			ctx := tApp.InitChain()
 
 			// Create all existing orders.
 			existingOrderMsgs := make([]clobtypes.MsgPlaceOrder, len(tc.placedMatchableOrders))
@@ -275,7 +299,7 @@ func TestWithdrawalGating_NegativeTncSubaccount_BlocksThenUnblocks(t *testing.T)
 				withdrawMsg := sendingtypes.MsgWithdrawFromSubaccount{
 					Sender:    tc.transferOrWithdrawSubaccount,
 					Recipient: tc.transferOrWithdrawSubaccount.Owner,
-					AssetId:   constants.Usdc.Id,
+					AssetId:   constants.TDai.Id,
 					Quantums:  1,
 				}
 				msg = &withdrawMsg
@@ -284,7 +308,7 @@ func TestWithdrawalGating_NegativeTncSubaccount_BlocksThenUnblocks(t *testing.T)
 					Transfer: &sendingtypes.Transfer{
 						Sender:    tc.transferOrWithdrawSubaccount,
 						Recipient: constants.Bob_Num0,
-						AssetId:   constants.Usdc.Id,
+						AssetId:   constants.TDai.Id,
 						Amount:    1,
 					},
 				}
@@ -334,6 +358,7 @@ func TestWithdrawalGating_NegativeTncSubaccount_BlocksThenUnblocks(t *testing.T)
 				&tApp.App.ConsumerKeeper,
 				ctx,
 				tc.priceUpdate,
+				"",
 				tApp.GetHeader().Height,
 			)
 			require.NoError(t, err)

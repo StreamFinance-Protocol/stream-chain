@@ -180,6 +180,7 @@ func CreateTestPerpetuals(t *testing.T, ctx sdk.Context, k *keeper.Keeper) {
 			p.Params.MarketType,
 			p.Params.DangerIndexPpm,
 			p.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
+			p.YieldIndex,
 		)
 		require.NoError(t, err)
 	}
@@ -228,6 +229,29 @@ func GetLiquidityTierUpsertEventsFromIndexerBlock(
 	return liquidityTierEvents
 }
 
+func GetUpdatePerpetualEventsFromIndexerBlock(
+	ctx sdk.Context,
+	keeper *keeper.Keeper,
+) []*indexerevents.UpdatePerpetualEventV1 {
+	var perpetualUpdateEvents []*indexerevents.UpdatePerpetualEventV1
+	block := keeper.GetIndexerEventManager().ProduceBlock(ctx)
+	if block == nil {
+		return perpetualUpdateEvents
+	}
+	for _, event := range block.Events {
+		if event.Subtype != indexerevents.SubtypeUpdatePerpetual {
+			continue
+		}
+		var updatePerpetualEvent indexerevents.UpdatePerpetualEventV1
+		err := proto.Unmarshal(event.DataBytes, &updatePerpetualEvent)
+		if err != nil {
+			panic(err)
+		}
+		perpetualUpdateEvents = append(perpetualUpdateEvents, &updatePerpetualEvent)
+	}
+	return perpetualUpdateEvents
+}
+
 func CreateNPerpetuals(
 	t *testing.T,
 	ctx sdk.Context,
@@ -267,6 +291,7 @@ func CreateNPerpetuals(
 			marketType,
 			0,
 			maxInsuranceFundDelta,
+			"0/1",
 		)
 		if err != nil {
 			return items, err
@@ -319,6 +344,7 @@ func CreateTestPricesAndPerpetualMarkets(
 			perp.Params.MarketType,
 			perp.Params.DangerIndexPpm,
 			perp.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
+			perp.YieldIndex,
 		)
 		require.NoError(t, err)
 	}

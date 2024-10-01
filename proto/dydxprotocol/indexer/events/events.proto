@@ -159,9 +159,9 @@ message OrderFillEventV1 {
   }
   // Fill amount in base quantums.
   uint64 fill_amount = 3;
-  // Maker fee in USDC quantums.
+  // Maker fee in TDAI quantums.
   sint64 maker_fee = 5;
-  // Taker fee in USDC quantums. If the taker order is a liquidation, then this
+  // Taker fee in TDAI quantums. If the taker order is a liquidation, then this
   // represents the special liquidation fee, not the standard taker fee.
   sint64 taker_fee = 6;
   // Total filled of the maker order in base quantums.
@@ -235,6 +235,7 @@ message SubaccountUpdateEventV1 {
   // updated_asset_positions will each be for unique assets.
   repeated dydxprotocol.indexer.protocol.v1.IndexerAssetPosition
       updated_asset_positions = 4;
+  string yield_index = 5;
 }
 
 // StatefulOrderEvent message contains information about a change to a stateful
@@ -289,7 +290,7 @@ message AssetCreateEventV1 {
   // Unique, sequentially-generated.
   uint32 id = 1;
 
-  // The human readable symbol of the `Asset` (e.g. `USDC`, `ATOM`).
+  // The human readable symbol of the `Asset` (e.g. `TDAI`, `ATOM`).
   // Must be uppercase, unique and correspond to the canonical symbol of the
   // full coin.
   string symbol = 2;
@@ -560,4 +561,19 @@ message UpdatePerpetualEventV1 {
 
   // The maximum cumulative insurance fund delta per block for isolated markets.
   string isolated_market_max_cumulative_insurance_fund_delta_per_block = 7;
+
+  // The perp yield index of this perpetual market
+  string perp_yield_index = 8;
+}
+
+// UpdateYieldParamsV1 message contains all the information about an update
+// to the yield params on the Stream Chain.
+message UpdateYieldParamsEventV1 {
+
+  // The current price of sDAI in tDAI as seen by the protocol
+  string sdai_price = 1;
+
+  // The current generalized asset yield index in the protocol.
+  string asset_yield_index = 2;
+
 }

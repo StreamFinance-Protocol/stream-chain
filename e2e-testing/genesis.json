@@ -10,12 +10,13 @@
       "assets": [
         {
           "atomic_resolution": -6,
-          "denom": "ibc/8E27BA2D5493AF5636760E354E46004562C46AB7EC0CC4C1CA14E9E20E2545B5",
+          "denom": "utdai",
           "denom_exponent": "-6",
           "has_market": false,
           "id": 0,
           "market_id": 0,
-          "symbol": "USDC"
+          "symbol": "TDAI",
+          "asset_yield_index": "0/1"
         }
       ]
     },
@@ -82,7 +83,7 @@
               "amount": "1000000000000000000000000"
             },
             {
-              "denom": "ibc/8E27BA2D5493AF5636760E354E46004562C46AB7EC0CC4C1CA14E9E20E2545B5",
+              "denom": "utdai",
               "amount": "100000000000000000"
             }
           ]
@@ -95,7 +96,7 @@
               "amount": "1000000000000000000000000"
             },
             {
-              "denom": "ibc/8E27BA2D5493AF5636760E354E46004562C46AB7EC0CC4C1CA14E9E20E2545B5",
+              "denom": "utdai",
               "amount": "100000000000000000"
             }
           ]
@@ -104,7 +105,7 @@
           "address": "dydx1v88c3xv9xyv3eetdx0tvcmq7ung3dywp5upwc6",
           "coins": [
             {
-              "denom": "ibc/8E27BA2D5493AF5636760E354E46004562C46AB7EC0CC4C1CA14E9E20E2545B5",
+              "denom": "utdai",
               "amount": "1300000000000000000"
             }
           ]
@@ -117,7 +118,7 @@
               "amount": "1000000000000000000000000"
             },
             {
-              "denom": "ibc/8E27BA2D5493AF5636760E354E46004562C46AB7EC0CC4C1CA14E9E20E2545B5",
+              "denom": "utdai",
               "amount": "100000000000000000"
             }
           ]
@@ -130,7 +131,7 @@
               "amount": "1000000000000000000000000"
             },
             {
-              "denom": "ibc/8E27BA2D5493AF5636760E354E46004562C46AB7EC0CC4C1CA14E9E20E2545B5",
+              "denom": "utdai",
               "amount": "100000000000000000"
             }
           ]
@@ -143,7 +144,7 @@
               "amount": "1000000000000000000000000"
             },
             {
-              "denom": "ibc/8E27BA2D5493AF5636760E354E46004562C46AB7EC0CC4C1CA14E9E20E2545B5",
+              "denom": "utdai",
               "amount": "900000000000000000"
             }
           ]
@@ -1272,7 +1273,8 @@
             "liquidity_tier": 0,
             "market_id": 0,
             "ticker": "BTC-USD"
-          }
+          },
+          "yield_index": "0/1"
         },
         {
           "params": {
@@ -1282,7 +1284,8 @@
             "liquidity_tier": 0,
             "market_id": 1,
             "ticker": "ETH-USD"
-          }
+          },
+          "yield_index": "0/1"
         },
         {
           "params": {
@@ -1292,7 +1295,8 @@
             "liquidity_tier": 1,
             "market_id": 2,
             "ticker": "LINK-USD"
-          }
+          },
+          "yield_index": "0/1"
         },
         {
           "params": {
@@ -1302,7 +1306,8 @@
             "liquidity_tier": 1,
             "market_id": 3,
             "ticker": "MATIC-USD"
-          }
+          },
+          "yield_index": "0/1"
         },
         {
           "params": {
@@ -1312,7 +1317,8 @@
             "liquidity_tier": 1,
             "market_id": 4,
             "ticker": "CRV-USD"
-          }
+          },
+          "yield_index": "0/1"
         },
         {
           "params": {
@@ -1322,7 +1328,8 @@
             "liquidity_tier": 1,
             "market_id": 5,
             "ticker": "SOL-USD"
-          }
+          },
+          "yield_index": "0/1"
         },
         {
           "params": {
@@ -1332,7 +1339,8 @@
             "liquidity_tier": 1,
             "market_id": 6,
             "ticker": "ADA-USD"
-          }
+          },
+          "yield_index": "0/1"
         },
         {
           "params": {
@@ -1342,7 +1350,8 @@
             "liquidity_tier": 1,
             "market_id": 7,
             "ticker": "AVAX-USD"
-          }
+          },
+          "yield_index": "0/1"
         },
         {
           "params": {
@@ -1352,7 +1361,8 @@
             "liquidity_tier": 1,
             "market_id": 8,
             "ticker": "FIL-USD"
-          }
+          },
+          "yield_index": "0/1"
         },
         {
           "params": {
@@ -1362,7 +1372,8 @@
             "liquidity_tier": 1,
             "market_id": 9,
             "ticker": "LTC-USD"
-          }
+          },
+          "yield_index": "0/1"
         },
         {
           "params": {
@@ -1372,7 +1383,8 @@
             "liquidity_tier": 1,
             "market_id": 10,
             "ticker": "DOGE-USD"
-          }
+          },
+          "yield_index": "0/1"
         },
         {
           "params": {
@@ -1382,7 +1394,8 @@
             "liquidity_tier": 1,
             "market_id": 11,
             "ticker": "ATOM-USD"
-          }
+          },
+          "yield_index": "0/1"
         },
         {
           "params": {
@@ -1392,7 +1405,8 @@
             "liquidity_tier": 1,
             "market_id": 12,
             "ticker": "DOT-USD"
-          }
+          },
+          "yield_index": "0/1"
         },
         {
           "params": {
@@ -1402,7 +1416,8 @@
             "liquidity_tier": 1,
             "market_id": 13,
             "ticker": "UNI-USD"
-          }
+          },
+          "yield_index": "0/1"
         },
         {
           "params": {
@@ -1412,7 +1427,8 @@
             "liquidity_tier": 1,
             "market_id": 14,
             "ticker": "BCH-USD"
-          }
+          },
+          "yield_index": "0/1"
         },
         {
           "params": {
@@ -1422,7 +1438,8 @@
             "liquidity_tier": 1,
             "market_id": 15,
             "ticker": "TRX-USD"
-          }
+          },
+          "yield_index": "0/1"
         },
         {
           "params": {
@@ -1432,7 +1449,8 @@
             "liquidity_tier": 1,
             "market_id": 16,
             "ticker": "NEAR-USD"
-          }
+          },
+          "yield_index": "0/1"
         },
         {
           "params": {
@@ -1442,7 +1460,8 @@
             "liquidity_tier": 2,
             "market_id": 17,
             "ticker": "MKR-USD"
-          }
+          },
+          "yield_index": "0/1"
         },
         {
           "params": {
@@ -1452,7 +1471,8 @@
             "liquidity_tier": 1,
             "market_id": 18,
             "ticker": "XLM-USD"
-          }
+          },
+          "yield_index": "0/1"
         },
         {
           "params": {
@@ -1462,7 +1482,8 @@
             "liquidity_tier": 1,
             "market_id": 19,
             "ticker": "ETC-USD"
-          }
+          },
+          "yield_index": "0/1"
         },
         {
           "params": {
@@ -1472,7 +1493,8 @@
             "liquidity_tier": 2,
             "market_id": 20,
             "ticker": "COMP-USD"
-          }
+          },
+          "yield_index": "0/1"
         },
         {
           "params": {
@@ -1482,7 +1504,8 @@
             "liquidity_tier": 1,
             "market_id": 21,
             "ticker": "WLD-USD"
-          }
+          },
+          "yield_index": "0/1"
         },
         {
           "params": {
@@ -1492,7 +1515,8 @@
             "liquidity_tier": 2,
             "market_id": 22,
             "ticker": "APE-USD"
-          }
+          },
+          "yield_index": "0/1"
         },
         {
           "params": {
@@ -1502,7 +1526,8 @@
             "liquidity_tier": 1,
             "market_id": 23,
             "ticker": "APT-USD"
-          }
+          },
+          "yield_index": "0/1"
         },
         {
           "params": {
@@ -1512,7 +1537,8 @@
             "liquidity_tier": 1,
             "market_id": 24,
             "ticker": "ARB-USD"
-          }
+          },
+          "yield_index": "0/1"
         },
         {
           "params": {
@@ -1522,7 +1548,8 @@
             "liquidity_tier": 2,
             "market_id": 25,
             "ticker": "BLUR-USD"
-          }
+          },
+          "yield_index": "0/1"
         },
         {
           "params": {
@@ -1532,7 +1559,8 @@
             "liquidity_tier": 2,
             "market_id": 26,
             "ticker": "LDO-USD"
-          }
+          },
+          "yield_index": "0/1"
         },
         {
           "params": {
@@ -1542,7 +1570,8 @@
             "liquidity_tier": 1,
             "market_id": 27,
             "ticker": "OP-USD"
-          }
+          },
+          "yield_index": "0/1"
         },
         {
           "params": {
@@ -1552,7 +1581,8 @@
             "liquidity_tier": 1,
             "market_id": 28,
             "ticker": "PEPE-USD"
-          }
+          },
+          "yield_index": "0/1"
         },
         {
           "params": {
@@ -1562,7 +1592,8 @@
             "liquidity_tier": 2,
             "market_id": 29,
             "ticker": "SEI-USD"
-          }
+          },
+          "yield_index": "0/1"
         },
         {
           "params": {
@@ -1572,7 +1603,8 @@
             "liquidity_tier": 1,
             "market_id": 30,
             "ticker": "SHIB-USD"
-          }
+          },
+          "yield_index": "0/1"
         },
         {
           "params": {
@@ -1582,7 +1614,8 @@
             "liquidity_tier": 1,
             "market_id": 31,
             "ticker": "SUI-USD"
-          }
+          },
+          "yield_index": "0/1"
         },
         {
           "params": {
@@ -1592,7 +1625,8 @@
             "liquidity_tier": 1,
             "market_id": 32,
             "ticker": "XRP-USD"
-          }
+          },
+          "yield_index": "0/1"
         },
         {
           "params": {
@@ -1602,7 +1636,8 @@
             "liquidity_tier": 4,
             "market_id": 33,
             "ticker": "TEST-USD"
-          }
+          },
+          "yield_index": "0/1"
         }
       ]
     },
@@ -2119,15 +2154,15 @@
     "ratelimit": {
       "limit_params_list": [
         {
-          "denom": "ibc/8E27BA2D5493AF5636760E354E46004562C46AB7EC0CC4C1CA14E9E20E2545B5",
+          "denom": "ibc/DEEFE2DEFDC8EA8879923C4CCA42BB888C3CD03FF7ECFEFB1C2FEC27A732ACC8",
           "limiters": [
             {
-              "baseline_minimum": "1000000000000",
+              "baseline_minimum": "1000000000000000000000000",
               "baseline_tvl_ppm": 10000,
               "period": "3600s"
             },
             {
-              "baseline_minimum": "10000000000000",
+              "baseline_minimum": "10000000000000000000000000",
               "baseline_tvl_ppm": 100000,
               "period": "86400s"
             }
@@ -2183,7 +2218,8 @@
             "number": 0,
             "owner": "dydx199tqg4wdlnu4qjlxchpd7seg454937hjrknju4"
           },
-          "margin_enabled": true
+          "margin_enabled": true,
+          "asset_yield_index": "0/1"
         },
         {
           "asset_positions": [
@@ -2197,7 +2233,8 @@
             "number": 0,
             "owner": "dydx10fx7sy6ywd5senxae9dwytf8jxek3t2gcen2vs"
           },
-          "margin_enabled": true
+          "margin_enabled": true,
+          "asset_yield_index": "0/1"
         },
         {
           "asset_positions": [
@@ -2211,7 +2248,8 @@
             "number": 0,
             "owner": "dydx1fjg6zp6vv8t9wvy4lps03r5l4g7tkjw9wvmh70"
           },
-          "margin_enabled": true
+          "margin_enabled": true,
+          "asset_yield_index": "0/1"
         },
         {
           "asset_positions": [
@@ -2225,7 +2263,8 @@
             "number": 0,
             "owner": "dydx1wau5mja7j7zdavtfq9lu7ejef05hm6ffenlcsn"
           },
-          "margin_enabled": true
+          "margin_enabled": true,
+          "asset_yield_index": "0/1"
         },
         {
           "asset_positions": [
@@ -2239,7 +2278,8 @@
             "number": 0,
             "owner": "dydx1nzuttarf5k2j0nug5yzhr6p74t9avehn9hlh8m"
           },
-          "margin_enabled": true
+          "margin_enabled": true,
+          "asset_yield_index": "0/1"
         }
       ]
     },

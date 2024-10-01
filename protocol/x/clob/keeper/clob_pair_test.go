@@ -2,15 +2,18 @@ package keeper_test
 
 import (
 	"fmt"
+	"math/big"
 	"strconv"
 	"testing"
 
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/app/module"
 
+	sdaiservertypes "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/server/types/sdaioracle"
 	indexerevents "github.com/StreamFinance-Protocol/stream-chain/protocol/indexer/events"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/indexer/indexer_manager"
 	indexershared "github.com/StreamFinance-Protocol/stream-chain/protocol/indexer/shared/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib"
+	ratelimitkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/keeper"
 
 	"cosmossdk.io/store/prefix"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/mocks"
@@ -40,6 +43,12 @@ func TestCreatePerpetualClobPair_MultiplePerpetual(t *testing.T) {
 	memClob := memclob.NewMemClobPriceTimePriority(false)
 	mockIndexerEventManager := &mocks.IndexerEventManager{}
 	ks := keepertest.NewClobKeepersTestContext(t, memClob, &mocks.BankKeeper{}, mockIndexerEventManager)
+
+	rateString := sdaiservertypes.TestSDAIEventRequest.ConversionRate
+	rate, conversionErr := ratelimitkeeper.ConvertStringToBigInt(rateString)
+	require.NoError(t, conversionErr)
+	ks.RatelimitKeeper.SetSDAIPrice(ks.Ctx, rate)
+	ks.RatelimitKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
 
 	prices.InitGenesis(ks.Ctx, *ks.PricesKeeper, constants.Prices_DefaultGenesisState)
 	perpetuals.InitGenesis(ks.Ctx, *ks.PerpetualsKeeper, constants.Perpetuals_DefaultGenesisState)

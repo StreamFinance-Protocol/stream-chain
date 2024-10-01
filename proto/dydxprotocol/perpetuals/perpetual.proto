@@ -30,6 +30,11 @@ message Perpetual {
         "github.com/StreamFinance-Protocol/stream-chain/protocol/dtypes.SerializableInt",
     (gogoproto.nullable) = false
   ];  
+
+  // The current yield index is determined by the cumulative
+  // all-time history of the yield mechanism. Starts at 0.
+  // This string should always be converted big.Rat.
+  string yield_index = 5;
 }
 
 enum PerpetualMarketType {
@@ -130,7 +135,7 @@ message LiquidityTier {
   uint64 base_position_notional = 5 [ deprecated = true ];
 
   // The impact notional amount (in quote quantums) is used to determine impact
-  // bid/ask prices and its recommended value is 500 USDC / initial margin
+  // bid/ask prices and its recommended value is 500 TDAI / initial margin
   // fraction.
   // - Impact bid price = average execution price for a market sell of the
   // impact notional value.

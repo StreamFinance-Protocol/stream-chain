@@ -115,6 +115,12 @@ export interface PerpetualParams {
   /** The market type specifying if this perpetual is cross or isolated */
 
   marketType: PerpetualMarketType;
+  /** The danger index is used to prioritze certain accounts and positions in liquidations */
+
+  dangerIndexPpm: number;
+  /** The maximum insurance fund delta per block for isolated perpetual markets. */
+
+  isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: Long;
 }
 /**
  * PerpetualParams represents the parameters of a perpetual on the dYdX
@@ -154,6 +160,12 @@ export interface PerpetualParamsSDKType {
   /** The market type specifying if this perpetual is cross or isolated */
 
   market_type: PerpetualMarketTypeSDKType;
+  /** The danger index is used to prioritze certain accounts and positions in liquidations */
+
+  danger_index_ppm: number;
+  /** The maximum insurance fund delta per block for isolated perpetual markets. */
+
+  isolated_market_max_cumulative_insurance_fund_delta_per_block: Long;
 }
 /** MarketPremiums stores a list of premiums for a single perpetual market. */
 
@@ -429,7 +441,9 @@ function createBasePerpetualParams(): PerpetualParams {
     atomicResolution: 0,
     defaultFundingPpm: 0,
     liquidityTier: 0,
-    marketType: 0
+    marketType: 0,
+    dangerIndexPpm: 0,
+    isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: Long.UZERO
   };
 }
 
@@ -461,6 +475,14 @@ export const PerpetualParams = {
 
     if (message.marketType !== 0) {
       writer.uint32(56).int32(message.marketType);
+    }
+
+    if (message.dangerIndexPpm !== 0) {
+      writer.uint32(64).uint32(message.dangerIndexPpm);
+    }
+
+    if (!message.isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock.isZero()) {
+      writer.uint32(72).uint64(message.isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock);
     }
 
     return writer;
@@ -503,6 +525,14 @@ export const PerpetualParams = {
           message.marketType = (reader.int32() as any);
           break;
 
+        case 8:
+          message.dangerIndexPpm = reader.uint32();
+          break;
+
+        case 9:
+          message.isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock = (reader.uint64() as Long);
+          break;
+
         default:
           reader.skipType(tag & 7);
           break;
@@ -521,6 +551,8 @@ export const PerpetualParams = {
     message.defaultFundingPpm = object.defaultFundingPpm ?? 0;
     message.liquidityTier = object.liquidityTier ?? 0;
     message.marketType = object.marketType ?? 0;
+    message.dangerIndexPpm = object.dangerIndexPpm ?? 0;
+    message.isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock = object.isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock !== undefined && object.isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock !== null ? Long.fromValue(object.isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock) : Long.UZERO;
     return message;
   }
 

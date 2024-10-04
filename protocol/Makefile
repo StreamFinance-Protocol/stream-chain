@@ -250,7 +250,7 @@ test-slow:
 	$(MAKE) test-exchange-slow
 
 test-unit:
-	@VERSION=$(VERSION) go test -mod=readonly -tags='test_ledger_mock $(build_tags)' ./x/perpetuals/...
+	@VERSION=$(VERSION) go test -mod=readonly -tags='test_ledger_mock $(build_tags)' -run "TestExtendVoteHandler" ./app/ve/...
 
 test-race:
 	@VERSION=$(VERSION) go test -mod=readonly -timeout 20m -race -tags='test_ledger_mock $(build_tags)' ./...
@@ -262,7 +262,7 @@ test-cover:
 	@VERSION=$(VERSION) go test -mod=readonly -timeout 12m -coverprofile=coverage.out -covermode=atomic -coverpkg=github.com/dydxprotocol/v4-chain/protocol/... -tags='test_ledger_mock $(build_tags)' ./...
 
 test-cover-slow:
-	@VERSION=$(VERSION) go test -mod=readonly -timeout 12m -coverprofile=coverage.out -covermode=atomic -coverpkg=github.com/dydxprotocol/v4-chain/protocol/... -tags='test_ledger_mock $(build_tags)' -p 1 -count=1 ./...
+	@VERSION=$(VERdockSION) go test -mod=readonly -timeout 12m -coverprofile=coverage.out -covermode=atomic -coverpkg=github.com/dydxprotocol/v4-chain/protocol/... -tags='test_ledger_mock $(build_tags)' -p 1 -count=1 ./...
 
 test-exchange-slow:
 	@VERSION=$(VERSION) go test -mod=readonly -tags='test_ledger_mock exchange_tests $(build_tags)' -p 1 -count=1 github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/pricefeed/client/handler -run "TestQueryingActualExchanges"
@@ -272,7 +272,7 @@ test-unit-and-integration: e2e-setup delete-anvil
 	$(MAKE) remove-container
 
 specific-test: 
-	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -timeout 80m -run "TestDelayMessageByBlocks" ./x/delaymsg/keeper/...
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -timeout 80m -run "TestMaybeGetLiquidationOrder" ./x/clob/keeper/...
 
 
 test-unit-and-integration-linux: e2e-setup-linux 

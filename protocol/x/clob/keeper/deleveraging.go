@@ -17,6 +17,7 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib/log"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib/metrics"
 	assettypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets/types"
+	heap "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/heap"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -328,7 +329,7 @@ func (k Keeper) OffsetSubaccountPerpetualPosition(
 
 	// Find subaccounts with open positions on the opposite side of the liquidated subaccount.
 	isDeleveragingLong := deltaQuantumsTotal.Sign() == -1
-	subaccountsWithOpenPositions := k.DaemonLiquidationInfo.GetSubaccountsWithOpenPositionsOnSide(
+	subaccountsWithOpenPositions := k.DaemonDeleveragingInfo.GetSubaccountsWithOpenPositionsOnSide(
 		perpetualId,
 		!isDeleveragingLong,
 	)
@@ -630,6 +631,8 @@ func (k Keeper) ProcessDeleveraging(
 			deleveragedSubaccountPerpetualQuantumsDelta,
 			offsettingSubaccountPerpetualQuantumsDelta,
 			big.NewInt(0),
+			big.NewInt(0),
+			big.NewInt(0),
 			false, // IsLiquidation is false since this isn't a liquidation match.
 			true,  // IsDeleverage is true since this is a deleveraging match.
 			perpetualId,
@@ -640,12 +643,12 @@ func (k Keeper) ProcessDeleveraging(
 }
 
 // GetSubaccountsWithPositionsInFinalSettlementMarkets uses the subaccountOpenPositionInfo returned from the
-// liquidations daemon to fetch subaccounts with open positions in final settlement markets. These subaccounts
+// deleveraging daemon to fetch subaccounts with open positions in final settlement markets. These subaccounts
 // will be deleveraged in either at the oracle price if non-negative TNC or at bankruptcy price if negative TNC. This
 // function is called in PrepareCheckState during the deleveraging step.
 func (k Keeper) GetSubaccountsWithPositionsInFinalSettlementMarkets(
 	ctx sdk.Context,
-) (subaccountsToDeleverage []subaccountToDeleverage) {
+) (subaccountsToDeleverage []heap.SubaccountToDeleverage) {
 	defer telemetry.MeasureSince(
 		time.Now(),
 		types.ModuleName,
@@ -659,11 +662,11 @@ func (k Keeper) GetSubaccountsWithPositionsInFinalSettlementMarkets(
 		}
 
 		finalSettlementPerpetualId := clobPair.MustGetPerpetualId()
-		subaccountsWithPosition := k.DaemonLiquidationInfo.GetSubaccountsWithOpenPositions(
+		subaccountsWithPosition := k.DaemonDeleveragingInfo.GetSubaccountsWithOpenPositions(
 			finalSettlementPerpetualId,
 		)
 		for _, subaccountId := range subaccountsWithPosition {
-			subaccountsToDeleverage = append(subaccountsToDeleverage, subaccountToDeleverage{
+			subaccountsToDeleverage = append(subaccountsToDeleverage, heap.SubaccountToDeleverage{
 				SubaccountId: subaccountId,
 				PerpetualId:  finalSettlementPerpetualId,
 			})
@@ -682,7 +685,7 @@ func (k Keeper) GetSubaccountsWithPositionsInFinalSettlementMarkets(
 // Returns an error if a deleveraging attempt returns an error.
 func (k Keeper) DeleverageSubaccounts(
 	ctx sdk.Context,
-	subaccountsToDeleverage []subaccountToDeleverage,
+	subaccountsToDeleverage []heap.SubaccountToDeleverage,
 ) error {
 	defer telemetry.MeasureSince(
 		time.Now(),

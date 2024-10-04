@@ -1834,6 +1834,8 @@ fetch('https://dydx-testnet.imperator.co/v4/perpetualMarkets',
       "maintenanceMarginFraction": "string",
       "openInterest": "string",
       "atomicResolution": 0,
+      "dangerIndexPpm": 0,
+      "isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock": "string",
       "quantumConversionExponent": 0,
       "tickSize": "string",
       "stepSize": "string",
@@ -1858,6 +1860,8 @@ fetch('https://dydx-testnet.imperator.co/v4/perpetualMarkets',
       "maintenanceMarginFraction": "string",
       "openInterest": "string",
       "atomicResolution": 0,
+      "dangerIndexPpm": 0,
+      "isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock": "string",
       "quantumConversionExponent": 0,
       "tickSize": "string",
       "stepSize": "string",
@@ -3681,6 +3685,8 @@ or
   "maintenanceMarginFraction": "string",
   "openInterest": "string",
   "atomicResolution": 0,
+  "dangerIndexPpm": 0,
+  "isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock": "string",
   "quantumConversionExponent": 0,
   "tickSize": "string",
   "stepSize": "string",
@@ -3711,6 +3717,8 @@ or
 |maintenanceMarginFraction|string|true|none|none|
 |openInterest|string|true|none|none|
 |atomicResolution|number(double)|true|none|none|
+|dangerIndexPpm|number(double)|true|none|none|
+|isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock|string|true|none|none|
 |quantumConversionExponent|number(double)|true|none|none|
 |tickSize|string|true|none|none|
 |stepSize|string|true|none|none|
@@ -3745,6 +3753,8 @@ or
       "maintenanceMarginFraction": "string",
       "openInterest": "string",
       "atomicResolution": 0,
+      "dangerIndexPpm": 0,
+      "isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock": "string",
       "quantumConversionExponent": 0,
       "tickSize": "string",
       "stepSize": "string",
@@ -3769,6 +3779,8 @@ or
       "maintenanceMarginFraction": "string",
       "openInterest": "string",
       "atomicResolution": 0,
+      "dangerIndexPpm": 0,
+      "isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock": "string",
       "quantumConversionExponent": 0,
       "tickSize": "string",
       "stepSize": "string",

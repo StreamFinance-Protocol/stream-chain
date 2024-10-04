@@ -1403,14 +1403,13 @@ function edit_genesis() {
 	dasel put -t int -f "$GENESIS" '.app_state.clob.clob_pairs.[32].quantum_conversion_exponent' -v '-9'
 
 	# Liquidations
-	dasel put -t int -f "$GENESIS" '.app_state.clob.liquidations_config.max_liquidation_fee_ppm' -v '15000'  # 1.5%
-	dasel put -t int -f "$GENESIS" '.app_state.clob.liquidations_config.position_block_limits.min_position_notional_liquidated' -v '1000000000' # 1_000 USDC
-	dasel put -t int -f "$GENESIS" '.app_state.clob.liquidations_config.position_block_limits.max_position_portion_liquidated_ppm' -v '100000'  # 10%
-	dasel put -t int -f "$GENESIS" '.app_state.clob.liquidations_config.subaccount_block_limits.max_notional_liquidated' -v '100000000000'  # 100_000 USDC
-	dasel put -t int -f "$GENESIS" '.app_state.clob.liquidations_config.subaccount_block_limits.max_quantums_insurance_lost' -v '1000000000000' # 1_000_000 USDC
+	dasel put -t int -f "$GENESIS" '.app_state.clob.liquidations_config.insurance_fund_fee_ppm' -v '15000'  # 1.5%
+	dasel put -t int -f "$GENESIS" '.app_state.clob.liquidations_config.validator_fee_ppm' -v '200000'  # 20%
+	dasel put -t int -f "$GENESIS" '.app_state.clob.liquidations_config.liquidity_fee_ppm' -v '800000'  # 80%
+	dasel put -t int -f "$GENESIS" '.app_state.clob.liquidations_config.max_cumulative_insurance_fund_delta' -v '1000000000000' # 1_000_000 USDC
 	dasel put -t int -f "$GENESIS" '.app_state.clob.liquidations_config.fillable_price_config.bankruptcy_adjustment_ppm' -v '1000000'
 	dasel put -t int -f "$GENESIS" '.app_state.clob.liquidations_config.fillable_price_config.spread_to_maintenance_margin_ratio_ppm' -v '1500000'  # 150%
-
+	
 	# Block Rate Limit
 	# Max 400 short term orders/cancels per block
 	dasel put -t json -f "$GENESIS" '.app_state.clob.block_rate_limit_config.max_short_term_orders_and_cancels_per_n_blocks.[]' -v "{}"
@@ -1513,7 +1512,7 @@ function add_subaccount() {
 	dasel put -t int -f "$GEN_FILE" ".app_state.subaccounts.subaccounts.[$IDX].asset_positions.[0].index" -v '0'
 }
 
-# Modify the genesis file to use only the test exchange for computing index prices. The test exchange is configured
+# Modify the genesis file to use only the test exchange for computing daemon prices. The test exchange is configured
 # to serve prices for BTC, ETH and LINK. This must be called after edit_genesis to ensure all markets exist.
 function update_genesis_use_test_exchange() {
 	GENESIS=$1/genesis.json
@@ -1563,7 +1562,7 @@ function update_genesis_use_test_exchange() {
 
 	# All remaining markets can just use the LINK ticker so the daemon will start. All markets must have at least 1
 	# exchange. With only one exchange configured, there should not be enough prices to meet the minimum exchange
-	# count, and these markets will not have index prices.
+	# count, and these markets will not have daemon prices.
 	for market_idx in {3..34}
 	do
 		dasel put -t string -f "$GENESIS" ".app_state.prices.market_params.[$market_idx].exchange_config_json" -v "$link_exchange_config_json"

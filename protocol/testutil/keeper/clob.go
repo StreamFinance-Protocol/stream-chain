@@ -1,10 +1,11 @@
 package keeper
 
 import (
+	"fmt"
 	"testing"
 
 	storetypes "cosmossdk.io/store/types"
-	liquidationtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/server/types/liquidations"
+	deleveragingtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/server/types/deleveraging"
 	indexerevents "github.com/StreamFinance-Protocol/stream-chain/protocol/indexer/events"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/indexer/indexer_manager"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib"
@@ -135,7 +136,6 @@ func NewClobKeepersTestContextWithUninitializedMemStore(
 			ks.StatsKeeper,
 			ks.SubaccountsKeeper,
 			indexerEventManager,
-			indexerEventsTransientStoreKey,
 		)
 		ks.Cdc = cdc
 
@@ -171,7 +171,6 @@ func createClobKeeper(
 	statsKeeper *statskeeper.Keeper,
 	saKeeper *subkeeper.Keeper,
 	indexerEventManager indexer_manager.IndexerEventManager,
-	indexerEventsTransientStoreKey storetypes.StoreKey,
 ) (*keeper.Keeper, storetypes.StoreKey, storetypes.StoreKey) {
 	storeKey := storetypes.NewKVStoreKey(types.StoreKey)
 	memKey := storetypes.NewMemoryStoreKey(types.MemStoreKey)
@@ -204,7 +203,8 @@ func createClobKeeper(
 		constants.TestEncodingCfg.TxConfig.TxDecoder(),
 		flags.GetDefaultClobFlags(),
 		rate_limit.NewNoOpRateLimiter[sdk.Msg](),
-		liquidationtypes.NewDaemonLiquidationInfo(),
+		deleveragingtypes.NewDaemonDeleveragingInfo(),
+		nil,
 	)
 	k.SetAnteHandler(constants.EmptyAnteHandler)
 
@@ -273,6 +273,8 @@ func CreateNClobPair(
 					items[i].StepBaseQuantums,
 					perps[i].Params.LiquidityTier,
 					perps[i].Params.MarketType,
+					perps[i].Params.DangerIndexPpm,
+					fmt.Sprintf("%d", perps[i].Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock),
 				),
 			),
 		).Return()

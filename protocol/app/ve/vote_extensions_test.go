@@ -52,14 +52,13 @@ func TestExtendVoteHandler(t *testing.T) {
 			extendVoteRequest: func() *cometabci.RequestExtendVote {
 				return nil
 			},
+			expectedError: true,
 		},
-		"price daemon returns no prices": {
+		"price daemon returns no prices - throws error": {
 			pricesKeeper: func() *mocks.PreBlockExecPricesKeeper {
 				mPricesKeeper := &mocks.PreBlockExecPricesKeeper{}
 				mPricesKeeper.On("GetValidMarketSpotPriceUpdates", mock.Anything).Return(
-					&pricestypes.MarketPriceUpdates{
-						MarketPriceUpdates: []*pricestypes.MarketPriceUpdate{},
-					},
+					[]*pricestypes.MarketSpotPriceUpdate{},
 				)
 
 				mPricesKeeper.On("GetMarketParam", mock.Anything, mock.Anything).Return(
@@ -83,15 +82,13 @@ func TestExtendVoteHandler(t *testing.T) {
 				)
 				return mClobKeeper
 			},
-			expectedResponse: &vetypes.DaemonVoteExtension{
-				Prices: nil,
-			},
+			expectedError: true,
 		},
 		"oracle service returns single price": {
 			pricesKeeper: func() *mocks.PreBlockExecPricesKeeper {
 				mpricesKeeper := &mocks.PreBlockExecPricesKeeper{}
 				mpricesKeeper.On("GetValidMarketSpotPriceUpdates", mock.Anything).Return(
-					constants.ValidSingleMarketPriceUpdateObj,
+					constants.ValidSingleSpotMarketPriceUpdate,
 				)
 				mpricesKeeper.On("GetMarketParam", mock.Anything, mock.Anything).Return(
 					constants.TestSingleMarketParam,
@@ -118,12 +115,15 @@ func TestExtendVoteHandler(t *testing.T) {
 			clobKeeper: func() *mocks.ExtendVoteClobKeeper {
 				mClobKeeper := &mocks.ExtendVoteClobKeeper{}
 				mClobKeeper.On("GetClobPair", mock.Anything, mock.Anything).Return(
-					clobtypes.ClobPair{},
+					clobtypes.ClobPair{
+						Id:              constants.MarketId0,
+						SubticksPerTick: 100_000,
+					},
 					true,
 				)
 				mClobKeeper.On("GetSingleMarketClobMetadata", mock.Anything, mock.Anything).Return(
 					clobtypes.ClobMetadata{
-						MidPrice: clobtypes.Subticks(constants.Price5),
+						MidPrice: clobtypes.Subticks(getSubticksFromPrice(constants.Price5)),
 					},
 				)
 				return mClobKeeper
@@ -142,7 +142,7 @@ func TestExtendVoteHandler(t *testing.T) {
 			pricesKeeper: func() *mocks.PreBlockExecPricesKeeper {
 				mPricesKeeper := &mocks.PreBlockExecPricesKeeper{}
 				mPricesKeeper.On("GetValidMarketSpotPriceUpdates", mock.Anything).Return(
-					constants.ValidMarketPriceUpdateObj,
+					constants.ValidMultiMarketSpotPriceUpdates,
 				)
 				mPricesKeeper.On("GetMarketParam", mock.Anything, constants.MarketId0).Return(
 					constants.TestMarketParams[0],
@@ -157,23 +157,23 @@ func TestExtendVoteHandler(t *testing.T) {
 					true,
 				)
 				mPricesKeeper.On("GetMarketParam", mock.Anything, constants.MarketId3).Return(
-					constants.Price4,
+					constants.TestMarketParams[3],
 					true,
 				)
 				mPricesKeeper.On("GetMarketParam", mock.Anything, constants.MarketId4).Return(
-					constants.Price3,
+					constants.TestMarketParams[4],
 					true,
 				)
 				mPricesKeeper.On("GetSmoothedSpotPrice", constants.MarketId0).Return(
-					constants.Price1,
+					constants.Price5,
 					true,
 				)
 				mPricesKeeper.On("GetSmoothedSpotPrice", constants.MarketId1).Return(
-					constants.Price2,
+					constants.Price6,
 					true,
 				)
 				mPricesKeeper.On("GetSmoothedSpotPrice", constants.MarketId2).Return(
-					constants.Price3,
+					constants.Price7,
 					true,
 				)
 				mPricesKeeper.On("GetSmoothedSpotPrice", constants.MarketId3).Return(
@@ -200,63 +200,98 @@ func TestExtendVoteHandler(t *testing.T) {
 				mClobKeeper := &mocks.ExtendVoteClobKeeper{}
 				mClobKeeper.On("GetClobPair", mock.Anything, mock.Anything).Return(
 					clobtypes.ClobPair{
-						Id: constants.MarketId0,
+						Id:              constants.MarketId0,
+						SubticksPerTick: 100_000,
 					},
 					true,
 				)
+				mClobKeeper.On("GetClobPair", mock.Anything, mock.Anything).Return(
+					clobtypes.ClobPair{
+						Id:              constants.MarketId1,
+						SubticksPerTick: 100_000,
+					},
+					true,
+				)
+				mClobKeeper.On("GetClobPair", mock.Anything, mock.Anything).Return(
+					clobtypes.ClobPair{
+						Id:              constants.MarketId2,
+						SubticksPerTick: 100_000,
+					},
+					true,
+				)
+				mClobKeeper.On("GetClobPair", mock.Anything, mock.Anything).Return(
+					clobtypes.ClobPair{
+						Id:              constants.MarketId3,
+						SubticksPerTick: 100_000,
+					},
+					true,
+				)
+				mClobKeeper.On("GetClobPair", mock.Anything, mock.Anything).Return(
+					clobtypes.ClobPair{
+						Id:              constants.MarketId4,
+						SubticksPerTick: 100_000,
+					},
+					true,
+				)
+
 				mClobKeeper.On(
 					"GetSingleMarketClobMetadata",
 					mock.Anything,
 					clobtypes.ClobPair{
-						Id: constants.MarketId0,
+						Id:              constants.MarketId0,
+						SubticksPerTick: 100_000,
 					},
 				).Return(
 					clobtypes.ClobMetadata{
-						MidPrice: clobtypes.Subticks(constants.Price5),
+						MidPrice: clobtypes.Subticks(getSubticksFromPrice(constants.Price5)),
 					},
 				)
 				mClobKeeper.On(
 					"GetSingleMarketClobMetadata",
 					mock.Anything,
 					clobtypes.ClobPair{
-						Id: constants.MarketId1,
+						Id:              constants.MarketId1,
+						SubticksPerTick: 100_000,
 					},
 				).Return(
 					clobtypes.ClobMetadata{
-						MidPrice: clobtypes.Subticks(constants.Price6),
+						MidPrice: clobtypes.Subticks(getSubticksFromPrice(constants.Price6)),
 					},
 				)
 				mClobKeeper.On(
 					"GetSingleMarketClobMetadata",
 					mock.Anything,
 					clobtypes.ClobPair{
-						Id: constants.MarketId2,
+						Id:              constants.MarketId2,
+						SubticksPerTick: 100_000,
 					},
 				).Return(
 					clobtypes.ClobMetadata{
-						MidPrice: clobtypes.Subticks(constants.Price7),
+						MidPrice: clobtypes.Subticks(getSubticksFromPrice(constants.Price7)),
 					},
 				)
 				mClobKeeper.On(
 					"GetSingleMarketClobMetadata",
 					mock.Anything,
 					clobtypes.ClobPair{
-						Id: constants.MarketId3,
+						Id:              constants.MarketId3,
+						SubticksPerTick: 100_000,
 					},
 				).Return(
 					clobtypes.ClobMetadata{
-						MidPrice: clobtypes.Subticks(constants.Price4),
+						MidPrice: clobtypes.Subticks(getSubticksFromPrice(constants.Price4)),
 					},
 				)
 				mClobKeeper.On(
 					"GetSingleMarketClobMetadata",
 					mock.Anything,
 					clobtypes.ClobPair{
-						Id: constants.MarketId4,
+						Id:              constants.MarketId4,
+						SubticksPerTick: 100_000,
 					},
 				).Return(
 					clobtypes.ClobMetadata{
-						MidPrice: clobtypes.Subticks(constants.Price3),
+						MidPrice: clobtypes.Subticks(getSubticksFromPrice(constants.Price3)),
 					},
 				)
 				return mClobKeeper
@@ -334,18 +369,30 @@ func TestExtendVoteHandler(t *testing.T) {
 				req = tc.extendVoteRequest()
 			}
 
-			mPriceApplier.On("ApplyPricesFromVE", mock.Anything, mock.Anything).Return(nil)
+			mPriceApplier.On("ApplyPricesFromVE", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 			resp, err := h.ExtendVoteHandler()(ctx, req)
 			if !tc.expectedError {
-				if resp == nil || len(resp.VoteExtension) == 0 {
+				require.NoError(t, err)
+				if resp == nil && tc.expectedResponse == nil {
 					return
 				}
-				require.NoError(t, err)
 				require.NotNil(t, resp)
 				ext, err := votecodec.Decode(resp.VoteExtension)
 				require.NoError(t, err)
-				require.Equal(t, tc.expectedResponse.Prices, ext.Prices)
+				require.Equal(t, len(tc.expectedResponse.Prices), len(ext.Prices))
+
+				expectedPriceMap := make(map[uint32]vetypes.PricePair)
+				for _, expectedPricePair := range tc.expectedResponse.Prices {
+					expectedPriceMap[expectedPricePair.MarketId] = expectedPricePair
+				}
+
+				for _, actualPricePair := range ext.Prices {
+					expectedPricePair, exists := expectedPriceMap[actualPricePair.MarketId]
+					require.True(t, exists, "MarketId %d not found in expected prices", actualPricePair.MarketId)
+					require.Equal(t, expectedPricePair.PnlPrice, actualPricePair.PnlPrice)
+					require.Equal(t, expectedPricePair.SpotPrice, actualPricePair.SpotPrice)
+				}
 			} else {
 				require.Error(t, err)
 			}
@@ -556,7 +603,7 @@ func TestVerifyVoteHandler(t *testing.T) {
 func TestGetVEBytesFromCurrPrices(t *testing.T) {
 	tests := map[string]struct {
 		markets        []uint32
-		indexPrices    []*pricestypes.MarketSpotPriceUpdate
+		daemonPrices   []*pricestypes.MarketSpotPriceUpdate
 		smoothedPrices map[uint32]uint64
 		midPrices      map[uint32]uint64
 		fundingRates   map[uint32]int64
@@ -565,7 +612,7 @@ func TestGetVEBytesFromCurrPrices(t *testing.T) {
 	}{
 		"throws error if no prices": {
 			markets:        []uint32{},
-			indexPrices:    []*pricestypes.MarketSpotPriceUpdate{},
+			daemonPrices:   []*pricestypes.MarketSpotPriceUpdate{},
 			smoothedPrices: nil,
 			midPrices:      nil,
 			fundingRates:   nil,
@@ -574,7 +621,7 @@ func TestGetVEBytesFromCurrPrices(t *testing.T) {
 		},
 		"valid single price, no funding-smooth-or-mid": {
 			markets: []uint32{constants.MarketId0},
-			indexPrices: []*pricestypes.MarketSpotPriceUpdate{
+			daemonPrices: []*pricestypes.MarketSpotPriceUpdate{
 				pricestypes.NewMarketSpotPriceUpdate(constants.MarketId0, constants.Price5),
 			},
 			smoothedPrices: map[uint32]uint64{
@@ -599,7 +646,7 @@ func TestGetVEBytesFromCurrPrices(t *testing.T) {
 		},
 		"valid single price with funding, no smooth or mid": {
 			markets: []uint32{constants.MarketId0},
-			indexPrices: []*pricestypes.MarketSpotPriceUpdate{
+			daemonPrices: []*pricestypes.MarketSpotPriceUpdate{
 				pricestypes.NewMarketSpotPriceUpdate(constants.MarketId0, constants.Price5),
 			},
 			smoothedPrices: map[uint32]uint64{
@@ -624,7 +671,7 @@ func TestGetVEBytesFromCurrPrices(t *testing.T) {
 		},
 		"valid multiple prices, no funding, smooth or mid": {
 			markets: []uint32{constants.MarketId0, constants.MarketId1},
-			indexPrices: []*pricestypes.MarketSpotPriceUpdate{
+			daemonPrices: []*pricestypes.MarketSpotPriceUpdate{
 				pricestypes.NewMarketSpotPriceUpdate(constants.MarketId0, constants.Price5),
 				pricestypes.NewMarketSpotPriceUpdate(constants.MarketId1, constants.Price6),
 			},
@@ -658,7 +705,7 @@ func TestGetVEBytesFromCurrPrices(t *testing.T) {
 		},
 		"valid multiple prices with funding, no smooth or mid": {
 			markets: []uint32{constants.MarketId0, constants.MarketId1},
-			indexPrices: []*pricestypes.MarketSpotPriceUpdate{
+			daemonPrices: []*pricestypes.MarketSpotPriceUpdate{
 				pricestypes.NewMarketSpotPriceUpdate(constants.MarketId0, constants.Price5),
 				pricestypes.NewMarketSpotPriceUpdate(constants.MarketId1, constants.Price6),
 			},
@@ -692,7 +739,7 @@ func TestGetVEBytesFromCurrPrices(t *testing.T) {
 		},
 		"valid multiple prices with funding and smooth, no mid": {
 			markets: []uint32{constants.MarketId0, constants.MarketId1},
-			indexPrices: []*pricestypes.MarketSpotPriceUpdate{
+			daemonPrices: []*pricestypes.MarketSpotPriceUpdate{
 				pricestypes.NewMarketSpotPriceUpdate(constants.MarketId0, constants.Price5),
 				pricestypes.NewMarketSpotPriceUpdate(constants.MarketId1, constants.Price6),
 			},
@@ -726,7 +773,7 @@ func TestGetVEBytesFromCurrPrices(t *testing.T) {
 		},
 		"valid multiple prices with smooth and mid, no funding": {
 			markets: []uint32{constants.MarketId0, constants.MarketId1},
-			indexPrices: []*pricestypes.MarketSpotPriceUpdate{
+			daemonPrices: []*pricestypes.MarketSpotPriceUpdate{
 				pricestypes.NewMarketSpotPriceUpdate(constants.MarketId0, constants.Price5),
 				pricestypes.NewMarketSpotPriceUpdate(constants.MarketId1, constants.Price6),
 			},
@@ -760,7 +807,7 @@ func TestGetVEBytesFromCurrPrices(t *testing.T) {
 		},
 		"valid multiple prices with smooth, no funding or mid": {
 			markets: []uint32{constants.MarketId0, constants.MarketId1},
-			indexPrices: []*pricestypes.MarketSpotPriceUpdate{
+			daemonPrices: []*pricestypes.MarketSpotPriceUpdate{
 				pricestypes.NewMarketSpotPriceUpdate(constants.MarketId0, constants.Price5),
 				pricestypes.NewMarketSpotPriceUpdate(constants.MarketId1, constants.Price6),
 			},
@@ -794,7 +841,7 @@ func TestGetVEBytesFromCurrPrices(t *testing.T) {
 		},
 		"valid multiple prices with mid, no funding or smooth": {
 			markets: []uint32{constants.MarketId0, constants.MarketId1},
-			indexPrices: []*pricestypes.MarketSpotPriceUpdate{
+			daemonPrices: []*pricestypes.MarketSpotPriceUpdate{
 				pricestypes.NewMarketSpotPriceUpdate(constants.MarketId0, constants.Price5),
 				pricestypes.NewMarketSpotPriceUpdate(constants.MarketId1, constants.Price6),
 			},
@@ -828,7 +875,7 @@ func TestGetVEBytesFromCurrPrices(t *testing.T) {
 		},
 		"single price with smooth, funding, and mid": {
 			markets: []uint32{constants.MarketId0},
-			indexPrices: []*pricestypes.MarketSpotPriceUpdate{
+			daemonPrices: []*pricestypes.MarketSpotPriceUpdate{
 				pricestypes.NewMarketSpotPriceUpdate(constants.MarketId0, constants.Price5),
 			},
 			smoothedPrices: map[uint32]uint64{
@@ -838,7 +885,7 @@ func TestGetVEBytesFromCurrPrices(t *testing.T) {
 				constants.MarketId0: 2000, // 0.2% in ppm
 			},
 			midPrices: map[uint32]uint64{
-				constants.MarketId0: constants.Price5In1000SubticksPerTick - 2000,
+				constants.MarketId0: constants.Price5In100_000SubticksPerTick - 200_000,
 			},
 			expected: &vetypes.DaemonVoteExtension{
 				Prices: []vetypes.PricePair{
@@ -853,7 +900,7 @@ func TestGetVEBytesFromCurrPrices(t *testing.T) {
 		},
 		"multiple prices with smooth, funding, and mid": {
 			markets: []uint32{constants.MarketId0, constants.MarketId1},
-			indexPrices: []*pricestypes.MarketSpotPriceUpdate{
+			daemonPrices: []*pricestypes.MarketSpotPriceUpdate{
 				pricestypes.NewMarketSpotPriceUpdate(constants.MarketId0, constants.Price5),
 				pricestypes.NewMarketSpotPriceUpdate(constants.MarketId1, constants.Price6),
 			},
@@ -866,8 +913,8 @@ func TestGetVEBytesFromCurrPrices(t *testing.T) {
 				constants.MarketId1: 500,
 			},
 			midPrices: map[uint32]uint64{
-				constants.MarketId0: constants.Price5In1000SubticksPerTick - 2000,
-				constants.MarketId1: constants.Price6In1000SubticksPerTick + 2000,
+				constants.MarketId0: constants.Price5In100_000SubticksPerTick - 200_000,
+				constants.MarketId1: constants.Price6In100_000SubticksPerTick + 200_000,
 			},
 			expected: &vetypes.DaemonVoteExtension{
 				Prices: []vetypes.PricePair{
@@ -895,7 +942,7 @@ func TestGetVEBytesFromCurrPrices(t *testing.T) {
 			mClobKeeper := &mocks.ExtendVoteClobKeeper{}
 			mPerpKeeper := &mocks.ExtendVotePerpetualsKeeper{}
 
-			mPricesKeeper.On("GetValidMarketSpotPriceUpdates", mock.Anything).Return(tc.indexPrices)
+			mPricesKeeper.On("GetValidMarketSpotPriceUpdates", mock.Anything).Return(tc.daemonPrices)
 
 			for _, market := range tc.markets {
 				mPricesKeeper.On("GetMarketParam", mock.Anything, market).Return(
@@ -940,7 +987,7 @@ func TestGetVEBytesFromCurrPrices(t *testing.T) {
 				mClobKeeper.On("GetClobPair", mock.Anything, clobtypes.ClobPairId(market)).Return(
 					clobtypes.ClobPair{
 						Id:              market,
-						SubticksPerTick: 1000,
+						SubticksPerTick: 100_000,
 					},
 					true,
 				)
@@ -951,7 +998,7 @@ func TestGetVEBytesFromCurrPrices(t *testing.T) {
 						mock.Anything,
 						clobtypes.ClobPair{
 							Id:              market,
-							SubticksPerTick: 1000,
+							SubticksPerTick: 100_000,
 						},
 					).Return(
 						clobtypes.ClobMetadata{
@@ -964,7 +1011,7 @@ func TestGetVEBytesFromCurrPrices(t *testing.T) {
 						mock.Anything,
 						clobtypes.ClobPair{
 							Id:              market,
-							SubticksPerTick: 1000,
+							SubticksPerTick: 100_000,
 						},
 					).Return(
 						clobtypes.ClobMetadata{
@@ -1032,4 +1079,8 @@ func getGobEncodedPriceBytes(
 		return []byte{}
 	}
 	return bytes
+}
+
+func getSubticksFromPrice(price uint64) clobtypes.Subticks {
+	return clobtypes.Subticks(price * 100_000)
 }

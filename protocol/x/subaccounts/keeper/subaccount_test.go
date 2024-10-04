@@ -173,6 +173,8 @@ func TestGetCollateralPool(t *testing.T) {
 						p.Params.DefaultFundingPpm,
 						p.Params.LiquidityTier,
 						p.Params.MarketType,
+						p.Params.DangerIndexPpm,
+						p.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
 					)
 					require.NoError(t, err)
 				}
@@ -4365,6 +4367,8 @@ func TestUpdateSubaccounts_WithdrawalsBlocked(t *testing.T) {
 					p.Params.DefaultFundingPpm,
 					p.Params.LiquidityTier,
 					p.Params.MarketType,
+					p.Params.DangerIndexPpm,
+					p.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
 				)
 				require.NoError(t, err)
 
@@ -5483,6 +5487,8 @@ func TestCanUpdateSubaccounts(t *testing.T) {
 					p.Params.DefaultFundingPpm,
 					p.Params.LiquidityTier,
 					p.Params.MarketType,
+					p.Params.DangerIndexPpm,
+					p.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
 				)
 				require.NoError(t, err)
 			}
@@ -5930,6 +5936,8 @@ func TestGetNetCollateralAndMarginRequirements(t *testing.T) {
 					p.Params.DefaultFundingPpm,
 					p.Params.LiquidityTier,
 					p.Params.MarketType,
+					p.Params.DangerIndexPpm,
+					p.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
 				)
 				require.NoError(t, err)
 			}

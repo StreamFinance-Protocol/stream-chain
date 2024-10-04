@@ -260,6 +260,8 @@ export interface PerpetualMarketResponseObject {
   maintenanceMarginFraction: string;
   openInterest: string;
   atomicResolution: number;
+  dangerIndexPpm: number;
+  isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: string;
   quantumConversionExponent: number;
   tickSize: string;
   stepSize: string;

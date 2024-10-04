@@ -2,6 +2,7 @@ package keeper_test
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"math/big"
 	"testing"
@@ -397,6 +398,8 @@ func TestCanDeleverageSubaccount(t *testing.T) {
 					perpetual.Params.DefaultFundingPpm,
 					perpetual.Params.LiquidityTier,
 					perpetual.Params.MarketType,
+					perpetual.Params.DangerIndexPpm,
+					perpetual.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
 				)
 				require.NoError(t, err)
 			}
@@ -419,6 +422,8 @@ func TestCanDeleverageSubaccount(t *testing.T) {
 							clobPair.StepBaseQuantums,
 							perpetuals[i].Params.LiquidityTier,
 							perpetuals[i].Params.MarketType,
+							perpetuals[i].Params.DangerIndexPpm,
+							fmt.Sprintf("%d", perpetuals[i].Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock),
 						),
 					),
 				).Once().Return()
@@ -778,6 +783,8 @@ func TestOffsetSubaccountPerpetualPosition(t *testing.T) {
 					p.Params.DefaultFundingPpm,
 					p.Params.LiquidityTier,
 					p.Params.MarketType,
+					p.Params.DangerIndexPpm,
+					p.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
 				)
 				require.NoError(t, err)
 			}
@@ -811,6 +818,8 @@ func TestOffsetSubaccountPerpetualPosition(t *testing.T) {
 							clobPair.StepBaseQuantums,
 							perps[i].Params.LiquidityTier,
 							perps[i].Params.MarketType,
+							perps[i].Params.DangerIndexPpm,
+							fmt.Sprintf("%d", perps[i].Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock),
 						),
 					),
 				).Once().Return()
@@ -866,7 +875,7 @@ func TestOffsetSubaccountPerpetualPosition(t *testing.T) {
 			}
 
 			positions := clobtest.GetOpenPositionsFromSubaccounts(tc.subaccounts)
-			ks.ClobKeeper.DaemonLiquidationInfo.UpdateSubaccountsWithPositions(positions)
+			ks.ClobKeeper.DaemonDeleveragingInfo.UpdateSubaccountsWithPositions(positions)
 			fills, deltaQuantumsRemaining := ks.ClobKeeper.OffsetSubaccountPerpetualPosition(
 				ks.Ctx,
 				tc.liquidatedSubaccountId,
@@ -1262,6 +1271,8 @@ func TestProcessDeleveraging(t *testing.T) {
 					p.Params.DefaultFundingPpm,
 					p.Params.LiquidityTier,
 					p.Params.MarketType,
+					p.Params.DangerIndexPpm,
+					p.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
 				)
 				require.NoError(t, err)
 			}
@@ -1481,6 +1492,8 @@ func TestProcessDeleveragingAtOraclePrice(t *testing.T) {
 					p.Params.DefaultFundingPpm,
 					p.Params.LiquidityTier,
 					p.Params.MarketType,
+					p.Params.DangerIndexPpm,
+					p.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
 				)
 				require.NoError(t, err)
 			}
@@ -1650,6 +1663,8 @@ func TestProcessDeleveraging_Rounding(t *testing.T) {
 					p.Params.DefaultFundingPpm,
 					p.Params.LiquidityTier,
 					p.Params.MarketType,
+					p.Params.DangerIndexPpm,
+					p.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
 				)
 				require.NoError(t, err)
 			}

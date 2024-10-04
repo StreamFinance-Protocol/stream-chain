@@ -31,7 +31,7 @@ import (
 type PerpKeepersTestContext struct {
 	Ctx               sdk.Context
 	PricesKeeper      *priceskeeper.Keeper
-	IndexPriceCache   *pricefeedserver_types.MarketToExchangePrices
+	DaemonPriceCache  *pricefeedserver_types.MarketToExchangePrices
 	AssetsKeeper      *assetskeeper.Keeper
 	EpochsKeeper      *epochskeeper.Keeper
 	PerpetualsKeeper  *keeper.Keeper
@@ -63,7 +63,7 @@ func PerpetualsKeepersWithClobHelpers(
 		transientStoreKey storetypes.StoreKey,
 	) []GenesisInitializer {
 		// Define necessary keepers here for unit tests
-		pc.PricesKeeper, _, pc.IndexPriceCache, _, pc.MockTimeProvider = createPricesKeeper(
+		pc.PricesKeeper, _, pc.DaemonPriceCache, _, pc.MockTimeProvider = createPricesKeeper(
 			stateStore,
 			db,
 			cdc,
@@ -178,6 +178,8 @@ func CreateTestPerpetuals(t *testing.T, ctx sdk.Context, k *keeper.Keeper) {
 			p.Params.DefaultFundingPpm,
 			p.Params.LiquidityTier,
 			p.Params.MarketType,
+			p.Params.DangerIndexPpm,
+			p.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
 		)
 		require.NoError(t, err)
 	}
@@ -242,10 +244,12 @@ func CreateNPerpetuals(
 
 		var defaultFundingPpm int32
 		marketType := types.PerpetualMarketType_PERPETUAL_MARKET_TYPE_CROSS
+		maxInsuranceFundDelta := uint64(0)
 
 		if i%3 == 0 {
 			defaultFundingPpm = 1
 			marketType = types.PerpetualMarketType_PERPETUAL_MARKET_TYPE_ISOLATED
+			maxInsuranceFundDelta = uint64(1_000_000)
 		} else if i%3 == 1 {
 			defaultFundingPpm = -1
 		} else {
@@ -261,6 +265,8 @@ func CreateNPerpetuals(
 			defaultFundingPpm,    // DefaultFundingPpm
 			allLiquidityTiers[i%len(allLiquidityTiers)].Id, // LiquidityTier
 			marketType,
+			0,
+			maxInsuranceFundDelta,
 		)
 		if err != nil {
 			return items, err
@@ -311,6 +317,8 @@ func CreateTestPricesAndPerpetualMarkets(
 			perp.Params.DefaultFundingPpm,
 			perp.Params.LiquidityTier,
 			perp.Params.MarketType,
+			perp.Params.DangerIndexPpm,
+			perp.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
 		)
 		require.NoError(t, err)
 	}

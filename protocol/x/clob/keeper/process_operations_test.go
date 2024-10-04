@@ -1,6 +1,8 @@
 package keeper_test
 
 import (
+	"fmt"
+	"math/big"
 	"testing"
 	"time"
 
@@ -67,6 +69,7 @@ type processProposerOperationsTestCase struct {
 	expectedQuoteBalances                map[satypes.SubaccountId]int64
 	expectedPerpetualPositions           map[satypes.SubaccountId][]*satypes.PerpetualPosition
 	expectedSubaccountLiquidationInfo    map[satypes.SubaccountId]types.SubaccountLiquidationInfo
+	expectedLiquidationDeltaPerBlock     map[uint32]*big.Int
 	expectedNegativeTncSubaccountSeen    map[uint32]bool
 	expectedError                        error
 	expectedPanics                       string
@@ -2343,8 +2346,6 @@ func setupProcessProposerOperationsTestCase(
 	// Assert Indexer messages
 	if tc.expectedError == nil && tc.expectedPanics == "" && len(tc.expectedMatches) > 0 {
 		setupNewMockEventManager(
-			t,
-			ctx,
 			mockIndexerEventManager,
 			tc.expectedMatches,
 			tc.rawOperations,
@@ -2383,6 +2384,8 @@ func setupProcessProposerOperationsTestCase(
 			p.Params.DefaultFundingPpm,
 			p.Params.LiquidityTier,
 			p.Params.MarketType,
+			p.Params.DangerIndexPpm,
+			p.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
 		)
 		require.NoError(t, err)
 	}
@@ -2422,6 +2425,8 @@ func setupProcessProposerOperationsTestCase(
 						clobPair.StepBaseQuantums,
 						tc.perpetuals[perpetualId].Params.LiquidityTier,
 						tc.perpetuals[perpetualId].Params.MarketType,
+						tc.perpetuals[perpetualId].Params.DangerIndexPpm,
+						fmt.Sprintf("%d", tc.perpetuals[perpetualId].Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock),
 					),
 				),
 			).Once().Return()
@@ -2547,6 +2552,16 @@ func runProcessProposerOperationsTestCase(
 		require.Equal(t, expected, actual)
 	}
 
+	for perpetualId, expectedLiquidationDeltaPerBlock := range tc.expectedLiquidationDeltaPerBlock {
+		liquidationDeltaPerBlock, err := ks.ClobKeeper.GetCumulativeInsuranceFundDelta(ctx, perpetualId)
+		require.NoError(t, err)
+		require.Equal(
+			t,
+			expectedLiquidationDeltaPerBlock,
+			liquidationDeltaPerBlock,
+		)
+	}
+
 	// Verify subaccount state.
 	assertSubaccountState(t, ctx, ks.SubaccountsKeeper, tc.expectedQuoteBalances, tc.expectedPerpetualPositions)
 
@@ -2578,8 +2593,6 @@ func runProcessProposerOperationsTestCase(
 }
 
 func setupNewMockEventManager(
-	t *testing.T,
-	ctx sdk.Context,
 	mockIndexerEventManager *mocks.IndexerEventManager,
 	matches []*MatchWithOrdersForTesting,
 	rawOperations []types.OperationRaw,

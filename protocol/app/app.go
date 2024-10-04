@@ -112,15 +112,15 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/mempool"
 
 	// Daemons
+	deleveragingclient "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/deleveraging/client"
 	daemonflags "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/flags"
-	liquidationclient "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/liquidation/client"
 	metricsclient "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/metrics/client"
 	pricefeedclient "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/pricefeed/client"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/pricefeed/client/constants"
 	pricefeed_types "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/pricefeed/types"
 	daemonserver "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/server"
 	daemonservertypes "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/server/types"
-	liquidationtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/server/types/liquidations"
+	deleveragingtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/server/types/deleveraging"
 	pricefeedtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/server/types/pricefeed"
 	daemontypes "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/types"
 
@@ -305,7 +305,7 @@ type App struct {
 	startDaemons func()
 
 	PriceFeedClient    *pricefeedclient.Client
-	LiquidationsClient *liquidationclient.Client
+	DeleveragingClient *deleveragingclient.Client
 
 	DaemonHealthMonitor *daemonservertypes.HealthMonitor
 
@@ -701,15 +701,15 @@ func New(
 	// Setup server for pricefeed messages. The server will wait for gRPC messages containing price
 	// updates and then encode them into an in-memory cache shared by the prices module.
 	// The in-memory data structure is shared by the x/prices module and PriceFeed daemon.
-	indexPriceCache := pricefeedtypes.NewMarketToExchangePrices(pricefeed_types.MaxPriceAge)
-	app.Server.WithPriceFeedMarketToExchangePrices(indexPriceCache)
+	daemonPriceCache := pricefeedtypes.NewMarketToExchangePrices(pricefeed_types.MaxPriceAge)
+	app.Server.WithPriceFeedMarketToExchangePrices(daemonPriceCache)
 
-	// Setup server for liquidation messages. The server will wait for gRPC messages containing
-	// potentially liquidatable subaccounts and then encode them into an in-memory slice shared by
-	// the liquidations module.
-	// The in-memory data structure is shared by the x/clob module and liquidations daemon.
-	daemonLiquidationInfo := liquidationtypes.NewDaemonLiquidationInfo()
-	app.Server.WithDaemonLiquidationInfo(daemonLiquidationInfo)
+	// Setup server for deleveraging messages. The server will wait for gRPC messages containing
+	// subaccounts with open perp positions and then encode them into an in-memory slice shared by
+	// the deleveraging module.
+	// The in-memory data structure is shared by the x/clob module and deleveraging daemon.
+	daemonDeleveragingInfo := deleveragingtypes.NewDaemonDeleveragingInfo()
+	app.Server.WithDaemonDeleveragingInfo(daemonDeleveragingInfo)
 
 	app.DaemonHealthMonitor = daemonservertypes.NewHealthMonitor(
 		daemonservertypes.DaemonStartupGracePeriod,
@@ -727,12 +727,12 @@ func New(
 		// Start server for handling gRPC messages from daemons.
 		go app.Server.Start()
 
-		// Start liquidations client for sending potentially liquidatable subaccounts to the application.
-		if daemonFlags.Liquidation.Enabled {
-			app.LiquidationsClient = liquidationclient.NewClient(logger)
+		// Start deleveraging client for sending subaccounts with open positions to the application.
+		if daemonFlags.Deleveraging.Enabled {
+			app.DeleveragingClient = deleveragingclient.NewClient(logger)
 			go func() {
-				app.RegisterDaemonWithHealthMonitor(app.LiquidationsClient, maxDaemonUnhealthyDuration)
-				if err := app.LiquidationsClient.Start(
+				app.RegisterDaemonWithHealthMonitor(app.DeleveragingClient, maxDaemonUnhealthyDuration)
+				if err := app.DeleveragingClient.Start(
 					// The client will use `context.Background` so that it can have a different context from
 					// the main application.
 					context.Background(),
@@ -796,7 +796,7 @@ func New(
 	app.PricesKeeper = *pricesmodulekeeper.NewKeeper(
 		appCodec,
 		keys[pricesmoduletypes.StoreKey],
-		indexPriceCache,
+		daemonPriceCache,
 		pricesmoduletypes.NewMarketToSmoothedSpotPrices(pricesmoduletypes.SmoothedPriceTrackingBlockHistoryLength),
 		timeProvider,
 		app.IndexerEventManager,
@@ -881,6 +881,31 @@ func New(
 		app.SubaccountsKeeper,
 	)
 
+	/****  ve daemon initializer ****/
+	app.voteCodec = vecodec.NewDefaultVoteExtensionCodec()
+	app.extCodec = vecodec.NewDefaultExtendedCommitCodec()
+
+	aggregatorFn := voteweighted.Median(
+		logger,
+		app.ConsumerKeeper,
+		voteweighted.DefaultPowerThreshold,
+	)
+
+	aggregator := veaggregator.NewVeAggregator(
+		logger,
+		daemonPriceCache,
+		app.PricesKeeper,
+		aggregatorFn,
+	)
+
+	priceApplier := priceapplier.NewPriceApplier(
+		logger,
+		aggregator,
+		app.PricesKeeper,
+		app.voteCodec,
+		app.extCodec,
+	)
+
 	clobFlags := clobflags.GetClobFlagValuesFromOptions(appOpts)
 	logger.Info("Parsed CLOB flags", "Flags", clobFlags)
 
@@ -911,7 +936,8 @@ func New(
 		txConfig.TxDecoder(),
 		clobFlags,
 		rate_limit.NewPanicRateLimiter[sdk.Msg](),
-		daemonLiquidationInfo,
+		daemonDeleveragingInfo,
+		priceApplier,
 	)
 	clobModule := clobmodule.NewAppModule(
 		appCodec,
@@ -941,31 +967,6 @@ func New(
 		app.AccountKeeper,
 		app.BankKeeper,
 		app.SubaccountsKeeper,
-	)
-
-	/****  ve daemon initializer ****/
-	app.voteCodec = vecodec.NewDefaultVoteExtensionCodec()
-	app.extCodec = vecodec.NewDefaultExtendedCommitCodec()
-
-	aggregatorFn := voteweighted.Median(
-		logger,
-		app.ConsumerKeeper,
-		voteweighted.DefaultPowerThreshold,
-	)
-
-	aggregator := veaggregator.NewVeAggregator(
-		logger,
-		indexPriceCache,
-		app.PricesKeeper,
-		aggregatorFn,
-	)
-
-	priceApplier := priceapplier.NewPriceApplier(
-		logger,
-		aggregator,
-		app.PricesKeeper,
-		app.voteCodec,
-		app.extCodec,
 	)
 
 	app.pricePreBlocker = *daemonpreblocker.NewDaemonPreBlockHandler(
@@ -1410,10 +1411,10 @@ func (app *App) Precommitter(ctx sdk.Context) {
 }
 
 // PrepareCheckStater application updates after commit and before any check state is invoked.
-func (app *App) PrepareCheckStater(ctx sdk.Context) {
+func (app *App) PrepareCheckStater(ctx sdk.Context, req *abci.RequestCommit) {
 	ctx = ctx.WithExecMode(lib.ExecModePrepareCheckState)
 
-	if err := app.ModuleManager.PrepareCheckState(ctx); err != nil {
+	if err := app.ModuleManager.PrepareCheckState(ctx, req); err != nil {
 		panic(err)
 	}
 }

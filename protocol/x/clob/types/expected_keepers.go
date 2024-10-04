@@ -75,6 +75,16 @@ type SubaccountsKeeper interface {
 		amount *big.Int,
 		perpetualId uint32,
 	) error
+	TransferLiquidityFee(
+		ctx sdk.Context,
+		liquidityFeeQuoteQuantums *big.Int,
+		perpetualId uint32,
+	) error
+	TransferValidatorFee(
+		ctx sdk.Context,
+		validatorFeeQuoteQuantums *big.Int,
+		perpetualId uint32,
+	) error
 	GetCollateralPoolFromPerpetualId(
 		ctx sdk.Context,
 		perpetualId uint32,
@@ -131,6 +141,9 @@ type PerpetualsKeeper interface {
 		ctx sdk.Context,
 		id uint32,
 	) (val perpetualsmoduletypes.Perpetual, err error)
+	GetAllPerpetuals(ctx sdk.Context) (list []perpetualsmoduletypes.Perpetual)
+	GetAllLiquidityTiers(ctx sdk.Context) (list []perpetualsmoduletypes.LiquidityTier)
+	IsIsolatedPerpetual(ctx sdk.Context, perpetualId uint32) (bool, error)
 	GetPerpetualAndMarketPrice(
 		ctx sdk.Context,
 		perpetualId uint32,
@@ -147,10 +160,13 @@ type PerpetualsKeeper interface {
 	)
 	MaybeProcessNewFundingTickEpoch(ctx sdk.Context)
 	GetInsuranceFundModuleAddress(ctx sdk.Context, perpetualId uint32) (sdk.AccAddress, error)
+	GetInsuranceFundName(ctx sdk.Context, perpetualId uint32) (string, error)
 }
 
 type PricesKeeper interface {
 	GetMarketParam(ctx sdk.Context, id uint32) (param pricestypes.MarketParam, exists bool)
+	GetAllMarketPrices(ctx sdk.Context) []pricestypes.MarketPrice
+	GetMarketPrice(ctx sdk.Context, id uint32) (pricestypes.MarketPrice, error)
 }
 
 type StatsKeeper interface {

@@ -95,7 +95,7 @@ func (h *VoteExtensionHandler) ExtendVoteHandler() sdk.ExtendVoteHandler {
 		}
 
 		// apply prices from prev block to ensure that the prices are up to date
-		if err := h.priceApplier.ApplyPricesFromVE(ctx, reqFinalizeBlock); err != nil {
+		if err := h.priceApplier.ApplyPricesFromVE(ctx, reqFinalizeBlock, true); err != nil {
 			h.logger.Error(
 				"failed to aggregate oracle votes",
 				"height", request.Height,
@@ -105,7 +105,6 @@ func (h *VoteExtensionHandler) ExtendVoteHandler() sdk.ExtendVoteHandler {
 
 			return &abci.ResponseExtendVote{VoteExtension: []byte{}}, err
 		}
-
 		veBytes, err := h.GetVEBytesFromCurrPrices(ctx)
 		if err != nil {
 			h.logger.Error(
@@ -170,7 +169,6 @@ func (h *VoteExtensionHandler) VerifyVoteExtensionHandler() sdk.VerifyVoteExtens
 
 func (h *VoteExtensionHandler) GetVEBytesFromCurrPrices(ctx sdk.Context) ([]byte, error) {
 	priceUpdates := h.getCurrentPricesForEachMarket(ctx)
-
 	if len(priceUpdates) == 0 {
 		return nil, fmt.Errorf("no valid prices")
 	}
@@ -235,9 +233,8 @@ func (h *VoteExtensionHandler) getCurrentPricesForEachMarket(
 	ctx sdk.Context,
 ) map[uint32]VEPricePair {
 	vePrices := make(map[uint32]VEPricePair)
-	indexPrices := h.pricesKeeper.GetValidMarketSpotPriceUpdates(ctx)
-
-	for _, market := range indexPrices {
+	daemonPrices := h.pricesKeeper.GetValidMarketSpotPriceUpdates(ctx)
+	for _, market := range daemonPrices {
 		clobMidPrice, smoothedPrice, lastFundingRate, allExist := h.getPeripheryPnlPriceData(
 			ctx,
 			market,
@@ -247,7 +244,6 @@ func (h *VoteExtensionHandler) getCurrentPricesForEachMarket(
 		if !allExist {
 			continue
 		}
-
 		medianPnlPrice := h.getMedianPnlPrice(
 			new(big.Int).SetUint64(market.SpotPrice),
 			clobMidPrice,
@@ -309,12 +305,12 @@ func (h *VoteExtensionHandler) getPeripheryPnlPriceData(
 }
 
 func (h *VoteExtensionHandler) getMedianPnlPrice(
-	indexPrice *big.Int,
+	daemonPrice *big.Int,
 	clobMidPrice *big.Int,
 	smoothedPrice *big.Int,
 	lastFundingRate *big.Int,
 ) *big.Int {
-	fundingWeightedPrice := h.getFundingWeightedIndexPrice(indexPrice, lastFundingRate)
+	fundingWeightedPrice := h.getFundingWeightedDaemonPrice(daemonPrice, lastFundingRate)
 	prices := []*big.Int{clobMidPrice, smoothedPrice, fundingWeightedPrice}
 	sort.Slice(prices, func(i, j int) bool {
 		return prices[i].Cmp(prices[j]) < 0
@@ -323,14 +319,13 @@ func (h *VoteExtensionHandler) getMedianPnlPrice(
 	return prices[1]
 }
 
-func (h *VoteExtensionHandler) getFundingWeightedIndexPrice(
-	indexPrice *big.Int,
+func (h *VoteExtensionHandler) getFundingWeightedDaemonPrice(
+	daemonPrice *big.Int,
 	lastFundingRate *big.Int,
 ) *big.Int {
 	adjustedFundingRate := new(big.Int).Add(lastFundingRate, big.NewInt(ppmFactor))
-	fundingWeightedPrice := new(big.Int).Mul(indexPrice, adjustedFundingRate)
+	fundingWeightedPrice := new(big.Int).Mul(daemonPrice, adjustedFundingRate)
 	fundingWeightedPrice = fundingWeightedPrice.Div(fundingWeightedPrice, big.NewInt(ppmFactor))
-
 	return fundingWeightedPrice
 }
 

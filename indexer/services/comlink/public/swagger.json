@@ -803,6 +803,13 @@
             "type": "number",
             "format": "double"
           },
+          "dangerIndexPpm": {
+            "type": "number",
+            "format": "double"
+          },
+          "isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock": {
+            "type": "string"
+          },
           "quantumConversionExponent": {
             "type": "number",
             "format": "double"
@@ -848,6 +855,8 @@
           "maintenanceMarginFraction",
           "openInterest",
           "atomicResolution",
+          "dangerIndexPpm",
+          "isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock",
           "quantumConversionExponent",
           "tickSize",
           "stepSize",

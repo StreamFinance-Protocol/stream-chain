@@ -1,0 +1,57 @@
+{
+  "name": "@gonzaddv/proto",
+  "version": "0.0.11",
+  "access": "public",
+  "description": "Protos for Klyra",
+  "author": "Klyra Trading Inc.",
+  "homepage": "https://github.com/StreamFinance-Protocol/stream-chain",
+  "license": "AGPL-3.0",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "copy": "copyfiles -f README.md package.json dist",
+    "build": "rm -rf dist/** && tsc && tsc --project ./tsconfig.esm.json && npm run copy",
+    "transpile": "node ./scripts/codegen",
+    "prepublishOnly": "npm version patch && npm run transpile && npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/StreamFinance-Protocol/stream-chain"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/StreamFinance-Protocol/stream-chain/issues"
+  },
+  "devDependencies": {
+    "@cosmology/telescope": "1.5.4",
+    "@dydxprotocol/node-service-base-dev": "^0.3.2",
+    "@protobufs/confio": "^0.0.6",
+    "@protobufs/cosmos": "^0.1.0",
+    "@protobufs/cosmos_proto": "^0.0.10",
+    "@protobufs/cosmwasm": "^0.1.1",
+    "@protobufs/gogoproto": "^0.0.10",
+    "@protobufs/google": "^0.0.10",
+    "@protobufs/ibc": "^0.1.0",
+    "@protobufs/osmosis": "^0.4.0",
+    "@protobufs/tendermint": "^0.0.10",
+    "copyfiles": "^2.4.1",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "@cosmjs/amino": "0.32.3",
+    "@cosmjs/proto-signing": "0.32.3",
+    "@cosmjs/stargate": "0.32.3",
+    "@cosmjs/tendermint-rpc": "0.32.3",
+    "@cosmology/lcd": "^0.13.3"
+  },
+  "engines": {
+    "pnpm": ">=9.14.3"
+  }
+}

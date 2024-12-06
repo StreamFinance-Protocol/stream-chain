@@ -1,6 +1,6 @@
 {
-  "name": "@gonzaddv/proto",
-  "version": "0.0.11",
+  "name": "@klyra/proto",
+  "version": "0.0.10",
   "access": "public",
   "description": "Protos for Klyra",
   "author": "Klyra Trading Inc.",

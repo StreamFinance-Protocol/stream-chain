@@ -2,6 +2,7 @@ package aggregator_test
 
 import (
 	"errors"
+	"fmt"
 	"math/big"
 	"strings"
 	"testing"
@@ -133,12 +134,20 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
 				},
 				constants.IsoUsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.FiveBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.FiveHundredBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveHundredBillion),
 				},
 				constants.Iso2UsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.ThreeBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.ThreeBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.ThirtyBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThirtyBillion),
+				},
+				constants.IsoBtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.FiveMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveMillion),
+				},
+				constants.Iso2BtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.ThreeMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
 			expectedSDaiConversionRate: nil,
@@ -163,12 +172,20 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
 				},
 				constants.IsoUsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.FiveBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.FiveHundredBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveHundredBillion),
 				},
 				constants.Iso2UsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.ThreeBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.ThreeBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.ThirtyBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThirtyBillion),
+				},
+				constants.IsoBtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.FiveMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveMillion),
+				},
+				constants.Iso2BtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.ThreeMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
 			expectedSDaiConversionRate: big.NewInt(1000000),
@@ -193,12 +210,20 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  constants.Price7Big,
 				},
 				constants.IsoUsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.FiveBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.FiveHundredBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveHundredBillion),
 				},
 				constants.Iso2UsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.ThreeBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.ThreeBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.ThirtyBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThirtyBillion),
+				},
+				constants.IsoBtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.FiveMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveMillion),
+				},
+				constants.Iso2BtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.ThreeMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
 			expectedError: nil,
@@ -222,12 +247,20 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  constants.Price7Big,
 				},
 				constants.IsoUsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.FiveBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.FiveHundredBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveHundredBillion),
 				},
 				constants.Iso2UsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.ThreeBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.ThreeBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.ThirtyBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThirtyBillion),
+				},
+				constants.IsoBtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.FiveMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveMillion),
+				},
+				constants.Iso2BtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.ThreeMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
 			expectedSDaiConversionRate: ratelimitkeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000000"),
@@ -253,12 +286,20 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
 				},
 				constants.IsoUsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.FiveBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.FiveHundredBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveHundredBillion),
 				},
 				constants.Iso2UsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.ThreeBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.ThreeBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.ThirtyBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThirtyBillion),
+				},
+				constants.IsoBtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.FiveMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveMillion),
+				},
+				constants.Iso2BtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.ThreeMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
 			expectedSDaiConversionRate: nil,
@@ -284,12 +325,20 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
 				},
 				constants.IsoUsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.FiveBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.FiveHundredBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveHundredBillion),
 				},
 				constants.Iso2UsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.ThreeBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.ThreeBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.ThirtyBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThirtyBillion),
+				},
+				constants.IsoBtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.FiveMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveMillion),
+				},
+				constants.Iso2BtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.ThreeMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
 			expectedSDaiConversionRate: ratelimitkeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000000"),
@@ -315,12 +364,20 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
 				},
 				constants.IsoUsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.FiveBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.FiveHundredBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveHundredBillion),
 				},
 				constants.Iso2UsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.ThreeBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.ThreeBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.ThirtyBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThirtyBillion),
+				},
+				constants.IsoBtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.FiveMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveMillion),
+				},
+				constants.Iso2BtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.ThreeMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
 			expectedSDaiConversionRate: ratelimitkeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000000"),
@@ -346,12 +403,20 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  constants.Price7Big,
 				},
 				constants.IsoUsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.FiveBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.FiveHundredBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveHundredBillion),
 				},
 				constants.Iso2UsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.ThreeBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.ThreeBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.ThirtyBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThirtyBillion),
+				},
+				constants.IsoBtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.FiveMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveMillion),
+				},
+				constants.Iso2BtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.ThreeMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
 			expectedSDaiConversionRate: nil,
@@ -377,12 +442,20 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  constants.Price7Big,
 				},
 				constants.IsoUsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.FiveBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.FiveHundredBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveHundredBillion),
 				},
 				constants.Iso2UsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.ThreeBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.ThreeBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.ThirtyBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThirtyBillion),
+				},
+				constants.IsoBtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.FiveMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveMillion),
+				},
+				constants.Iso2BtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.ThreeMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
 			expectedSDaiConversionRate: nil,
@@ -408,12 +481,20 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  constants.Price7Big,
 				},
 				constants.IsoUsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.FiveBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.FiveHundredBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveHundredBillion),
 				},
 				constants.Iso2UsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.ThreeBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.ThreeBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.ThirtyBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThirtyBillion),
+				},
+				constants.IsoBtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.FiveMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveMillion),
+				},
+				constants.Iso2BtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.ThreeMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
 			expectedSDaiConversionRate: ratelimitkeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000001"),
@@ -439,12 +520,20 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  constants.Price7Big,
 				},
 				constants.IsoUsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.FiveBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.FiveHundredBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveHundredBillion),
 				},
 				constants.Iso2UsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.ThreeBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.ThreeBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.ThirtyBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThirtyBillion),
+				},
+				constants.IsoBtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.FiveMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveMillion),
+				},
+				constants.Iso2BtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.ThreeMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
 			expectedSDaiConversionRate: ratelimitkeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000000"),
@@ -471,12 +560,20 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
 				},
 				constants.IsoUsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.FiveBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.FiveHundredBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveHundredBillion),
 				},
 				constants.Iso2UsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.ThreeBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.ThreeBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.ThirtyBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThirtyBillion),
+				},
+				constants.IsoBtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.FiveMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveMillion),
+				},
+				constants.Iso2BtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.ThreeMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
 			expectedSDaiConversionRate: nil,
@@ -503,12 +600,20 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
 				},
 				constants.IsoUsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.FiveBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.FiveHundredBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveHundredBillion),
 				},
 				constants.Iso2UsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.ThreeBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.ThreeBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.ThirtyBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThirtyBillion),
+				},
+				constants.IsoBtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.FiveMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveMillion),
+				},
+				constants.Iso2BtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.ThreeMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
 			expectedSDaiConversionRate: ratelimitkeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000001"),
@@ -535,12 +640,20 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
 				},
 				constants.IsoUsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.FiveBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.FiveHundredBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveHundredBillion),
 				},
 				constants.Iso2UsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.ThreeBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.ThreeBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.ThirtyBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThirtyBillion),
+				},
+				constants.IsoBtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.FiveMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveMillion),
+				},
+				constants.Iso2BtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.ThreeMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
 			expectedSDaiConversionRate: ratelimitkeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000001"),
@@ -567,12 +680,20 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
 				},
 				constants.IsoUsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.FiveBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.FiveHundredBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveHundredBillion),
 				},
 				constants.Iso2UsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.ThreeBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.ThreeBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.ThirtyBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThirtyBillion),
+				},
+				constants.IsoBtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.FiveMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveMillion),
+				},
+				constants.Iso2BtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.ThreeMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
 			expectedSDaiConversionRate: ratelimitkeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000001"),
@@ -599,12 +720,20 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  constants.Price7Big,
 				},
 				constants.IsoUsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.FiveBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.FiveHundredBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveHundredBillion),
 				},
 				constants.Iso2UsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.ThreeBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.ThreeBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.ThirtyBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThirtyBillion),
+				},
+				constants.IsoBtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.FiveMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveMillion),
+				},
+				constants.Iso2BtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.ThreeMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
 			expectedSDaiConversionRate: nil,
@@ -631,12 +760,20 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  constants.Price7Big,
 				},
 				constants.IsoUsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.FiveBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.FiveHundredBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveHundredBillion),
 				},
 				constants.Iso2UsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.ThreeBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.ThreeBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.ThirtyBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThirtyBillion),
+				},
+				constants.IsoBtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.FiveMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveMillion),
+				},
+				constants.Iso2BtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.ThreeMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
 			expectedSDaiConversionRate: nil,
@@ -663,12 +800,20 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  constants.Price7Big,
 				},
 				constants.IsoUsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.FiveBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.FiveHundredBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveHundredBillion),
 				},
 				constants.Iso2UsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.ThreeBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.ThreeBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.ThirtyBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThirtyBillion),
+				},
+				constants.IsoBtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.FiveMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveMillion),
+				},
+				constants.Iso2BtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.ThreeMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
 			expectedSDaiConversionRate: ratelimitkeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000001"),
@@ -751,12 +896,20 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
 				},
 				constants.IsoUsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.FiveBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.FiveHundredBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveHundredBillion),
 				},
 				constants.Iso2UsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.ThreeBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.ThreeBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.ThirtyBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThirtyBillion),
+				},
+				constants.IsoBtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.FiveMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveMillion),
+				},
+				constants.Iso2BtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.ThreeMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
 			expectedSDaiConversionRate: nil,
@@ -783,12 +936,20 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
 				},
 				constants.IsoUsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.FiveBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.FiveHundredBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveHundredBillion),
 				},
 				constants.Iso2UsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.ThreeBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.ThreeBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.ThirtyBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThirtyBillion),
+				},
+				constants.IsoBtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.FiveMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveMillion),
+				},
+				constants.Iso2BtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.ThreeMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
 			expectedSDaiConversionRate: nil,
@@ -815,12 +976,20 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
 				},
 				constants.IsoUsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.FiveBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.FiveHundredBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveHundredBillion),
 				},
 				constants.Iso2UsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.ThreeBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.ThreeBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.ThirtyBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThirtyBillion),
+				},
+				constants.IsoBtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.FiveMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveMillion),
+				},
+				constants.Iso2BtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.ThreeMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
 			expectedSDaiConversionRate: ratelimitkeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000001"),
@@ -847,12 +1016,20 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
 				},
 				constants.IsoUsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.FiveBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.FiveHundredBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveHundredBillion),
 				},
 				constants.Iso2UsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.ThreeBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.ThreeBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.ThirtyBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThirtyBillion),
+				},
+				constants.IsoBtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.FiveMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveMillion),
+				},
+				constants.Iso2BtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.ThreeMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
 			expectedSDaiConversionRate: nil,
@@ -879,12 +1056,20 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
 				},
 				constants.IsoUsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.FiveBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.FiveHundredBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveHundredBillion),
 				},
 				constants.Iso2UsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.ThreeBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.ThreeBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.ThirtyBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThirtyBillion),
+				},
+				constants.IsoBtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.FiveMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveMillion),
+				},
+				constants.Iso2BtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.ThreeMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
 			expectedSDaiConversionRate: nil,
@@ -911,12 +1096,20 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
 				},
 				constants.IsoUsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.FiveBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.FiveHundredBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveHundredBillion),
 				},
 				constants.Iso2UsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.ThreeBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.ThreeBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.ThirtyBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThirtyBillion),
+				},
+				constants.IsoBtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.FiveMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveMillion),
+				},
+				constants.Iso2BtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.ThreeMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
 			expectedSDaiConversionRate: nil,
@@ -943,12 +1136,20 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  constants.Price7Big,
 				},
 				constants.IsoUsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.FiveBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.FiveHundredBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveHundredBillion),
 				},
 				constants.Iso2UsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.ThreeBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.ThreeBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.ThirtyBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThirtyBillion),
+				},
+				constants.IsoBtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.FiveMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveMillion),
+				},
+				constants.Iso2BtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.ThreeMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
 			expectedSDaiConversionRate: nil,
@@ -976,12 +1177,20 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
 				},
 				constants.IsoUsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.FiveBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.FiveHundredBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveHundredBillion),
 				},
 				constants.Iso2UsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.ThreeBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.ThreeBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.ThirtyBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThirtyBillion),
+				},
+				constants.IsoBtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.FiveMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveMillion),
+				},
+				constants.Iso2BtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.ThreeMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
 			expectedSDaiConversionRate: new(big.Int).SetUint64(50000),
@@ -1008,12 +1217,20 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  constants.Price7Big,
 				},
 				constants.IsoUsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.FiveBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.FiveHundredBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveHundredBillion),
 				},
 				constants.Iso2UsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.ThreeBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.ThreeBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.ThirtyBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThirtyBillion),
+				},
+				constants.IsoBtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.FiveMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveMillion),
+				},
+				constants.Iso2BtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.ThreeMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
 			expectedSDaiConversionRate: ratelimitkeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000002"),
@@ -1040,12 +1257,20 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  constants.Price7Big,
 				},
 				constants.IsoUsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.FiveBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.FiveHundredBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveHundredBillion),
 				},
 				constants.Iso2UsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.ThreeBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.ThreeBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.ThirtyBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThirtyBillion),
+				},
+				constants.IsoBtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.FiveMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveMillion),
+				},
+				constants.Iso2BtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.ThreeMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
 			expectedSDaiConversionRate: ratelimitkeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000002"),
@@ -1072,12 +1297,20 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  constants.Price7Big,
 				},
 				constants.IsoUsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.FiveBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.FiveHundredBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveHundredBillion),
 				},
 				constants.Iso2UsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.ThreeBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.ThreeBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.ThirtyBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThirtyBillion),
+				},
+				constants.IsoBtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.FiveMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveMillion),
+				},
+				constants.Iso2BtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.ThreeMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
 			expectedSDaiConversionRate: ratelimitkeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000001"),
@@ -1104,12 +1337,20 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
 				},
 				constants.IsoUsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.FiveBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.FiveHundredBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveHundredBillion),
 				},
 				constants.Iso2UsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.ThreeBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.ThreeBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.ThirtyBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThirtyBillion),
+				},
+				constants.IsoBtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.FiveMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveMillion),
+				},
+				constants.Iso2BtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.ThreeMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
 			expectedSDaiConversionRate: ratelimitkeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000001"),
@@ -1136,12 +1377,20 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
 				},
 				constants.IsoUsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.FiveBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.FiveBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.FiveHundredBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveHundredBillion),
 				},
 				constants.Iso2UsdPair: {
-					SpotPrice: new(big.Int).SetUint64(constants.ThreeBillion),
-					PnlPrice:  new(big.Int).SetUint64(constants.ThreeBillion),
+					SpotPrice: new(big.Int).SetUint64(constants.ThirtyBillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThirtyBillion),
+				},
+				constants.IsoBtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.FiveMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.FiveMillion),
+				},
+				constants.Iso2BtcPair: {
+					SpotPrice: new(big.Int).SetUint64(constants.ThreeMillion),
+					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
 			expectedSDaiConversionRate: ratelimitkeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000000"),
@@ -1196,6 +1445,9 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 			} else {
 				require.NoError(t, err)
 			}
+
+			fmt.Println("PRICES", prices)
+			fmt.Println("SDAI CONVERSION RATE", sDaiConversionRate)
 
 			require.Equal(t, tc.expectedPrices, prices)
 			require.Equal(t, tc.expectedSDaiConversionRate, sDaiConversionRate)

@@ -28,7 +28,7 @@ func TestUpdatePerpetualParams(t *testing.T) {
 		perptest.WithLiquidityTier(1),
 		perptest.WithCollateralPoolId(0),
 	)
-	testMarket4 := *pricestest.GenerateMarketParamPrice(pricestest.WithId(4))
+	testMarket9999 := *pricestest.GenerateMarketParamPrice(pricestest.WithId(9999))
 
 	tests := map[string]struct {
 		setup             func(*testing.T, sdk.Context, *perpkeeper.Keeper, *priceskeeper.Keeper, *assetskeeper.Keeper)
@@ -65,7 +65,7 @@ func TestUpdatePerpetualParams(t *testing.T) {
 					perpKeeper,
 					[]types.Perpetual{testPerp},
 				)
-				keepertest.CreateTestPriceMarkets(t, ctx, pricesKeeper, []pricestypes.MarketParamPrice{testMarket4})
+				keepertest.CreateTestPriceMarkets(t, ctx, pricesKeeper, []pricestypes.MarketParamPrice{testMarket9999})
 			},
 			msg: &types.MsgUpdatePerpetualParams{
 				Authority: lib.GovModuleAddress.String(),
@@ -132,7 +132,7 @@ func TestUpdatePerpetualParams(t *testing.T) {
 					perpKeeper,
 					[]types.Perpetual{testPerp},
 				)
-				keepertest.CreateTestPriceMarkets(t, ctx, pricesKeeper, []pricestypes.MarketParamPrice{testMarket4})
+				keepertest.CreateTestPriceMarkets(t, ctx, pricesKeeper, []pricestypes.MarketParamPrice{testMarket9999})
 			},
 			msg: &types.MsgUpdatePerpetualParams{
 				Authority: lib.GovModuleAddress.String(),
@@ -155,7 +155,7 @@ func TestUpdatePerpetualParams(t *testing.T) {
 					perpKeeper,
 					[]types.Perpetual{testPerp},
 				)
-				keepertest.CreateTestPriceMarkets(t, ctx, pricesKeeper, []pricestypes.MarketParamPrice{testMarket4})
+				keepertest.CreateTestPriceMarkets(t, ctx, pricesKeeper, []pricestypes.MarketParamPrice{testMarket9999})
 			},
 			msg: &types.MsgUpdatePerpetualParams{
 				Authority: constants.AliceAccAddress.String(),

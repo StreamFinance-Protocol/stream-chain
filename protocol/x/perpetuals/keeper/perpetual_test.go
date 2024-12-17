@@ -1100,7 +1100,7 @@ func TestGetNetNotional_Success(t *testing.T) {
 			keepertest.CreateTestLiquidityTiers(t, pc.Ctx, pc.PerpetualsKeeper)
 			keepertest.CreateTestCollateralPools(t, pc.Ctx, pc.PerpetualsKeeper)
 			// Create a new market param and price.
-			marketId := uint32(4)
+			marketId := uint32(constants.DefaultMarketIdNotUsedInGenesis)
 			_, err := pc.PricesKeeper.CreateMarket(
 				pc.Ctx,
 				pricestypes.MarketParam{
@@ -3599,11 +3599,11 @@ func TestIsPositionUpdatable(t *testing.T) {
 		"Updatable": {
 			perp: *perptest.GeneratePerpetual(
 				perptest.WithId(1),
-				perptest.WithMarketId(2),
+				perptest.WithMarketId(constants.DefaultMarketIdNotUsedInGenesis),
 			),
 			queryPerpId: 1,
 			marketParamPrice: *pricestest.GenerateMarketParamPrice(
-				pricestest.WithId(2),
+				pricestest.WithId(constants.DefaultMarketIdNotUsedInGenesis),
 				pricestest.WithSpotPriceValue(1000), // non-zero
 				pricestest.WithPnlPriceValue(1000),  // non-zero
 			),
@@ -3612,11 +3612,11 @@ func TestIsPositionUpdatable(t *testing.T) {
 		"Not updatable due to zero oracle price": {
 			perp: *perptest.GeneratePerpetual(
 				perptest.WithId(1),
-				perptest.WithMarketId(2),
+				perptest.WithMarketId(constants.DefaultMarketIdNotUsedInGenesis),
 			),
 			queryPerpId: 1,
 			marketParamPrice: *pricestest.GenerateMarketParamPrice(
-				pricestest.WithId(2),
+				pricestest.WithId(constants.DefaultMarketIdNotUsedInGenesis),
 				pricestest.WithSpotPriceValue(0),
 				pricestest.WithPnlPriceValue(0),
 			),
@@ -3625,11 +3625,11 @@ func TestIsPositionUpdatable(t *testing.T) {
 		"Error: Perp Id not found": {
 			perp: *perptest.GeneratePerpetual(
 				perptest.WithId(1),
-				perptest.WithMarketId(2),
+				perptest.WithMarketId(constants.DefaultMarketIdNotUsedInGenesis),
 			),
 			queryPerpId: 100, // doesn't exist
 			marketParamPrice: *pricestest.GenerateMarketParamPrice(
-				pricestest.WithId(2),
+				pricestest.WithId(constants.DefaultMarketIdNotUsedInGenesis),
 			),
 			expectedErr: "Perpetual does not exist",
 		},

@@ -1376,12 +1376,32 @@ func TestTransferFeesToFeeCollectorModule(t *testing.T) {
 			expectedSubaccountsModuleAccBalance: big.NewInt(100),  // 600 - 500
 			expectedFeeModuleAccBalance:         big.NewInt(3000), // 500 + 2500
 		},
+		"success - send to fee-collector module account - non tdai": {
+			asset:                               *constants.BtcUsd,
+			feeModuleAccBalance:                 big.NewInt(2500),
+			subaccountModuleAccBalance:          big.NewInt(600),
+			quantums:                            big.NewInt(500),
+			perpetualId:                         6,
+			collateralPoolAddr:                  types.CollateralPoolOneAddress,
+			expectedSubaccountsModuleAccBalance: big.NewInt(100),  // 600 - 500
+			expectedFeeModuleAccBalance:         big.NewInt(3000), // 500 + 2500
+		},
 		"success - quantums is zero": {
 			asset:                               *constants.TDai,
 			feeModuleAccBalance:                 big.NewInt(2500),
 			subaccountModuleAccBalance:          big.NewInt(600),
 			quantums:                            big.NewInt(0),
 			collateralPoolAddr:                  types.CollateralPoolZeroAddress,
+			expectedSubaccountsModuleAccBalance: big.NewInt(600),  // 600
+			expectedFeeModuleAccBalance:         big.NewInt(2500), // 2500
+		},
+		"success - quantums is zero - non tdai": {
+			asset:                               *constants.BtcUsd,
+			feeModuleAccBalance:                 big.NewInt(2500),
+			subaccountModuleAccBalance:          big.NewInt(600),
+			quantums:                            big.NewInt(0),
+			perpetualId:                         6,
+			collateralPoolAddr:                  types.CollateralPoolOneAddress,
 			expectedSubaccountsModuleAccBalance: big.NewInt(600),  // 600
 			expectedFeeModuleAccBalance:         big.NewInt(2500), // 2500
 		},
@@ -1395,6 +1415,17 @@ func TestTransferFeesToFeeCollectorModule(t *testing.T) {
 			expectedFeeModuleAccBalance:         big.NewInt(2500),
 			expectedErr:                         sdkerrors.ErrInsufficientFunds,
 		},
+		"failure - subaccounts module does not have sufficient funds - non tdai": {
+			asset:                               *constants.BtcUsd,
+			feeModuleAccBalance:                 big.NewInt(2500),
+			subaccountModuleAccBalance:          big.NewInt(300),
+			quantums:                            big.NewInt(500),
+			perpetualId:                         6,
+			collateralPoolAddr:                  types.CollateralPoolOneAddress,
+			expectedSubaccountsModuleAccBalance: big.NewInt(300),
+			expectedFeeModuleAccBalance:         big.NewInt(2500),
+			expectedErr:                         sdkerrors.ErrInsufficientFunds,
+		},
 		"success - transfer quantums is negative": {
 			feeModuleAccBalance:                 big.NewInt(1500),
 			asset:                               *constants.TDai,
@@ -1404,8 +1435,16 @@ func TestTransferFeesToFeeCollectorModule(t *testing.T) {
 			expectedSubaccountsModuleAccBalance: big.NewInt(1000),
 			expectedFeeModuleAccBalance:         big.NewInt(1000),
 		},
-		// TODO(DEC-715): Add more test for non-TDai assets, after asset update
-		// is implemented.
+		"success - transfer quantums is negative - non tdai": {
+			feeModuleAccBalance:                 big.NewInt(1500),
+			asset:                               *constants.BtcUsd,
+			subaccountModuleAccBalance:          big.NewInt(500),
+			quantums:                            big.NewInt(-500),
+			perpetualId:                         6,
+			collateralPoolAddr:                  types.CollateralPoolOneAddress,
+			expectedSubaccountsModuleAccBalance: big.NewInt(1000),
+			expectedFeeModuleAccBalance:         big.NewInt(1000),
+		},
 	}
 
 	for name, tc := range tests {
@@ -1415,8 +1454,25 @@ func TestTransferFeesToFeeCollectorModule(t *testing.T) {
 
 			err := keepertest.CreateTDaiAsset(ctx, assetsKeeper)
 			require.NoError(t, err)
-			err = keepertest.CreateBTCAsset(ctx, assetsKeeper)
-			require.NoError(t, err)
+
+			if tc.asset.Denom != constants.TDai.Denom {
+				_, err := assetsKeeper.CreateAsset(
+					ctx,
+					tc.asset.Id,
+					tc.asset.Symbol,
+					tc.asset.Denom,
+					tc.asset.DenomExponent,
+					tc.asset.HasMarket,
+					tc.asset.MarketId,
+					tc.asset.AtomicResolution,
+					tc.asset.AssetYieldIndex,
+					tc.asset.MaxSlippagePpm,
+				)
+				require.NoError(t, err)
+			} else {
+				err = keepertest.CreateBTCAsset(ctx, assetsKeeper)
+				require.NoError(t, err)
+			}
 
 			keepertest.CreateTestLiquidityTiers(t, ctx, perpetualsKeeper)
 			keepertest.CreateTestCollateralPools(t, ctx, perpetualsKeeper)
@@ -1466,22 +1522,6 @@ func TestTransferFeesToFeeCollectorModule(t *testing.T) {
 				require.NoError(t, err)
 			}
 
-			if tc.asset.Denom != constants.TDai.Denom {
-				_, err := assetsKeeper.CreateAsset(
-					ctx,
-					tc.asset.Id,
-					tc.asset.Symbol,
-					tc.asset.Denom,
-					tc.asset.DenomExponent,
-					tc.asset.HasMarket,
-					tc.asset.MarketId,
-					tc.asset.AtomicResolution,
-					tc.asset.AssetYieldIndex,
-					tc.asset.MaxSlippagePpm,
-				)
-				require.NoError(t, err)
-			}
-
 			err = keeper.TransferFeesToFeeCollectorModule(
 				ctx,
 				tc.asset.Id,
@@ -1525,6 +1565,7 @@ func TestTransferInsuranceFundPayments(t *testing.T) {
 		subaccountModuleAccBalance int64
 		insuranceFundBalance       int64
 		perpetual                  perptypes.Perpetual
+		asset                      asstypes.Asset
 		collateralPoolAddr         sdk.AccAddress
 
 		// Transfer details.
@@ -1538,6 +1579,7 @@ func TestTransferInsuranceFundPayments(t *testing.T) {
 	}{
 		"success - send to insurance fund module account": {
 			perpetual:                           constants.BtcUsd_SmallMarginRequirement,
+			asset:                               *constants.TDai,
 			insuranceFundBalance:                2500,
 			subaccountModuleAccBalance:          600,
 			quantums:                            big.NewInt(500),
@@ -1545,8 +1587,19 @@ func TestTransferInsuranceFundPayments(t *testing.T) {
 			expectedSubaccountsModuleAccBalance: 100,  // 600 - 500
 			expectedInsuranceFundBalance:        3000, // 2500 + 500
 		},
+		"success - send to insurance fund module account - non tdai": {
+			perpetual:                           constants.EthUsd_SmallMarginRequirement_CollatPool1,
+			asset:                               *constants.BtcUsd,
+			insuranceFundBalance:                2500,
+			subaccountModuleAccBalance:          600,
+			quantums:                            big.NewInt(500),
+			collateralPoolAddr:                  types.CollateralPoolOneAddress,
+			expectedSubaccountsModuleAccBalance: 100,  // 600 - 500
+			expectedInsuranceFundBalance:        3000, // 2500 + 500
+		},
 		"success - send from insurance fund module account": {
 			perpetual:                           constants.BtcUsd_SmallMarginRequirement,
+			asset:                               *constants.TDai,
 			insuranceFundBalance:                2500,
 			subaccountModuleAccBalance:          600,
 			quantums:                            big.NewInt(-500),
@@ -1554,8 +1607,19 @@ func TestTransferInsuranceFundPayments(t *testing.T) {
 			expectedSubaccountsModuleAccBalance: 1100, // 600 + 500
 			expectedInsuranceFundBalance:        2000, // 2500 - 500
 		},
+		"success - send from insurance fund module account - non tdai": {
+			perpetual:                           constants.EthUsd_SmallMarginRequirement_CollatPool1,
+			asset:                               *constants.BtcUsd,
+			insuranceFundBalance:                2500,
+			subaccountModuleAccBalance:          600,
+			quantums:                            big.NewInt(-500),
+			collateralPoolAddr:                  types.CollateralPoolOneAddress,
+			expectedSubaccountsModuleAccBalance: 1100, // 600 + 500
+			expectedInsuranceFundBalance:        2000, // 2500 - 500
+		},
 		"success - can send zero payment": {
 			perpetual:                           constants.BtcUsd_SmallMarginRequirement,
+			asset:                               *constants.TDai,
 			insuranceFundBalance:                2500,
 			subaccountModuleAccBalance:          600,
 			quantums:                            big.NewInt(0),
@@ -1563,26 +1627,19 @@ func TestTransferInsuranceFundPayments(t *testing.T) {
 			expectedSubaccountsModuleAccBalance: 600,
 			expectedInsuranceFundBalance:        2500,
 		},
-		"success - send to isolated insurance fund account": {
-			perpetual:                           constants.IsoUsd_IsolatedMarket,
+		"success - can send zero payment - non tdai": {
+			perpetual:                           constants.EthUsd_SmallMarginRequirement_CollatPool1,
+			asset:                               *constants.BtcUsd,
 			insuranceFundBalance:                2500,
 			subaccountModuleAccBalance:          600,
-			quantums:                            big.NewInt(500),
-			collateralPoolAddr:                  types.CollateralPoolTwoAddress,
-			expectedSubaccountsModuleAccBalance: 100,  // 600 - 500
-			expectedInsuranceFundBalance:        3000, // 2500 + 500
-		},
-		"success - send from isolated insurance fund account": {
-			perpetual:                           constants.IsoUsd_IsolatedMarket,
-			insuranceFundBalance:                2500,
-			subaccountModuleAccBalance:          600,
-			quantums:                            big.NewInt(-500),
-			collateralPoolAddr:                  types.CollateralPoolTwoAddress,
-			expectedSubaccountsModuleAccBalance: 1100, // 600 + 500
-			expectedInsuranceFundBalance:        2000, // 2500 - 500
+			quantums:                            big.NewInt(0),
+			collateralPoolAddr:                  types.CollateralPoolOneAddress,
+			expectedSubaccountsModuleAccBalance: 600,
+			expectedInsuranceFundBalance:        2500,
 		},
 		"failure - subaccounts module does not have sufficient funds": {
 			perpetual:                           constants.BtcUsd_SmallMarginRequirement,
+			asset:                               *constants.TDai,
 			insuranceFundBalance:                2500,
 			subaccountModuleAccBalance:          300,
 			quantums:                            big.NewInt(500),
@@ -1591,12 +1648,35 @@ func TestTransferInsuranceFundPayments(t *testing.T) {
 			expectedInsuranceFundBalance:        2500,
 			expectedErr:                         sdkerrors.ErrInsufficientFunds,
 		},
+		"failure - subaccounts module does not have sufficient funds - non tdai": {
+			perpetual:                           constants.EthUsd_SmallMarginRequirement_CollatPool1,
+			asset:                               *constants.BtcUsd,
+			insuranceFundBalance:                2500,
+			subaccountModuleAccBalance:          300,
+			quantums:                            big.NewInt(500),
+			collateralPoolAddr:                  types.CollateralPoolOneAddress,
+			expectedSubaccountsModuleAccBalance: 300,
+			expectedInsuranceFundBalance:        2500,
+			expectedErr:                         sdkerrors.ErrInsufficientFunds,
+		},
 		"failure - insurance fund does not have sufficient funds": {
 			perpetual:                           constants.BtcUsd_SmallMarginRequirement,
+			asset:                               *constants.TDai,
 			insuranceFundBalance:                300,
 			subaccountModuleAccBalance:          2500,
 			quantums:                            big.NewInt(-500),
 			collateralPoolAddr:                  types.CollateralPoolZeroAddress,
+			expectedSubaccountsModuleAccBalance: 2500,
+			expectedInsuranceFundBalance:        300,
+			expectedErr:                         sdkerrors.ErrInsufficientFunds,
+		},
+		"failure - insurance fund does not have sufficient funds - non tdai": {
+			perpetual:                           constants.EthUsd_SmallMarginRequirement_CollatPool1,
+			asset:                               *constants.BtcUsd,
+			insuranceFundBalance:                300,
+			subaccountModuleAccBalance:          2500,
+			quantums:                            big.NewInt(-500),
+			collateralPoolAddr:                  types.CollateralPoolOneAddress,
 			expectedSubaccountsModuleAccBalance: 2500,
 			expectedInsuranceFundBalance:        300,
 			expectedErr:                         sdkerrors.ErrInsufficientFunds,
@@ -1623,11 +1703,11 @@ func TestTransferInsuranceFundPayments(t *testing.T) {
 			auth_testutil.CreateTestModuleAccount(ctx, accountKeeper, perptypes.InsuranceFundName, []string{})
 
 			bankKeeper.SetDenomMetaData(ctx, banktypes.Metadata{
-				Base:    constants.TDai.Denom,
-				Display: constants.TDai.Denom,
+				Base:    tc.asset.Denom,
+				Display: tc.asset.Denom,
 				DenomUnits: []*banktypes.DenomUnit{
 					{
-						Denom:    constants.TDai.Denom,
+						Denom:    tc.asset.Denom,
 						Exponent: 0,
 					},
 				},
@@ -1656,7 +1736,7 @@ func TestTransferInsuranceFundPayments(t *testing.T) {
 					ctx,
 					insuranceFundAddr,
 					sdk.Coins{
-						sdk.NewInt64Coin(constants.TDai.Denom, tc.insuranceFundBalance),
+						sdk.NewInt64Coin(tc.asset.Denom, tc.insuranceFundBalance),
 					},
 					*bankKeeper,
 				)
@@ -1668,7 +1748,7 @@ func TestTransferInsuranceFundPayments(t *testing.T) {
 					ctx,
 					tc.collateralPoolAddr,
 					sdk.Coins{
-						sdk.NewInt64Coin(constants.TDai.Denom, tc.subaccountModuleAccBalance),
+						sdk.NewInt64Coin(tc.asset.Denom, tc.subaccountModuleAccBalance),
 					},
 					*bankKeeper,
 				)
@@ -1700,20 +1780,20 @@ func TestTransferInsuranceFundPayments(t *testing.T) {
 			}
 
 			// Check the subaccount module balance.
-			subaccountsModuleAccBalance := bankKeeper.GetBalance(ctx, tc.collateralPoolAddr, constants.TDai.Denom)
+			subaccountsModuleAccBalance := bankKeeper.GetBalance(ctx, tc.collateralPoolAddr, tc.asset.Denom)
 			require.Equal(
 				t,
-				sdk.NewInt64Coin(constants.TDai.Denom, tc.expectedSubaccountsModuleAccBalance),
+				sdk.NewInt64Coin(tc.asset.Denom, tc.expectedSubaccountsModuleAccBalance),
 				subaccountsModuleAccBalance,
 			)
 
 			// Check the fee module account balance has been updated as expected.
 			toModuleBalance := bankKeeper.GetBalance(
 				ctx, insuranceFundAddr,
-				constants.TDai.Denom,
+				tc.asset.Denom,
 			)
 			require.Equal(t,
-				sdk.NewInt64Coin(constants.TDai.Denom, tc.expectedInsuranceFundBalance),
+				sdk.NewInt64Coin(tc.asset.Denom, tc.expectedInsuranceFundBalance),
 				toModuleBalance,
 			)
 		})

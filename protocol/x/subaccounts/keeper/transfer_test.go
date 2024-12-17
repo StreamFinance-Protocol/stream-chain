@@ -1375,12 +1375,32 @@ func TestTransferFeesToFeeCollectorModule(t *testing.T) {
 			expectedSubaccountsModuleAccBalance: big.NewInt(100),  // 600 - 500
 			expectedFeeModuleAccBalance:         big.NewInt(3000), // 500 + 2500
 		},
+		"success - send to fee-collector module account - non tdai": {
+			asset:                               *constants.BtcUsd,
+			feeModuleAccBalance:                 big.NewInt(2500),
+			subaccountModuleAccBalance:          big.NewInt(600),
+			quantums:                            big.NewInt(500),
+			perpetualId:                         6,
+			collateralPoolAddr:                  types.CollateralPoolOneAddress,
+			expectedSubaccountsModuleAccBalance: big.NewInt(100),  // 600 - 500
+			expectedFeeModuleAccBalance:         big.NewInt(3000), // 500 + 2500
+		},
 		"success - quantums is zero": {
 			asset:                               *constants.TDai,
 			feeModuleAccBalance:                 big.NewInt(2500),
 			subaccountModuleAccBalance:          big.NewInt(600),
 			quantums:                            big.NewInt(0),
 			collateralPoolAddr:                  types.CollateralPoolZeroAddress,
+			expectedSubaccountsModuleAccBalance: big.NewInt(600),  // 600
+			expectedFeeModuleAccBalance:         big.NewInt(2500), // 2500
+		},
+		"success - quantums is zero - non tdai": {
+			asset:                               *constants.BtcUsd,
+			feeModuleAccBalance:                 big.NewInt(2500),
+			subaccountModuleAccBalance:          big.NewInt(600),
+			quantums:                            big.NewInt(0),
+			perpetualId:                         6,
+			collateralPoolAddr:                  types.CollateralPoolOneAddress,
 			expectedSubaccountsModuleAccBalance: big.NewInt(600),  // 600
 			expectedFeeModuleAccBalance:         big.NewInt(2500), // 2500
 		},
@@ -1394,6 +1414,17 @@ func TestTransferFeesToFeeCollectorModule(t *testing.T) {
 			expectedFeeModuleAccBalance:         big.NewInt(2500),
 			expectedErr:                         sdkerrors.ErrInsufficientFunds,
 		},
+		"failure - subaccounts module does not have sufficient funds - non tdai": {
+			asset:                               *constants.BtcUsd,
+			feeModuleAccBalance:                 big.NewInt(2500),
+			subaccountModuleAccBalance:          big.NewInt(300),
+			quantums:                            big.NewInt(500),
+			perpetualId:                         6,
+			collateralPoolAddr:                  types.CollateralPoolOneAddress,
+			expectedSubaccountsModuleAccBalance: big.NewInt(300),
+			expectedFeeModuleAccBalance:         big.NewInt(2500),
+			expectedErr:                         sdkerrors.ErrInsufficientFunds,
+		},
 		"success - transfer quantums is negative": {
 			feeModuleAccBalance:                 big.NewInt(1500),
 			asset:                               *constants.TDai,
@@ -1403,8 +1434,16 @@ func TestTransferFeesToFeeCollectorModule(t *testing.T) {
 			expectedSubaccountsModuleAccBalance: big.NewInt(1000),
 			expectedFeeModuleAccBalance:         big.NewInt(1000),
 		},
-		// TODO(DEC-715): Add more test for non-TDai assets, after asset update
-		// is implemented.
+		"success - transfer quantums is negative - non tdai": {
+			feeModuleAccBalance:                 big.NewInt(1500),
+			asset:                               *constants.BtcUsd,
+			subaccountModuleAccBalance:          big.NewInt(500),
+			quantums:                            big.NewInt(-500),
+			perpetualId:                         6,
+			collateralPoolAddr:                  types.CollateralPoolOneAddress,
+			expectedSubaccountsModuleAccBalance: big.NewInt(1000),
+			expectedFeeModuleAccBalance:         big.NewInt(1000),
+		},
 	}
 
 	for name, tc := range tests {
@@ -1414,8 +1453,25 @@ func TestTransferFeesToFeeCollectorModule(t *testing.T) {
 
 			err := keepertest.CreateTDaiAsset(ctx, assetsKeeper)
 			require.NoError(t, err)
-			err = keepertest.CreateBTCAsset(ctx, assetsKeeper)
-			require.NoError(t, err)
+
+			if tc.asset.Denom != constants.TDai.Denom {
+				_, err := assetsKeeper.CreateAsset(
+					ctx,
+					tc.asset.Id,
+					tc.asset.Symbol,
+					tc.asset.Denom,
+					tc.asset.DenomExponent,
+					tc.asset.HasMarket,
+					tc.asset.MarketId,
+					tc.asset.AtomicResolution,
+					tc.asset.AssetYieldIndex,
+					tc.asset.MaxSlippagePpm,
+				)
+				require.NoError(t, err)
+			} else {
+				err = keepertest.CreateBTCAsset(ctx, assetsKeeper)
+				require.NoError(t, err)
+			}
 
 			keepertest.CreateTestLiquidityTiers(t, ctx, perpetualsKeeper)
 			keepertest.CreateTestCollateralPools(t, ctx, perpetualsKeeper)
@@ -1461,22 +1517,6 @@ func TestTransferFeesToFeeCollectorModule(t *testing.T) {
 						sdk.NewCoin(tc.asset.Denom, sdkmath.NewIntFromBigInt(tc.subaccountModuleAccBalance)),
 					},
 					*bankKeeper,
-				)
-				require.NoError(t, err)
-			}
-
-			if tc.asset.Denom != constants.TDai.Denom {
-				_, err := assetsKeeper.CreateAsset(
-					ctx,
-					tc.asset.Id,
-					tc.asset.Symbol,
-					tc.asset.Denom,
-					tc.asset.DenomExponent,
-					tc.asset.HasMarket,
-					tc.asset.MarketId,
-					tc.asset.AtomicResolution,
-					tc.asset.AssetYieldIndex,
-					tc.asset.MaxSlippagePpm,
 				)
 				require.NoError(t, err)
 			}

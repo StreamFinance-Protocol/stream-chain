@@ -9,14 +9,12 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/constants"
-	pricestest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/prices"
 
 	keepertest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets"
 	btkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/blocktime/keeper"
 	blocktimetypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/blocktime/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices"
-	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
 	sakeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
@@ -275,11 +273,6 @@ func TestQueryWithdrawalAndTransfersBlockedInfo(t *testing.T) {
 			ctx, keeper, pricesKeeper, perpetualsKeeper, _, _, assetsKeeper, _, blocktimeKeeper, _ := keepertest.SubaccountsKeepers(t, true)
 			prices.InitGenesis(ctx, *pricesKeeper, constants.Prices_DefaultGenesisState)
 			assets.InitGenesis(ctx, *assetsKeeper, constants.Assets_DefaultGenesisState)
-
-			testMarket2 := *pricestest.GenerateMarketParamPrice(pricestest.WithId(2))
-			testMarket3 := *pricestest.GenerateMarketParamPrice(pricestest.WithId(3))
-			testMarket4 := *pricestest.GenerateMarketParamPrice(pricestest.WithId(4))
-			keepertest.CreateTestPriceMarkets(t, ctx, pricesKeeper, []pricestypes.MarketParamPrice{testMarket2, testMarket3, testMarket4})
 
 			keepertest.CreateTestLiquidityTiers(t, ctx, perpetualsKeeper)
 			keepertest.CreateTestCollateralPools(t, ctx, perpetualsKeeper)

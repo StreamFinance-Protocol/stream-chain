@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	"fmt"
 	"math"
 	"math/big"
 	"testing"
@@ -11,13 +12,11 @@ import (
 	bank_testutil "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/bank"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/constants"
 	keepertest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/keeper"
-	pricestest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/prices"
 	sample_testutil "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/sample"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets"
 	asstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices"
-	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -75,7 +74,7 @@ func TestWithdrawFundsFromSubaccountToAccount_DepositFundsFromAccountToSubaccoun
 			quantums:                   big.NewInt(500),
 			assetPositions:             keepertest.CreateBtcAssetPosition(big.NewInt(500)),
 			perpetualPositions: []*types.PerpetualPosition{
-				&constants.PerpetualPosition_OneETHLong_BTCQuote,
+				&constants.PerpetualPosition_OneIsoBtcLong,
 			},
 			collateralPoolAddr:                  types.CollateralPoolOneAddress,
 			expectedQuoteBalance:                big.NewInt(0),    // 500 - 500
@@ -105,7 +104,7 @@ func TestWithdrawFundsFromSubaccountToAccount_DepositFundsFromAccountToSubaccoun
 			quantums:                   big.NewInt(500),
 			assetPositions:             keepertest.CreateBtcAssetPosition(big.NewInt(500)),
 			perpetualPositions: []*types.PerpetualPosition{
-				&constants.PerpetualPosition_OneETHLong_BTCQuote,
+				&constants.PerpetualPosition_OneIsoBtcLong,
 			},
 			collateralPoolAddr:                  types.CollateralPoolOneAddress,
 			expectedQuoteBalance:                big.NewInt(0),    // 500 - 500
@@ -160,7 +159,7 @@ func TestWithdrawFundsFromSubaccountToAccount_DepositFundsFromAccountToSubaccoun
 			quantums:                   big.NewInt(500),
 			assetPositions:             keepertest.CreateBtcAssetPosition(big.NewInt(150)),
 			perpetualPositions: []*types.PerpetualPosition{
-				&constants.PerpetualPosition_OneETHLong_BTCQuote,
+				&constants.PerpetualPosition_OneIsoBtcLong,
 			},
 			collateralPoolAddr:                  types.CollateralPoolOneAddress,
 			expectedQuoteBalance:                big.NewInt(650),  // 150 + 500
@@ -238,7 +237,7 @@ func TestWithdrawFundsFromSubaccountToAccount_DepositFundsFromAccountToSubaccoun
 				new(big.Int).SetUint64(math.MaxUint64 - 100),
 			),
 			perpetualPositions: []*types.PerpetualPosition{
-				&constants.PerpetualPosition_OneETHLong_BTCQuote,
+				&constants.PerpetualPosition_OneIsoBtcLong,
 			},
 			collateralPoolAddr: types.CollateralPoolOneAddress,
 			expectedQuoteBalance: new(big.Int).Add(
@@ -303,6 +302,10 @@ func TestWithdrawFundsFromSubaccountToAccount_DepositFundsFromAccountToSubaccoun
 			keepertest.CreateTestPerpetuals(t, ctx, perpetualsKeeper)
 
 			ratelimitKeeper.SetAssetYieldIndex(ctx, big.NewRat(1, 1))
+
+			fmt.Println("COLLATERAL POOLS", perpetualsKeeper.GetAllCollateralPools(ctx))
+			subaccountsModuleAccBalance := bankKeeper.GetBalance(ctx, tc.collateralPoolAddr, tc.asset.Denom)
+			fmt.Println("INITIAL SUBACCOUNTS MODULE ACC BALANCE", subaccountsModuleAccBalance)
 
 			// Set up Subaccounts module account.
 			auth_testutil.CreateTestModuleAccount(ctx, accountKeeper, types.ModuleName, []string{})
@@ -381,7 +384,10 @@ func TestWithdrawFundsFromSubaccountToAccount_DepositFundsFromAccountToSubaccoun
 			)
 
 			// Check the subaccount module balance.
-			subaccountsModuleAccBalance := bankKeeper.GetBalance(ctx, tc.collateralPoolAddr, tc.asset.Denom)
+			subaccountsModuleAccBalance = bankKeeper.GetBalance(ctx, tc.collateralPoolAddr, tc.asset.Denom)
+			fmt.Println("subaccountsModuleAccBalance", subaccountsModuleAccBalance)
+			fmt.Println("ASSET DENOM", tc.asset.Denom)
+			fmt.Println("tc", tc.asset.Id)
 			require.Equal(t,
 				sdk.NewCoin(tc.asset.Denom, sdkmath.NewIntFromBigInt(tc.expectedSubaccountsModuleAccBalance)),
 				subaccountsModuleAccBalance,
@@ -779,11 +785,11 @@ func TestTransferFundsFromSubaccountToSubaccount_Success(t *testing.T) {
 			quantums:             big.NewInt(500),
 			senderAssetPositions: keepertest.CreateBtcAssetPosition(big.NewInt(500)),
 			senderPerpetualPositions: []*types.PerpetualPosition{
-				&constants.PerpetualPosition_OneETHLong_BTCQuote,
+				&constants.PerpetualPosition_OneIsoBtcLong,
 			},
 			recipientAssetPositions: keepertest.CreateBtcAssetPosition(big.NewInt(600)),
 			recipientPerpetualPositions: []*types.PerpetualPosition{
-				&constants.PerpetualPosition_OneETHLong_BTCQuote,
+				&constants.PerpetualPosition_OneIsoBtcLong,
 			},
 			senderCollateralPoolBalance:            big.NewInt(1100), // 500 + 600
 			recipientCollateralPoolBalance:         big.NewInt(1100), // same collateral pool, same balance
@@ -821,11 +827,11 @@ func TestTransferFundsFromSubaccountToSubaccount_Success(t *testing.T) {
 			quantums:             big.NewInt(500),
 			senderAssetPositions: keepertest.CreateBtcAssetPosition(big.NewInt(500)),
 			senderPerpetualPositions: []*types.PerpetualPosition{
-				&constants.PerpetualPosition_OneETHLong_BTCQuote,
+				&constants.PerpetualPosition_OneIsoBtcLong,
 			},
 			recipientAssetPositions: keepertest.CreateBtcAssetPosition(big.NewInt(600)),
 			recipientPerpetualPositions: []*types.PerpetualPosition{
-				&constants.PerpetualPosition_OneETHLong_BTCQuote_CollatPool4,
+				&constants.PerpetualPosition_OneIsoBtcLong_CollatPool4,
 			},
 			senderCollateralPoolBalance:            big.NewInt(600),
 			recipientCollateralPoolBalance:         big.NewInt(700),
@@ -863,11 +869,11 @@ func TestTransferFundsFromSubaccountToSubaccount_Success(t *testing.T) {
 			quantums:             big.NewInt(500),
 			senderAssetPositions: keepertest.CreateBtcAssetPosition(big.NewInt(600)),
 			senderPerpetualPositions: []*types.PerpetualPosition{
-				&constants.PerpetualPosition_OneETHLong_BTCQuote_CollatPool4,
+				&constants.PerpetualPosition_OneIsoBtcLong_CollatPool4,
 			},
 			recipientAssetPositions: keepertest.CreateBtcAssetPosition(big.NewInt(500)),
 			recipientPerpetualPositions: []*types.PerpetualPosition{
-				&constants.PerpetualPosition_OneETHLong_BTCQuote,
+				&constants.PerpetualPosition_OneIsoBtcLong,
 			},
 			senderCollateralPoolBalance:            big.NewInt(700),
 			recipientCollateralPoolBalance:         big.NewInt(600),
@@ -909,11 +915,6 @@ func TestTransferFundsFromSubaccountToSubaccount_Success(t *testing.T) {
 			ctx, keeper, pricesKeeper, perpetualsKeeper, accountKeeper, bankKeeper, assetsKeeper, ratelimitKeeper, _, _ := keepertest.SubaccountsKeepers(t, true)
 			prices.InitGenesis(ctx, *pricesKeeper, constants.Prices_DefaultGenesisState)
 			assets.InitGenesis(ctx, *assetsKeeper, constants.Assets_DefaultGenesisState)
-
-			testMarket2 := *pricestest.GenerateMarketParamPrice(pricestest.WithId(2))
-			testMarket3 := *pricestest.GenerateMarketParamPrice(pricestest.WithId(3))
-			testMarket4 := *pricestest.GenerateMarketParamPrice(pricestest.WithId(4))
-			keepertest.CreateTestPriceMarkets(t, ctx, pricesKeeper, []pricestypes.MarketParamPrice{testMarket2, testMarket3, testMarket4})
 
 			keepertest.CreateTestLiquidityTiers(t, ctx, perpetualsKeeper)
 			keepertest.CreateTestCollateralPools(t, ctx, perpetualsKeeper)

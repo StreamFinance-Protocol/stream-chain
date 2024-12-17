@@ -4,11 +4,9 @@ import (
 	"testing"
 
 	keepertest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/keeper"
-	pricestest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/prices"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/tracer"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices"
-	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -234,11 +232,6 @@ func TestGetSetNegativeTncSubaccountSeenAtBlock(t *testing.T) {
 			prices.InitGenesis(ctx, *pricesKeeper, constants.Prices_DefaultGenesisState)
 			assets.InitGenesis(ctx, *assetsKeeper, constants.Assets_DefaultGenesisState)
 
-			testMarket2 := *pricestest.GenerateMarketParamPrice(pricestest.WithId(2))
-			testMarket3 := *pricestest.GenerateMarketParamPrice(pricestest.WithId(3))
-			testMarket4 := *pricestest.GenerateMarketParamPrice(pricestest.WithId(4))
-			keepertest.CreateTestPriceMarkets(t, ctx, pricesKeeper, []pricestypes.MarketParamPrice{testMarket2, testMarket3, testMarket4})
-
 			keepertest.CreateTestLiquidityTiers(t, ctx, perpetualsKeeper)
 			keepertest.CreateTestCollateralPools(t, ctx, perpetualsKeeper)
 			keepertest.CreateTestPerpetuals(t, ctx, perpetualsKeeper)
@@ -264,11 +257,6 @@ func TestGetSetNegativeTncSubaccountSeenAtBlock_PanicsOnDecreasingBlock(t *testi
 	ctx, subaccountsKeeper, pricesKeeper, perpetualsKeeper, _, _, assetsKeeper, _, _, _ := keepertest.SubaccountsKeepers(t, true)
 	prices.InitGenesis(ctx, *pricesKeeper, constants.Prices_DefaultGenesisState)
 	assets.InitGenesis(ctx, *assetsKeeper, constants.Assets_DefaultGenesisState)
-
-	testMarket2 := *pricestest.GenerateMarketParamPrice(pricestest.WithId(2))
-	testMarket3 := *pricestest.GenerateMarketParamPrice(pricestest.WithId(3))
-	testMarket4 := *pricestest.GenerateMarketParamPrice(pricestest.WithId(4))
-	keepertest.CreateTestPriceMarkets(t, ctx, pricesKeeper, []pricestypes.MarketParamPrice{testMarket2, testMarket3, testMarket4})
 
 	keepertest.CreateTestLiquidityTiers(t, ctx, perpetualsKeeper)
 	keepertest.CreateTestCollateralPools(t, ctx, perpetualsKeeper)

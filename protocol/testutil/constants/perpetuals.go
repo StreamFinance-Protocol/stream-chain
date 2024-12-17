@@ -361,6 +361,24 @@ var (
 		YieldIndex:   big.NewRat(0, 1).String(),
 	}
 
+	EthUsd_SmallMarginRequirement_CollatPool1_Params = perptypes.PerpetualParams{
+		Id:                0,
+		Ticker:            "ETH-USD small margin requirement",
+		MarketId:          uint32(1),
+		AtomicResolution:  int32(-8),
+		DefaultFundingPpm: int32(0),
+		LiquidityTier:     uint32(8),
+		DangerIndexPpm:    uint32(0),
+		CollateralPoolId:  uint32(1),
+	}
+
+	EthUsd_SmallMarginRequirement_CollatPool1 = perptypes.Perpetual{
+		Params:       EthUsd_SmallMarginRequirement_CollatPool1_Params,
+		FundingIndex: dtypes.ZeroInt(),
+		OpenInterest: dtypes.ZeroInt(),
+		YieldIndex:   big.NewRat(0, 1).String(),
+	}
+
 	BtcUsd_SmallMarginRequirement_DangerIndex = perptypes.Perpetual{
 		Params:       BtcUsd_SmallMarginRequirement_DangerIndex_Params,
 		FundingIndex: dtypes.ZeroInt(),

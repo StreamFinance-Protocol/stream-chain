@@ -8,6 +8,7 @@ var (
 	CollateralPoolOneAddress   = authtypes.NewModuleAddress(ModuleName + ":1")
 	CollateralPoolTwoAddress   = authtypes.NewModuleAddress(ModuleName + ":2")
 	CollateralPoolThreeAddress = authtypes.NewModuleAddress(ModuleName + ":3")
+	CollateralPoolFourAddress  = authtypes.NewModuleAddress(ModuleName + ":4")
 
 	LiquidityFeeModuleAddress = "liquidity_module"
 )

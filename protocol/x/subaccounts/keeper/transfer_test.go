@@ -753,7 +753,7 @@ func TestTransferFundsFromSubaccountToSubaccount_Success(t *testing.T) {
 		expectedSenderCollateralPoolBalance    *big.Int
 		expectedRecipientCollateralPoolBalance *big.Int
 	}{
-		"Send TDai from non-isolated subaccount to non-isolated subaccount": {
+		"Send TDai from  subaccount to subaccount in same collat pool": {
 			asset:                *constants.TDai,
 			quantums:             big.NewInt(500),
 			senderAssetPositions: keepertest.CreateTDaiAssetPosition(big.NewInt(500)),
@@ -774,7 +774,28 @@ func TestTransferFundsFromSubaccountToSubaccount_Success(t *testing.T) {
 			expectedSenderCollateralPoolBalance:    big.NewInt(1100), // no changes to collateral pools
 			expectedRecipientCollateralPoolBalance: big.NewInt(1100),
 		},
-		"Send TDai from isolated subaccount to non-isolated subaccount": {
+		"Send non TDai from  subaccount to subaccount in same collat pool": {
+			asset:                *constants.BtcUsd,
+			quantums:             big.NewInt(500),
+			senderAssetPositions: keepertest.CreateBtcAssetPosition(big.NewInt(500)),
+			senderPerpetualPositions: []*types.PerpetualPosition{
+				&constants.PerpetualPosition_OneETHLong_BTCQuote,
+			},
+			recipientAssetPositions: keepertest.CreateBtcAssetPosition(big.NewInt(600)),
+			recipientPerpetualPositions: []*types.PerpetualPosition{
+				&constants.PerpetualPosition_OneETHLong_BTCQuote,
+			},
+			senderCollateralPoolBalance:            big.NewInt(1100), // 500 + 600
+			recipientCollateralPoolBalance:         big.NewInt(1100), // same collateral pool, same balance
+			senderCollateralPoolAddr:               types.CollateralPoolOneAddress,
+			recipientCollateralPoolAddr:            types.CollateralPoolOneAddress,
+			expectedRecipientAssetPositions:        keepertest.CreateBtcAssetPosition(big.NewInt(1100)),
+			expectedSenderQuoteBalance:             big.NewInt(0),    // 500 - 500
+			expectedRecipientQuoteBalance:          big.NewInt(1100), // 500 + 600
+			expectedSenderCollateralPoolBalance:    big.NewInt(1100), // no changes to collateral pools
+			expectedRecipientCollateralPoolBalance: big.NewInt(1100),
+		},
+		"Send TDai from subaccount to subaccount with different collat pools": {
 			asset:                *constants.TDai,
 			quantums:             big.NewInt(500),
 			senderAssetPositions: keepertest.CreateTDaiAssetPosition(big.NewInt(500)),
@@ -795,49 +816,70 @@ func TestTransferFundsFromSubaccountToSubaccount_Success(t *testing.T) {
 			expectedSenderCollateralPoolBalance:    big.NewInt(100),  // 600 - 500
 			expectedRecipientCollateralPoolBalance: big.NewInt(1200), // 700 + 500
 		},
-		"Send TDai from non-isolated subaccount to isolated subaccount": {
-			asset:                *constants.TDai,
+		"Send non Tdai from subaccount to subaccount with different collat pools": {
+			asset:                *constants.BtcUsd,
 			quantums:             big.NewInt(500),
-			senderAssetPositions: keepertest.CreateTDaiAssetPosition(big.NewInt(500)),
+			senderAssetPositions: keepertest.CreateBtcAssetPosition(big.NewInt(500)),
 			senderPerpetualPositions: []*types.PerpetualPosition{
-				&constants.PerpetualPosition_OneBTCLong,
+				&constants.PerpetualPosition_OneETHLong_BTCQuote,
 			},
-			recipientAssetPositions: keepertest.CreateTDaiAssetPosition(big.NewInt(600)),
+			recipientAssetPositions: keepertest.CreateBtcAssetPosition(big.NewInt(600)),
 			recipientPerpetualPositions: []*types.PerpetualPosition{
-				&constants.PerpetualPosition_OneISOLong,
+				&constants.PerpetualPosition_OneETHLong_BTCQuote_CollatPool4,
 			},
 			senderCollateralPoolBalance:            big.NewInt(600),
 			recipientCollateralPoolBalance:         big.NewInt(700),
-			senderCollateralPoolAddr:               types.CollateralPoolZeroAddress,
-			recipientCollateralPoolAddr:            types.CollateralPoolTwoAddress,
-			expectedRecipientAssetPositions:        keepertest.CreateTDaiAssetPosition(big.NewInt(1100)),
+			senderCollateralPoolAddr:               types.CollateralPoolOneAddress,
+			recipientCollateralPoolAddr:            types.CollateralPoolFourAddress,
+			expectedRecipientAssetPositions:        keepertest.CreateBtcAssetPosition(big.NewInt(1100)),
 			expectedSenderQuoteBalance:             big.NewInt(0),    // 500 - 500
 			expectedRecipientQuoteBalance:          big.NewInt(1100), // 500 + 600
 			expectedSenderCollateralPoolBalance:    big.NewInt(100),  // 600 - 500
 			expectedRecipientCollateralPoolBalance: big.NewInt(1200), // 700 + 500
 		},
-		"Send TDai from isolated subaccount to isolated subaccount (same perp)": {
+		"Send TDai from subaccount to subaccount with different collat pools - reverse": {
 			asset:                *constants.TDai,
 			quantums:             big.NewInt(500),
-			senderAssetPositions: keepertest.CreateTDaiAssetPosition(big.NewInt(500)),
+			senderAssetPositions: keepertest.CreateTDaiAssetPosition(big.NewInt(600)),
 			senderPerpetualPositions: []*types.PerpetualPosition{
-				&constants.PerpetualPosition_OneISOLong,
+				&constants.PerpetualPosition_OneBTCLong,
 			},
-			recipientAssetPositions: keepertest.CreateTDaiAssetPosition(big.NewInt(600)),
+			recipientAssetPositions: keepertest.CreateTDaiAssetPosition(big.NewInt(500)),
 			recipientPerpetualPositions: []*types.PerpetualPosition{
 				&constants.PerpetualPosition_OneISOLong,
 			},
-			senderCollateralPoolBalance:            big.NewInt(1100), // 500 + 600
-			recipientCollateralPoolBalance:         big.NewInt(1100), // same collateral pool, same balance
-			senderCollateralPoolAddr:               types.CollateralPoolTwoAddress,
+			senderCollateralPoolBalance:            big.NewInt(700),
+			recipientCollateralPoolBalance:         big.NewInt(600),
+			senderCollateralPoolAddr:               types.CollateralPoolZeroAddress,
 			recipientCollateralPoolAddr:            types.CollateralPoolTwoAddress,
-			expectedRecipientAssetPositions:        keepertest.CreateTDaiAssetPosition(big.NewInt(1100)),
-			expectedSenderQuoteBalance:             big.NewInt(0),    // 500 - 500
-			expectedRecipientQuoteBalance:          big.NewInt(1100), // 500 + 600
-			expectedSenderCollateralPoolBalance:    big.NewInt(1100), // no changes to collateral pools
-			expectedRecipientCollateralPoolBalance: big.NewInt(1100),
+			expectedRecipientAssetPositions:        keepertest.CreateTDaiAssetPosition(big.NewInt(1000)),
+			expectedSenderQuoteBalance:             big.NewInt(100),  // 600 - 500
+			expectedRecipientQuoteBalance:          big.NewInt(1000), // 500 + 500
+			expectedSenderCollateralPoolBalance:    big.NewInt(200),  // 700 - 500
+			expectedRecipientCollateralPoolBalance: big.NewInt(1100), // 600 + 500
 		},
-		"Send TDai from isolated subaccount to isolated subaccount (different perp)": {
+		"Send non Tdai from subaccount to subaccount with different collat pools - reverse": {
+			asset:                *constants.BtcUsd,
+			quantums:             big.NewInt(500),
+			senderAssetPositions: keepertest.CreateBtcAssetPosition(big.NewInt(600)),
+			senderPerpetualPositions: []*types.PerpetualPosition{
+				&constants.PerpetualPosition_OneETHLong_BTCQuote_CollatPool4,
+			},
+			recipientAssetPositions: keepertest.CreateBtcAssetPosition(big.NewInt(500)),
+			recipientPerpetualPositions: []*types.PerpetualPosition{
+				&constants.PerpetualPosition_OneETHLong_BTCQuote,
+			},
+			senderCollateralPoolBalance:            big.NewInt(700),
+			recipientCollateralPoolBalance:         big.NewInt(600),
+			senderCollateralPoolAddr:               types.CollateralPoolFourAddress,
+			recipientCollateralPoolAddr:            types.CollateralPoolOneAddress,
+			expectedRecipientAssetPositions:        keepertest.CreateBtcAssetPosition(big.NewInt(1000)),
+			expectedSenderQuoteBalance:             big.NewInt(100),  // 600 - 500
+			expectedRecipientQuoteBalance:          big.NewInt(1000), // 500 + 500
+			expectedSenderCollateralPoolBalance:    big.NewInt(200),  // 700 - 500
+			expectedRecipientCollateralPoolBalance: big.NewInt(1100), // 600 + 500
+		},
+		"Send TDai from subaccount to subaccount with different collat pools (different perp)": {
 			asset:                *constants.TDai,
 			quantums:             big.NewInt(500),
 			senderAssetPositions: keepertest.CreateTDaiAssetPosition(big.NewInt(500)),
@@ -858,8 +900,6 @@ func TestTransferFundsFromSubaccountToSubaccount_Success(t *testing.T) {
 			expectedSenderCollateralPoolBalance:    big.NewInt(100),  // 600 - 500
 			expectedRecipientCollateralPoolBalance: big.NewInt(1200), // 700 + 500
 		},
-		// TODO(DEC-715): Add more test for non-TDai assets, after asset update
-		// is implemented.
 		// TODO(CORE-169): Add tests for when the input quantums is rounded down to
 		// a integer denom amount.
 	}
@@ -899,7 +939,6 @@ func TestTransferFundsFromSubaccountToSubaccount_Success(t *testing.T) {
 			senderSubaccount.PerpetualPositions = tc.senderPerpetualPositions
 			recipientSubaccount.AssetPositions = tc.recipientAssetPositions
 			recipientSubaccount.PerpetualPositions = tc.recipientPerpetualPositions
-
 			keeper.SetSubaccount(ctx, senderSubaccount)
 			keeper.SetSubaccount(ctx, recipientSubaccount)
 
@@ -947,7 +986,7 @@ func TestTransferFundsFromSubaccountToSubaccount_Success(t *testing.T) {
 			}
 			require.Equal(t,
 				tc.expectedSenderQuoteBalance,
-				updatedSenderSubaccount.GetTDaiPosition(),
+				updatedSenderSubaccount.GetAssetPosition(tc.asset.Id),
 			)
 
 			updatedRecipientSubaccount := keeper.GetSubaccount(ctx, *recipientSubaccount.Id)
@@ -959,7 +998,7 @@ func TestTransferFundsFromSubaccountToSubaccount_Success(t *testing.T) {
 			}
 			require.Equal(t,
 				tc.expectedRecipientQuoteBalance,
-				updatedRecipientSubaccount.GetTDaiPosition(),
+				updatedRecipientSubaccount.GetAssetPosition(tc.asset.Id),
 			)
 
 			// Check the subaccount module balance.

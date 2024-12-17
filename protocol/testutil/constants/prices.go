@@ -15,6 +15,11 @@ const (
 	LtcUsdPair   = "LTC-USD"
 	IsoUsdPair   = "ISO-USD"
 	Iso2UsdPair  = "ISO2-USD"
+	IsoBtcPair   = "ISO-BTC"
+	Iso2BtcPair  = "ISO2-BTC"
+
+	DefaultMarketIdNotUsedInGenesis = 9999
+	LastMarketIdInGenesis           = 6
 
 	BtcUsdExponent   = -5
 	EthUsdExponent   = -6
@@ -25,6 +30,8 @@ const (
 	LtcUsdExponent   = -7
 	IsoUsdExponent   = -8
 	Iso2UsdExponent  = -7
+	IsoBtcExponent   = -8
+	Iso2BtcExponent  = -8
 
 	CoinbaseExchangeName  = "Coinbase"
 	BinanceExchangeName   = "Binance"
@@ -32,10 +39,13 @@ const (
 	BitfinexExchangeName  = "Bitfinex"
 	KrakenExchangeName    = "Kraken"
 
-	FiveBillion  = uint64(5_000_000_000)
-	ThreeBillion = uint64(3_000_000_000)
-	FiveMillion  = uint64(5_000_000)
-	OneMillion   = uint64(1_000_000)
+	FiveHundredBillion = uint64(500_000_000_000)
+	ThirtyBillion      = uint64(30_000_000_000)
+	FiveBillion        = uint64(5_000_000_000)
+	ThreeBillion       = uint64(3_000_000_000)
+	FiveMillion        = uint64(5_000_000)
+	ThreeMillion       = uint64(3_000_000)
+	OneMillion         = uint64(1_000_000)
 
 	// Market param validation errors.
 	ErrorMsgMarketPairCannotBeEmpty = "Pair cannot be empty"
@@ -210,6 +220,22 @@ var TestMarketExchangeConfigs = map[pricefeedclient.MarketId]string{
 			}
 		]
 	  }`,
+	exchange_config.MARKET_ISO_BTC: `{
+		"exchanges": [
+			{
+			"exchangeName": "Binance",
+			"ticker": "ISOBTC"
+			}
+		]
+	  }`,
+	exchange_config.MARKET_ISO2_BTC: `{
+		"exchanges": [
+			{
+			"exchangeName": "Binance",
+			"ticker": "ISO2BTC"
+			}
+		]
+	  }`,
 }
 
 var TestMarketParams = []types.MarketParam{
@@ -253,6 +279,22 @@ var TestMarketParams = []types.MarketParam{
 		MinPriceChangePpm:  50,
 		ExchangeConfigJson: TestMarketExchangeConfigs[exchange_config.MARKET_ISO2_USD],
 	},
+	{
+		Id:                 5,
+		Pair:               IsoBtcPair,
+		Exponent:           IsoBtcExponent,
+		MinExchanges:       1,
+		MinPriceChangePpm:  50,
+		ExchangeConfigJson: TestMarketExchangeConfigs[exchange_config.MARKET_ISO_BTC],
+	},
+	{
+		Id:                 6,
+		Pair:               Iso2BtcPair,
+		Exponent:           Iso2BtcExponent,
+		MinExchanges:       1,
+		MinPriceChangePpm:  50,
+		ExchangeConfigJson: TestMarketExchangeConfigs[exchange_config.MARKET_ISO2_BTC],
+	},
 }
 
 var TestSingleMarketParam = types.MarketParam{
@@ -286,22 +328,37 @@ var TestMarketPrices = []types.MarketPrice{
 	{
 		Id:        3,
 		Exponent:  IsoUsdExponent,
-		SpotPrice: FiveBillion, // 50$ == 1 ISO
-		PnlPrice:  FiveBillion, // 50$ == 1 ISO
+		SpotPrice: FiveHundredBillion, // $5,000 == 1 ISO
+		PnlPrice:  FiveHundredBillion, // $5,000 == 1 ISO
 	},
 	{
 		Id:        4,
 		Exponent:  Iso2UsdExponent,
-		SpotPrice: ThreeBillion, // 300$ == 1 ISO2
-		PnlPrice:  ThreeBillion, // 300$ == 1 ISO2
+		SpotPrice: ThirtyBillion, // $3,000 == 1 ISO2
+		PnlPrice:  ThirtyBillion, // $3,000 == 1 ISO2
+	},
+	{
+		Id:        5,
+		Exponent:  IsoBtcExponent,
+		SpotPrice: FiveMillion, // 0.05 BTC == 1 ISO
+		PnlPrice:  FiveMillion, // 0.05 BTC == 1 ISO
+	},
+	{
+		Id:        6,
+		Exponent:  Iso2BtcExponent,
+		SpotPrice: ThreeMillion, // 0.03 BTC == 1 ISO2
+		PnlPrice:  ThreeMillion, // 0.03 BTC == 1 ISO2
 	},
 }
+
 var IdsToPairs = map[uint32]string{
 	0: BtcUsdPair,
 	1: EthUsdPair,
 	2: SolUsdPair,
 	3: IsoUsdPair,
 	4: Iso2UsdPair,
+	5: IsoBtcPair,
+	6: Iso2BtcPair,
 }
 
 var TestMarketIdsToExponents = map[uint32]int32{
@@ -543,6 +600,46 @@ var (
 				ExchangeConfigJson: TestMarketExchangeConfigs[exchange_config.MARKET_ETH_USD],
 				MinPriceChangePpm:  uint32(50),
 			},
+			{
+				Id:                 uint32(2),
+				Pair:               SolUsdPair,
+				Exponent:           SolUsdExponent,
+				MinExchanges:       uint32(1),
+				ExchangeConfigJson: TestMarketExchangeConfigs[exchange_config.MARKET_SOL_USD],
+				MinPriceChangePpm:  uint32(50),
+			},
+			{
+				Id:                 uint32(3),
+				Pair:               IsoUsdPair,
+				Exponent:           IsoUsdExponent,
+				MinExchanges:       uint32(1),
+				ExchangeConfigJson: TestMarketExchangeConfigs[exchange_config.MARKET_ISO_USD],
+				MinPriceChangePpm:  uint32(50),
+			},
+			{
+				Id:                 uint32(4),
+				Pair:               Iso2UsdPair,
+				Exponent:           Iso2UsdExponent,
+				MinExchanges:       uint32(1),
+				ExchangeConfigJson: TestMarketExchangeConfigs[exchange_config.MARKET_ISO2_USD],
+				MinPriceChangePpm:  uint32(50),
+			},
+			{
+				Id:                 uint32(5),
+				Pair:               IsoBtcPair,
+				Exponent:           IsoBtcExponent,
+				MinExchanges:       uint32(1),
+				ExchangeConfigJson: TestMarketExchangeConfigs[exchange_config.MARKET_ISO_BTC],
+				MinPriceChangePpm:  uint32(50),
+			},
+			{
+				Id:                 uint32(6),
+				Pair:               Iso2BtcPair,
+				Exponent:           Iso2BtcExponent,
+				MinExchanges:       uint32(1),
+				ExchangeConfigJson: TestMarketExchangeConfigs[exchange_config.MARKET_ISO2_BTC],
+				MinPriceChangePpm:  uint32(50),
+			},
 		},
 		MarketPrices: []types.MarketPrice{
 			{
@@ -556,6 +653,36 @@ var (
 				Exponent:  EthUsdExponent,
 				SpotPrice: ThreeBillion, // $3,000 == 1 ETH
 				PnlPrice:  ThreeBillion, // $3,000 == 1 ETH
+			},
+			{
+				Id:        uint32(2),
+				Exponent:  SolUsdExponent,
+				SpotPrice: FiveBillion, // $50 == 1 SOL
+				PnlPrice:  FiveBillion, // $50 == 1 SOL
+			},
+			{
+				Id:        uint32(3),
+				Exponent:  IsoUsdExponent,
+				SpotPrice: FiveHundredBillion, // $5,000 == 1 ISO
+				PnlPrice:  FiveHundredBillion, // $5,000 == 1 ISO
+			},
+			{
+				Id:        uint32(4),
+				Exponent:  Iso2UsdExponent,
+				SpotPrice: ThirtyBillion, // $3,000 == 1 ISO2
+				PnlPrice:  ThirtyBillion, // $3,000 == 1 ISO2
+			},
+			{
+				Id:        uint32(5),
+				Exponent:  IsoBtcExponent,
+				SpotPrice: FiveMillion, // 0.05 BTC == 1 ISO
+				PnlPrice:  FiveMillion, // 0.05 BTC == 1 ISO
+			},
+			{
+				Id:        uint32(6),
+				Exponent:  Iso2BtcExponent,
+				SpotPrice: ThreeMillion, // 0.03 BTC == 1 ISO2
+				PnlPrice:  ThreeMillion, // 0.03 BTC == 1 ISO2
 			},
 		},
 	}

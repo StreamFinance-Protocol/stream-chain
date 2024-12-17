@@ -117,17 +117,18 @@ func CreateTestMarkets(t *testing.T, ctx sdk.Context, k *keeper.Keeper) {
 }
 
 func CreateNonDefaultTestMarkets(t *testing.T, ctx sdk.Context, k *keeper.Keeper) {
-	for i, marketParam := range constants.TestMarketParams[2:] {
+	lastMarketIdPlusOne := constants.LastMarketIdInGenesis + 1
+	for i, marketParam := range constants.TestMarketParams[lastMarketIdPlusOne:] {
 		_, err := k.CreateMarket(
 			ctx,
 			marketParam,
-			constants.TestMarketPrices[i+2],
+			constants.TestMarketPrices[i+lastMarketIdPlusOne],
 		)
 		require.NoError(t, err)
 		err = k.UpdateSpotAndPnlMarketPrices(ctx, &types.MarketPriceUpdate{
-			MarketId:  uint32(i + 2),
-			SpotPrice: constants.TestMarketPrices[i+2].SpotPrice,
-			PnlPrice:  constants.TestMarketPrices[i+2].PnlPrice,
+			MarketId:  uint32(i + lastMarketIdPlusOne),
+			SpotPrice: constants.TestMarketPrices[i+lastMarketIdPlusOne].SpotPrice,
+			PnlPrice:  constants.TestMarketPrices[i+lastMarketIdPlusOne].PnlPrice,
 		})
 		require.NoError(t, err)
 	}

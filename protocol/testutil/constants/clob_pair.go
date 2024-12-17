@@ -163,4 +163,40 @@ var (
 		QuantumConversionExponent: -8,
 		Status:                    clobtypes.ClobPair_STATUS_ACTIVE,
 	}
+	ClobPair_5_IsoBtc = clobtypes.ClobPair{
+		Id: 5,
+		Metadata: &clobtypes.ClobPair_PerpetualClobMetadata{
+			PerpetualClobMetadata: &clobtypes.PerpetualClobMetadata{
+				PerpetualId: 5,
+			},
+		},
+		StepBaseQuantums:          5,
+		SubticksPerTick:           5,
+		QuantumConversionExponent: -8,
+		Status:                    clobtypes.ClobPair_STATUS_ACTIVE,
+	}
+	ClobPair_6_IsoBtc_CollatPool4 = clobtypes.ClobPair{
+		Id: 6,
+		Metadata: &clobtypes.ClobPair_PerpetualClobMetadata{
+			PerpetualClobMetadata: &clobtypes.PerpetualClobMetadata{
+				PerpetualId: 6,
+			},
+		},
+		StepBaseQuantums:          5,
+		SubticksPerTick:           5,
+		QuantumConversionExponent: -8,
+		Status:                    clobtypes.ClobPair_STATUS_ACTIVE,
+	}
+	ClobPair_5_Iso2Btc = clobtypes.ClobPair{
+		Id: 7,
+		Metadata: &clobtypes.ClobPair_PerpetualClobMetadata{
+			PerpetualClobMetadata: &clobtypes.PerpetualClobMetadata{
+				PerpetualId: 7,
+			},
+		},
+		StepBaseQuantums:          5,
+		SubticksPerTick:           5,
+		QuantumConversionExponent: -8,
+		Status:                    clobtypes.ClobPair_STATUS_ACTIVE,
+	}
 )

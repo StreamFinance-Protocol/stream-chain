@@ -2,6 +2,7 @@ package keeper_test
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"math/big"
 	"testing"
@@ -4526,7 +4527,7 @@ func TestGetNextSubaccountToLiquidate(t *testing.T) {
 			numIsolatedLiquidations: 0,
 
 			expectedSubaccountId:                  constants.Bob_Num0,
-			expectedNumIsolated:                   -1000000,
+			expectedNumIsolated:                   math.MinInt,
 			expectedIsolatedPositionsPriorityHeap: heap.NewLiquidationPriorityHeap(),
 			expectedSubaccountIds:                 heap.NewLiquidationPriorityHeap(),
 		},
@@ -4594,6 +4595,9 @@ func TestGetNextSubaccountToLiquidate(t *testing.T) {
 			} else {
 				require.Equal(t, tc.expectedSubaccountId, subaccountId.SubaccountId)
 			}
+
+			fmt.Println("EXPECTED NUM ISOLATED", tc.expectedNumIsolated)
+			fmt.Println("NUM ISOLATED", tc.numIsolatedLiquidations)
 			require.Equal(t, tc.expectedNumIsolated, tc.numIsolatedLiquidations)
 			require.Equal(t, tc.expectedIsolatedPositionsPriorityHeap.Len(), isolatedPositionsPriorityHeap.Len())
 			require.Equal(t, tc.expectedSubaccountIds.Len(), subaccountIds.Len())

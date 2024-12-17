@@ -8,12 +8,10 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/mocks"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/constants"
 	keepertest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/keeper"
-	pricestest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/prices"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/memclob"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
-	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
@@ -260,11 +258,6 @@ func TestIncrementCumulativeInsuranceFundDelta(t *testing.T) {
 			// Create liquidity tiers.
 			keepertest.CreateTestLiquidityTiers(t, ctx, ks.PerpetualsKeeper)
 			keepertest.CreateTestCollateralPools(t, ctx, ks.PerpetualsKeeper)
-
-			testMarket2 := *pricestest.GenerateMarketParamPrice(pricestest.WithId(2))
-			testMarket3 := *pricestest.GenerateMarketParamPrice(pricestest.WithId(3))
-			testMarket4 := *pricestest.GenerateMarketParamPrice(pricestest.WithId(4))
-			keepertest.CreateTestPriceMarkets(t, ctx, ks.PricesKeeper, []pricestypes.MarketParamPrice{testMarket2, testMarket3, testMarket4})
 
 			// Create perpetuals.
 			for _, p := range tc.perpetuals {

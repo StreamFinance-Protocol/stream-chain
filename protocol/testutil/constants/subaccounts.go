@@ -41,6 +41,14 @@ var (
 		PerpetualPositions: []*satypes.PerpetualPosition{},
 		AssetYieldIndex:    big.NewRat(1, 1).String(),
 	}
+	Alice_Num1_1BTC = satypes.Subaccount{
+		Id: &Alice_Num1,
+		AssetPositions: []*satypes.AssetPosition{
+			&Long_Asset_1BTC,
+		},
+		PerpetualPositions: []*satypes.PerpetualPosition{},
+		AssetYieldIndex:    big.NewRat(0, 1).String(),
+	}
 	Alice_Num1_100_000USD = satypes.Subaccount{
 		Id: &Alice_Num1,
 		AssetPositions: []*satypes.AssetPosition{

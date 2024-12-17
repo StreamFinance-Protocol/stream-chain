@@ -132,6 +132,16 @@ func CreateTDaiAssetPosition(
 	}
 }
 
+func CreateBtcAssetPosition(
+	quoteBalance *big.Int,
+) []*types.AssetPosition {
+	return []*types.AssetPosition{
+		{
+			AssetId:  assettypes.AssetBtc.Id,
+			Quantums: dtypes.NewIntFromBigInt(quoteBalance),
+		},
+	}
+}
 func CreateTDaiAssetUpdate(
 	deltaQuoteBalance *big.Int,
 ) []types.AssetUpdate {

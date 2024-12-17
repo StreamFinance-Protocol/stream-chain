@@ -10,10 +10,8 @@ import (
 	testapp "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/app"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/constants"
 	testkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/keeper"
-	pricestest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/prices"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices"
-	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
 	"github.com/stretchr/testify/require"
@@ -350,11 +348,6 @@ func TestProcessNewSDaiConversionRateUpdate(t *testing.T) {
 
 			prices.InitGenesis(ctx, *pricesKeeper, constants.Prices_DefaultGenesisState)
 			assets.InitGenesis(ctx, *assetsKeeper, constants.Assets_DefaultGenesisState)
-
-			testMarket2 := *pricestest.GenerateMarketParamPrice(pricestest.WithId(2))
-			testMarket3 := *pricestest.GenerateMarketParamPrice(pricestest.WithId(3))
-			testMarket4 := *pricestest.GenerateMarketParamPrice(pricestest.WithId(4))
-			testkeeper.CreateTestPriceMarkets(t, ctx, pricesKeeper, []pricestypes.MarketParamPrice{testMarket2, testMarket3, testMarket4})
 
 			testkeeper.CreateTestLiquidityTiers(t, ctx, perpetualsKeeper)
 			testkeeper.CreateTestCollateralPools(t, ctx, perpetualsKeeper)

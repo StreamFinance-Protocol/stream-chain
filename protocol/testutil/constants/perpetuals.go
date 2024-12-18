@@ -770,6 +770,24 @@ var (
 		OpenInterest: dtypes.ZeroInt(),
 		YieldIndex:   big.NewRat(0, 1).String(),
 	}
+
+	BtcBtc_SmallMarginRequirement_CollatPool1_Params_Id8 = perptypes.PerpetualParams{
+		Id:                9,
+		Ticker:            "BTC-BTC small margin requirement",
+		MarketId:          uint32(0),
+		AtomicResolution:  int32(-8),
+		DefaultFundingPpm: int32(0),
+		LiquidityTier:     uint32(8),
+		DangerIndexPpm:    uint32(0),
+		CollateralPoolId:  uint32(1),
+	}
+
+	BtcBtc_SmallMarginRequirement_CollatPool1_Id8 = perptypes.Perpetual{
+		Params:       BtcBtc_SmallMarginRequirement_CollatPool1_Params_Id8,
+		FundingIndex: dtypes.ZeroInt(),
+		OpenInterest: dtypes.ZeroInt(),
+		YieldIndex:   big.NewRat(0, 1).String(),
+	}
 )
 
 var TestMarketPerpetuals = []perptypes.Perpetual{

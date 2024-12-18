@@ -17,15 +17,23 @@ func TestCollateralPoolValidate(t *testing.T) {
 		"Validates successfully": {
 			MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
 			multiCollateralAssets: &types.MultiCollateralAssetsArray{
-				MultiCollateralAssets: []uint32{1, 2, 3},
+				MultiCollateralAssets: []uint32{2},
 			},
 			quoteAssetId:  2,
 			expectedError: nil,
 		},
+		"Failure: Multi Collateral Assets has more than one asset": {
+			MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+			multiCollateralAssets: &types.MultiCollateralAssetsArray{
+				MultiCollateralAssets: []uint32{1, 2, 3},
+			},
+			quoteAssetId:  2,
+			expectedError: types.ErrCollateralPoolMustHaveOnlyOneAsset,
+		},
 		"Failure: Max Cumulative Insurance Fund Delta Per Block is zero": {
 			MaxCumulativeInsuranceFundDeltaPerBlock: 0,
 			multiCollateralAssets: &types.MultiCollateralAssetsArray{
-				MultiCollateralAssets: []uint32{1, 2, 3},
+				MultiCollateralAssets: []uint32{2},
 			},
 			quoteAssetId:  2,
 			expectedError: types.ErrMaxCumulativeInsuranceFundDeltaPerBlockZero,
@@ -38,7 +46,7 @@ func TestCollateralPoolValidate(t *testing.T) {
 		},
 		"Failure: Multi Collateral Asset Does Not Contain Quote Asset": {
 			MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
-			multiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{1, 2, 3}},
+			multiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{1}},
 			quoteAssetId:                            4,
 			expectedError:                           types.ErrIsolatedMarketMultiCollateralAssetDoesNotContainQuoteAsset,
 		},

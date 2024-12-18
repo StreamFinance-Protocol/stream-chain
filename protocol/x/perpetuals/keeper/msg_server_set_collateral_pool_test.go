@@ -38,17 +38,6 @@ func TestSetCollateralPool(t *testing.T) {
 				},
 			},
 		},
-		"Success: update all parameters": {
-			msg: &types.MsgSetCollateralPool{
-				Authority: lib.GovModuleAddress.String(),
-				CollateralPool: types.CollateralPool{
-					CollateralPoolId:                        testCp.CollateralPoolId,
-					MaxCumulativeInsuranceFundDeltaPerBlock: 123_432,
-					MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{0, 1}},
-					QuoteAssetId:                            0,
-				},
-			},
-		},
 		"Success: create a new liquidity tier": {
 			msg: &types.MsgSetCollateralPool{
 				Authority: lib.GovModuleAddress.String(),
@@ -71,6 +60,18 @@ func TestSetCollateralPool(t *testing.T) {
 				},
 			},
 			expectedErr: "cannot modify collateral pool quote asset",
+		},
+		"Failure: cannot update to multiple assets": {
+			msg: &types.MsgSetCollateralPool{
+				Authority: lib.GovModuleAddress.String(),
+				CollateralPool: types.CollateralPool{
+					CollateralPoolId:                        testCp.CollateralPoolId,
+					MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_001,
+					MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{0, 1}},
+					QuoteAssetId:                            0,
+				},
+			},
+			expectedErr: "collateral pool can only have 1 asset",
 		},
 		"Failure: supported multi collateral assets must contains quote asset": {
 			msg: &types.MsgSetCollateralPool{

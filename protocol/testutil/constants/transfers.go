@@ -58,11 +58,23 @@ var (
 		AssetId:   assettypes.AssetTDai.Id,
 		Quantums:  500_000_000, // $500
 	}
+	MsgDepositToSubaccount_Alice_To_Alice_Num0_1BTC = types.MsgDepositToSubaccount{
+		Sender:    AliceAccAddress.String(),
+		Recipient: Alice_Num0,
+		AssetId:   assettypes.AssetBtc.Id,
+		Quantums:  100_000_000, // 1 BTC
+	}
 	MsgDepositToSubaccount_Alice_To_Carl_Num0_750 = types.MsgDepositToSubaccount{
 		Sender:    AliceAccAddress.String(),
 		Recipient: Carl_Num0,
 		AssetId:   assettypes.AssetTDai.Id,
 		Quantums:  750_000_000, // $750
+	}
+	MsgDepositToSubaccount_Alice_To_Carl_Num0_halfBTC = types.MsgDepositToSubaccount{
+		Sender:    AliceAccAddress.String(),
+		Recipient: Carl_Num0,
+		AssetId:   assettypes.AssetTDai.Id,
+		Quantums:  50_000_000, // 0.5 BTC
 	}
 )
 

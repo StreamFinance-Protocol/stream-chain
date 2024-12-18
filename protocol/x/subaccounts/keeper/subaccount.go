@@ -361,6 +361,8 @@ func GetSettledSubaccountWithPerpetuals(
 		if totalNewYield.Cmp(big.NewInt(0)) < 0 {
 			return types.Subaccount{}, nil, nil, types.ErrYieldClaimedNegative
 		}
+	} else {
+		subaccountWithYield.AssetYieldIndex = assetYieldIndex.String()
 	}
 
 	if len(subaccountWithYield.PerpetualPositions) == 0 {

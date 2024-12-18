@@ -752,6 +752,24 @@ var (
 		OpenInterest: dtypes.ZeroInt(),
 		YieldIndex:   big.NewRat(0, 1).String(),
 	}
+
+	BtcBtc_100PercentMarginRequirement_CollatPool1_Params_Id8 = perptypes.PerpetualParams{
+		Id:                8,
+		Ticker:            "BTC-BTC 100% margin requirement",
+		MarketId:          uint32(0),
+		AtomicResolution:  int32(-8),
+		DefaultFundingPpm: int32(0),
+		LiquidityTier:     uint32(0),
+		DangerIndexPpm:    uint32(0),
+		CollateralPoolId:  uint32(1),
+	}
+
+	BtcBtc_100PercentMarginRequirement_CollatPool1_Id8 = perptypes.Perpetual{
+		Params:       BtcBtc_100PercentMarginRequirement_CollatPool1_Params_Id8,
+		FundingIndex: dtypes.ZeroInt(),
+		OpenInterest: dtypes.ZeroInt(),
+		YieldIndex:   big.NewRat(0, 1).String(),
+	}
 )
 
 var TestMarketPerpetuals = []perptypes.Perpetual{
@@ -802,6 +820,7 @@ var TestMarketPerpetuals = []perptypes.Perpetual{
 	IsoBtc_CollatPool1_Id5,
 	IsoBtc_CollatPool4_Id6,
 	IsoBtc_CollatPool1_Id7,
+	BtcBtc_100PercentMarginRequirement_CollatPool1_Id8,
 }
 
 // AddPremiumVotes messages.

@@ -12,11 +12,23 @@ var (
 		AssetId:   assettypes.AssetTDai.Id,
 		Amount:    500_000_000, // $500
 	}
+	Transfer_Carl_Num0_Dave_Num0_Quote_1Tenth_BTC = types.Transfer{
+		Sender:    Carl_Num0,
+		Recipient: Dave_Num0,
+		AssetId:   assettypes.AssetBtc.Id,
+		Amount:    10_000_000, // 0.1BTC
+	}
 	Transfer_Carl_Num0_Dave_Num0_Quote_600 = types.Transfer{
 		Sender:    Carl_Num0,
 		Recipient: Dave_Num0,
 		AssetId:   assettypes.AssetTDai.Id,
 		Amount:    600_000_000, // $600
+	}
+	Transfer_Carl_Num0_Dave_Num0_Quote_2_BTC = types.Transfer{
+		Sender:    Carl_Num0,
+		Recipient: Dave_Num0,
+		AssetId:   assettypes.AssetBtc.Id,
+		Amount:    200_000_000, // $600
 	}
 	Transfer_Carl_Num0_Dave_Num0_Asset_600 = types.Transfer{
 		Sender:    Carl_Num0,

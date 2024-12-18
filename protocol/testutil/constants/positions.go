@@ -221,6 +221,10 @@ var (
 		AssetId:  1,
 		Quantums: dtypes.NewInt(100_000_000), // 1 BTC
 	}
+	Long_Asset_2BTC = satypes.AssetPosition{
+		AssetId:  1,
+		Quantums: dtypes.NewInt(200_000_000), // 1 BTC
+	}
 	Short_Asset_1BTC = satypes.AssetPosition{
 		AssetId:  1,
 		Quantums: dtypes.NewInt(-100_000_000), // 1 BTC

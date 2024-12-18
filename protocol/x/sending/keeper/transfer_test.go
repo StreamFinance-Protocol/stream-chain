@@ -428,6 +428,72 @@ func TestProcessTransfer_CreateRecipientAccount(t *testing.T) {
 	require.True(t, ks.AccountKeeper.HasAccount(ks.Ctx, recipientAddr))
 }
 
+func TestProcessTransfer_CreateRecipientAccount_NonTdai(t *testing.T) {
+	ks := keepertest.SendingKeepers(t)
+
+	ks.Ctx = ks.Ctx.WithBlockHeight(5)
+	keepertest.CreateTestMarkets(t, ks.Ctx, ks.PricesKeeper)
+
+	// Set up tDAI asset in assets module.
+	err := keepertest.CreateTDaiAsset(ks.Ctx, ks.AssetsKeeper)
+	require.NoError(t, err)
+	err = keepertest.CreateBTCAsset(ks.Ctx, ks.AssetsKeeper)
+	require.NoError(t, err)
+
+	keepertest.CreateTestLiquidityTiers(t, ks.Ctx, ks.PerpetualsKeeper)
+	keepertest.CreateTestCollateralPools(t, ks.Ctx, ks.PerpetualsKeeper)
+
+	ks.RatelimitKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+
+	perpetuals := []perptypes.Perpetual{
+		constants.IsoBtc_CollatPool1_Id7,
+	}
+
+	for _, p := range perpetuals {
+		_, err := ks.PerpetualsKeeper.CreatePerpetual(
+			ks.Ctx,
+			p.Params.Id,
+			p.Params.Ticker,
+			p.Params.MarketId,
+			p.Params.AtomicResolution,
+			p.Params.DefaultFundingPpm,
+			p.Params.LiquidityTier,
+			p.Params.DangerIndexPpm,
+			p.Params.CollateralPoolId,
+			p.YieldIndex,
+		)
+		require.NoError(t, err)
+	}
+	ks.SubaccountsKeeper.SetSubaccount(ks.Ctx, constants.Carl_Num0_1BTC)
+	ks.AccountKeeper.SetAccount(
+		ks.Ctx,
+		ks.AccountKeeper.NewAccountWithAddress(ks.Ctx, constants.Carl_Num0.MustGetAccAddress()),
+	)
+
+	// Create a sample recipient address.
+	recipient := sample.AccAddress()
+	recipientAddr, err := sdk.AccAddressFromBech32(recipient)
+	require.NoError(t, err)
+
+	// Verify that the recipient account does not exist.
+	require.False(t, ks.AccountKeeper.HasAccount(ks.Ctx, recipientAddr))
+
+	// Process the transfer.
+	transfer := types.Transfer{
+		Sender: constants.Carl_Num0,
+		Recipient: satypes.SubaccountId{
+			Owner:  recipient,
+			Number: uint32(0),
+		},
+		AssetId: assettypes.AssetBtc.Id,
+		Amount:  10_000_000, // 0.1 BTC
+	}
+	err = ks.SendingKeeper.ProcessTransfer(ks.Ctx, &transfer)
+	require.NoError(t, err)
+
+	// The account should've been created for the recipient address.
+	require.True(t, ks.AccountKeeper.HasAccount(ks.Ctx, recipientAddr))
+}
 func TestProcessDepositToSubaccount(t *testing.T) {
 	testError := errors.New("error")
 

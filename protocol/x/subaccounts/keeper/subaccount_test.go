@@ -896,6 +896,95 @@ func TestUpdateSubaccounts(t *testing.T) {
 			},
 			msgSenderEnabled: false,
 		},
+		"update zeroes position (position should be deleted)": {
+			assetPositions:  testutil.CreateTDaiAssetPosition(big.NewInt(25_000_000_000)), // $25,000
+			expectedSuccess: true,
+			collateralPoolTDaiBalances: map[string]int64{
+				types.CollateralPoolZeroAddress.String(): 25_000_000_000,
+			},
+			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcUsd_NoMarginRequirement,
+			},
+			perpetualPositions: []*types.PerpetualPosition{
+				{
+					PerpetualId:  uint32(0),
+					Quantums:     dtypes.NewInt(100_000_000), // 1 BTC
+					FundingIndex: dtypes.NewInt(0),
+					YieldIndex:   big.NewRat(0, 1).String(),
+				},
+			},
+			expectedPerpetualPositions: []*types.PerpetualPosition{},
+			expectedUpdatedPerpetualPositions: map[types.SubaccountId][]*types.PerpetualPosition{
+				defaultSubaccountId: {
+					{
+						PerpetualId:  uint32(0),
+						Quantums:     dtypes.NewInt(0), // 0 BTC
+						FundingIndex: dtypes.NewInt(0),
+						YieldIndex:   big.NewRat(0, 1).String(),
+					},
+				},
+			},
+			expectedAssetPositions: []*types.AssetPosition{
+				{
+					AssetId:  uint32(0),
+					Quantums: dtypes.NewInt(25_000_000_000),
+				},
+			},
+			updates: []types.Update{
+				{
+					PerpetualUpdates: []types.PerpetualUpdate{
+						{
+							PerpetualId:      uint32(0),
+							BigQuantumsDelta: big.NewInt(-100_000_000), // -1 BTC
+						},
+					},
+				},
+			},
+			msgSenderEnabled: false,
+		},
+		"update zeroes asset position (asset should be deleted)": {
+			assetPositions:  testutil.CreateTDaiAssetPosition(big.NewInt(25_000_000_000)), // $25,000
+			expectedSuccess: true,
+			collateralPoolTDaiBalances: map[string]int64{
+				types.CollateralPoolZeroAddress.String(): 25_000_000_000,
+			},
+			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcUsd_NoMarginRequirement,
+			},
+			perpetualPositions: []*types.PerpetualPosition{
+				{
+					PerpetualId:  uint32(0),
+					Quantums:     dtypes.NewInt(100_000_000), // 1 BTC
+					FundingIndex: dtypes.NewInt(0),
+					YieldIndex:   big.NewRat(0, 1).String(),
+				},
+			},
+			expectedPerpetualPositions: []*types.PerpetualPosition{
+				{
+					PerpetualId:  uint32(0),
+					Quantums:     dtypes.NewInt(100_000_000), // 1 BTC
+					FundingIndex: dtypes.NewInt(0),
+					YieldIndex:   big.NewRat(0, 1).String(),
+				},
+			},
+			expectedUpdatedAssetPositions: map[types.SubaccountId][]*types.AssetPosition{
+				defaultSubaccountId: {
+					{
+						AssetId:  uint32(0),
+						Quantums: dtypes.NewInt(0),
+					},
+				},
+			},
+			expectedAssetPositions: []*types.AssetPosition{},
+			updates: []types.Update{
+				{
+					AssetUpdates: testutil.CreateTDaiAssetUpdate(big.NewInt(-25_000_000_000)), // -$25,000
+				},
+			},
+			msgSenderEnabled: false,
+		},
 		"FAIL: cannot add a perpetual position from a different collateral pool": {
 			assetPositions:           testutil.CreateTDaiAssetPosition(big.NewInt(25_000_000_000)), // $25,000
 			expectedSuccess:          false,

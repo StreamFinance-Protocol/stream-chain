@@ -7,23 +7,21 @@ import (
 )
 
 func (collateralPool CollateralPool) Validate() error {
-	if collateralPool.MaxCumulativeInsuranceFundDeltaPerBlock == 0 {
-		return errorsmod.Wrap(ErrMaxCumulativeInsuranceFundDeltaPerBlockZero, lib.UintToString(collateralPool.MaxCumulativeInsuranceFundDeltaPerBlock))
-	}
 
 	if len(collateralPool.MultiCollateralAssets.MultiCollateralAssets) == 0 {
 		return errorsmod.Wrap(ErrMultiCollateralAssetsEmpty, "")
 	}
 
-	quoteAssetFound := false
-	for _, asset := range collateralPool.MultiCollateralAssets.MultiCollateralAssets {
-		if asset == collateralPool.QuoteAssetId {
-			quoteAssetFound = true
-			break
-		}
+	if len(collateralPool.MultiCollateralAssets.MultiCollateralAssets) > 1 {
+		return errorsmod.Wrap(ErrCollateralPoolMustHaveOnlyOneAsset, "")
 	}
 
-	if !quoteAssetFound {
+	if collateralPool.MaxCumulativeInsuranceFundDeltaPerBlock == 0 {
+		return errorsmod.Wrap(ErrMaxCumulativeInsuranceFundDeltaPerBlockZero, lib.UintToString(collateralPool.MaxCumulativeInsuranceFundDeltaPerBlock))
+	}
+
+	collatAsset := collateralPool.MultiCollateralAssets.MultiCollateralAssets[0]
+	if collatAsset != collateralPool.QuoteAssetId {
 		return errorsmod.Wrap(ErrIsolatedMarketMultiCollateralAssetDoesNotContainQuoteAsset, "")
 	}
 

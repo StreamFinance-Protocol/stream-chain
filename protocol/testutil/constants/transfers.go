@@ -86,10 +86,22 @@ var (
 		AssetId:   assettypes.AssetTDai.Id,
 		Quantums:  500_000_000, // $500
 	}
+	MsgWithdrawFromSubaccount_Alice_Num0_To_Alice_1BTC = types.MsgWithdrawFromSubaccount{
+		Sender:    Alice_Num0,
+		Recipient: AliceAccAddress.String(),
+		AssetId:   assettypes.AssetBtc.Id,
+		Quantums:  100_000_000, // 1 BTC
+	}
 	MsgWithdrawFromSubaccount_Carl_Num0_To_Alice_750 = types.MsgWithdrawFromSubaccount{
 		Sender:    Carl_Num0,
 		Recipient: AliceAccAddress.String(),
 		AssetId:   assettypes.AssetTDai.Id,
 		Quantums:  750_000_000, // $750
+	}
+	MsgWithdrawFromSubaccount_Carl_Num0_To_Alice_halfBTC = types.MsgWithdrawFromSubaccount{
+		Sender:    Carl_Num0,
+		Recipient: AliceAccAddress.String(),
+		AssetId:   assettypes.AssetBtc.Id,
+		Quantums:  50_000_000, // 0.5BTC
 	}
 )

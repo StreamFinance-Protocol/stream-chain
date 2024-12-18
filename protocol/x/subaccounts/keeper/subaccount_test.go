@@ -149,6 +149,19 @@ func TestGetCollateralPool(t *testing.T) {
 			},
 			expectedAddress: types.CollateralPoolTwoAddress,
 		},
+		"collateral pool with btc as quote asset": {
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcBtc_100PercentMarginRequirement_CollatPool1_Id8,
+			},
+			perpetualPositions: []*types.PerpetualPosition{
+				{
+					PerpetualId: constants.BtcBtc_100PercentMarginRequirement_CollatPool1_Id8.GetId(),
+					Quantums:    dtypes.NewInt(100_000_000),
+					YieldIndex:  big.NewRat(0, 1).String(),
+				},
+			},
+			expectedAddress: types.CollateralPoolOneAddress,
+		},
 		"collateral pool with no positions": {
 			perpetualPositions: make([]*types.PerpetualPosition, 0),
 			expectedAddress:    authtypes.NewModuleAddress(types.ModuleName),

@@ -627,8 +627,22 @@ func TestProcessWithdrawFromSubaccount(t *testing.T) {
 				mckCall.Return(nil)
 			},
 		},
+		"Success - non tdai": {
+			msg:         constants.MsgWithdrawFromSubaccount_Carl_Num0_To_Alice_halfBTC,
+			expectedErr: nil,
+			setUpMocks: func(mckCall *mock.Call) {
+				mckCall.Return(nil)
+			},
+		},
 		"Propagate error": {
 			msg:         constants.MsgWithdrawFromSubaccount_Carl_Num0_To_Alice_750,
+			expectedErr: testError,
+			setUpMocks: func(mckCall *mock.Call) {
+				mckCall.Return(testError)
+			},
+		},
+		"Propagate error - non tdai": {
+			msg:         constants.MsgWithdrawFromSubaccount_Carl_Num0_To_Alice_halfBTC,
 			expectedErr: testError,
 			setUpMocks: func(mckCall *mock.Call) {
 				mckCall.Return(testError)
@@ -642,12 +656,29 @@ func TestProcessWithdrawFromSubaccount(t *testing.T) {
 				mckCall.Panic(testError.Error())
 			},
 		},
+		"Propagate panic - non tdai": {
+			msg:         constants.MsgWithdrawFromSubaccount_Carl_Num0_To_Alice_halfBTC,
+			expectedErr: testError,
+			shouldPanic: true,
+			setUpMocks: func(mckCall *mock.Call) {
+				mckCall.Panic(testError.Error())
+			},
+		},
 		"Bad recipient address string": {
 			msg: types.MsgWithdrawFromSubaccount{
 				Sender:    constants.Alice_Num0,
 				Recipient: "1234567", // bad address string
 				AssetId:   assettypes.AssetTDai.Id,
 				Quantums:  750_000_000,
+			},
+			expectedErrContains: "decoding bech32 failed",
+		},
+		"Bad recipient address string - non tdai": {
+			msg: types.MsgWithdrawFromSubaccount{
+				Sender:    constants.Alice_Num0,
+				Recipient: "1234567", // bad address string
+				AssetId:   assettypes.AssetBtc.Id,
+				Quantums:  50_000_000,
 			},
 			expectedErrContains: "decoding bech32 failed",
 		},

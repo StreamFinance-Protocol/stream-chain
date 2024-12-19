@@ -40,10 +40,6 @@ func (k Keeper) IsValidMultiCollateralUpdate(
 	perpIdToParams map[uint32]perptypes.PerpetualParams,
 ) (types.UpdateResult, error) {
 
-	if len(settledUpdate.AssetUpdates) == 0 {
-		return types.Success, nil
-	}
-
 	if len(settledUpdate.PerpetualUpdates) == 0 && len(settledUpdate.SettledSubaccount.PerpetualPositions) == 0 {
 		return types.Success, nil
 	}

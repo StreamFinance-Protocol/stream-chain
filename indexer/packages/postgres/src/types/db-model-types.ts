@@ -1,12 +1,12 @@
 /* ------- DATABASE MODEL TYPES ------- */
-import Big from "big.js";
+import Big from 'big.js';
 
-import { CandleResolution } from "./candle-types";
-import { FillType, Liquidity } from "./fill-types";
-import { OrderSide, OrderStatus, OrderType, TimeInForce } from "./order-types";
-import { PerpetualMarketStatus } from "./perpetual-market-types";
-import { PerpetualPositionStatus } from "./perpetual-position-types";
-import { PositionSide } from "./position-types";
+import { CandleResolution } from './candle-types';
+import { FillType, Liquidity } from './fill-types';
+import { OrderSide, OrderStatus, OrderType, TimeInForce } from './order-types';
+import { PerpetualMarketStatus } from './perpetual-market-types';
+import { PerpetualPositionStatus } from './perpetual-position-types';
+import { PositionSide } from './position-types';
 
 type IsoString = string;
 
@@ -85,6 +85,7 @@ export interface PerpetualMarketFromDatabase {
   quantumConversionExponent: number;
   atomicResolution: number;
   dangerIndexPpm: number;
+  collateralPoolId: number;
   subticksPerTick: number;
   stepBaseQuantums: number;
   liquidityTierId: number;

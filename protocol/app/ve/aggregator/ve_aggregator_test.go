@@ -2,7 +2,6 @@ package aggregator_test
 
 import (
 	"errors"
-	"fmt"
 	"math/big"
 	"strings"
 	"testing"
@@ -1445,9 +1444,6 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 			} else {
 				require.NoError(t, err)
 			}
-
-			fmt.Println("PRICES", prices)
-			fmt.Println("SDAI CONVERSION RATE", sDaiConversionRate)
 
 			require.Equal(t, tc.expectedPrices, prices)
 			require.Equal(t, tc.expectedSDaiConversionRate, sDaiConversionRate)

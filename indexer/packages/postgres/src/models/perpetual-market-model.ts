@@ -7,9 +7,7 @@ import {
   NonNegativeNumericPattern,
   NumericPattern,
 } from '../lib/validators';
-import {
-  PerpetualMarketStatus,
-} from '../types';
+import { PerpetualMarketStatus } from '../types';
 
 export default class PerpetualMarketModel extends Model {
   static get tableName() {
@@ -64,6 +62,7 @@ export default class PerpetualMarketModel extends Model {
         'quantumConversionExponent',
         'atomicResolution',
         'dangerIndexPpm',
+        'collateralPoolId',
         'subticksPerTick',
         'stepBaseQuantums',
         'liquidityTierId',
@@ -74,7 +73,10 @@ export default class PerpetualMarketModel extends Model {
         clobPairId: { type: 'string', pattern: IntegerPattern },
         ticker: { type: 'string' },
         marketId: { type: 'integer' },
-        status: { type: 'string', enum: [...Object.values(PerpetualMarketStatus)] },
+        status: {
+          type: 'string',
+          enum: [...Object.values(PerpetualMarketStatus)],
+        },
         priceChange24H: { type: 'string', pattern: NumericPattern },
         volume24H: { type: 'string', pattern: NonNegativeNumericPattern },
         trades24H: { type: 'integer' },
@@ -83,6 +85,7 @@ export default class PerpetualMarketModel extends Model {
         quantumConversionExponent: { type: 'integer' },
         atomicResolution: { type: 'integer' },
         dangerIndexPpm: { type: 'integer' },
+        collateralPoolId: { type: 'integer' },
         subticksPerTick: { type: 'integer' },
         stepBaseQuantums: { type: 'integer' },
         liquidityTierId: { type: 'integer' },
@@ -113,6 +116,7 @@ export default class PerpetualMarketModel extends Model {
       quantumConversionExponent: 'integer',
       atomicResolution: 'integer',
       dangerIndexPpm: 'integer',
+      collateralPoolId: 'integer',
       subticksPerTick: 'integer',
       stepBaseQuantums: 'integer',
       liquidityTierId: 'integer',
@@ -146,6 +150,8 @@ export default class PerpetualMarketModel extends Model {
   atomicResolution!: number;
 
   dangerIndexPpm!: number;
+
+  collateralPoolId!: number;
 
   subticksPerTick!: number;
 

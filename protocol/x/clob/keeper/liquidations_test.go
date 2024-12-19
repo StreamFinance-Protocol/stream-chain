@@ -4148,6 +4148,26 @@ func TestGetBestPerpetualPositionToLiquidate(t *testing.T) {
 				),
 			),
 		},
+		// `Handles non-TDAI collateral pool correctly`: {
+		// 	perpetualPositions: []*satypes.PerpetualPosition{
+		// 		&constants.PerpetualPosition_OneIsoBtcLong,
+		// 	},
+		// 	perpetuals: []perptypes.Perpetual{
+		// 		constants.IsoBtc_CollatPool1_Id5,
+		// 	},
+		// 	liquidationConfig: constants.LiquidationsConfig_No_Limit,
+
+		// 	clobPairs: []types.ClobPair{
+		// 		constants.ClobPair_5_IsoBtc,
+		// 	},
+
+		// 	expectedClobPair: constants.ClobPair_5_IsoBtc,
+		// 	expectedQuantums: new(big.Int).Neg(
+		// 		big_testutil.MustFirst(
+		// 			new(big.Int).SetString("-10000000", 10),
+		// 		),
+		// 	),
+		// },
 	}
 
 	for name, tc := range tests {
@@ -5818,6 +5838,70 @@ func TestCheckInsuranceFundLimits(t *testing.T) {
 			perpetualId:          0,
 			expectedError:        nil,
 		},
+		"success - insurance fund delta within limits for non-TDAI backed perpetual": {
+			perpetuals: []perptypes.Perpetual{
+				constants.IsoBtc_CollatPool1_Id5,
+			},
+			liquidationsConfig: types.LiquidationsConfig{
+				InsuranceFundFeePpm: 10_000,
+				FillablePriceConfig: types.FillablePriceConfig{
+					BankruptcyAdjustmentPpm:           10_000_000,
+					SpreadToMaintenanceMarginRatioPpm: 10_000,
+				},
+			},
+			maxInsuranceFundLost: 1_000_000,
+			insuranceFundDelta:   big.NewInt(-1_100_000),
+			perpetualId:          5,
+			expectedError:        types.ErrLiquidationExceedsMaxInsuranceLost,
+		},
+		"failure - insurance fund delta exceeds limits for non-TDAI backed perpetual": {
+			perpetuals: []perptypes.Perpetual{
+				constants.IsoBtc_CollatPool1_Id5,
+			},
+			liquidationsConfig: types.LiquidationsConfig{
+				InsuranceFundFeePpm: 10_000,
+				FillablePriceConfig: types.FillablePriceConfig{
+					BankruptcyAdjustmentPpm:           10_000_000,
+					SpreadToMaintenanceMarginRatioPpm: 10_000,
+				},
+			},
+			maxInsuranceFundLost: 1_000_000,
+			insuranceFundDelta:   big.NewInt(-500_000),
+			perpetualId:          5,
+			expectedError:        nil,
+		},
+		"success - insurance fund delta at limit for non-TDAI backed perpetual": {
+			perpetuals: []perptypes.Perpetual{
+				constants.IsoBtc_CollatPool1_Id5,
+			},
+			liquidationsConfig: types.LiquidationsConfig{
+				InsuranceFundFeePpm: 10_000,
+				FillablePriceConfig: types.FillablePriceConfig{
+					BankruptcyAdjustmentPpm:           10_000_000,
+					SpreadToMaintenanceMarginRatioPpm: 10_000,
+				},
+			},
+			maxInsuranceFundLost: 1_000_000,
+			insuranceFundDelta:   big.NewInt(-1_000_000),
+			perpetualId:          5,
+			expectedError:        nil,
+		},
+		"success - insurance fund positive for non-TDAI backed perpetual": {
+			perpetuals: []perptypes.Perpetual{
+				constants.IsoBtc_CollatPool1_Id5,
+			},
+			liquidationsConfig: types.LiquidationsConfig{
+				InsuranceFundFeePpm: 10_000,
+				FillablePriceConfig: types.FillablePriceConfig{
+					BankruptcyAdjustmentPpm:           10_000_000,
+					SpreadToMaintenanceMarginRatioPpm: 10_000,
+				},
+			},
+			maxInsuranceFundLost: 1_000_000,
+			insuranceFundDelta:   big.NewInt(2_000_000),
+			perpetualId:          5,
+			expectedError:        nil,
+		},
 	}
 
 	for name, tc := range tests {
@@ -5834,13 +5918,15 @@ func TestCheckInsuranceFundLimits(t *testing.T) {
 			keepertest.CreateTestCollateralPools(t, ctx, ks.PerpetualsKeeper)
 
 			if tc.maxInsuranceFundLost != 0 {
-				ks.PerpetualsKeeper.UpsertCollateralPool(
-					ctx,
-					constants.CollateralPools[0].CollateralPoolId,
-					tc.maxInsuranceFundLost,
-					constants.CollateralPools[0].MultiCollateralAssets,
-					constants.CollateralPools[0].QuoteAssetId,
-				)
+				for _, pool := range constants.CollateralPools {
+					ks.PerpetualsKeeper.UpsertCollateralPool(
+						ctx,
+						pool.CollateralPoolId,
+						tc.maxInsuranceFundLost,
+						pool.MultiCollateralAssets,
+						pool.QuoteAssetId,
+					)
+				}
 			}
 
 			// Create all perpetuals.

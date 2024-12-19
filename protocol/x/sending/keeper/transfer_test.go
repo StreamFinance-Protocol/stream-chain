@@ -206,7 +206,7 @@ func TestProcessTransferWithinSameCollateralPool(t *testing.T) {
 			},
 			asset: *constants.BtcUsd,
 			perpetuals: []perptypes.Perpetual{
-				constants.IsoBtc_CollatPool1_Id7,
+				constants.Iso2Btc_CollatPool1_Id7,
 			},
 			transfer: &constants.Transfer_Carl_Num0_Dave_Num0_Quote_1Tenth_BTC,
 			expectedSubaccountBalance: map[satypes.SubaccountId]*big.Int{
@@ -234,7 +234,7 @@ func TestProcessTransferWithinSameCollateralPool(t *testing.T) {
 			},
 			asset: *constants.BtcUsd,
 			perpetuals: []perptypes.Perpetual{
-				constants.IsoBtc_CollatPool1_Id7,
+				constants.Iso2Btc_CollatPool1_Id7,
 			},
 			transfer: &constants.Transfer_Carl_Num0_Dave_Num0_Quote_1Tenth_BTC,
 			expectedSubaccountBalance: map[satypes.SubaccountId]*big.Int{
@@ -249,7 +249,7 @@ func TestProcessTransferWithinSameCollateralPool(t *testing.T) {
 			},
 			asset: *constants.BtcUsd,
 			perpetuals: []perptypes.Perpetual{
-				constants.IsoBtc_CollatPool1_Id7,
+				constants.Iso2Btc_CollatPool1_Id7,
 			},
 			transfer: &constants.Transfer_Carl_Num0_Dave_Num0_Quote_2_BTC,
 			expectedSubaccountBalance: map[satypes.SubaccountId]*big.Int{
@@ -446,7 +446,7 @@ func TestProcessTransfer_CreateRecipientAccount_NonTdai(t *testing.T) {
 	ks.RatelimitKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
 
 	perpetuals := []perptypes.Perpetual{
-		constants.IsoBtc_CollatPool1_Id7,
+		constants.Iso2Btc_CollatPool1_Id7,
 	}
 
 	for _, p := range perpetuals {

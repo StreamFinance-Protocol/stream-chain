@@ -152,7 +152,7 @@ var (
 		FundingIndex: dtypes.NewInt(0),
 		YieldIndex:   big.NewRat(0, 1).String(),
 	}
-	PerpetualPosition_OneIsoBtcLongShort = satypes.PerpetualPosition{
+	PerpetualPosition_OneIsoBtcShort = satypes.PerpetualPosition{
 		PerpetualId:  5,
 		Quantums:     dtypes.NewInt(-10_000_000),
 		FundingIndex: dtypes.NewInt(0),

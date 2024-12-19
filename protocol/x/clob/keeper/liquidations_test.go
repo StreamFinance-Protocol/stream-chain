@@ -4213,7 +4213,7 @@ func TestGetBestPerpetualPositionToLiquidate(t *testing.T) {
 		},
 		`Full position size is returned when subaccount has one perpetual short position with non-TDAI backed perpetual`: {
 			perpetualPositions: []*satypes.PerpetualPosition{
-				&constants.PerpetualPosition_OneIsoBtcLongShort,
+				&constants.PerpetualPosition_OneIsoBtcShort,
 			},
 			perpetuals: []perptypes.Perpetual{
 				constants.BtcUsd_20PercentInitial_10PercentMaintenance,
@@ -4236,7 +4236,7 @@ func TestGetBestPerpetualPositionToLiquidate(t *testing.T) {
 
 			expectedClobPair: constants.ClobPair_5_IsoBtc,
 			expectedQuantums: new(big.Int).Neg(
-				constants.PerpetualPosition_OneIsoBtcLongShort.GetBigQuantums(),
+				constants.PerpetualPosition_OneIsoBtcShort.GetBigQuantums(),
 			),
 		},
 		`Full position size of max uint64 of perpetual and CLOB pair are returned when subaccount
@@ -4299,26 +4299,6 @@ func TestGetBestPerpetualPositionToLiquidate(t *testing.T) {
 				),
 			),
 		},
-		// `Handles non-TDAI collateral pool correctly`: {
-		// 	perpetualPositions: []*satypes.PerpetualPosition{
-		// 		&constants.PerpetualPosition_OneIsoBtcLong,
-		// 	},
-		// 	perpetuals: []perptypes.Perpetual{
-		// 		constants.IsoBtc_CollatPool1_Id5,
-		// 	},
-		// 	liquidationConfig: constants.LiquidationsConfig_No_Limit,
-
-		// 	clobPairs: []types.ClobPair{
-		// 		constants.ClobPair_5_IsoBtc,
-		// 	},
-
-		// 	expectedClobPair: constants.ClobPair_5_IsoBtc,
-		// 	expectedQuantums: new(big.Int).Neg(
-		// 		big_testutil.MustFirst(
-		// 			new(big.Int).SetString("-10000000", 10),
-		// 		),
-		// 	),
-		// },
 	}
 
 	for name, tc := range tests {

@@ -764,7 +764,7 @@ var (
 		CollateralPoolId:  uint32(1),
 	}
 
-	IsoBtc_CollatPool1_Id7 = perptypes.Perpetual{
+	Iso2Btc_CollatPool1_Id7 = perptypes.Perpetual{
 		Params:       Iso2Btc_CollatPool1_Params_Id7,
 		FundingIndex: dtypes.ZeroInt(),
 		OpenInterest: dtypes.ZeroInt(),
@@ -855,7 +855,7 @@ var TestMarketPerpetuals = []perptypes.Perpetual{
 	Iso2Usd_IsolatedMarket,
 	IsoBtc_CollatPool1_Id5,
 	IsoBtc_CollatPool4_Id6,
-	IsoBtc_CollatPool1_Id7,
+	Iso2Btc_CollatPool1_Id7,
 	BtcBtc_100PercentMarginRequirement_CollatPool1_Id8,
 }
 

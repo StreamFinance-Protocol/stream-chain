@@ -260,7 +260,7 @@ test-unit-and-integration:
 	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' ./...
 
 specific-test: 
-	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -timeout 80m ./x/clob/client/cli/... -run "TestLiquidationOrderIntegrationTestSuite"
+	@VERSION=$(VERSION) go test -mod=readonly -tags='integration_test test_ledger_mock $(build_tags)' -p 1 -timeout 80m ./x/clob/client/cli/... -run "TestCancelOrderIntegrationTestSuite"
 
 benchmark:
 	@VERSION=$(VERSION) go test -mod=readonly -tags='$(build_tags)' -bench=. ./...

@@ -403,13 +403,13 @@ func (s *PlaceOrderIntegrationTestSuite) TestCLIPlaceOrderBTCCollat() {
 
 	var subaccountResp satypes.QuerySubaccountResponse
 	s.Require().NoError(s.network.Config.Codec.UnmarshalJSON(resp.Bytes(), &subaccountResp))
-	subaccountZero := subaccountResp.Subaccount
+	subaccountTwo := subaccountResp.Subaccount
 
 	resp, err = sa_testutil.MsgQuerySubaccountExec(ctx, s.validatorAddress, subaccountNumberThree)
 	s.Require().NoError(err)
 
 	s.Require().NoError(s.network.Config.Codec.UnmarshalJSON(resp.Bytes(), &subaccountResp))
-	subaccountOne := subaccountResp.Subaccount
+	subaccountThree := subaccountResp.Subaccount
 
 	// Compute the fill price so as to know how much QuoteBalance should be remaining.
 	fillSizeQuoteQuantums := types.FillAmountToQuoteQuantums(
@@ -430,21 +430,21 @@ func (s *PlaceOrderIntegrationTestSuite) TestCLIPlaceOrderBTCCollat() {
 			new(big.Int).SetInt64(initialQuoteBalance - fillSizeQuoteQuantums - takerFee),
 			new(big.Int).SetInt64(initialQuoteBalance - fillSizeQuoteQuantums - makerFee),
 		},
-		subaccountZero.GetAssetPosition(1),
+		subaccountTwo.GetAssetPosition(1),
 	)
-	s.Require().Len(subaccountZero.PerpetualPositions, 1)
-	s.Require().Equal(quantums.ToBigInt(), subaccountZero.PerpetualPositions[0].GetBigQuantums())
+	s.Require().Len(subaccountTwo.PerpetualPositions, 1)
+	s.Require().Equal(quantums.ToBigInt(), subaccountTwo.PerpetualPositions[0].GetBigQuantums())
 
 	s.Require().Contains(
 		[]*big.Int{
 			new(big.Int).SetInt64(initialQuoteBalance + fillSizeQuoteQuantums - takerFee),
 			new(big.Int).SetInt64(initialQuoteBalance + fillSizeQuoteQuantums - makerFee),
 		},
-		subaccountOne.GetAssetPosition(1),
+		subaccountThree.GetAssetPosition(1),
 	)
-	s.Require().Len(subaccountOne.PerpetualPositions, 1)
+	s.Require().Len(subaccountThree.PerpetualPositions, 1)
 	// Check that position is short and has the right size.
-	s.Require().Equal(new(big.Int).Neg(quantums.ToBigInt()), subaccountOne.PerpetualPositions[0].GetBigQuantums())
+	s.Require().Equal(new(big.Int).Neg(quantums.ToBigInt()), subaccountThree.PerpetualPositions[0].GetBigQuantums())
 
 	// Check that the `subaccounts` module account has expected remaining TDai balance.
 

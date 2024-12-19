@@ -132,7 +132,7 @@ func CreateBankGenesisStateForLiquidationTest(
 					),
 					sdk.NewInt64Coin(
 						"btc-denom",
-						1000000000000,
+						1000000000000000,
 					),
 				},
 			},
@@ -150,7 +150,7 @@ func CreateBankGenesisStateForLiquidationTest(
 				Coins: []sdk.Coin{
 					sdk.NewInt64Coin(
 						"btc-denom",
-						1000000000000,
+						1000000000000000,
 					),
 				},
 			},

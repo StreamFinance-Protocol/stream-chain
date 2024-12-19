@@ -37,14 +37,17 @@ import (
 )
 
 var (
-	liqTestMakerOrderQuantums                = satypes.BaseQuantums(100_000_000) // 1 BTC.
-	liqTestInitialSubaccountModuleAccBalance = int64(1_000_000_000_000)
-	liqTestSubaccountZeroInitialBalance      = int64(100_000_000_000)
-	liqTestSubaccountNumberZero              = uint32(0)
-	liqTestSubaccountNumberOne               = uint32(1)
-	liqTestSubaccountNumberTwo               = uint32(2)
-	liqTestSubaccountNumberThree             = uint32(3)
-	liqTestUnixSocketAddress                 = "/tmp/liquidations_cli_test.sock"
+	liqTestMakerOrderQuantums                   = satypes.BaseQuantums(100_000_000) // 1 BTC.
+	liqTestInitialSubaccountModuleAccBalance    = int64(1_000_000_000_000)
+	liqTestInitialSubaccountModuleAccBalanceBTC = int64(1_000_000_000_000_000)
+
+	liqTestSubaccountZeroInitialBalance = int64(100_000_000_000)
+	liqTestSubaccountTwoInitialBalance  = int64(10_000_000_000_000)
+	liqTestSubaccountNumberZero         = uint32(0)
+	liqTestSubaccountNumberOne          = uint32(1)
+	liqTestSubaccountNumberTwo          = uint32(2)
+	liqTestSubaccountNumberThree        = uint32(3)
+	liqTestUnixSocketAddress            = "/tmp/liquidations_cli_test.sock"
 )
 
 type LiquidationsIntegrationTestSuite struct {
@@ -177,7 +180,7 @@ func (s *LiquidationsIntegrationTestSuite) SetupSuite() {
 			AssetPositions: []*satypes.AssetPosition{
 				{
 					AssetId:  1,
-					Quantums: dtypes.NewInt(-4_500_100_000_000),
+					Quantums: dtypes.NewInt(-90_002_000),
 				},
 			},
 			PerpetualPositions: []*satypes.PerpetualPosition{
@@ -286,7 +289,6 @@ func (s *LiquidationsIntegrationTestSuite) TestCLILiquidations() {
 	takerFee := fillSizeQuoteQuantums * int64(constants.PerpetualFeeParams.Tiers[0].TakerFeePpm) / int64(lib.OneMillion)
 	makerFee := fillSizeQuoteQuantums * int64(constants.PerpetualFeeParams.Tiers[0].MakerFeePpm) / int64(lib.OneMillion)
 	subaccountZeroInitialQuoteBalance := constants.TDai_Asset_100_000.GetBigQuantums().Int64()
-	fmt.Println("subaccountZeroInitialQuoteBalance", subaccountZeroInitialQuoteBalance)
 	s.Require().Contains(
 		[]*big.Int{
 			new(big.Int).SetInt64(subaccountZeroInitialQuoteBalance - fillSizeQuoteQuantums - takerFee),
@@ -364,6 +366,7 @@ func (s *LiquidationsIntegrationTestSuite) TestCLILiquidations() {
 }
 
 func (s *LiquidationsIntegrationTestSuite) TestCLILiquidationsBTCCollat() {
+
 	val := s.network.Validators[0]
 	ctx := val.ClientCtx
 
@@ -372,7 +375,7 @@ func (s *LiquidationsIntegrationTestSuite) TestCLILiquidationsBTCCollat() {
 
 	goodTilBlock := uint32(currentHeight) + types.ShortBlockWindow
 	clientId := uint64(1)
-	subticks := types.Subticks(50_000_000_000)
+	subticks := types.Subticks(5_000_000_000_000)
 
 	// Place the maker order that should be filled by the liquidation order.
 	_, err = cli_testutil.MsgPlaceOrderExec(
@@ -402,13 +405,13 @@ func (s *LiquidationsIntegrationTestSuite) TestCLILiquidationsBTCCollat() {
 
 	var subaccountResp satypes.QuerySubaccountResponse
 	s.Require().NoError(s.network.Config.Codec.UnmarshalJSON(resp.Bytes(), &subaccountResp))
-	subaccountZero := subaccountResp.Subaccount
+	subaccountTwo := subaccountResp.Subaccount
 
 	resp, err = sa_testutil.MsgQuerySubaccountExec(ctx, s.validatorAddress, liqTestSubaccountNumberThree)
 	s.Require().NoError(err)
 
 	s.Require().NoError(s.network.Config.Codec.UnmarshalJSON(resp.Bytes(), &subaccountResp))
-	subaccountOne := subaccountResp.Subaccount
+	subaccountThree := subaccountResp.Subaccount
 
 	// Compute the fill price so as to know how much QuoteBalance should be remaining.
 	fillSizeQuoteQuantums := types.FillAmountToQuoteQuantums(
@@ -420,26 +423,25 @@ func (s *LiquidationsIntegrationTestSuite) TestCLILiquidationsBTCCollat() {
 	// Assert that both Subaccounts have the appropriate state.
 	takerFee := fillSizeQuoteQuantums * int64(constants.PerpetualFeeParams.Tiers[0].TakerFeePpm) / int64(lib.OneMillion)
 	makerFee := fillSizeQuoteQuantums * int64(constants.PerpetualFeeParams.Tiers[0].MakerFeePpm) / int64(lib.OneMillion)
-	subaccountZeroInitialQuoteBalance := int64(10_000_000_000_000)
 	s.Require().Contains(
 		[]*big.Int{
-			new(big.Int).SetInt64(subaccountZeroInitialQuoteBalance - fillSizeQuoteQuantums - takerFee),
-			new(big.Int).SetInt64(subaccountZeroInitialQuoteBalance - fillSizeQuoteQuantums - makerFee),
+			new(big.Int).SetInt64(liqTestSubaccountTwoInitialBalance - fillSizeQuoteQuantums - takerFee),
+			new(big.Int).SetInt64(liqTestSubaccountTwoInitialBalance - fillSizeQuoteQuantums - makerFee),
 		},
-		subaccountZero.GetAssetPosition(1),
+		subaccountTwo.GetAssetPosition(1),
 	)
-	s.Require().Len(subaccountZero.PerpetualPositions, 1)
-	s.Require().Equal(liqTestMakerOrderQuantums.ToBigInt(), subaccountZero.PerpetualPositions[0].GetBigQuantums())
+	s.Require().Len(subaccountTwo.PerpetualPositions, 1)
+	s.Require().Equal(liqTestMakerOrderQuantums.ToBigInt(), subaccountTwo.PerpetualPositions[0].GetBigQuantums())
 
-	subaccountOneInitialQuoteBalance := int64(-4_500_100_000_000)
+	subaccountThreeInitialQuoteBalance := int64(-90_002_000)
 	liquidationFee := fillSizeQuoteQuantums *
 		int64(types.LiquidationsConfig_Default.InsuranceFundFeePpm) /
 		int64(lib.OneMillion)
 	s.Require().Equal(
-		new(big.Int).SetInt64(subaccountOneInitialQuoteBalance+fillSizeQuoteQuantums-liquidationFee),
-		subaccountOne.GetAssetPosition(1),
+		new(big.Int).SetInt64(subaccountThreeInitialQuoteBalance+fillSizeQuoteQuantums-liquidationFee),
+		subaccountThree.GetAssetPosition(1),
 	)
-	s.Require().Empty(subaccountOne.PerpetualPositions)
+	s.Require().Empty(subaccountThree.PerpetualPositions)
 
 	// Check that the `subaccounts` module account has expected remaining TDai balance.
 	collateralPoolAddress := satypes.ModuleName + ":1"
@@ -453,7 +455,7 @@ func (s *LiquidationsIntegrationTestSuite) TestCLILiquidationsBTCCollat() {
 
 	s.Require().NoError(err)
 	s.Require().Equal(
-		liqTestInitialSubaccountModuleAccBalance-liqTestSubaccountZeroInitialBalance+subaccountOne.GetAssetPosition(1).Int64(),
+		liqTestInitialSubaccountModuleAccBalanceBTC-liqTestSubaccountTwoInitialBalance+subaccountThree.GetAssetPosition(1).Int64(),
 		saModuleBtcBalance,
 	)
 
@@ -466,7 +468,7 @@ func (s *LiquidationsIntegrationTestSuite) TestCLILiquidationsBTCCollat() {
 
 	s.Require().NoError(err)
 	s.Require().Equal(
-		liqTestInitialSubaccountModuleAccBalance+liqTestSubaccountZeroInitialBalance-subaccountOne.GetAssetPosition(1).Int64()-liquidationFee-makerFee,
+		liqTestInitialSubaccountModuleAccBalanceBTC+liqTestSubaccountTwoInitialBalance-subaccountThree.GetAssetPosition(1).Int64()-liquidationFee-makerFee,
 		collateralPoolModuleBtcBalance,
 	)
 

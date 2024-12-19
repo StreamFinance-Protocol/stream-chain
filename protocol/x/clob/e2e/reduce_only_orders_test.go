@@ -550,6 +550,7 @@ func TestReduceOnlyOrders(t *testing.T) {
 							genesisState.Perpetuals = []perptypes.Perpetual{
 								constants.BtcUsd_20PercentInitial_10PercentMaintenance,
 								constants.EthUsd_20PercentInitial_10PercentMaintenance,
+								constants.BtcEth_20PercentInitial_10PercentMaintenance,
 							}
 							genesisState.CollateralPools = constants.CollateralPools
 						},

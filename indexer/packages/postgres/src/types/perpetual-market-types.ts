@@ -56,6 +56,7 @@ export enum PerpetualMarketColumns {
   quantumConversionExponent = 'quantumConversionExponent',
   atomicResolution = 'atomicResolution',
   dangerIndexPpm = 'dangerIndexPpm',
+  collateralPoolId = 'collateralPoolId',
   subticksPerTick = 'subticksPerTick',
   stepBaseQuantums = 'stepBaseQuantums',
   liquidityTierId = 'liquidityTierId',

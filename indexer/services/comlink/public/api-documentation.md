@@ -3824,9 +3824,9 @@ func main() {
       "sumClose": "string",
       "netFunding": "string",
       "unrealizedPnl": "string",
+      "perpYieldIndex": "string",
       "closedAt": "string",
-      "exitPrice": "string",
-      "perpYieldIndex": "string"
+      "exitPrice": "string"
     }
   ]
 }
@@ -5801,24 +5801,6 @@ This operation does not require authentication
 |*anonymous*|DELEVERAGED|
 |*anonymous*|OFFSETTING|
 
-```json
-"PERPETUAL"
-
-```
-
-### Properties
-
-|Name|Type|Required|Restrictions|Description|
-|---|---|---|---|---|
-|*anonymous*|string|false|none|none|
-
-#### Enumerated Values
-
-|Property|Value|
-|---|---|
-|*anonymous*|PERPETUAL|
-|*anonymous*|SPOT|
-
 ## FillResponseObject
 
 <a id="schemafillresponseobject"></a>
@@ -6330,19 +6312,6 @@ or
 |*anonymous*|INITIALIZING|
 |*anonymous*|FINAL_SETTLEMENT|
 
-### Properties
-
-|Name|Type|Required|Restrictions|Description|
-|---|---|---|---|---|
-|*anonymous*|string|false|none|none|
-
-#### Enumerated Values
-
-|Property|Value|
-|---|---|
-|*anonymous*|CROSS|
-|*anonymous*|ISOLATED|
-
 ## PerpetualMarketResponseObject
 
 <a id="schemaperpetualmarketresponseobject"></a>
@@ -6406,6 +6375,7 @@ or
 |openInterestUpperCap|string|false|none|none|
 |baseOpenInterest|string|true|none|none|
 |perpYieldIndex|string|true|none|none|
+
 ## PerpetualMarketResponse
 
 <a id="schemaperpetualmarketresponse"></a>
@@ -6502,9 +6472,9 @@ or
       "sumClose": "string",
       "netFunding": "string",
       "unrealizedPnl": "string",
+      "perpYieldIndex": "string",
       "closedAt": "string",
-      "exitPrice": "string",
-      "perpYieldIndex": "string"
+      "exitPrice": "string"
     }
   ]
 }

@@ -1,14 +1,12 @@
 /* ------- DATABASE MODEL TYPES ------- */
-import Big from 'big.js';
+import Big from "big.js";
 
-import { CandleResolution } from './candle-types';
-import { FillType, Liquidity } from './fill-types';
-import {
-  OrderSide, OrderStatus, OrderType, TimeInForce,
-} from './order-types';
-import { PerpetualMarketStatus } from './perpetual-market-types';
-import { PerpetualPositionStatus } from './perpetual-position-types';
-import { PositionSide } from './position-types';
+import { CandleResolution } from "./candle-types";
+import { FillType, Liquidity } from "./fill-types";
+import { OrderSide, OrderStatus, OrderType, TimeInForce } from "./order-types";
+import { PerpetualMarketStatus } from "./perpetual-market-types";
+import { PerpetualPositionStatus } from "./perpetual-position-types";
+import { PositionSide } from "./position-types";
 
 type IsoString = string;
 
@@ -17,20 +15,21 @@ export interface IdBasedModelFromDatabase {
 }
 
 export interface SubaccountFromDatabase extends IdBasedModelFromDatabase {
-  address: string,
-  assetYieldIndex: string,
-  subaccountNumber: number,
-  updatedAt: IsoString,
-  updatedAtHeight: string,
+  address: string;
+  assetYieldIndex: string;
+  subaccountNumber: number;
+  updatedAt: IsoString;
+  updatedAtHeight: string;
 }
 
-export interface PerpetualPositionFromDatabase extends IdBasedModelFromDatabase {
+export interface PerpetualPositionFromDatabase
+  extends IdBasedModelFromDatabase {
   id: string;
   subaccountId: string;
   perpetualId: string;
   side: PositionSide;
   status: PerpetualPositionStatus;
-  size: string;  // The size of the position. Positive for long, negative for short.
+  size: string; // The size of the position. Positive for long, negative for short.
   maxSize: string;
   entryPrice: string;
   exitPrice?: string;
@@ -125,10 +124,10 @@ export interface TendermintEventFromDatabase {
 }
 
 export interface TransactionFromDatabase extends IdBasedModelFromDatabase {
-  id: string,
-  blockHeight: string,
-  transactionIndex: number,
-  transactionHash: string,
+  id: string;
+  blockHeight: string;
+  transactionIndex: number;
+  transactionHash: string;
 }
 
 export interface AssetFromDatabase {
@@ -210,7 +209,8 @@ export interface PnlTicksFromDatabase extends IdBasedModelFromDatabase {
   blockTime: IsoString;
 }
 
-export interface FundingIndexUpdatesFromDatabase extends IdBasedModelFromDatabase {
+export interface FundingIndexUpdatesFromDatabase
+  extends IdBasedModelFromDatabase {
   perpetualId: string;
   eventId: Buffer;
   rate: string;
@@ -235,19 +235,33 @@ export interface YieldParamsFromDatabase extends IdBasedModelFromDatabase {
   createdAtHeight: string;
 }
 
-export type SubaccountAssetNetTransferMap = { [subaccountId: string]:
-{ [assetId: string]: string } };
-export type SubaccountToPerpetualPositionsMap = { [subaccountId: string]:
-{ [perpetualId: string]: PerpetualPositionFromDatabase } };
-export type PerpetualPositionsMap = { [perpetualMarketId: string]: PerpetualPositionFromDatabase };
-export type PerpetualMarketsMap = { [perpetualMarketId: string]: PerpetualMarketFromDatabase };
+export type SubaccountAssetNetTransferMap = {
+  [subaccountId: string]: { [assetId: string]: string };
+};
+export type SubaccountToPerpetualPositionsMap = {
+  [subaccountId: string]: {
+    [perpetualId: string]: PerpetualPositionFromDatabase;
+  };
+};
+export type PerpetualPositionsMap = {
+  [perpetualMarketId: string]: PerpetualPositionFromDatabase;
+};
+export type PerpetualMarketsMap = {
+  [perpetualMarketId: string]: PerpetualMarketFromDatabase;
+};
 export type AssetsMap = { [assetId: string]: AssetFromDatabase };
-export type LiquidityTiersMap = { [liquidityTierId: number]: LiquidityTiersFromDatabase };
+export type LiquidityTiersMap = {
+  [liquidityTierId: number]: LiquidityTiersFromDatabase;
+};
 export type SubaccountTDaiMap = { [subaccountId: string]: Big };
-export type AssetPositionsMap = { [subaccountId: string]: AssetPositionFromDatabase[] };
+export type AssetPositionsMap = {
+  [subaccountId: string]: AssetPositionFromDatabase[];
+};
 export type MarketsMap = { [marketId: number]: MarketFromDatabase };
 export type OraclePricesMap = { [marketId: number]: OraclePriceFromDatabase[] };
-export type PriceMap = { [marketId: number]: { spotPrice: string; pnlPrice: string } };
+export type PriceMap = {
+  [marketId: number]: { spotPrice: string; pnlPrice: string };
+};
 export type FundingIndexMap = { [perpetualId: string]: Big };
 export type CandlesResolutionMap = { [resolution: string]: CandleFromDatabase };
 export type CandlesMap = { [ticker: string]: CandlesResolutionMap };

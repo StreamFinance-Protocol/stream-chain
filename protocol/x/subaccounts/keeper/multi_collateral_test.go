@@ -224,6 +224,43 @@ func TestIsValidMultiCollateralUpdate(t *testing.T) {
 			},
 			expectedResult: types.Success,
 		},
+		"Failure: Opening Position with valid asset updates - invalid existing asset": {
+			settledUpdate: keeper.SettledUpdate{
+				SettledSubaccount: constants.Alice_Num1_10_000USD,
+				AssetUpdates: []types.AssetUpdate{
+					{
+						AssetId:          1,
+						BigQuantumsDelta: big.NewInt(100_000_000),
+					},
+				},
+				PerpetualUpdates: []types.PerpetualUpdate{
+					{
+						PerpetualId:      1,
+						BigQuantumsDelta: big.NewInt(-100_000_000),
+					},
+				},
+			},
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcUsd_0DefaultFunding_10AtomicResolution_UniqueCollatPool,
+			},
+			collatPools: []perptypes.CollateralPool{
+				constants.CollateralPools[1],
+			},
+			assets: []asstypes.Asset{
+				*constants.TDai,
+				*constants.BtcUsd,
+			},
+			marketParams: []pricestypes.MarketParam{
+				constants.TestMarketParams[0],
+			},
+			liqTiers: []perptypes.LiquidityTier{
+				constants.LiquidityTiers[1],
+			},
+			perpIdToParams: map[uint32]perptypes.PerpetualParams{
+				1: constants.BtcUsd_0DefaultFunding_10AtomicResolution_UniqueCollatPool_Params,
+			},
+			expectedResult: types.ViolatesMultiCollateralConstraints,
+		},
 		"Failure: perp update for perp that doesn't exist": {
 			settledUpdate: keeper.SettledUpdate{
 				SettledSubaccount: constants.Alice_Num0_1USD,

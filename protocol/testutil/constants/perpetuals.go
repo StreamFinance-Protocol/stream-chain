@@ -459,6 +459,24 @@ var (
 		YieldIndex:   big.NewRat(0, 1).String(),
 	}
 
+	BtcEth_20PercentInitial_10PercentMaintenance_OpenInterest1_Params = perptypes.PerpetualParams{
+		Id:                2,
+		Ticker:            "BTC-ETH 20/10 margin requirements",
+		MarketId:          uint32(1),
+		AtomicResolution:  int32(-8),
+		DefaultFundingPpm: int32(0),
+		LiquidityTier:     uint32(3),
+		DangerIndexPpm:    uint32(0),
+		CollateralPoolId:  uint32(1),
+	}
+
+	BtcEth_20PercentInitial_10PercentMaintenance = perptypes.Perpetual{
+		Params:       BtcEth_20PercentInitial_10PercentMaintenance_OpenInterest1_Params,
+		FundingIndex: dtypes.ZeroInt(),
+		OpenInterest: dtypes.ZeroInt(),
+		YieldIndex:   big.NewRat(0, 1).String(),
+	}
+
 	BtcUsd_20PercentInitial_10PercentMaintenance_OpenInterest1 = perptypes.Perpetual{
 		Params:       BtcUsd_20PercentInitial_10PercentMaintenance_OpenInterest1_Params,
 		FundingIndex: dtypes.ZeroInt(),

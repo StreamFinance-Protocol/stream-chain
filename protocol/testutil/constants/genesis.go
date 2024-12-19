@@ -295,6 +295,16 @@ const GenesisState = `{
           "step_base_quantums": 1000,
           "subticks_per_tick": 100000
         }
+        {
+          "id": 2,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 2
+          },
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_ACTIVE",
+          "step_base_quantums": 1000,
+          "subticks_per_tick": 100000
+        }
       ],
       "equity_tier_limit_config": {
         "short_term_order_equity_tiers": [
@@ -999,7 +1009,8 @@ const GenesisState = `{
             "id": 0,
             "liquidity_tier": 0,
             "market_id": 0,
-            "ticker": "BTC-USD"
+            "ticker": "BTC-USD",
+            "collateral_pool_id": 0
           }
         },
         {
@@ -1009,7 +1020,19 @@ const GenesisState = `{
             "id": 1,
             "liquidity_tier": 0,
             "market_id": 1,
-            "ticker": "ETH-USD"
+            "ticker": "ETH-USD",
+            "collateral_pool_id": 0
+          }
+        },
+        {
+          "params": {
+            "atomic_resolution": -9,
+            "default_funding_ppm": 0,
+            "id": 2,
+            "liquidity_tier": 0,
+            "market_id": 1,
+            "ticker": "ETH-BTC",
+            "collateral_pool_id": 1
           }
         }
       ]

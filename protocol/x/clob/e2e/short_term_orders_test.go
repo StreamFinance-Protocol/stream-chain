@@ -47,6 +47,14 @@ func TestPlaceOrder(t *testing.T) {
 		},
 		&PlaceOrder_Alice_Num0_Id0_Clob0_Buy5_Price10_GTB20,
 	)
+	CheckTx_PlaceOrder_Alice_Num0_Id2_Buy5_Price10_GTB20 := testapp.MustMakeCheckTx(
+		ctx,
+		tApp.App,
+		testapp.MustMakeCheckTxOptions{
+			AccAddressForSigning: constants.Alice_Num0.Owner,
+		},
+		&PlaceOrder_Alice_Num0_Id2_Clob2_Buy5_Price10_GTB20,
+	)
 	CheckTx_PlaceOrder_Alice_Num0_Id0_Buy6_Price10_GTB20 := testapp.MustMakeCheckTx(
 		ctx,
 		tApp.App,
@@ -55,6 +63,14 @@ func TestPlaceOrder(t *testing.T) {
 		},
 		&PlaceOrder_Alice_Num0_Id0_Clob0_Buy6_Price10_GTB20,
 	)
+	CheckTx_PlaceOrder_Alice_Num0_Id2_Buy6_Price10_GTB20 := testapp.MustMakeCheckTx(
+		ctx,
+		tApp.App,
+		testapp.MustMakeCheckTxOptions{
+			AccAddressForSigning: constants.Alice_Num0.Owner,
+		},
+		&PlaceOrder_Alice_Num0_Id2_Clob2_Buy6_Price10_GTB20,
+	)
 	CheckTx_PlaceOrder_Bob_Num0_Id0_Sell5_Price10_GTB20 := testapp.MustMakeCheckTx(
 		ctx,
 		tApp.App,
@@ -62,6 +78,14 @@ func TestPlaceOrder(t *testing.T) {
 			AccAddressForSigning: constants.Bob_Num0.Owner,
 		},
 		&PlaceOrder_Bob_Num0_Id0_Clob0_Sell5_Price10_GTB20,
+	)
+	CheckTx_PlaceOrder_Bob_Num0_Id2_Sell5_Price10_GTB20 := testapp.MustMakeCheckTx(
+		ctx,
+		tApp.App,
+		testapp.MustMakeCheckTxOptions{
+			AccAddressForSigning: constants.Bob_Num0.Owner,
+		},
+		&PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20,
 	)
 
 	tests := map[string]struct {
@@ -89,6 +113,31 @@ func TestPlaceOrder(t *testing.T) {
 				).AddHeader(msgsender.MessageHeader{
 					Key:   msgsender.TransactionHashHeaderKey,
 					Value: tmhash.Sum(CheckTx_PlaceOrder_Alice_Num0_Id0_Buy5_Price10_GTB20.Tx),
+				}),
+			},
+			expectedOnchainMessagesInNextBlock: []msgsender.Message{indexer_manager.CreateIndexerBlockEventMessage(
+				&indexer_manager.IndexerTendermintBlock{
+					Height: 2,
+					Time:   ctx.BlockTime(),
+				})},
+		},
+		"Test placing an order - non tdai": {
+			orders: []clobtypes.MsgPlaceOrder{PlaceOrder_Alice_Num0_Id2_Clob2_Buy5_Price10_GTB20},
+			expectedOffchainMessagesAfterPlaceOrder: []msgsender.Message{
+				off_chain_updates.MustCreateOrderPlaceMessage(
+					ctx,
+					PlaceOrder_Alice_Num0_Id2_Clob2_Buy5_Price10_GTB20.Order,
+				).AddHeader(msgsender.MessageHeader{
+					Key:   msgsender.TransactionHashHeaderKey,
+					Value: tmhash.Sum(CheckTx_PlaceOrder_Alice_Num0_Id2_Buy5_Price10_GTB20.Tx),
+				}),
+				off_chain_updates.MustCreateOrderUpdateMessage(
+					ctx,
+					PlaceOrder_Alice_Num0_Id2_Clob2_Buy5_Price10_GTB20.Order.OrderId,
+					0,
+				).AddHeader(msgsender.MessageHeader{
+					Key:   msgsender.TransactionHashHeaderKey,
+					Value: tmhash.Sum(CheckTx_PlaceOrder_Alice_Num0_Id2_Buy5_Price10_GTB20.Tx),
 				}),
 			},
 			expectedOnchainMessagesInNextBlock: []msgsender.Message{indexer_manager.CreateIndexerBlockEventMessage(
@@ -262,6 +311,179 @@ func TestPlaceOrder(t *testing.T) {
 										FillAmount: PlaceOrder_Alice_Num0_Id0_Clob0_Buy5_Price10_GTB20.
 											Order.GetBaseQuantums().ToUint64(),
 										MakerOrderId: PlaceOrder_Alice_Num0_Id0_Clob0_Buy5_Price10_GTB20.Order.OrderId,
+									},
+								},
+							),
+						},
+					},
+					)))},
+				})},
+		},
+		"Test matching an order fully - non tdai": {
+			orders: []clobtypes.MsgPlaceOrder{
+				PlaceOrder_Alice_Num0_Id2_Clob2_Buy5_Price10_GTB20,
+				PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20,
+			},
+			expectedOrdersFilled: []clobtypes.OrderId{
+				PlaceOrder_Alice_Num0_Id2_Clob2_Buy5_Price10_GTB20.Order.OrderId,
+				PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.Order.OrderId,
+			},
+			expectedOffchainMessagesAfterPlaceOrder: []msgsender.Message{
+				off_chain_updates.MustCreateOrderPlaceMessage(
+					ctx,
+					PlaceOrder_Alice_Num0_Id2_Clob2_Buy5_Price10_GTB20.Order,
+				).AddHeader(msgsender.MessageHeader{
+					Key:   msgsender.TransactionHashHeaderKey,
+					Value: tmhash.Sum(CheckTx_PlaceOrder_Alice_Num0_Id2_Buy5_Price10_GTB20.Tx),
+				}),
+				off_chain_updates.MustCreateOrderUpdateMessage(
+					ctx,
+					PlaceOrder_Alice_Num0_Id2_Clob2_Buy5_Price10_GTB20.Order.OrderId,
+					0,
+				).AddHeader(msgsender.MessageHeader{
+					Key:   msgsender.TransactionHashHeaderKey,
+					Value: tmhash.Sum(CheckTx_PlaceOrder_Alice_Num0_Id2_Buy5_Price10_GTB20.Tx),
+				}),
+				off_chain_updates.MustCreateOrderPlaceMessage(
+					ctx,
+					PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.Order,
+				).AddHeader(msgsender.MessageHeader{
+					Key:   msgsender.TransactionHashHeaderKey,
+					Value: tmhash.Sum(CheckTx_PlaceOrder_Bob_Num0_Id2_Sell5_Price10_GTB20.Tx),
+				}),
+				off_chain_updates.MustCreateOrderUpdateMessage(
+					ctx,
+					PlaceOrder_Alice_Num0_Id2_Clob2_Buy5_Price10_GTB20.Order.OrderId,
+					PlaceOrder_Alice_Num0_Id2_Clob2_Buy5_Price10_GTB20.Order.GetBaseQuantums(),
+				).AddHeader(msgsender.MessageHeader{
+					Key:   msgsender.TransactionHashHeaderKey,
+					Value: tmhash.Sum(CheckTx_PlaceOrder_Bob_Num0_Id2_Sell5_Price10_GTB20.Tx),
+				}),
+				off_chain_updates.MustCreateOrderUpdateMessage(
+					ctx,
+					PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.Order.OrderId,
+					PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.Order.GetBaseQuantums(),
+				).AddHeader(msgsender.MessageHeader{
+					Key:   msgsender.TransactionHashHeaderKey,
+					Value: tmhash.Sum(CheckTx_PlaceOrder_Bob_Num0_Id2_Sell5_Price10_GTB20.Tx),
+				}),
+			},
+			expectedOnchainMessagesInNextBlock: []msgsender.Message{indexer_manager.CreateIndexerBlockEventMessage(
+				&indexer_manager.IndexerTendermintBlock{
+					Height: 2,
+					Time:   ctx.BlockTime(),
+					Events: []*indexer_manager.IndexerTendermintEvent{
+						{
+							Subtype:             indexerevents.SubtypeSubaccountUpdate,
+							OrderingWithinBlock: &indexer_manager.IndexerTendermintEvent_TransactionIndex{},
+							EventIndex:          0,
+							Version:             indexerevents.SubaccountUpdateEventVersion,
+							DataBytes: indexer_manager.GetBytes(
+								indexerevents.NewSubaccountUpdateEvent(
+									&constants.Bob_Num0,
+									[]*satypes.PerpetualPosition{
+										{
+											PerpetualId: Clob_2.MustGetPerpetualId(),
+											Quantums: dtypes.NewInt(-int64(
+												PlaceOrder_Alice_Num0_Id2_Clob2_Buy5_Price10_GTB20.Order.GetQuantums())),
+											FundingIndex: dtypes.NewInt(0),
+										},
+									},
+									// Maker fees calculate to 0 so asset position doesn't change.
+									[]*satypes.AssetPosition{
+										{
+											AssetId:  assettypes.AssetBtc.Id,
+											Quantums: dtypes.NewIntFromBigInt(bobSubaccount.GetAssetPosition(assettypes.AssetBtc.Id)),
+										},
+									},
+									nil, // no funding payments
+									constants.AssetYieldIndex_Zero,
+								),
+							),
+						},
+						{
+							Subtype:             indexerevents.SubtypeSubaccountUpdate,
+							OrderingWithinBlock: &indexer_manager.IndexerTendermintEvent_TransactionIndex{},
+							EventIndex:          1,
+							Version:             indexerevents.SubaccountUpdateEventVersion,
+							DataBytes: indexer_manager.GetBytes(
+								indexerevents.NewSubaccountUpdateEvent(
+									&constants.Alice_Num0,
+									[]*satypes.PerpetualPosition{
+										{
+											PerpetualId: Clob_2.MustGetPerpetualId(),
+											Quantums: dtypes.NewInt(int64(
+												PlaceOrder_Alice_Num0_Id2_Clob2_Buy5_Price10_GTB20.Order.GetQuantums())),
+											FundingIndex: dtypes.NewInt(0),
+										},
+									},
+									// Taker fees calculate to 0 so asset position doesn't change.
+									[]*satypes.AssetPosition{
+										{
+											AssetId:  assettypes.AssetBtc.Id,
+											Quantums: dtypes.NewIntFromBigInt(aliceSubaccount.GetAssetPosition(assettypes.AssetBtc.Id)),
+										},
+									},
+									nil, // no funding payments
+									constants.AssetYieldIndex_Zero,
+								),
+							),
+						},
+						{
+							Subtype:             indexerevents.SubtypeOrderFill,
+							OrderingWithinBlock: &indexer_manager.IndexerTendermintEvent_TransactionIndex{},
+							EventIndex:          2,
+							Version:             indexerevents.OrderFillEventVersion,
+							DataBytes: indexer_manager.GetBytes(
+								indexerevents.NewOrderFillEvent(
+									PlaceOrder_Alice_Num0_Id2_Clob2_Buy5_Price10_GTB20.Order,
+									PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.Order,
+									PlaceOrder_Alice_Num0_Id2_Clob2_Buy5_Price10_GTB20.Order.GetBaseQuantums(),
+									0, // Fees are 0 due to lost precision
+									0,
+									PlaceOrder_Alice_Num0_Id2_Clob2_Buy5_Price10_GTB20.Order.GetBaseQuantums(),
+									PlaceOrder_Alice_Num0_Id2_Clob2_Buy5_Price10_GTB20.Order.GetBaseQuantums(),
+								),
+							),
+						},
+						{
+							Subtype: indexerevents.SubtypeOpenInterestUpdate,
+							OrderingWithinBlock: &indexer_manager.IndexerTendermintEvent_BlockEvent_{
+								BlockEvent: indexer_manager.IndexerTendermintEvent_BLOCK_EVENT_END_BLOCK,
+							},
+							Version: indexerevents.OpenInterestUpdateVersion,
+							DataBytes: indexer_manager.GetBytes(
+								&indexerevents.OpenInterestUpdateEventV1{
+									OpenInterestUpdates: []*indexerevents.OpenInterestUpdate{
+										{
+											PerpetualId: Clob_2.MustGetPerpetualId(),
+											OpenInterest: dtypes.NewIntFromUint64(
+												PlaceOrder_Alice_Num0_Id2_Clob2_Buy5_Price10_GTB20.Order.GetBigQuantums().Uint64(),
+											),
+										},
+									},
+								}),
+						},
+					},
+					TxHashes: []string{string(lib.GetTxHash(testtx.MustGetTxBytes(&clobtypes.MsgProposedOperations{
+						OperationsQueue: []clobtypes.OperationRaw{
+							{
+								Operation: &clobtypes.OperationRaw_ShortTermOrderPlacement{
+									ShortTermOrderPlacement: CheckTx_PlaceOrder_Alice_Num0_Id2_Buy5_Price10_GTB20.Tx,
+								},
+							},
+							{
+								Operation: &clobtypes.OperationRaw_ShortTermOrderPlacement{
+									ShortTermOrderPlacement: CheckTx_PlaceOrder_Bob_Num0_Id2_Sell5_Price10_GTB20.Tx,
+								},
+							},
+							clobtestutils.NewMatchOperationRaw(
+								&PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.Order,
+								[]clobtypes.MakerFill{
+									{
+										FillAmount: PlaceOrder_Alice_Num0_Id2_Clob2_Buy5_Price10_GTB20.
+											Order.GetBaseQuantums().ToUint64(),
+										MakerOrderId: PlaceOrder_Alice_Num0_Id2_Clob2_Buy5_Price10_GTB20.Order.OrderId,
 									},
 								},
 							),
@@ -449,6 +671,185 @@ func TestPlaceOrder(t *testing.T) {
 					)))},
 				})},
 		},
+		"Test matching an order partially, maker order remains on book - non tdai": {
+			orders: []clobtypes.MsgPlaceOrder{
+				PlaceOrder_Alice_Num0_Id2_Clob2_Buy6_Price10_GTB20,
+				PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20,
+			},
+			expectedOrdersFilled: []clobtypes.OrderId{
+				PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.Order.OrderId,
+			},
+			expectedOffchainMessagesAfterPlaceOrder: []msgsender.Message{
+				off_chain_updates.MustCreateOrderPlaceMessage(
+					ctx,
+					PlaceOrder_Alice_Num0_Id2_Clob2_Buy6_Price10_GTB20.Order,
+				).AddHeader(msgsender.MessageHeader{
+					Key:   msgsender.TransactionHashHeaderKey,
+					Value: tmhash.Sum(CheckTx_PlaceOrder_Alice_Num0_Id2_Buy6_Price10_GTB20.Tx),
+				}),
+				off_chain_updates.MustCreateOrderUpdateMessage(
+					ctx,
+					PlaceOrder_Alice_Num0_Id2_Clob2_Buy6_Price10_GTB20.Order.OrderId,
+					0,
+				).AddHeader(msgsender.MessageHeader{
+					Key:   msgsender.TransactionHashHeaderKey,
+					Value: tmhash.Sum(CheckTx_PlaceOrder_Alice_Num0_Id2_Buy6_Price10_GTB20.Tx),
+				}),
+				off_chain_updates.MustCreateOrderPlaceMessage(
+					ctx,
+					PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.Order,
+				).AddHeader(msgsender.MessageHeader{
+					Key:   msgsender.TransactionHashHeaderKey,
+					Value: tmhash.Sum(CheckTx_PlaceOrder_Bob_Num0_Id2_Sell5_Price10_GTB20.Tx),
+				}),
+				off_chain_updates.MustCreateOrderUpdateMessage(
+					ctx,
+					PlaceOrder_Alice_Num0_Id2_Clob2_Buy6_Price10_GTB20.Order.OrderId,
+					PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.Order.GetBaseQuantums(),
+				).AddHeader(msgsender.MessageHeader{
+					Key:   msgsender.TransactionHashHeaderKey,
+					Value: tmhash.Sum(CheckTx_PlaceOrder_Bob_Num0_Id2_Sell5_Price10_GTB20.Tx),
+				}),
+				off_chain_updates.MustCreateOrderUpdateMessage(
+					ctx,
+					PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.Order.OrderId,
+					PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.Order.GetBaseQuantums(),
+				).AddHeader(msgsender.MessageHeader{
+					Key:   msgsender.TransactionHashHeaderKey,
+					Value: tmhash.Sum(CheckTx_PlaceOrder_Bob_Num0_Id2_Sell5_Price10_GTB20.Tx),
+				}),
+			},
+			expectedOffchainMessagesInNextBlock: []msgsender.Message{
+				off_chain_updates.MustCreateOrderUpdateMessage(
+					ctx,
+					PlaceOrder_Alice_Num0_Id2_Clob2_Buy6_Price10_GTB20.Order.OrderId,
+					PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.Order.GetBaseQuantums(),
+				),
+			},
+			expectedOnchainMessagesInNextBlock: []msgsender.Message{indexer_manager.CreateIndexerBlockEventMessage(
+				&indexer_manager.IndexerTendermintBlock{
+					Height: 2,
+					Time:   ctx.BlockTime(),
+					Events: []*indexer_manager.IndexerTendermintEvent{
+						{
+							Subtype:             indexerevents.SubtypeSubaccountUpdate,
+							OrderingWithinBlock: &indexer_manager.IndexerTendermintEvent_TransactionIndex{},
+							EventIndex:          0,
+							Version:             indexerevents.SubaccountUpdateEventVersion,
+							DataBytes: indexer_manager.GetBytes(
+								indexerevents.NewSubaccountUpdateEvent(
+									&constants.Bob_Num0,
+									[]*satypes.PerpetualPosition{
+										{
+											PerpetualId: Clob_2.MustGetPerpetualId(),
+											Quantums: dtypes.NewInt(-int64(
+												PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.Order.GetQuantums())),
+											FundingIndex: dtypes.NewInt(0),
+										},
+									},
+									// Maker fees calculate to 0 so asset position doesn't change.
+									[]*satypes.AssetPosition{
+										{
+											AssetId:  assettypes.AssetBtc.Id,
+											Quantums: dtypes.NewIntFromBigInt(bobSubaccount.GetAssetPosition(assettypes.AssetBtc.Id)),
+										},
+									},
+									nil, // no funding payments
+									constants.AssetYieldIndex_Zero,
+								),
+							),
+						},
+						{
+							Subtype:             indexerevents.SubtypeSubaccountUpdate,
+							OrderingWithinBlock: &indexer_manager.IndexerTendermintEvent_TransactionIndex{},
+							EventIndex:          1,
+							Version:             indexerevents.SubaccountUpdateEventVersion,
+							DataBytes: indexer_manager.GetBytes(
+								indexerevents.NewSubaccountUpdateEvent(
+									&constants.Alice_Num0,
+									[]*satypes.PerpetualPosition{
+										{
+											PerpetualId: Clob_2.MustGetPerpetualId(),
+											Quantums: dtypes.NewInt(int64(
+												PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.Order.GetQuantums())),
+											FundingIndex: dtypes.NewInt(0),
+										},
+									},
+									// Taker fees calculate to 0 so asset position doesn't change.
+									[]*satypes.AssetPosition{
+										{
+											AssetId:  assettypes.AssetBtc.Id,
+											Quantums: dtypes.NewIntFromBigInt(aliceSubaccount.GetAssetPosition(assettypes.AssetBtc.Id)),
+										},
+									},
+									nil, // no funding payments
+									constants.AssetYieldIndex_Zero,
+								),
+							),
+						},
+						{
+							Subtype:             indexerevents.SubtypeOrderFill,
+							OrderingWithinBlock: &indexer_manager.IndexerTendermintEvent_TransactionIndex{},
+							EventIndex:          2,
+							Version:             indexerevents.OrderFillEventVersion,
+							DataBytes: indexer_manager.GetBytes(
+								indexerevents.NewOrderFillEvent(
+									PlaceOrder_Alice_Num0_Id2_Clob2_Buy6_Price10_GTB20.Order,
+									PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.Order,
+									PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.Order.GetBaseQuantums(),
+									0, // Fees are 0 due to lost precision
+									0,
+									PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.Order.GetBaseQuantums(),
+									PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.Order.GetBaseQuantums(),
+								),
+							),
+						},
+						{
+							Subtype: indexerevents.SubtypeOpenInterestUpdate,
+							OrderingWithinBlock: &indexer_manager.IndexerTendermintEvent_BlockEvent_{
+								BlockEvent: indexer_manager.IndexerTendermintEvent_BLOCK_EVENT_END_BLOCK,
+							},
+							Version: indexerevents.OpenInterestUpdateVersion,
+							DataBytes: indexer_manager.GetBytes(
+								&indexerevents.OpenInterestUpdateEventV1{
+									OpenInterestUpdates: []*indexerevents.OpenInterestUpdate{
+										{
+											PerpetualId: Clob_2.MustGetPerpetualId(),
+											OpenInterest: dtypes.NewIntFromUint64(
+												PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.Order.GetBigQuantums().Uint64(),
+											),
+										},
+									},
+								}),
+						},
+					},
+					TxHashes: []string{string(lib.GetTxHash(testtx.MustGetTxBytes(&clobtypes.MsgProposedOperations{
+						OperationsQueue: []clobtypes.OperationRaw{
+							{
+								Operation: &clobtypes.OperationRaw_ShortTermOrderPlacement{
+									ShortTermOrderPlacement: CheckTx_PlaceOrder_Alice_Num0_Id2_Buy6_Price10_GTB20.Tx,
+								},
+							},
+							{
+								Operation: &clobtypes.OperationRaw_ShortTermOrderPlacement{
+									ShortTermOrderPlacement: CheckTx_PlaceOrder_Bob_Num0_Id2_Sell5_Price10_GTB20.Tx,
+								},
+							},
+							clobtestutils.NewMatchOperationRaw(
+								&PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.Order,
+								[]clobtypes.MakerFill{
+									{
+										FillAmount: PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.
+											Order.GetBaseQuantums().ToUint64(),
+										MakerOrderId: PlaceOrder_Alice_Num0_Id2_Clob2_Buy6_Price10_GTB20.Order.OrderId,
+									},
+								},
+							),
+						},
+					},
+					)))},
+				})},
+		},
 		"Test matching an order partially, taker order remains on book": {
 			orders: []clobtypes.MsgPlaceOrder{
 				PlaceOrder_Bob_Num0_Id0_Clob0_Sell5_Price10_GTB20,
@@ -628,6 +1029,185 @@ func TestPlaceOrder(t *testing.T) {
 					)))},
 				})},
 		},
+		"Test matching an order partially, taker order remains on book - non tdai": {
+			orders: []clobtypes.MsgPlaceOrder{
+				PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20,
+				PlaceOrder_Alice_Num0_Id2_Clob2_Buy6_Price10_GTB20,
+			},
+			expectedOrdersFilled: []clobtypes.OrderId{
+				PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.Order.OrderId,
+			},
+			expectedOffchainMessagesAfterPlaceOrder: []msgsender.Message{
+				off_chain_updates.MustCreateOrderPlaceMessage(
+					ctx,
+					PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.Order,
+				).AddHeader(msgsender.MessageHeader{
+					Key:   msgsender.TransactionHashHeaderKey,
+					Value: tmhash.Sum(CheckTx_PlaceOrder_Bob_Num0_Id2_Sell5_Price10_GTB20.Tx),
+				}),
+				off_chain_updates.MustCreateOrderUpdateMessage(
+					ctx,
+					PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.Order.OrderId,
+					0,
+				).AddHeader(msgsender.MessageHeader{
+					Key:   msgsender.TransactionHashHeaderKey,
+					Value: tmhash.Sum(CheckTx_PlaceOrder_Bob_Num0_Id2_Sell5_Price10_GTB20.Tx),
+				}),
+				off_chain_updates.MustCreateOrderPlaceMessage(
+					ctx,
+					PlaceOrder_Alice_Num0_Id2_Clob2_Buy6_Price10_GTB20.Order,
+				).AddHeader(msgsender.MessageHeader{
+					Key:   msgsender.TransactionHashHeaderKey,
+					Value: tmhash.Sum(CheckTx_PlaceOrder_Alice_Num0_Id2_Buy6_Price10_GTB20.Tx),
+				}),
+				off_chain_updates.MustCreateOrderUpdateMessage(
+					ctx,
+					PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.Order.OrderId,
+					PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.Order.GetBaseQuantums(),
+				).AddHeader(msgsender.MessageHeader{
+					Key:   msgsender.TransactionHashHeaderKey,
+					Value: tmhash.Sum(CheckTx_PlaceOrder_Alice_Num0_Id2_Buy6_Price10_GTB20.Tx),
+				}),
+				off_chain_updates.MustCreateOrderUpdateMessage(
+					ctx,
+					PlaceOrder_Alice_Num0_Id2_Clob2_Buy6_Price10_GTB20.Order.OrderId,
+					PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.Order.GetBaseQuantums(),
+				).AddHeader(msgsender.MessageHeader{
+					Key:   msgsender.TransactionHashHeaderKey,
+					Value: tmhash.Sum(CheckTx_PlaceOrder_Alice_Num0_Id2_Buy6_Price10_GTB20.Tx),
+				}),
+			},
+			expectedOffchainMessagesInNextBlock: []msgsender.Message{
+				off_chain_updates.MustCreateOrderUpdateMessage(
+					ctx,
+					PlaceOrder_Alice_Num0_Id2_Clob2_Buy6_Price10_GTB20.Order.OrderId,
+					PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.Order.GetBaseQuantums(),
+				),
+			},
+			expectedOnchainMessagesInNextBlock: []msgsender.Message{indexer_manager.CreateIndexerBlockEventMessage(
+				&indexer_manager.IndexerTendermintBlock{
+					Height: 2,
+					Time:   ctx.BlockTime(),
+					Events: []*indexer_manager.IndexerTendermintEvent{
+						{
+							Subtype:             indexerevents.SubtypeSubaccountUpdate,
+							OrderingWithinBlock: &indexer_manager.IndexerTendermintEvent_TransactionIndex{},
+							EventIndex:          0,
+							Version:             indexerevents.SubaccountUpdateEventVersion,
+							DataBytes: indexer_manager.GetBytes(
+								indexerevents.NewSubaccountUpdateEvent(
+									&constants.Alice_Num0,
+									[]*satypes.PerpetualPosition{
+										{
+											PerpetualId: Clob_2.MustGetPerpetualId(),
+											Quantums: dtypes.NewInt(int64(
+												PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.Order.GetQuantums())),
+											FundingIndex: dtypes.NewInt(0),
+										},
+									},
+									// Taker fees calculate to 0 so asset position doesn't change.
+									[]*satypes.AssetPosition{
+										{
+											AssetId:  assettypes.AssetBtc.Id,
+											Quantums: dtypes.NewIntFromBigInt(aliceSubaccount.GetAssetPosition(assettypes.AssetBtc.Id)),
+										},
+									},
+									nil, // no funding payments
+									constants.AssetYieldIndex_Zero,
+								),
+							),
+						},
+						{
+							Subtype:             indexerevents.SubtypeSubaccountUpdate,
+							OrderingWithinBlock: &indexer_manager.IndexerTendermintEvent_TransactionIndex{},
+							EventIndex:          1,
+							Version:             indexerevents.SubaccountUpdateEventVersion,
+							DataBytes: indexer_manager.GetBytes(
+								indexerevents.NewSubaccountUpdateEvent(
+									&constants.Bob_Num0,
+									[]*satypes.PerpetualPosition{
+										{
+											PerpetualId: Clob_2.MustGetPerpetualId(),
+											Quantums: dtypes.NewInt(-int64(
+												PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.Order.GetQuantums())),
+											FundingIndex: dtypes.NewInt(0),
+										},
+									},
+									// Maker fees calculate to 0 so asset position doesn't change.
+									[]*satypes.AssetPosition{
+										{
+											AssetId:  assettypes.AssetBtc.Id,
+											Quantums: dtypes.NewIntFromBigInt(bobSubaccount.GetAssetPosition(assettypes.AssetBtc.Id)),
+										},
+									},
+									nil, // no funding payments
+									constants.AssetYieldIndex_Zero,
+								),
+							),
+						},
+						{
+							Subtype:             indexerevents.SubtypeOrderFill,
+							OrderingWithinBlock: &indexer_manager.IndexerTendermintEvent_TransactionIndex{},
+							EventIndex:          2,
+							Version:             indexerevents.OrderFillEventVersion,
+							DataBytes: indexer_manager.GetBytes(
+								indexerevents.NewOrderFillEvent(
+									PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.Order,
+									PlaceOrder_Alice_Num0_Id2_Clob2_Buy6_Price10_GTB20.Order,
+									PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.Order.GetBaseQuantums(),
+									0, // Fees are 0 due to lost precision
+									0,
+									PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.Order.GetBaseQuantums(),
+									PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.Order.GetBaseQuantums(),
+								),
+							),
+						},
+						{
+							Subtype: indexerevents.SubtypeOpenInterestUpdate,
+							OrderingWithinBlock: &indexer_manager.IndexerTendermintEvent_BlockEvent_{
+								BlockEvent: indexer_manager.IndexerTendermintEvent_BLOCK_EVENT_END_BLOCK,
+							},
+							Version: indexerevents.OpenInterestUpdateVersion,
+							DataBytes: indexer_manager.GetBytes(
+								&indexerevents.OpenInterestUpdateEventV1{
+									OpenInterestUpdates: []*indexerevents.OpenInterestUpdate{
+										{
+											PerpetualId: Clob_2.MustGetPerpetualId(),
+											OpenInterest: dtypes.NewIntFromUint64(
+												PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.Order.GetBigQuantums().Uint64(),
+											),
+										},
+									},
+								}),
+						},
+					},
+					TxHashes: []string{string(lib.GetTxHash(testtx.MustGetTxBytes(&clobtypes.MsgProposedOperations{
+						OperationsQueue: []clobtypes.OperationRaw{
+							{
+								Operation: &clobtypes.OperationRaw_ShortTermOrderPlacement{
+									ShortTermOrderPlacement: CheckTx_PlaceOrder_Bob_Num0_Id2_Sell5_Price10_GTB20.Tx,
+								},
+							},
+							{
+								Operation: &clobtypes.OperationRaw_ShortTermOrderPlacement{
+									ShortTermOrderPlacement: CheckTx_PlaceOrder_Alice_Num0_Id2_Buy6_Price10_GTB20.Tx,
+								},
+							},
+							clobtestutils.NewMatchOperationRaw(
+								&PlaceOrder_Alice_Num0_Id2_Clob2_Buy6_Price10_GTB20.Order,
+								[]clobtypes.MakerFill{
+									{
+										FillAmount: PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.
+											Order.GetBaseQuantums().ToUint64(),
+										MakerOrderId: PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20.Order.OrderId,
+									},
+								},
+							),
+						},
+					},
+					)))},
+				})},
+		},
 	}
 
 	for name, tc := range tests {
@@ -655,7 +1235,6 @@ func TestPlaceOrder(t *testing.T) {
 			tApp.ParallelApp.RatelimitKeeper.SetAssetYieldIndex(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
 			ctx = tApp.InitChain()
-
 			// Clear any messages produced prior to these checkTx calls.
 			msgSender.Clear()
 			for _, order := range tc.orders {
@@ -674,6 +1253,12 @@ func TestPlaceOrder(t *testing.T) {
 			// Clear the messages that we already matched prior to advancing to the next block.
 			msgSender.Clear()
 			ctx = tApp.AdvanceToBlock(2, testapp.AdvanceToBlockOptions{})
+
+			// subaccount := tApp.App.SubaccountsKeeper.GetSubaccount(ctx, constants.Alice_Num0)
+			// assets := subaccount.GetAssetPositions()
+			// perps := subaccount.GetPerpetualPositions()
+			// fmt.Println("XXXX Alice has ASSETS: XXXX", len(assets), assets[0].Quantums, assets[1].Quantums)
+			// fmt.Println("XXXX Alice has PERPS: XXXX", len(perps), perps[0].Quantums)
 			require.ElementsMatch(t, tc.expectedOffchainMessagesInNextBlock, msgSender.GetOffchainMessages())
 			require.ElementsMatch(t, tc.expectedOnchainMessagesInNextBlock, msgSender.GetOnchainMessages())
 			for _, order := range tc.orders {

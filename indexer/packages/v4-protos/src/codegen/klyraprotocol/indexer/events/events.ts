@@ -1011,6 +1011,12 @@ export interface PerpetualMarketCreateEventV2 {
    */
 
   dangerIndexPpm: number;
+  /**
+   * The collateral pool id is used to signify which collateral pool this
+   * perpetual belongs to
+   */
+
+  collateralPoolId: number;
 }
 /**
  * PerpetualMarketCreateEventV2 message contains all the information about a
@@ -1087,6 +1093,12 @@ export interface PerpetualMarketCreateEventV2SDKType {
    */
 
   danger_index_ppm: number;
+  /**
+   * The collateral pool id is used to signify which collateral pool this
+   * perpetual belongs to
+   */
+
+  collateral_pool_id: number;
 }
 /**
  * LiquidityTierUpsertEventV1 message contains all the information to
@@ -2964,7 +2976,8 @@ function createBasePerpetualMarketCreateEventV2(): PerpetualMarketCreateEventV2 
     subticksPerTick: 0,
     stepBaseQuantums: Long.UZERO,
     liquidityTier: 0,
-    dangerIndexPpm: 0
+    dangerIndexPpm: 0,
+    collateralPoolId: 0
   };
 }
 
@@ -3012,6 +3025,10 @@ export const PerpetualMarketCreateEventV2 = {
 
     if (message.dangerIndexPpm !== 0) {
       writer.uint32(88).uint32(message.dangerIndexPpm);
+    }
+
+    if (message.collateralPoolId !== 0) {
+      writer.uint32(96).uint32(message.collateralPoolId);
     }
 
     return writer;
@@ -3070,6 +3087,10 @@ export const PerpetualMarketCreateEventV2 = {
           message.dangerIndexPpm = reader.uint32();
           break;
 
+        case 12:
+          message.collateralPoolId = reader.uint32();
+          break;
+
         default:
           reader.skipType(tag & 7);
           break;
@@ -3092,6 +3113,7 @@ export const PerpetualMarketCreateEventV2 = {
     message.stepBaseQuantums = object.stepBaseQuantums !== undefined && object.stepBaseQuantums !== null ? Long.fromValue(object.stepBaseQuantums) : Long.UZERO;
     message.liquidityTier = object.liquidityTier ?? 0;
     message.dangerIndexPpm = object.dangerIndexPpm ?? 0;
+    message.collateralPoolId = object.collateralPoolId ?? 0;
     return message;
   }
 

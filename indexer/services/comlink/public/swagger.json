@@ -804,6 +804,10 @@
             "type": "number",
             "format": "double"
           },
+          "collateralPoolId": {
+            "type": "number",
+            "format": "double"
+          },
           "quantumConversionExponent": {
             "type": "number",
             "format": "double"
@@ -850,6 +854,7 @@
           "openInterest",
           "atomicResolution",
           "dangerIndexPpm",
+          "collateralPoolId",
           "quantumConversionExponent",
           "tickSize",
           "stepSize",

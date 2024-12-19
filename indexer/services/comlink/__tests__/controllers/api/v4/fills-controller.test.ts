@@ -26,7 +26,8 @@ describe('fills-controller#V4', () => {
   });
 
   describe('GET', () => {
-    const defaultSubaccountNumber: number = testConstants.defaultSubaccount.subaccountNumber;
+    const defaultSubaccountNumber: number =
+      testConstants.defaultSubaccount.subaccountNumber;
     const defaultAddress: string = testConstants.defaultSubaccount.address;
     const defaultMarket: string = testConstants.defaultPerpetualMarket.ticker;
     const invalidMarket: string = 'UNKNOWN';
@@ -46,7 +47,8 @@ describe('fills-controller#V4', () => {
 
       const response: request.Response = await sendRequest({
         type: RequestMethod.GET,
-        path: `/v4/fills?address=${testConstants.defaultAddress}` +
+        path:
+          `/v4/fills?address=${testConstants.defaultAddress}` +
           `&subaccountNumber=${testConstants.defaultSubaccount.subaccountNumber}`,
       });
 
@@ -70,7 +72,7 @@ describe('fills-controller#V4', () => {
           expect.objectContaining({
             ...expected,
           }),
-        ]),
+        ])
       );
     });
 
@@ -94,7 +96,8 @@ describe('fills-controller#V4', () => {
 
       const response: request.Response = await sendRequest({
         type: RequestMethod.GET,
-        path: `/v4/fills?address=${testConstants.defaultAddress}` +
+        path:
+          `/v4/fills?address=${testConstants.defaultAddress}` +
           `&subaccountNumber=${testConstants.defaultSubaccount.subaccountNumber}` +
           `&market=${testConstants.defaultPerpetualMarket2.ticker}`,
       });
@@ -120,7 +123,7 @@ describe('fills-controller#V4', () => {
           expect.objectContaining({
             ...expected,
           }),
-        ]),
+        ])
       );
     });
 
@@ -145,7 +148,8 @@ describe('fills-controller#V4', () => {
 
       const response: request.Response = await sendRequest({
         type: RequestMethod.GET,
-        path: `/v4/fills?address=${testConstants.defaultAddress}` +
+        path:
+          `/v4/fills?address=${testConstants.defaultAddress}` +
           `&subaccountNumber=${testConstants.defaultSubaccount.subaccountNumber}`,
       });
 
@@ -188,7 +192,7 @@ describe('fills-controller#V4', () => {
           expect.objectContaining({
             ...expected[1],
           }),
-        ]),
+        ])
       );
     });
 
@@ -199,7 +203,8 @@ describe('fills-controller#V4', () => {
 
       const response: request.Response = await sendRequest({
         type: RequestMethod.GET,
-        path: `/v4/fills?address=${testConstants.defaultAddress}` +
+        path:
+          `/v4/fills?address=${testConstants.defaultAddress}` +
           `&subaccountNumber=${testConstants.defaultSubaccount.subaccountNumber}` +
           `&market=${testConstants.defaultPerpetualMarket2.ticker}`,
       });
@@ -217,17 +222,25 @@ describe('fills-controller#V4', () => {
       const parentSubaccountNumber: number = 0;
       const response: request.Response = await sendRequest({
         type: RequestMethod.GET,
-        path: `/v4/fills/parentSubaccountNumber?address=${testConstants.defaultAddress}` +
-            `&parentSubaccountNumber=${parentSubaccountNumber}`,
+        path:
+          `/v4/fills/parentSubaccountNumber?address=${testConstants.defaultAddress}` +
+          `&parentSubaccountNumber=${parentSubaccountNumber}`,
       });
 
       // Use fillResponseObjectFromFillCreateObject to create expectedFills
       const expectedFills: Partial<FillResponseObject>[] = [
-        fillResponseObjectFromFillCreateObject(testConstants.defaultFill, defaultSubaccountNumber),
-        fillResponseObjectFromFillCreateObject(testConstants.isolatedMarketFill,
-          testConstants.isolatedSubaccount.subaccountNumber),
-        fillResponseObjectFromFillCreateObject(testConstants.isolatedMarketFill2,
-          testConstants.isolatedSubaccount2.subaccountNumber),
+        fillResponseObjectFromFillCreateObject(
+          testConstants.defaultFill,
+          defaultSubaccountNumber
+        ),
+        fillResponseObjectFromFillCreateObject(
+          testConstants.isolatedMarketFill,
+          testConstants.isolatedSubaccount.subaccountNumber
+        ),
+        fillResponseObjectFromFillCreateObject(
+          testConstants.isolatedMarketFill2,
+          testConstants.isolatedSubaccount2.subaccountNumber
+        ),
       ];
 
       expect(response.body.fills).toHaveLength(3);
@@ -242,7 +255,7 @@ describe('fills-controller#V4', () => {
           expect.objectContaining({
             ...expectedFills[2],
           }),
-        ]),
+        ])
       );
     });
 
@@ -256,17 +269,22 @@ describe('fills-controller#V4', () => {
       const parentSubaccountNumber: number = 0;
       const response: request.Response = await sendRequest({
         type: RequestMethod.GET,
-        path: `/v4/fills/parentSubaccountNumber?address=${testConstants.defaultAddress}` +
-            `&parentSubaccountNumber=${parentSubaccountNumber}` +
-            `&market=${testConstants.isolatedPerpetualMarket.ticker}`,
+        path:
+          `/v4/fills/parentSubaccountNumber?address=${testConstants.defaultAddress}` +
+          `&parentSubaccountNumber=${parentSubaccountNumber}` +
+          `&market=${testConstants.isolatedPerpetualMarket.ticker}`,
       });
 
       // Use fillResponseObjectFromFillCreateObject to create expectedFills
       const expectedFills: Partial<FillResponseObject>[] = [
-        fillResponseObjectFromFillCreateObject(testConstants.isolatedMarketFill,
-          testConstants.isolatedSubaccount.subaccountNumber),
-        fillResponseObjectFromFillCreateObject(testConstants.isolatedMarketFill2,
-          testConstants.isolatedSubaccount2.subaccountNumber),
+        fillResponseObjectFromFillCreateObject(
+          testConstants.isolatedMarketFill,
+          testConstants.isolatedSubaccount.subaccountNumber
+        ),
+        fillResponseObjectFromFillCreateObject(
+          testConstants.isolatedMarketFill2,
+          testConstants.isolatedSubaccount2.subaccountNumber
+        ),
       ];
 
       expect(response.body.fills).toHaveLength(2);
@@ -278,7 +296,7 @@ describe('fills-controller#V4', () => {
           expect.objectContaining({
             ...expectedFills[1],
           }),
-        ]),
+        ])
       );
     });
 
@@ -291,9 +309,10 @@ describe('fills-controller#V4', () => {
       const parentSubaccountNumber: number = 0;
       const response: request.Response = await sendRequest({
         type: RequestMethod.GET,
-        path: `/v4/fills/parentSubaccountNumber?address=${testConstants.defaultAddress}` +
-            `&parentSubaccountNumber=${parentSubaccountNumber}` +
-            `&market=${testConstants.isolatedPerpetualMarket2.ticker}`,
+        path:
+          `/v4/fills/parentSubaccountNumber?address=${testConstants.defaultAddress}` +
+          `&parentSubaccountNumber=${parentSubaccountNumber}` +
+          `&market=${testConstants.isolatedPerpetualMarket2.ticker}`,
       });
 
       expect(response.body.fills).toEqual([]);

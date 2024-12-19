@@ -1,5 +1,9 @@
 import { SUBACCOUNTS_WEBSOCKET_MESSAGE_VERSION } from '@klyraprotocol-indexer/kafka';
-import { testConstants, TradeContent, TradeType } from '@klyraprotocol-indexer/postgres';
+import {
+  testConstants,
+  TradeContent,
+  TradeType,
+} from '@klyraprotocol-indexer/postgres';
 import {
   bigIntToBytes,
   ORDER_FLAG_CONDITIONAL,
@@ -40,8 +44,15 @@ import {
 import Long from 'long';
 import { DateTime } from 'luxon';
 
-import { contentToSingleTradeMessage, createConsolidatedKafkaEventFromTrade } from './kafka-publisher-helpers';
-import { MILLIS_IN_NANOS, SECONDS_IN_MILLIS, ZERO_ASSET_YIELD_INDEX } from '../../src/constants';
+import {
+  contentToSingleTradeMessage,
+  createConsolidatedKafkaEventFromTrade,
+} from './kafka-publisher-helpers';
+import {
+  MILLIS_IN_NANOS,
+  SECONDS_IN_MILLIS,
+  ZERO_ASSET_YIELD_INDEX,
+} from '../../src/constants';
 import { SubaccountUpdate } from '../../src/lib/translated-types';
 import {
   ConsolidatedKafkaEvent,
@@ -81,21 +92,22 @@ export const defaultFundingUpdateSampleEvent: FundingEventMessage = {
   ],
 };
 
-export const defaultFundingUpdateSampleEventWithAdditionalMarket: FundingEventMessage = {
-  type: FundingEventV1_Type.TYPE_PREMIUM_SAMPLE,
-  updates: [
-    {
-      perpetualId: 0,
-      fundingValuePpm: 10,
-      fundingIndex: bigIntToBytes(BigInt(0)),
-    },
-    {
-      perpetualId: 99999,
-      fundingValuePpm: 10,
-      fundingIndex: bigIntToBytes(BigInt(0)),
-    },
-  ],
-};
+export const defaultFundingUpdateSampleEventWithAdditionalMarket: FundingEventMessage =
+  {
+    type: FundingEventV1_Type.TYPE_PREMIUM_SAMPLE,
+    updates: [
+      {
+        perpetualId: 0,
+        fundingValuePpm: 10,
+        fundingIndex: bigIntToBytes(BigInt(0)),
+      },
+      {
+        perpetualId: 99999,
+        fundingValuePpm: 10,
+        fundingIndex: bigIntToBytes(BigInt(0)),
+      },
+    ],
+  };
 
 export const defaultFundingRateEvent: FundingEventMessage = {
   type: FundingEventV1_Type.TYPE_FUNDING_RATE_AND_INDEX,
@@ -136,39 +148,42 @@ export const defaultMarketModify: MarketEventV1 = {
   },
 };
 
-export const defaultPerpetualMarketCreateEventV1: PerpetualMarketCreateEventV1 = {
-  id: 0,
-  clobPairId: 1,
-  ticker: 'BTC-USD',
-  marketId: 0,
-  status: ClobPairStatus.CLOB_PAIR_STATUS_INITIALIZING,
-  quantumConversionExponent: -8,
-  atomicResolution: -10,
-  subticksPerTick: 100,
-  stepBaseQuantums: Long.fromValue(10, true),
-  liquidityTier: 0,
-};
+export const defaultPerpetualMarketCreateEventV1: PerpetualMarketCreateEventV1 =
+  {
+    id: 0,
+    clobPairId: 1,
+    ticker: 'BTC-USD',
+    marketId: 0,
+    status: ClobPairStatus.CLOB_PAIR_STATUS_INITIALIZING,
+    quantumConversionExponent: -8,
+    atomicResolution: -10,
+    subticksPerTick: 100,
+    stepBaseQuantums: Long.fromValue(10, true),
+    liquidityTier: 0,
+  };
 
-export const defaultPerpetualMarketCreateEventV2: PerpetualMarketCreateEventV2 = {
-  id: 0,
-  clobPairId: 1,
-  ticker: 'BTC-USD',
-  marketId: 0,
-  status: ClobPairStatus.CLOB_PAIR_STATUS_INITIALIZING,
-  quantumConversionExponent: -8,
-  atomicResolution: -10,
-  subticksPerTick: 100,
-  stepBaseQuantums: Long.fromValue(10, true),
-  liquidityTier: 0,
-  dangerIndexPpm: 1000000,
-};
+export const defaultPerpetualMarketCreateEventV2: PerpetualMarketCreateEventV2 =
+  {
+    id: 0,
+    clobPairId: 1,
+    ticker: 'BTC-USD',
+    marketId: 0,
+    status: ClobPairStatus.CLOB_PAIR_STATUS_INITIALIZING,
+    quantumConversionExponent: -8,
+    atomicResolution: -10,
+    subticksPerTick: 100,
+    stepBaseQuantums: Long.fromValue(10, true),
+    liquidityTier: 0,
+    dangerIndexPpm: 1000000,
+    collateralPoolId: 0,
+  };
 
 export const defaultLiquidityTierUpsertEventV2: LiquidityTierUpsertEventV2 = {
   id: 0,
   name: 'Large-Cap',
-  initialMarginPpm: 50000,  // 5%
-  maintenanceFractionPpm: 600000,  // 60% of IM = 3%
-  basePositionNotional: Long.fromValue(1_000_000_000_000, true),  // 1_000_000 TDAI
+  initialMarginPpm: 50000, // 5%
+  maintenanceFractionPpm: 600000, // 60% of IM = 3%
+  basePositionNotional: Long.fromValue(1_000_000_000_000, true), // 1_000_000 TDAI
   openInterestLowerCap: Long.fromValue(0, true),
   openInterestUpperCap: Long.fromValue(1_000_000_000_000, true),
 };
@@ -176,9 +191,9 @@ export const defaultLiquidityTierUpsertEventV2: LiquidityTierUpsertEventV2 = {
 export const defaultLiquidityTierUpsertEventV1: LiquidityTierUpsertEventV1 = {
   id: 0,
   name: 'Large-Cap',
-  initialMarginPpm: 50000,  // 5%
-  maintenanceFractionPpm: 600000,  // 60% of IM = 3%
-  basePositionNotional: Long.fromValue(1_000_000_000_000, true),  // 1_000_000 TDAI
+  initialMarginPpm: 50000, // 5%
+  maintenanceFractionPpm: 600000, // 60% of IM = 3%
+  basePositionNotional: Long.fromValue(1_000_000_000_000, true), // 1_000_000 TDAI
 };
 
 const defaultOpenInterestUpdate1: OpenInterestUpdate = {
@@ -220,7 +235,8 @@ export const defaultTime: Timestamp = {
   seconds: Long.fromValue(Math.floor(defaultDateTime.toSeconds()), true),
   nanos: (defaultDateTime.toMillis() % SECONDS_IN_MILLIS) * MILLIS_IN_NANOS,
 };
-export const defaultTxHash: string = '0x32343534306431622d306461302d343831322d613730372d3965613162336162';
+export const defaultTxHash: string =
+  '0x32343534306431622d306461302d343831322d613730372d3965613162336162';
 
 export const defaultZeroAssetYieldIndex: string = '0/1';
 
@@ -402,12 +418,13 @@ export const defaultTradeContent: TradeContent = {
   createdAt: 'createdAt',
   type: TradeType.LIMIT,
 };
-export const defaultTradeMessage: SingleTradeMessage = contentToSingleTradeMessage(
-  defaultTradeContent,
-  testConstants.defaultPerpetualMarket.clobPairId,
-);
-export const defaultTradeKafkaEvent:
-ConsolidatedKafkaEvent = createConsolidatedKafkaEventFromTrade(defaultTradeMessage);
+export const defaultTradeMessage: SingleTradeMessage =
+  contentToSingleTradeMessage(
+    defaultTradeContent,
+    testConstants.defaultPerpetualMarket.clobPairId
+  );
+export const defaultTradeKafkaEvent: ConsolidatedKafkaEvent =
+  createConsolidatedKafkaEventFromTrade(defaultTradeMessage);
 
 export const defaultStatefulOrderPlacementEvent: StatefulOrderEventV1 = {
   orderPlace: {

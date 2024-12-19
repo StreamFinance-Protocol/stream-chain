@@ -294,16 +294,16 @@ const GenesisState = `{
           "status": "STATUS_ACTIVE",
           "step_base_quantums": 1000,
           "subticks_per_tick": 100000
-        }
+        },
         {
           "id": 2,
           "perpetual_clob_metadata": {
             "perpetual_id": 2
           },
-          "quantum_conversion_exponent": -9,
+          "quantum_conversion_exponent": -8,
           "status": "STATUS_ACTIVE",
-          "step_base_quantums": 1000,
-          "subticks_per_tick": 100000
+          "step_base_quantums": 10,
+          "subticks_per_tick": 10000
         }
       ],
       "equity_tier_limit_config": {
@@ -1026,12 +1026,12 @@ const GenesisState = `{
         },
         {
           "params": {
-            "atomic_resolution": -9,
+            "atomic_resolution": -8,
             "default_funding_ppm": 0,
             "id": 2,
             "liquidity_tier": 0,
-            "market_id": 1,
-            "ticker": "ETH-BTC",
+            "market_id": 2,
+            "ticker": "LINK-BTC",
             "collateral_pool_id": 1
           }
         }
@@ -1060,7 +1060,7 @@ const GenesisState = `{
           "exponent": -8,
           "id": 2,
           "min_exchanges": 1,
-          "min_price_change_ppm": 2000,
+          "min_price_change_ppm": 1000,
           "pair": "LINK-USD"
         },
         {
@@ -1566,6 +1566,11 @@ const GenesisState = `{
               "asset_id": 0,
               "index": 0,
               "quantums": "100000000000000000"
+            },
+            {
+              "asset_id": 1,
+              "index": 0,
+              "quantums": "1000000000"
             }
           ],
           "id": {
@@ -1581,6 +1586,11 @@ const GenesisState = `{
               "asset_id": 0,
               "index": 0,
               "quantums": "100000000000000000"
+            },
+            {
+              "asset_id": 1,
+              "index": 0,
+              "quantums": "1000000000"
             }
           ],
           "id": {

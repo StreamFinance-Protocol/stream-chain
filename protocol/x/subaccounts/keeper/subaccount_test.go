@@ -7391,6 +7391,314 @@ func TestUpdateSubaccounts_WithdrawalsBlocked(t *testing.T) {
 	}
 }
 
+func TestUpdateSubaccountWithTwoSeparateUpdates(t *testing.T) {
+
+	tests := map[string]struct {
+		// state
+		perpetuals        []perptypes.Perpetual
+		newFundingIndices []*big.Int // 1:1 mapped to perpetuals list
+		assets            []*asstypes.Asset
+		marketParamPrices []pricestypes.MarketParamPrice
+
+		// Only set when specified. Defaults to 0/1.
+		initialGlobalAssetYieldIndex         *big.Rat
+		postFirstUpdateGlobalAssetYieldIndex *big.Rat
+		fundsInTDaiPool                      *big.Int
+
+		// subaccount state
+		perpetualPositions        []*types.PerpetualPosition
+		assetPositions            []*types.AssetPosition
+		subaccountAssetYieldIndex string
+
+		// collateral pool state
+		collateralPoolTDaiBalances map[string]int64
+
+		// updates
+		// If not specified, default to `CollatCheck`
+		firstUpdateType types.UpdateType
+		firstUpdates    []types.Update
+
+		secondUpdateType types.UpdateType
+		secondUpdates    []types.Update
+
+		// expectations
+		expectedCollateralPoolTDaiBalances map[string]int64
+		expectedPerpetualPositions         []*types.PerpetualPosition
+		expectedAssetPositions             []*types.AssetPosition
+		expectedTDaiYieldPoolBalance       *big.Int
+
+		expectedSuccessFirstUpdate          bool
+		expectedSuccessPerUpdateFirstUpdate []types.UpdateResult
+		expectedErrFirstUpdate              error
+
+		expectedSuccessSecondUpdate          bool
+		expectedSuccessPerUpdateSecondUpdate []types.UpdateResult
+		expectedErrSecondUpdate              error
+
+		// Only contains the updated perpetual positions, to assert against the events included.
+		expectedAssetYieldIndex string
+	}{
+		"Closes an open subaccount, updates global asset yield index, and opens a new subaccount": {
+			assetPositions:               testutil.CreateTDaiAssetPosition(big.NewInt(100_000_000_000)),
+			subaccountAssetYieldIndex:    "2/1",
+			initialGlobalAssetYieldIndex: big.NewRat(2, 1),
+			fundsInTDaiPool:              big.NewInt(200_000_000_000),
+			collateralPoolTDaiBalances: map[string]int64{
+				types.CollateralPoolZeroAddress.String(): 100_000_000_000,
+			},
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcUsd_NoMarginRequirement,
+			},
+			perpetualPositions: []*types.PerpetualPosition{
+				{
+					PerpetualId:  uint32(0),
+					Quantums:     dtypes.NewInt(100_000_000), // 1 BTC
+					FundingIndex: dtypes.NewInt(0),
+					YieldIndex:   big.NewRat(0, 1).String(),
+				},
+			},
+			expectedSuccessFirstUpdate:          true,
+			expectedSuccessPerUpdateFirstUpdate: []types.UpdateResult{types.Success},
+			firstUpdates: []types.Update{
+				{
+					AssetUpdates: testutil.CreateTDaiAssetUpdate(big.NewInt(-100_000_000_000)),
+					PerpetualUpdates: []types.PerpetualUpdate{
+						{
+							PerpetualId:      uint32(0),
+							BigQuantumsDelta: big.NewInt(-100_000_000), // close position
+						},
+					},
+				},
+			},
+			postFirstUpdateGlobalAssetYieldIndex: big.NewRat(3, 1),
+			expectedSuccessSecondUpdate:          true,
+			expectedSuccessPerUpdateSecondUpdate: []types.UpdateResult{types.Success},
+			secondUpdates: []types.Update{
+				{
+					AssetUpdates: testutil.CreateTDaiAssetUpdate(big.NewInt(25_000_000_000)),
+					PerpetualUpdates: []types.PerpetualUpdate{
+						{
+							PerpetualId:      uint32(0),
+							BigQuantumsDelta: big.NewInt(50_000_000), // .5 BTC
+						},
+					},
+				},
+			},
+			expectedAssetYieldIndex: big.NewRat(3, 1).String(),
+			expectedPerpetualPositions: []*types.PerpetualPosition{
+				{
+					PerpetualId:  uint32(0),
+					Quantums:     dtypes.NewInt(50_000_000), // 1.5 BTC
+					FundingIndex: dtypes.NewInt(0),
+					YieldIndex:   big.NewRat(0, 1).String(),
+				},
+			},
+			expectedAssetPositions: []*types.AssetPosition{
+				{
+					AssetId:  uint32(0),
+					Quantums: dtypes.NewInt(25_000_000_000),
+				},
+			},
+			expectedTDaiYieldPoolBalance: big.NewInt(200_000_000_000),
+			expectedCollateralPoolTDaiBalances: map[string]int64{
+				types.CollateralPoolZeroAddress.String(): 100_000_000_000,
+			},
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+
+			// Initialization
+			ctx, keeper, pricesKeeper, perpetualsKeeper, accountKeeper, bankKeeper, assetsKeeper, rateLimitKeeper, _, _ := testutil.SubaccountsKeepers(
+				t,
+				true,
+			)
+			ctx = ctx.WithTxBytes(constants.TestTxBytes)
+			testutil.CreateTestMarkets(t, ctx, pricesKeeper)
+
+			// Always creates TDai asset first
+			require.NoError(t, testutil.CreateTDaiAsset(ctx, assetsKeeper))
+			require.NoError(t, testutil.CreateBTCAsset(ctx, assetsKeeper))
+
+			testutil.CreateTestLiquidityTiers(t, ctx, perpetualsKeeper)
+			testutil.CreateTestCollateralPools(t, ctx, perpetualsKeeper)
+
+			// Set up initial sdai price
+			rateString := sdaiservertypes.TestSDAIEventRequest.ConversionRate
+			rate, conversionErr := ratelimitkeeper.ConvertStringToBigInt(rateString)
+			require.NoError(t, conversionErr)
+
+			rateLimitKeeper.SetSDAIPrice(ctx, rate)
+			globalAssetYieldIndex := big.NewRat(1, 1)
+			if tc.initialGlobalAssetYieldIndex != nil {
+				globalAssetYieldIndex = tc.initialGlobalAssetYieldIndex
+			}
+			rateLimitKeeper.SetAssetYieldIndex(ctx, globalAssetYieldIndex)
+
+			for _, m := range tc.marketParamPrices {
+				_, err := pricesKeeper.CreateMarket(
+					ctx,
+					m.Param,
+					m.Price,
+				)
+				require.NoError(t, err)
+			}
+
+			for _, a := range tc.assets {
+				_, err := assetsKeeper.CreateAsset(
+					ctx,
+					a.Id,
+					a.Symbol,
+					a.Denom,
+					a.DenomExponent,
+					a.HasMarket,
+					a.MarketId,
+					a.AtomicResolution,
+					a.AssetYieldIndex,
+					a.MaxSlippagePpm,
+				)
+				require.NoError(t, err)
+			}
+
+			for i, p := range tc.perpetuals {
+				perpetualsKeeper.SetPerpetualForTest(ctx, p)
+
+				// Update FundingIndex for testing settlements.
+				if i < len(tc.newFundingIndices) {
+					err := perpetualsKeeper.ModifyFundingIndex(
+						ctx,
+						p.Params.Id,
+						tc.newFundingIndices[i],
+					)
+					require.NoError(t, err)
+				}
+			}
+
+			for collateralPoolAddr, TDaiBal := range tc.collateralPoolTDaiBalances {
+				err := bank_testutil.FundAccount(
+					ctx,
+					sdk.MustAccAddressFromBech32(collateralPoolAddr),
+					sdk.Coins{
+						sdk.NewCoin(asstypes.AssetTDai.Denom, sdkmath.NewInt(TDaiBal)),
+					},
+					*bankKeeper,
+				)
+				require.NoError(t, err)
+			}
+
+			if tc.fundsInTDaiPool != nil {
+				err := bank_testutil.FundModuleAccount(
+					ctx,
+					ratelimittypes.TDaiPoolAccount,
+					sdk.Coins{
+						sdk.NewCoin(asstypes.AssetTDai.Denom, sdkmath.NewIntFromBigInt(tc.fundsInTDaiPool)),
+					},
+					*bankKeeper,
+				)
+				require.NoError(t, err)
+			}
+
+			subaccount := createNSubaccount(keeper, ctx, 1, big.NewInt(1_000))[0]
+			subaccount.PerpetualPositions = tc.perpetualPositions
+			subaccount.AssetPositions = tc.assetPositions
+			subaccountYieldIndex := constants.AssetYieldIndex_Zero
+			if tc.subaccountAssetYieldIndex != "" {
+				subaccountYieldIndex = tc.subaccountAssetYieldIndex
+			}
+			subaccount.AssetYieldIndex = subaccountYieldIndex
+			keeper.SetSubaccount(ctx, subaccount)
+			subaccountId := *subaccount.Id
+
+			// First update
+			for i, u := range tc.firstUpdates {
+				if u.SubaccountId == (types.SubaccountId{}) {
+					u.SubaccountId = subaccountId
+				}
+				tc.firstUpdates[i] = u
+			}
+
+			updateType := types.CollatCheck
+			if tc.firstUpdateType != types.UpdateTypeUnspecified {
+				updateType = tc.firstUpdateType
+			}
+			success, successPerUpdate, err := keeper.UpdateSubaccounts(ctx, tc.firstUpdates, updateType)
+			if tc.expectedErrFirstUpdate != nil {
+				require.ErrorIs(t, err, tc.expectedErrFirstUpdate)
+			} else {
+				require.NoError(t, err)
+				require.Equal(t, tc.expectedSuccessPerUpdateFirstUpdate, successPerUpdate)
+				require.Equal(t, tc.expectedSuccessFirstUpdate, success)
+			}
+
+			// Update global asset yield index
+			if tc.postFirstUpdateGlobalAssetYieldIndex != nil {
+				rateLimitKeeper.SetAssetYieldIndex(ctx, tc.postFirstUpdateGlobalAssetYieldIndex)
+			}
+
+			// Second update
+			for i, u := range tc.secondUpdates {
+				if u.SubaccountId == (types.SubaccountId{}) {
+					u.SubaccountId = subaccountId
+				}
+				tc.secondUpdates[i] = u
+			}
+
+			updateType = types.CollatCheck
+			if tc.secondUpdateType != types.UpdateTypeUnspecified {
+				updateType = tc.secondUpdateType
+			}
+			success, successPerUpdate, err = keeper.UpdateSubaccounts(ctx, tc.secondUpdates, updateType)
+			if tc.expectedErrSecondUpdate != nil {
+				require.ErrorIs(t, err, tc.expectedErrSecondUpdate)
+			} else {
+				require.NoError(t, err)
+				require.Equal(t, tc.expectedSuccessPerUpdateSecondUpdate, successPerUpdate)
+				require.Equal(t, tc.expectedSuccessSecondUpdate, success)
+			}
+
+			// Checks
+			newSubaccount := keeper.GetSubaccount(ctx, subaccountId)
+			require.Equal(t, len(newSubaccount.PerpetualPositions), len(tc.expectedPerpetualPositions))
+			for i, ep := range tc.expectedPerpetualPositions {
+				require.Equal(t, *ep, *newSubaccount.PerpetualPositions[i])
+			}
+			require.Equal(t, len(newSubaccount.AssetPositions), len(tc.expectedAssetPositions))
+			for i, ep := range tc.expectedAssetPositions {
+				require.Equal(t, *ep, *newSubaccount.AssetPositions[i])
+			}
+			if tc.expectedErrFirstUpdate == nil && tc.expectedErrSecondUpdate == nil {
+				require.Equal(t, 0, tc.postFirstUpdateGlobalAssetYieldIndex.Cmp(ratelimitkeeper.ConvertStringToBigRatWithPanicOnErr(newSubaccount.AssetYieldIndex)),
+					"Expected AssetYieldIndex %v. Got %v.", tc.postFirstUpdateGlobalAssetYieldIndex, newSubaccount.AssetYieldIndex,
+				)
+			}
+
+			for collateralPoolAddr, expectedTDaiBal := range tc.expectedCollateralPoolTDaiBalances {
+				TDaiBal := bankKeeper.GetBalance(
+					ctx,
+					sdk.MustAccAddressFromBech32(collateralPoolAddr),
+					asstypes.AssetTDai.Denom,
+				)
+				require.Equal(t,
+					sdk.NewCoin(asstypes.AssetTDai.Denom, sdkmath.NewInt(expectedTDaiBal)),
+					TDaiBal,
+				)
+			}
+
+			if tc.expectedTDaiYieldPoolBalance != nil {
+				TDaiBal := bankKeeper.GetBalance(
+					ctx,
+					accountKeeper.GetModuleAddress(ratelimittypes.TDaiPoolAccount),
+					asstypes.AssetTDai.Denom,
+				)
+				require.Equal(t,
+					sdk.NewCoin(asstypes.AssetTDai.Denom, sdkmath.NewIntFromBigInt(tc.expectedTDaiYieldPoolBalance)),
+					TDaiBal,
+				)
+			}
+		})
+	}
+}
+
 func TestCanUpdateSubaccounts(t *testing.T) {
 	tests := map[string]struct {
 		// State.

@@ -349,6 +349,7 @@ func CreateNClobPair(
 					items[i].StepBaseQuantums,
 					perps[i].Params.LiquidityTier,
 					perps[i].Params.DangerIndexPpm,
+					perps[i].Params.CollateralPoolId,
 				),
 			),
 		).Return()

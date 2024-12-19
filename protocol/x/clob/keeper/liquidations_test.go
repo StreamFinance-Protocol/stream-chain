@@ -1171,6 +1171,7 @@ func TestPlacePerpetualLiquidation_PreexistingLiquidation(t *testing.T) {
 						constants.ClobPair_Btc.StepBaseQuantums,
 						constants.BtcUsd_100PercentMarginRequirement.Params.LiquidityTier,
 						constants.BtcUsd_100PercentMarginRequirement.Params.DangerIndexPpm,
+						constants.BtcUsd_100PercentMarginRequirement.Params.CollateralPoolId,
 					),
 				),
 			).Once().Return()
@@ -1201,6 +1202,7 @@ func TestPlacePerpetualLiquidation_PreexistingLiquidation(t *testing.T) {
 						constants.ClobPair_Eth.StepBaseQuantums,
 						constants.EthUsd_100PercentMarginRequirement.Params.LiquidityTier,
 						constants.EthUsd_100PercentMarginRequirement.Params.DangerIndexPpm,
+						constants.EthUsd_100PercentMarginRequirement.Params.CollateralPoolId,
 					),
 				),
 			).Once().Return()
@@ -2622,6 +2624,7 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 							clobPair.StepBaseQuantums,
 							perpetuals[i].Params.LiquidityTier,
 							perpetuals[i].Params.DangerIndexPpm,
+							perpetuals[i].Params.CollateralPoolId,
 						),
 					),
 				).Once().Return()
@@ -2759,6 +2762,7 @@ func TestPlacePerpetualLiquidation_SendOffchainMessages(t *testing.T) {
 				constants.ClobPair_Btc.StepBaseQuantums,
 				constants.Perpetuals_DefaultGenesisState.Perpetuals[0].Params.LiquidityTier,
 				constants.Perpetuals_DefaultGenesisState.Perpetuals[0].Params.DangerIndexPpm,
+				constants.Perpetuals_DefaultGenesisState.Perpetuals[0].Params.CollateralPoolId,
 			),
 		),
 	).Once().Return()
@@ -3824,6 +3828,7 @@ func TestGetLiquidationInsuranceFundFeeAndRemainingAvailableCollateral(t *testin
 						constants.ClobPair_Btc.StepBaseQuantums,
 						tc.perpetuals[0].Params.LiquidityTier,
 						tc.perpetuals[0].Params.DangerIndexPpm,
+						tc.perpetuals[0].Params.CollateralPoolId,
 					),
 				),
 			).Once().Return()
@@ -4363,6 +4368,7 @@ func TestGetBestPerpetualPositionToLiquidate(t *testing.T) {
 							clobPair.StepBaseQuantums,
 							tc.perpetuals[perpetualId].Params.LiquidityTier,
 							tc.perpetuals[perpetualId].Params.DangerIndexPpm,
+							tc.perpetuals[perpetualId].Params.CollateralPoolId,
 						),
 					),
 				).Once().Return()

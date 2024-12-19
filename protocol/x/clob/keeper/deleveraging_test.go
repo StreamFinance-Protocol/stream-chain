@@ -407,6 +407,7 @@ func TestCanDeleverageSubaccount(t *testing.T) {
 							clobPair.StepBaseQuantums,
 							perpetuals[i].Params.LiquidityTier,
 							perpetuals[i].Params.DangerIndexPpm,
+							perpetuals[i].Params.CollateralPoolId,
 						),
 					),
 				).Once().Return()
@@ -851,6 +852,7 @@ func TestOffsetSubaccountPerpetualPosition(t *testing.T) {
 							clobPair.StepBaseQuantums,
 							perps[i].Params.LiquidityTier,
 							perps[i].Params.DangerIndexPpm,
+							perps[i].Params.CollateralPoolId,
 						),
 					),
 				).Once().Return()

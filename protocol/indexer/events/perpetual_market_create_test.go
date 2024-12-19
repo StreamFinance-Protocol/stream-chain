@@ -22,6 +22,7 @@ func TestNewPerpetualMarketCreateEvent_Success(t *testing.T) {
 		5,
 		0,
 		1000000,
+		0,
 	)
 	expectedPerpetualMarketCreateEventProto := &PerpetualMarketCreateEventV2{
 		Id:                        0,

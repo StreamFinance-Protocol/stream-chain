@@ -3432,15 +3432,6 @@ func TestModifyCollateralPool_Success(t *testing.T) {
 		// verify the fields are modified in state.
 		maxCumulativeInsuranceFundDeltaPerBlock := uint64(i + 1_000_000_000_000)
 		multiCollateralAssets := pool.MultiCollateralAssets
-		if i == 0 {
-			multiCollateralAssets = &types.MultiCollateralAssetsArray{
-				MultiCollateralAssets: append(pool.MultiCollateralAssets.MultiCollateralAssets, uint32(1)),
-			}
-		} else if i == 1 {
-			multiCollateralAssets = &types.MultiCollateralAssetsArray{
-				MultiCollateralAssets: append(pool.MultiCollateralAssets.MultiCollateralAssets, uint32(0)),
-			}
-		}
 		quoteAssetId := pool.QuoteAssetId
 		modifiedPool, err := pc.PerpetualsKeeper.UpsertCollateralPool(
 			pc.Ctx,

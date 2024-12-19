@@ -18,7 +18,7 @@ func TestMsgSetCollateralPool_ValidateBasic(t *testing.T) {
 				CollateralPool: types.CollateralPool{
 					CollateralPoolId:                        1,
 					MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
-					MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{1, 2, 3}},
+					MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{2}},
 					QuoteAssetId:                            2,
 				},
 			},
@@ -35,7 +35,7 @@ func TestMsgSetCollateralPool_ValidateBasic(t *testing.T) {
 				CollateralPool: types.CollateralPool{
 					CollateralPoolId:                        1,
 					MaxCumulativeInsuranceFundDeltaPerBlock: 0,
-					MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{1, 2, 3}},
+					MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{2}},
 					QuoteAssetId:                            2,
 				},
 			},
@@ -59,11 +59,23 @@ func TestMsgSetCollateralPool_ValidateBasic(t *testing.T) {
 				CollateralPool: types.CollateralPool{
 					CollateralPoolId:                        1,
 					MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
-					MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{1, 2, 3}},
+					MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{1}},
 					QuoteAssetId:                            4,
 				},
 			},
 			expectedErr: types.ErrIsolatedMarketMultiCollateralAssetDoesNotContainQuoteAsset.Error(),
+		},
+		"Failure: Multi Collateral Asset contains more than one asset": {
+			msg: types.MsgSetCollateralPool{
+				Authority: validAuthority,
+				CollateralPool: types.CollateralPool{
+					CollateralPoolId:                        1,
+					MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+					MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{1, 2, 3}},
+					QuoteAssetId:                            1,
+				},
+			},
+			expectedErr: types.ErrCollateralPoolMustHaveOnlyOneAsset.Error(),
 		},
 	}
 

@@ -153,6 +153,17 @@ func CreateTDaiAssetUpdate(
 	}
 }
 
+func CreateBTCAssetUpdate(
+	deltaQuoteBalance *big.Int,
+) []types.AssetUpdate {
+	return []types.AssetUpdate{
+		{
+			AssetId:          assettypes.AssetBtc.Id,
+			BigQuantumsDelta: deltaQuoteBalance,
+		},
+	}
+}
+
 // GetSubaccountUpdateEventsFromIndexerBlock returns the subaccount update events in the
 // Indexer Block event Kafka message.
 func GetSubaccountUpdateEventsFromIndexerBlock(

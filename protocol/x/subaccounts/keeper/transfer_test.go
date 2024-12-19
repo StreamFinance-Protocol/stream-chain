@@ -1381,7 +1381,7 @@ func TestTransferFeesToFeeCollectorModule(t *testing.T) {
 			feeModuleAccBalance:                 big.NewInt(2500),
 			subaccountModuleAccBalance:          big.NewInt(600),
 			quantums:                            big.NewInt(500),
-			perpetualId:                         6,
+			perpetualId:                         7,
 			collateralPoolAddr:                  types.CollateralPoolOneAddress,
 			expectedSubaccountsModuleAccBalance: big.NewInt(100),  // 600 - 500
 			expectedFeeModuleAccBalance:         big.NewInt(3000), // 500 + 2500
@@ -1400,7 +1400,7 @@ func TestTransferFeesToFeeCollectorModule(t *testing.T) {
 			feeModuleAccBalance:                 big.NewInt(2500),
 			subaccountModuleAccBalance:          big.NewInt(600),
 			quantums:                            big.NewInt(0),
-			perpetualId:                         6,
+			perpetualId:                         7,
 			collateralPoolAddr:                  types.CollateralPoolOneAddress,
 			expectedSubaccountsModuleAccBalance: big.NewInt(600),  // 600
 			expectedFeeModuleAccBalance:         big.NewInt(2500), // 2500
@@ -1440,7 +1440,7 @@ func TestTransferFeesToFeeCollectorModule(t *testing.T) {
 			asset:                               *constants.BtcUsd,
 			subaccountModuleAccBalance:          big.NewInt(500),
 			quantums:                            big.NewInt(-500),
-			perpetualId:                         6,
+			perpetualId:                         7,
 			collateralPoolAddr:                  types.CollateralPoolOneAddress,
 			expectedSubaccountsModuleAccBalance: big.NewInt(1000),
 			expectedFeeModuleAccBalance:         big.NewInt(1000),

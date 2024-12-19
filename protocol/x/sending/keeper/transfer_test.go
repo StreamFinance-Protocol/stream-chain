@@ -33,6 +33,8 @@ type TransferTestCase struct {
 	// Setup.
 	subaccounts []satypes.Subaccount
 	transfer    *types.Transfer
+	asset       assettypes.Asset
+	perpetuals  []perptypes.Perpetual
 	// Expectations.
 	expectedSubaccountBalance map[satypes.SubaccountId]*big.Int
 	expectedErr               string
@@ -129,11 +131,7 @@ func runProcessTransferTest(t *testing.T, tc TransferTestCase) {
 
 	ks.RatelimitKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
 
-	perpetuals := []perptypes.Perpetual{
-		constants.BtcUsd_100PercentMarginRequirement,
-	}
-
-	for _, p := range perpetuals {
+	for _, p := range tc.perpetuals {
 		_, err := ks.PerpetualsKeeper.CreatePerpetual(
 			ks.Ctx,
 			p.Params.Id,
@@ -160,10 +158,16 @@ func runProcessTransferTest(t *testing.T, tc TransferTestCase) {
 		)
 	}
 
+	subaccounts := ks.SubaccountsKeeper.GetAllSubaccount(ks.Ctx)
+	for _, subacc := range subaccounts {
+		assets := subacc.GetAssetPosition(tc.asset.Id)
+		fmt.Println("subaccount XXX", subacc.Id, assets)
+	}
+
 	err = ks.SendingKeeper.ProcessTransfer(ks.Ctx, tc.transfer)
 	for subaccountId, expectedQuoteBalance := range tc.expectedSubaccountBalance {
 		subaccount := ks.SubaccountsKeeper.GetSubaccount(ks.Ctx, subaccountId)
-		require.Equal(t, expectedQuoteBalance, subaccount.GetTDaiPosition())
+		require.Equal(t, expectedQuoteBalance, subaccount.GetAssetPosition(tc.asset.Id))
 	}
 	if tc.expectedErr != "" {
 		require.ErrorContains(t, err, tc.expectedErr)
@@ -185,15 +189,38 @@ func TestProcessTransferWithinSameCollateralPool(t *testing.T) {
 				constants.Carl_Num0_599USD,
 				constants.Dave_Num0_599USD,
 			},
+			asset: *constants.TDai,
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcUsd_100PercentMarginRequirement,
+			},
 			transfer: &constants.Transfer_Carl_Num0_Dave_Num0_Quote_500,
 			expectedSubaccountBalance: map[satypes.SubaccountId]*big.Int{
 				constants.Carl_Num0: big.NewInt(99_000_000),
 				constants.Dave_Num0: big.NewInt(1_099_000_000),
 			},
 		},
+		"Transfer succeeds - non tdai": {
+			subaccounts: []satypes.Subaccount{
+				constants.Carl_Num0_1BTC,
+				constants.Dave_Num0_1BTC,
+			},
+			asset: *constants.BtcUsd,
+			perpetuals: []perptypes.Perpetual{
+				constants.IsoBtc_CollatPool1_Id7,
+			},
+			transfer: &constants.Transfer_Carl_Num0_Dave_Num0_Quote_1Tenth_BTC,
+			expectedSubaccountBalance: map[satypes.SubaccountId]*big.Int{
+				constants.Carl_Num0: big.NewInt(90_000_000),
+				constants.Dave_Num0: big.NewInt(110_000_000),
+			},
+		},
 		"Transfer succeeds - recipient does not exist": {
 			subaccounts: []satypes.Subaccount{
 				constants.Carl_Num0_599USD,
+			},
+			asset: *constants.TDai,
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcUsd_100PercentMarginRequirement,
 			},
 			transfer: &constants.Transfer_Carl_Num0_Dave_Num0_Quote_500,
 			expectedSubaccountBalance: map[satypes.SubaccountId]*big.Int{
@@ -201,10 +228,47 @@ func TestProcessTransferWithinSameCollateralPool(t *testing.T) {
 				constants.Dave_Num0: big.NewInt(500_000_000),
 			},
 		},
+		"Transfer succeeds - recipient does not exist - non tdai": {
+			subaccounts: []satypes.Subaccount{
+				constants.Carl_Num0_1BTC,
+			},
+			asset: *constants.BtcUsd,
+			perpetuals: []perptypes.Perpetual{
+				constants.IsoBtc_CollatPool1_Id7,
+			},
+			transfer: &constants.Transfer_Carl_Num0_Dave_Num0_Quote_1Tenth_BTC,
+			expectedSubaccountBalance: map[satypes.SubaccountId]*big.Int{
+				constants.Carl_Num0: big.NewInt(90_000_000),
+				constants.Dave_Num0: big.NewInt(10_000_000),
+			},
+		},
+		"Sender does not have sufficient balance - non tdai": {
+			subaccounts: []satypes.Subaccount{
+				constants.Carl_Num0_1BTC,
+				constants.Dave_Num0_1BTC,
+			},
+			asset: *constants.BtcUsd,
+			perpetuals: []perptypes.Perpetual{
+				constants.IsoBtc_CollatPool1_Id7,
+			},
+			transfer: &constants.Transfer_Carl_Num0_Dave_Num0_Quote_2_BTC,
+			expectedSubaccountBalance: map[satypes.SubaccountId]*big.Int{
+				constants.Carl_Num0: big.NewInt(100_000_000), // balance unchanged
+				constants.Dave_Num0: big.NewInt(100_000_000), // balance unchanged
+			},
+			expectedErr: fmt.Sprintf(
+				"Subaccount with id %v failed with UpdateResult: NewlyUndercollateralized: failed to apply subaccount updates",
+				constants.Carl_Num0,
+			),
+		},
 		"Sender does not have sufficient balance": {
 			subaccounts: []satypes.Subaccount{
 				constants.Carl_Num0_599USD,
 				constants.Dave_Num0_599USD,
+			},
+			asset: *constants.TDai,
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcUsd_100PercentMarginRequirement,
 			},
 			transfer: &constants.Transfer_Carl_Num0_Dave_Num0_Quote_600,
 			expectedSubaccountBalance: map[satypes.SubaccountId]*big.Int{
@@ -216,10 +280,33 @@ func TestProcessTransferWithinSameCollateralPool(t *testing.T) {
 				constants.Carl_Num0,
 			),
 		},
+		"Sender is under collateralized - non tdai": {
+			subaccounts: []satypes.Subaccount{
+				constants.Carl_Num0_2BTC_Asset_1BTC_Short,
+				constants.Dave_Num0_1BTC,
+			},
+			asset: *constants.BtcUsd,
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcBtc_100PercentMarginRequirement_CollatPool1_Id8,
+			},
+			transfer: &constants.Transfer_Carl_Num0_Dave_Num0_Quote_1Tenth_BTC,
+			expectedSubaccountBalance: map[satypes.SubaccountId]*big.Int{
+				constants.Carl_Num0: big.NewInt(200_000_000), // balance unchanged
+				constants.Dave_Num0: big.NewInt(100_000_000), // balance unchanged
+			},
+			expectedErr: fmt.Sprintf(
+				"Subaccount with id %v failed with UpdateResult: NewlyUndercollateralized: failed to apply subaccount updates",
+				constants.Carl_Num0,
+			),
+		},
 		"Sender is under collateralized": {
 			subaccounts: []satypes.Subaccount{
 				constants.Carl_Num0_1BTC_Short,
 				constants.Dave_Num0_599USD,
+			},
+			asset: *constants.TDai,
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcUsd_100PercentMarginRequirement,
 			},
 			transfer: &constants.Transfer_Carl_Num0_Dave_Num0_Quote_600,
 			expectedSubaccountBalance: map[satypes.SubaccountId]*big.Int{
@@ -231,10 +318,33 @@ func TestProcessTransferWithinSameCollateralPool(t *testing.T) {
 				constants.Carl_Num0,
 			),
 		},
+		"Transfer violates multi collateral constraints": {
+			subaccounts: []satypes.Subaccount{
+				constants.Carl_Num0_2BTC_Asset_1BTC_Short,
+				constants.Dave_Num0_1BTC,
+			},
+			asset: *constants.BtcUsd,
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcBtc_100PercentMarginRequirement_CollatPool1_Id8,
+			},
+			transfer: &constants.Transfer_Carl_Num0_Dave_Num0_Quote_500,
+			expectedSubaccountBalance: map[satypes.SubaccountId]*big.Int{
+				constants.Carl_Num0: big.NewInt(200_000_000),
+				constants.Dave_Num0: big.NewInt(100_000_000),
+			},
+			expectedErr: fmt.Sprintf(
+				"Subaccount with id %v failed with UpdateResult: ViolatesMultiCollateralConstraints: failed to apply subaccount updates",
+				constants.Carl_Num0,
+			),
+		},
 		"Receiver is under collateralized (transfer still succeeds)": {
 			subaccounts: []satypes.Subaccount{
 				constants.Carl_Num0_2BTC_Short,
 				constants.Dave_Num0_1BTC_Long_50000USD_Short,
+			},
+			asset: *constants.TDai,
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcUsd_100PercentMarginRequirement,
 			},
 			transfer: &constants.Transfer_Carl_Num0_Dave_Num0_Quote_500,
 			expectedSubaccountBalance: map[satypes.SubaccountId]*big.Int{
@@ -318,6 +428,72 @@ func TestProcessTransfer_CreateRecipientAccount(t *testing.T) {
 	require.True(t, ks.AccountKeeper.HasAccount(ks.Ctx, recipientAddr))
 }
 
+func TestProcessTransfer_CreateRecipientAccount_NonTdai(t *testing.T) {
+	ks := keepertest.SendingKeepers(t)
+
+	ks.Ctx = ks.Ctx.WithBlockHeight(5)
+	keepertest.CreateTestMarkets(t, ks.Ctx, ks.PricesKeeper)
+
+	// Set up tDAI asset in assets module.
+	err := keepertest.CreateTDaiAsset(ks.Ctx, ks.AssetsKeeper)
+	require.NoError(t, err)
+	err = keepertest.CreateBTCAsset(ks.Ctx, ks.AssetsKeeper)
+	require.NoError(t, err)
+
+	keepertest.CreateTestLiquidityTiers(t, ks.Ctx, ks.PerpetualsKeeper)
+	keepertest.CreateTestCollateralPools(t, ks.Ctx, ks.PerpetualsKeeper)
+
+	ks.RatelimitKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+
+	perpetuals := []perptypes.Perpetual{
+		constants.IsoBtc_CollatPool1_Id7,
+	}
+
+	for _, p := range perpetuals {
+		_, err := ks.PerpetualsKeeper.CreatePerpetual(
+			ks.Ctx,
+			p.Params.Id,
+			p.Params.Ticker,
+			p.Params.MarketId,
+			p.Params.AtomicResolution,
+			p.Params.DefaultFundingPpm,
+			p.Params.LiquidityTier,
+			p.Params.DangerIndexPpm,
+			p.Params.CollateralPoolId,
+			p.YieldIndex,
+		)
+		require.NoError(t, err)
+	}
+	ks.SubaccountsKeeper.SetSubaccount(ks.Ctx, constants.Carl_Num0_1BTC)
+	ks.AccountKeeper.SetAccount(
+		ks.Ctx,
+		ks.AccountKeeper.NewAccountWithAddress(ks.Ctx, constants.Carl_Num0.MustGetAccAddress()),
+	)
+
+	// Create a sample recipient address.
+	recipient := sample.AccAddress()
+	recipientAddr, err := sdk.AccAddressFromBech32(recipient)
+	require.NoError(t, err)
+
+	// Verify that the recipient account does not exist.
+	require.False(t, ks.AccountKeeper.HasAccount(ks.Ctx, recipientAddr))
+
+	// Process the transfer.
+	transfer := types.Transfer{
+		Sender: constants.Carl_Num0,
+		Recipient: satypes.SubaccountId{
+			Owner:  recipient,
+			Number: uint32(0),
+		},
+		AssetId: assettypes.AssetBtc.Id,
+		Amount:  10_000_000, // 0.1 BTC
+	}
+	err = ks.SendingKeeper.ProcessTransfer(ks.Ctx, &transfer)
+	require.NoError(t, err)
+
+	// The account should've been created for the recipient address.
+	require.True(t, ks.AccountKeeper.HasAccount(ks.Ctx, recipientAddr))
+}
 func TestProcessDepositToSubaccount(t *testing.T) {
 	testError := errors.New("error")
 
@@ -335,8 +511,22 @@ func TestProcessDepositToSubaccount(t *testing.T) {
 				mckCall.Return(nil)
 			},
 		},
+		"Success - non tdai": {
+			msg:         constants.MsgDepositToSubaccount_Alice_To_Alice_Num0_1BTC,
+			expectedErr: nil,
+			setUpMocks: func(mckCall *mock.Call) {
+				mckCall.Return(nil)
+			},
+		},
 		"Propagate error": {
 			msg:         constants.MsgDepositToSubaccount_Alice_To_Carl_Num0_750,
+			expectedErr: testError,
+			setUpMocks: func(mckCall *mock.Call) {
+				mckCall.Return(testError)
+			},
+		},
+		"Propagate error - non tdai": {
+			msg:         constants.MsgDepositToSubaccount_Alice_To_Carl_Num0_halfBTC,
 			expectedErr: testError,
 			setUpMocks: func(mckCall *mock.Call) {
 				mckCall.Return(testError)
@@ -350,12 +540,29 @@ func TestProcessDepositToSubaccount(t *testing.T) {
 				mckCall.Panic(testError.Error())
 			},
 		},
+		"Propagate panic - non tdai": {
+			msg:         constants.MsgDepositToSubaccount_Alice_To_Carl_Num0_750,
+			expectedErr: testError,
+			shouldPanic: true,
+			setUpMocks: func(mckCall *mock.Call) {
+				mckCall.Panic(testError.Error())
+			},
+		},
 		"Bad sender address string": {
 			msg: types.MsgDepositToSubaccount{
 				Sender:    "1234567", // bad address string
 				Recipient: constants.Alice_Num0,
 				AssetId:   assettypes.AssetTDai.Id,
 				Quantums:  750_000_000,
+			},
+			expectedErrContains: "decoding bech32 failed",
+		},
+		"Bad sender address string - non tdai": {
+			msg: types.MsgDepositToSubaccount{
+				Sender:    "1234567", // bad address string
+				Recipient: constants.Alice_Num0,
+				AssetId:   assettypes.AssetBtc.Id,
+				Quantums:  50_000_000,
 			},
 			expectedErrContains: "decoding bech32 failed",
 		},
@@ -420,8 +627,22 @@ func TestProcessWithdrawFromSubaccount(t *testing.T) {
 				mckCall.Return(nil)
 			},
 		},
+		"Success - non tdai": {
+			msg:         constants.MsgWithdrawFromSubaccount_Carl_Num0_To_Alice_halfBTC,
+			expectedErr: nil,
+			setUpMocks: func(mckCall *mock.Call) {
+				mckCall.Return(nil)
+			},
+		},
 		"Propagate error": {
 			msg:         constants.MsgWithdrawFromSubaccount_Carl_Num0_To_Alice_750,
+			expectedErr: testError,
+			setUpMocks: func(mckCall *mock.Call) {
+				mckCall.Return(testError)
+			},
+		},
+		"Propagate error - non tdai": {
+			msg:         constants.MsgWithdrawFromSubaccount_Carl_Num0_To_Alice_halfBTC,
 			expectedErr: testError,
 			setUpMocks: func(mckCall *mock.Call) {
 				mckCall.Return(testError)
@@ -435,12 +656,29 @@ func TestProcessWithdrawFromSubaccount(t *testing.T) {
 				mckCall.Panic(testError.Error())
 			},
 		},
+		"Propagate panic - non tdai": {
+			msg:         constants.MsgWithdrawFromSubaccount_Carl_Num0_To_Alice_halfBTC,
+			expectedErr: testError,
+			shouldPanic: true,
+			setUpMocks: func(mckCall *mock.Call) {
+				mckCall.Panic(testError.Error())
+			},
+		},
 		"Bad recipient address string": {
 			msg: types.MsgWithdrawFromSubaccount{
 				Sender:    constants.Alice_Num0,
 				Recipient: "1234567", // bad address string
 				AssetId:   assettypes.AssetTDai.Id,
 				Quantums:  750_000_000,
+			},
+			expectedErrContains: "decoding bech32 failed",
+		},
+		"Bad recipient address string - non tdai": {
+			msg: types.MsgWithdrawFromSubaccount{
+				Sender:    constants.Alice_Num0,
+				Recipient: "1234567", // bad address string
+				AssetId:   assettypes.AssetBtc.Id,
+				Quantums:  50_000_000,
 			},
 			expectedErrContains: "decoding bech32 failed",
 		},

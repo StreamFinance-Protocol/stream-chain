@@ -187,6 +187,11 @@ var (
 		40,
 		"cannot remove multi collateral asset from collateral pool",
 	)
+	ErrCollateralPoolMustHaveOnlyOneAsset = errorsmod.Register(
+		ModuleName,
+		41,
+		"collateral pool can only have 1 asset",
+	)
 
 	// Miscallaneous errors
 	ErrNotImplementedFunding = errorsmod.Register(ModuleName, 1001, "Not Implemented: Perpetuals Funding")

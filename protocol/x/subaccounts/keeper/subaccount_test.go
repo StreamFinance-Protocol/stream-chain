@@ -149,6 +149,19 @@ func TestGetCollateralPool(t *testing.T) {
 			},
 			expectedAddress: types.CollateralPoolTwoAddress,
 		},
+		"collateral pool with btc as quote asset": {
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcBtc_100PercentMarginRequirement_CollatPool1_Id8,
+			},
+			perpetualPositions: []*types.PerpetualPosition{
+				{
+					PerpetualId: constants.BtcBtc_100PercentMarginRequirement_CollatPool1_Id8.GetId(),
+					Quantums:    dtypes.NewInt(100_000_000),
+					YieldIndex:  big.NewRat(0, 1).String(),
+				},
+			},
+			expectedAddress: types.CollateralPoolOneAddress,
+		},
 		"collateral pool with no positions": {
 			perpetualPositions: make([]*types.PerpetualPosition, 0),
 			expectedAddress:    authtypes.NewModuleAddress(types.ModuleName),
@@ -341,7 +354,6 @@ func TestUpdateSubaccounts(t *testing.T) {
 
 		// expectations
 		expectedCollateralPoolTDaiBalances map[string]int64
-		expectedQuoteBalance               *big.Int
 		expectedPerpetualPositions         []*types.PerpetualPosition
 		expectedAssetPositions             []*types.AssetPosition
 		expectedSuccess                    bool
@@ -360,7 +372,6 @@ func TestUpdateSubaccounts(t *testing.T) {
 		msgSenderEnabled                      bool
 	}{
 		"one update to TDai asset position": {
-			expectedQuoteBalance:     big.NewInt(100),
 			expectedSuccess:          true,
 			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
 			updates: []types.Update{
@@ -385,8 +396,68 @@ func TestUpdateSubaccounts(t *testing.T) {
 			expectedAssetYieldIndex: constants.AssetYieldIndex_Zero,
 			msgSenderEnabled:        true,
 		},
+		"one update to BTC asset position": {
+			expectedSuccess:          true,
+			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
+			updates: []types.Update{
+				{
+					AssetUpdates: testutil.CreateBTCAssetUpdate(big.NewInt(100)),
+				},
+			},
+			expectedAssetPositions: []*types.AssetPosition{
+				{
+					AssetId:  uint32(1),
+					Quantums: dtypes.NewInt(100), // 100
+				},
+			},
+			expectedUpdatedAssetPositions: map[types.SubaccountId][]*types.AssetPosition{
+				defaultSubaccountId: {
+					{
+						AssetId:  uint32(1),
+						Quantums: dtypes.NewInt(100), // 100
+					},
+				},
+			},
+			expectedAssetYieldIndex: constants.AssetYieldIndex_Zero,
+			msgSenderEnabled:        true,
+		},
+		"one update to both BTC and TDai asset position": {
+			expectedSuccess:          true,
+			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
+			updates: []types.Update{
+				{
+					AssetUpdates: append(
+						testutil.CreateBTCAssetUpdate(big.NewInt(100)),
+						testutil.CreateTDaiAssetUpdate(big.NewInt(500))...,
+					),
+				},
+			},
+			expectedAssetPositions: []*types.AssetPosition{
+				{
+					AssetId:  uint32(0),
+					Quantums: dtypes.NewInt(500), // 500 TDai
+				},
+				{
+					AssetId:  uint32(1),
+					Quantums: dtypes.NewInt(100), // 100
+				},
+			},
+			expectedUpdatedAssetPositions: map[types.SubaccountId][]*types.AssetPosition{
+				defaultSubaccountId: {
+					{
+						AssetId:  uint32(0),
+						Quantums: dtypes.NewInt(500), // 500 TDai
+					},
+					{
+						AssetId:  uint32(1),
+						Quantums: dtypes.NewInt(100), // 100
+					},
+				},
+			},
+			expectedAssetYieldIndex: constants.AssetYieldIndex_Zero,
+			msgSenderEnabled:        true,
+		},
 		"one negative update to TDai asset position": {
-			expectedQuoteBalance:     big.NewInt(-100),
 			expectedSuccess:          true,
 			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
 			perpetuals: []perptypes.Perpetual{
@@ -430,8 +501,111 @@ func TestUpdateSubaccounts(t *testing.T) {
 			expectedAssetYieldIndex: constants.AssetYieldIndex_Zero,
 			msgSenderEnabled:        true,
 		},
+		"FAIL (because asset is now BTC where 100 quantums is worth much more): one negative update to BTC asset position": {
+			expectedSuccess:          false,
+			expectedSuccessPerUpdate: []types.UpdateResult{types.NewlyUndercollateralized},
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcBtc_100PercentMarginRequirement_CollatPool1_Id8,
+			},
+			perpetualPositions: []*types.PerpetualPosition{
+				{
+					PerpetualId:  uint32(8),
+					Quantums:     dtypes.NewInt(100_000_000), // 1 BTC
+					FundingIndex: dtypes.NewInt(0),
+					YieldIndex:   big.NewRat(0, 1).String(),
+				},
+			},
+			expectedPerpetualPositions: []*types.PerpetualPosition{
+				{
+					PerpetualId:  uint32(8),
+					Quantums:     dtypes.NewInt(100_000_000), // 1 BTC
+					FundingIndex: dtypes.NewInt(0),
+					YieldIndex:   big.NewRat(0, 1).String(),
+				},
+			},
+			updates: []types.Update{
+				{
+					AssetUpdates: testutil.CreateBTCAssetUpdate(big.NewInt(-100)),
+				},
+			},
+			expectedAssetYieldIndex: constants.AssetYieldIndex_Zero,
+			msgSenderEnabled:        true,
+		},
+		"FAIL (because violates collateral constraints): one negative update to TDai asset position on BTC collateral pool": {
+			expectedSuccess:          false,
+			expectedSuccessPerUpdate: []types.UpdateResult{types.ViolatesMultiCollateralConstraints},
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcBtc_100PercentMarginRequirement_CollatPool1_Id8,
+			},
+			perpetualPositions: []*types.PerpetualPosition{
+				{
+					PerpetualId:  uint32(8),
+					Quantums:     dtypes.NewInt(100_000_000), // 1 BTC
+					FundingIndex: dtypes.NewInt(0),
+					YieldIndex:   big.NewRat(0, 1).String(),
+				},
+			},
+			expectedPerpetualPositions: []*types.PerpetualPosition{
+				{
+					PerpetualId:  uint32(8),
+					Quantums:     dtypes.NewInt(100_000_000), // 1 BTC
+					FundingIndex: dtypes.NewInt(0),
+					YieldIndex:   big.NewRat(0, 1).String(),
+				},
+			},
+			updates: []types.Update{
+				{
+					AssetUpdates: testutil.CreateTDaiAssetUpdate(big.NewInt(-100)),
+				},
+			},
+			expectedAssetYieldIndex: constants.AssetYieldIndex_Zero,
+			msgSenderEnabled:        true,
+		},
+		"one negative update to BTC asset position": {
+			expectedSuccess:          true,
+			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcBtc_SmallMarginRequirement_CollatPool1_Id8,
+			},
+			perpetualPositions: []*types.PerpetualPosition{
+				{
+					PerpetualId:  uint32(9),
+					Quantums:     dtypes.NewInt(100_000_000), // 1 BTC
+					FundingIndex: dtypes.NewInt(0),
+					YieldIndex:   big.NewRat(0, 1).String(),
+				},
+			},
+			expectedPerpetualPositions: []*types.PerpetualPosition{
+				{
+					PerpetualId:  uint32(9),
+					Quantums:     dtypes.NewInt(100_000_000), // 1 BTC
+					FundingIndex: dtypes.NewInt(0),
+					YieldIndex:   big.NewRat(0, 1).String(),
+				},
+			},
+			expectedAssetPositions: []*types.AssetPosition{
+				{
+					AssetId:  uint32(1),
+					Quantums: dtypes.NewInt(-100),
+				},
+			},
+			expectedUpdatedAssetPositions: map[types.SubaccountId][]*types.AssetPosition{
+				defaultSubaccountId: {
+					{
+						AssetId:  uint32(1),
+						Quantums: dtypes.NewInt(-100),
+					},
+				},
+			},
+			updates: []types.Update{
+				{
+					AssetUpdates: testutil.CreateBTCAssetUpdate(big.NewInt(-100)),
+				},
+			},
+			expectedAssetYieldIndex: constants.AssetYieldIndex_Zero,
+			msgSenderEnabled:        true,
+		},
 		"one negative update to TDai asset position + persist unsettled negative funding": {
-			expectedQuoteBalance:     big.NewInt(-2100),
 			expectedSuccess:          true,
 			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
 			perpetuals: []perptypes.Perpetual{
@@ -491,8 +665,67 @@ func TestUpdateSubaccounts(t *testing.T) {
 			expectedAssetYieldIndex: constants.AssetYieldIndex_Zero,
 			msgSenderEnabled:        true,
 		},
+		"one negative update to BTC asset position + persist unsettled negative funding": {
+			expectedSuccess:          true,
+			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcBtc_SmallMarginRequirement_CollatPool1_Id8,
+			},
+			newFundingIndices: []*big.Int{big.NewInt(-10)},
+			perpetualPositions: []*types.PerpetualPosition{
+				{
+					PerpetualId:  uint32(9),
+					Quantums:     dtypes.NewInt(100_000_000), // 1 BTC
+					FundingIndex: dtypes.NewInt(-30),         // indexDelta=20, settlement=-20*100
+					YieldIndex:   big.NewRat(0, 1).String(),
+				},
+			},
+			expectedPerpetualPositions: []*types.PerpetualPosition{
+				{
+					PerpetualId:  uint32(9),
+					Quantums:     dtypes.NewInt(100_000_000), // 1 BTC
+					FundingIndex: dtypes.NewInt(-10),
+					YieldIndex:   big.NewRat(0, 1).String(),
+				},
+			},
+			expectedAssetPositions: []*types.AssetPosition{
+				{
+					AssetId:  uint32(1),
+					Quantums: dtypes.NewInt(-2100),
+				},
+			},
+			expectedUpdatedPerpetualPositions: map[types.SubaccountId][]*types.PerpetualPosition{
+				defaultSubaccountId: {
+					{
+						PerpetualId:  uint32(9),
+						Quantums:     dtypes.NewInt(100_000_000),
+						FundingIndex: dtypes.NewInt(-10),
+						YieldIndex:   big.NewRat(0, 1).String(),
+					},
+				},
+			},
+			expectedSubaccoundIdToFundingPayments: map[types.SubaccountId]map[uint32]dtypes.SerializableInt{
+				defaultSubaccountId: {
+					uint32(9): dtypes.NewInt(2_000), // negated settlement
+				},
+			},
+			expectedUpdatedAssetPositions: map[types.SubaccountId][]*types.AssetPosition{
+				defaultSubaccountId: {
+					{
+						AssetId:  uint32(1),
+						Quantums: dtypes.NewInt(-2100),
+					},
+				},
+			},
+			updates: []types.Update{
+				{
+					AssetUpdates: testutil.CreateBTCAssetUpdate(big.NewInt(-100)),
+				},
+			},
+			expectedAssetYieldIndex: constants.AssetYieldIndex_Zero,
+			msgSenderEnabled:        true,
+		},
 		"one negative update to TDai asset position + persist unsettled positive funding": {
-			expectedQuoteBalance:     big.NewInt(-92),
 			expectedSuccess:          true,
 			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
 			perpetuals: []perptypes.Perpetual{
@@ -554,7 +787,6 @@ func TestUpdateSubaccounts(t *testing.T) {
 			msgSenderEnabled:        true,
 		},
 		"multiple updates for same position not allowed": {
-			expectedQuoteBalance:     big.NewInt(0),
 			expectedSuccess:          false,
 			expectedSuccessPerUpdate: nil,
 			expectedErr:              types.ErrNonUniqueUpdatesPosition,
@@ -595,7 +827,6 @@ func TestUpdateSubaccounts(t *testing.T) {
 			msgSenderEnabled:        true,
 		},
 		"multiple updates to same account not allowed": {
-			expectedQuoteBalance:     big.NewInt(0),
 			expectedErr:              types.ErrNonUniqueUpdatesSubaccount,
 			expectedSuccess:          false,
 			expectedSuccessPerUpdate: nil,
@@ -612,7 +843,6 @@ func TestUpdateSubaccounts(t *testing.T) {
 		},
 		"update increases position size": {
 			assetPositions:           testutil.CreateTDaiAssetPosition(big.NewInt(25_000_000_000)), // $25,000
-			expectedQuoteBalance:     big.NewInt(0),
 			expectedSuccess:          true,
 			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
 			perpetuals: []perptypes.Perpetual{
@@ -666,9 +896,149 @@ func TestUpdateSubaccounts(t *testing.T) {
 			},
 			msgSenderEnabled: false,
 		},
-		"update decreases position size": {
+		"update zeroes position (position should be deleted)": {
+			assetPositions:  testutil.CreateTDaiAssetPosition(big.NewInt(25_000_000_000)), // $25,000
+			expectedSuccess: true,
+			collateralPoolTDaiBalances: map[string]int64{
+				types.CollateralPoolZeroAddress.String(): 25_000_000_000,
+			},
+			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcUsd_NoMarginRequirement,
+			},
+			perpetualPositions: []*types.PerpetualPosition{
+				{
+					PerpetualId:  uint32(0),
+					Quantums:     dtypes.NewInt(100_000_000), // 1 BTC
+					FundingIndex: dtypes.NewInt(0),
+					YieldIndex:   big.NewRat(0, 1).String(),
+				},
+			},
+			expectedPerpetualPositions: []*types.PerpetualPosition{},
+			expectedUpdatedPerpetualPositions: map[types.SubaccountId][]*types.PerpetualPosition{
+				defaultSubaccountId: {
+					{
+						PerpetualId:  uint32(0),
+						Quantums:     dtypes.NewInt(0), // 0 BTC
+						FundingIndex: dtypes.NewInt(0),
+						YieldIndex:   big.NewRat(0, 1).String(),
+					},
+				},
+			},
+			expectedAssetPositions: []*types.AssetPosition{
+				{
+					AssetId:  uint32(0),
+					Quantums: dtypes.NewInt(25_000_000_000),
+				},
+			},
+			updates: []types.Update{
+				{
+					PerpetualUpdates: []types.PerpetualUpdate{
+						{
+							PerpetualId:      uint32(0),
+							BigQuantumsDelta: big.NewInt(-100_000_000), // -1 BTC
+						},
+					},
+				},
+			},
+			msgSenderEnabled: false,
+		},
+		"update zeroes asset position (asset should be deleted)": {
+			assetPositions:  testutil.CreateTDaiAssetPosition(big.NewInt(25_000_000_000)), // $25,000
+			expectedSuccess: true,
+			collateralPoolTDaiBalances: map[string]int64{
+				types.CollateralPoolZeroAddress.String(): 25_000_000_000,
+			},
+			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcUsd_NoMarginRequirement,
+			},
+			perpetualPositions: []*types.PerpetualPosition{
+				{
+					PerpetualId:  uint32(0),
+					Quantums:     dtypes.NewInt(100_000_000), // 1 BTC
+					FundingIndex: dtypes.NewInt(0),
+					YieldIndex:   big.NewRat(0, 1).String(),
+				},
+			},
+			expectedPerpetualPositions: []*types.PerpetualPosition{
+				{
+					PerpetualId:  uint32(0),
+					Quantums:     dtypes.NewInt(100_000_000), // 1 BTC
+					FundingIndex: dtypes.NewInt(0),
+					YieldIndex:   big.NewRat(0, 1).String(),
+				},
+			},
+			expectedUpdatedAssetPositions: map[types.SubaccountId][]*types.AssetPosition{
+				defaultSubaccountId: {
+					{
+						AssetId:  uint32(0),
+						Quantums: dtypes.NewInt(0),
+					},
+				},
+			},
+			expectedAssetPositions: []*types.AssetPosition{},
+			updates: []types.Update{
+				{
+					AssetUpdates: testutil.CreateTDaiAssetUpdate(big.NewInt(-25_000_000_000)), // -$25,000
+				},
+			},
+			msgSenderEnabled: false,
+		},
+		"FAIL: cannot add a perpetual position from a different collateral pool": {
 			assetPositions:           testutil.CreateTDaiAssetPosition(big.NewInt(25_000_000_000)), // $25,000
-			expectedQuoteBalance:     big.NewInt(50_000_000_000),                                   // $50,000
+			expectedSuccess:          false,
+			expectedSuccessPerUpdate: []types.UpdateResult{types.ViolatesCollateralPoolConstraints},
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcUsd_NoMarginRequirement,
+				constants.BtcBtc_SmallMarginRequirement_CollatPool1_Id8,
+			},
+			perpetualPositions: []*types.PerpetualPosition{
+				{
+					PerpetualId:  uint32(0),
+					Quantums:     dtypes.NewInt(100_000_000), // 1 BTC
+					FundingIndex: dtypes.NewInt(0),
+					YieldIndex:   big.NewRat(0, 1).String(),
+				},
+			},
+			expectedPerpetualPositions: []*types.PerpetualPosition{
+				{
+					PerpetualId:  uint32(0),
+					Quantums:     dtypes.NewInt(100_000_000), // 1 BTC
+					FundingIndex: dtypes.NewInt(0),
+					YieldIndex:   big.NewRat(0, 1).String(),
+				},
+			},
+			expectedUpdatedPerpetualPositions: map[types.SubaccountId][]*types.PerpetualPosition{},
+			expectedAssetPositions: []*types.AssetPosition{
+				{
+					AssetId:  uint32(0),
+					Quantums: dtypes.NewInt(25_000_000_000),
+				},
+			},
+			expectedUpdatedAssetPositions: map[types.SubaccountId][]*types.AssetPosition{
+				defaultSubaccountId: {
+					{
+						AssetId:  uint32(0),
+						Quantums: dtypes.NewInt(0),
+					},
+				},
+			},
+			updates: []types.Update{
+				{
+					AssetUpdates: testutil.CreateTDaiAssetUpdate(big.NewInt(-25_000_000_000)), // -$25,000
+					PerpetualUpdates: []types.PerpetualUpdate{
+						{
+							PerpetualId:      uint32(9),
+							BigQuantumsDelta: big.NewInt(50_000_000), // .5 BTC
+						},
+					},
+				},
+			},
+			msgSenderEnabled: false,
+		},
+		"update decreases position size": {
+			assetPositions:           testutil.CreateTDaiAssetPosition(big.NewInt(25_000_000_000)), // $25,000                                  // $50,000
 			expectedSuccess:          true,
 			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
 			perpetuals: []perptypes.Perpetual{
@@ -727,6 +1097,174 @@ func TestUpdateSubaccounts(t *testing.T) {
 			},
 			msgSenderEnabled: false,
 		},
+		"update decreases position size BTC": {
+			assetPositions:           testutil.CreateBtcAssetPosition(big.NewInt(25_000_000_000)), // 250 BTC
+			expectedSuccess:          true,
+			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcBtc_SmallMarginRequirement_CollatPool1_Id8,
+			},
+			perpetualPositions: []*types.PerpetualPosition{
+				{
+					PerpetualId:  uint32(9),
+					Quantums:     dtypes.NewInt(100_000_000), // 1 BTC
+					FundingIndex: dtypes.NewInt(0),
+					YieldIndex:   big.NewRat(0, 1).String(),
+				},
+			},
+			expectedPerpetualPositions: []*types.PerpetualPosition{
+				{
+					PerpetualId:  uint32(9),
+					Quantums:     dtypes.NewInt(50_000_000), // .50 BTC
+					FundingIndex: dtypes.NewInt(0),
+					YieldIndex:   big.NewRat(0, 1).String(),
+				},
+			},
+			expectedUpdatedPerpetualPositions: map[types.SubaccountId][]*types.PerpetualPosition{
+				defaultSubaccountId: {
+					{
+						PerpetualId:  uint32(9),
+						Quantums:     dtypes.NewInt(50_000_000), // .50 BTC
+						FundingIndex: dtypes.NewInt(0),
+						YieldIndex:   big.NewRat(0, 1).String(),
+					},
+				},
+			},
+			expectedAssetPositions: []*types.AssetPosition{
+				{
+					AssetId:  uint32(1),
+					Quantums: dtypes.NewInt(50_000_000_000),
+				},
+			},
+			expectedUpdatedAssetPositions: map[types.SubaccountId][]*types.AssetPosition{
+				defaultSubaccountId: {
+					{
+						AssetId:  uint32(1),
+						Quantums: dtypes.NewInt(50_000_000_000), // (as BTC perp is priced at 50000 BTC asset)
+					},
+				},
+			},
+			updates: []types.Update{
+				{
+					AssetUpdates: testutil.CreateBTCAssetUpdate(big.NewInt(25_000_000_000)),
+					PerpetualUpdates: []types.PerpetualUpdate{
+						{
+							PerpetualId:      uint32(9),
+							BigQuantumsDelta: big.NewInt(-50_000_000), // -.5 BTC
+						},
+					},
+				},
+			},
+			msgSenderEnabled: false,
+		},
+		"FAIL: cannot add a short from a different collateral pool": {
+			assetPositions:           testutil.CreateTDaiAssetPosition(big.NewInt(25_000_000_000)), // $25,000
+			expectedSuccess:          false,
+			expectedSuccessPerUpdate: []types.UpdateResult{types.ViolatesCollateralPoolConstraints},
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcUsd_NoMarginRequirement,
+				constants.BtcBtc_SmallMarginRequirement_CollatPool1_Id8,
+			},
+			perpetualPositions: []*types.PerpetualPosition{
+				{
+					PerpetualId:  uint32(0),
+					Quantums:     dtypes.NewInt(100_000_000), // 1 BTC
+					FundingIndex: dtypes.NewInt(0),
+					YieldIndex:   big.NewRat(0, 1).String(),
+				},
+			},
+			expectedPerpetualPositions: []*types.PerpetualPosition{
+				{
+					PerpetualId:  uint32(0),
+					Quantums:     dtypes.NewInt(100_000_000), // 1 BTC
+					FundingIndex: dtypes.NewInt(0),
+					YieldIndex:   big.NewRat(0, 1).String(),
+				},
+			},
+			expectedUpdatedPerpetualPositions: map[types.SubaccountId][]*types.PerpetualPosition{},
+			expectedAssetPositions: []*types.AssetPosition{
+				{
+					AssetId:  uint32(0),
+					Quantums: dtypes.NewInt(25_000_000_000),
+				},
+			},
+			expectedUpdatedAssetPositions: map[types.SubaccountId][]*types.AssetPosition{
+				defaultSubaccountId: {
+					{
+						AssetId:  uint32(0),
+						Quantums: dtypes.NewInt(0),
+					},
+				},
+			},
+			updates: []types.Update{
+				{
+					AssetUpdates: testutil.CreateTDaiAssetUpdate(big.NewInt(-25_000_000_000)), // -$25,000
+					PerpetualUpdates: []types.PerpetualUpdate{
+						{
+							PerpetualId:      uint32(9),
+							BigQuantumsDelta: big.NewInt(-50_000_000), // .5 BTC
+						},
+					},
+				},
+			},
+			msgSenderEnabled: false,
+		},
+		"FAIL: cannot add a perpetual position from a different collateral and from a good collateral pool even if resulting subaccount would be valid": {
+			assetPositions:           testutil.CreateTDaiAssetPosition(big.NewInt(25_000_000_000)), // $25,000
+			expectedSuccess:          false,
+			expectedSuccessPerUpdate: []types.UpdateResult{types.ViolatesCollateralPoolConstraints},
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcUsd_NoMarginRequirement,
+				constants.BtcBtc_SmallMarginRequirement_CollatPool1_Id8,
+			},
+			perpetualPositions: []*types.PerpetualPosition{
+				{
+					PerpetualId:  uint32(0),
+					Quantums:     dtypes.NewInt(100_000_000), // 1 BTC
+					FundingIndex: dtypes.NewInt(0),
+					YieldIndex:   big.NewRat(0, 1).String(),
+				},
+			},
+			expectedPerpetualPositions: []*types.PerpetualPosition{
+				{
+					PerpetualId:  uint32(0),
+					Quantums:     dtypes.NewInt(100_000_000), // 1 BTC
+					FundingIndex: dtypes.NewInt(0),
+					YieldIndex:   big.NewRat(0, 1).String(),
+				},
+			},
+			expectedUpdatedPerpetualPositions: map[types.SubaccountId][]*types.PerpetualPosition{},
+			expectedAssetPositions: []*types.AssetPosition{
+				{
+					AssetId:  uint32(0),
+					Quantums: dtypes.NewInt(25_000_000_000),
+				},
+			},
+			expectedUpdatedAssetPositions: map[types.SubaccountId][]*types.AssetPosition{
+				defaultSubaccountId: {
+					{
+						AssetId:  uint32(0),
+						Quantums: dtypes.NewInt(0),
+					},
+				},
+			},
+			updates: []types.Update{
+				{
+					AssetUpdates: testutil.CreateTDaiAssetUpdate(big.NewInt(-25_000_000_000)), // -$25,000
+					PerpetualUpdates: []types.PerpetualUpdate{
+						{
+							PerpetualId:      uint32(0),
+							BigQuantumsDelta: big.NewInt(50_000_000), // .5 BTC
+						},
+						{
+							PerpetualId:      uint32(9),
+							BigQuantumsDelta: big.NewInt(50_000_000), // .5 BTC
+						},
+					},
+				},
+			},
+			msgSenderEnabled: false,
+		},
 		"update closes long position": {
 			assetPositions: testutil.CreateTDaiAssetPosition(big.NewInt(25_000_000_000)), // $25,000
 			collateralPoolTDaiBalances: map[string]int64{
@@ -735,7 +1273,6 @@ func TestUpdateSubaccounts(t *testing.T) {
 			expectedCollateralPoolTDaiBalances: map[string]int64{
 				types.ModuleAddress.String(): 75_000_000_000,
 			},
-			expectedQuoteBalance:     big.NewInt(75_000_000_000), // $75,000
 			expectedSuccess:          true,
 			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
 			perpetuals: []perptypes.Perpetual{
@@ -797,7 +1334,6 @@ func TestUpdateSubaccounts(t *testing.T) {
 			expectedCollateralPoolTDaiBalances: map[string]int64{
 				types.ModuleAddress.String(): 50_000_000_000,
 			},
-			expectedQuoteBalance:     big.NewInt(50_000_000_000), // $50,000
 			expectedSuccess:          true,
 			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
 			perpetuals: []perptypes.Perpetual{
@@ -929,7 +1465,6 @@ func TestUpdateSubaccounts(t *testing.T) {
 					Quantums: dtypes.NewInt(50_000),
 				},
 			),
-			expectedQuoteBalance:     big.NewInt(200_000_000_000), // $200,000
 			expectedSuccess:          true,
 			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
 			expectedAssetPositions: []*types.AssetPosition{
@@ -969,8 +1504,7 @@ func TestUpdateSubaccounts(t *testing.T) {
 			msgSenderEnabled:        true,
 		},
 		"update closes first 1 positions and updates 2nd": {
-			assetPositions:           testutil.CreateTDaiAssetPosition(big.NewInt(100_000_000_000)), // $100,000
-			expectedQuoteBalance:     big.NewInt(50_000_000_000),                                    // $50,000
+			assetPositions:           testutil.CreateTDaiAssetPosition(big.NewInt(100_000_000_000)), // $100,000                              // $50,000
 			expectedSuccess:          true,
 			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
 			perpetuals: []perptypes.Perpetual{
@@ -1056,7 +1590,6 @@ func TestUpdateSubaccounts(t *testing.T) {
 			expectedCollateralPoolTDaiBalances: map[string]int64{
 				types.CollateralPoolZeroAddress.String(): 100_000_000_000,
 			},
-			expectedQuoteBalance:     big.NewInt(50_000_000_000), // $50,000
 			expectedSuccess:          true,
 			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
 			perpetuals: []perptypes.Perpetual{
@@ -1114,7 +1647,6 @@ func TestUpdateSubaccounts(t *testing.T) {
 			collateralPoolTDaiBalances: map[string]int64{
 				types.ModuleAddress.String(): 100_000_000_000,
 			},
-			expectedQuoteBalance:     big.NewInt(150_000_000_000), // $50,000
 			expectedSuccess:          true,
 			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
 			perpetuals: []perptypes.Perpetual{
@@ -1167,8 +1699,7 @@ func TestUpdateSubaccounts(t *testing.T) {
 			msgSenderEnabled: false,
 		},
 		"update opens new long eth position with existing btc position": {
-			assetPositions:           testutil.CreateTDaiAssetPosition(big.NewInt(100_000_000_000)), // $100,000
-			expectedQuoteBalance:     big.NewInt(100_000_000_000),                                   // $100,000
+			assetPositions:           testutil.CreateTDaiAssetPosition(big.NewInt(100_000_000_000)), // $100,000                                // $100,000
 			expectedSuccess:          true,
 			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
 			perpetuals: []perptypes.Perpetual{
@@ -1228,8 +1759,7 @@ func TestUpdateSubaccounts(t *testing.T) {
 		},
 		// TODO(DEC-581): add similar test case for multi-collateral asset support.
 		"update eth position from long to short with existing btc position": {
-			assetPositions:           testutil.CreateTDaiAssetPosition(big.NewInt(100_000_000_000)), // $100,000
-			expectedQuoteBalance:     big.NewInt(100_000_000_000),                                   // $100,000
+			assetPositions:           testutil.CreateTDaiAssetPosition(big.NewInt(100_000_000_000)), // $100,000                                  // $100,000
 			expectedSuccess:          true,
 			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
 			perpetuals: []perptypes.Perpetual{
@@ -1294,8 +1824,7 @@ func TestUpdateSubaccounts(t *testing.T) {
 			msgSenderEnabled:        true,
 		},
 		"update opens new long eth position with existing btc and sol position": {
-			assetPositions:           testutil.CreateTDaiAssetPosition(big.NewInt(100_000_000_000)), // $100,000
-			expectedQuoteBalance:     big.NewInt(100_000_000_000),                                   // $100,000
+			assetPositions:           testutil.CreateTDaiAssetPosition(big.NewInt(100_000_000_000)), // $100,000                                 // $100,000
 			expectedSuccess:          true,
 			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
 			perpetuals: []perptypes.Perpetual{
@@ -1367,8 +1896,7 @@ func TestUpdateSubaccounts(t *testing.T) {
 			msgSenderEnabled:        true,
 		},
 		"update opens new long btc position with existing eth and sol position": {
-			assetPositions:           testutil.CreateTDaiAssetPosition(big.NewInt(100_000_000_000)), // $100,000
-			expectedQuoteBalance:     big.NewInt(100_000_000_000),                                   // $100,000
+			assetPositions:           testutil.CreateTDaiAssetPosition(big.NewInt(100_000_000_000)), // $100,000                                  // $100,000
 			expectedSuccess:          true,
 			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
 			perpetuals: []perptypes.Perpetual{
@@ -1440,8 +1968,7 @@ func TestUpdateSubaccounts(t *testing.T) {
 			msgSenderEnabled:        true,
 		},
 		"update opens new long eth position with existing unsettled sol position": {
-			assetPositions:           testutil.CreateTDaiAssetPosition(big.NewInt(100_000_000_000)), // $100,000
-			expectedQuoteBalance:     big.NewInt(100_000_000_000),                                   // $100,000
+			assetPositions:           testutil.CreateTDaiAssetPosition(big.NewInt(100_000_000_000)), // $100,000                                // $100,000
 			expectedSuccess:          true,
 			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
 			perpetuals: []perptypes.Perpetual{
@@ -1517,8 +2044,7 @@ func TestUpdateSubaccounts(t *testing.T) {
 			msgSenderEnabled:        true,
 		},
 		"provides out-of-order updates (not ordered by PerpetualId)": {
-			assetPositions:           testutil.CreateTDaiAssetPosition(big.NewInt(100_000_000_000)), // $100,000
-			expectedQuoteBalance:     big.NewInt(100_000_000_000),                                   // $100,000
+			assetPositions:           testutil.CreateTDaiAssetPosition(big.NewInt(100_000_000_000)), // $100,000                                  // $100,000
 			expectedSuccess:          true,
 			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
 			perpetuals: []perptypes.Perpetual{
@@ -1616,7 +2142,6 @@ func TestUpdateSubaccounts(t *testing.T) {
 			msgSenderEnabled:        true,
 		},
 		"updates multiple subaccounts with new perpetual and asset positions": {
-			expectedQuoteBalance: big.NewInt(100_000_000), // $100
 			collateralPoolTDaiBalances: map[string]int64{
 				types.CollateralPoolZeroAddress.String(): 100_000_000_000,
 			},
@@ -1710,7 +2235,6 @@ func TestUpdateSubaccounts(t *testing.T) {
 			msgSenderEnabled:        true,
 		},
 		"update would make account undercollateralized": {
-			expectedQuoteBalance:     big.NewInt(0),
 			expectedSuccess:          false,
 			expectedSuccessPerUpdate: []types.UpdateResult{types.NewlyUndercollateralized},
 			perpetuals: []perptypes.Perpetual{
@@ -1748,7 +2272,6 @@ func TestUpdateSubaccounts(t *testing.T) {
 		},
 		"updates new TDai asset position which exceeds max uint64": {
 			assetPositions:           testutil.CreateTDaiAssetPosition(new(big.Int).SetUint64(math.MaxUint64)),
-			expectedQuoteBalance:     new(big.Int).SetUint64(math.MaxUint64),
 			expectedSuccess:          true,
 			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
 			expectedAssetPositions: []*types.AssetPosition{
@@ -1784,11 +2307,7 @@ func TestUpdateSubaccounts(t *testing.T) {
 			msgSenderEnabled:        true,
 		},
 		"new TDai asset position (including unsettled funding) size exceeds max uint64": {
-			assetPositions: testutil.CreateTDaiAssetPosition(new(big.Int).SetUint64(math.MaxUint64 - 5)),
-			expectedQuoteBalance: new(big.Int).Add(
-				new(big.Int).SetUint64(math.MaxUint64),
-				new(big.Int).SetInt64(1),
-			),
+			assetPositions:           testutil.CreateTDaiAssetPosition(new(big.Int).SetUint64(math.MaxUint64 - 5)),
 			expectedSuccess:          true,
 			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
 			perpetuals: []perptypes.Perpetual{
@@ -1855,7 +2374,6 @@ func TestUpdateSubaccounts(t *testing.T) {
 			msgSenderEnabled:        true,
 		},
 		"new position size exceeds max uint64": {
-			expectedQuoteBalance:     big.NewInt(0),
 			expectedSuccess:          true,
 			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
 			perpetuals: []perptypes.Perpetual{
@@ -1906,7 +2424,6 @@ func TestUpdateSubaccounts(t *testing.T) {
 			msgSenderEnabled:        true,
 		},
 		"existing position size + update exceeds max uint64": {
-			expectedQuoteBalance:     big.NewInt(0),
 			expectedSuccess:          true,
 			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
 			perpetuals: []perptypes.Perpetual{
@@ -1976,8 +2493,7 @@ func TestUpdateSubaccounts(t *testing.T) {
 			msgSenderEnabled: false,
 		},
 		"perpetual does not exist": {
-			expectedQuoteBalance: big.NewInt(0),
-			expectedErr:          perptypes.ErrPerpetualDoesNotExist,
+			expectedErr: perptypes.ErrPerpetualDoesNotExist,
 			updates: []types.Update{
 				{
 					PerpetualUpdates: []types.PerpetualUpdate{
@@ -3153,6 +3669,66 @@ func TestUpdateSubaccounts(t *testing.T) {
 			},
 			msgSenderEnabled: true,
 		},
+		"Successfully doesn't claims yield for one perp on BTC collateral pool": {
+			assetPositions:            testutil.CreateBtcAssetPosition(big.NewInt(100_000_000_000)),
+			subaccountAssetYieldIndex: constants.AssetYieldIndex_Zero,
+			globalAssetYieldIndex:     big.NewRat(1, 1),
+			fundsInTDaiPool:           big.NewInt(200_000_000_000),
+			collateralPoolTDaiBalances: map[string]int64{
+				types.CollateralPoolZeroAddress.String(): 100_000_000_000,
+			},
+			perpetuals: []perptypes.Perpetual{
+				{
+					Params:       constants.BtcBtc_SmallMarginRequirement_CollatPool1_Id8.Params,
+					FundingIndex: constants.BtcBtc_SmallMarginRequirement_CollatPool1_Id8.FundingIndex,
+					OpenInterest: constants.BtcBtc_SmallMarginRequirement_CollatPool1_Id8.OpenInterest,
+					YieldIndex:   big.NewRat(1, 1).String(),
+				},
+			},
+			perpetualPositions: []*types.PerpetualPosition{
+				{
+					PerpetualId:  uint32(9),
+					Quantums:     dtypes.NewInt(1_000_000_000), // 10 BTC
+					FundingIndex: dtypes.NewInt(0),
+					YieldIndex:   big.NewRat(0, 1).String(),
+				},
+			},
+			expectedSuccess:          true,
+			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
+			expectedAssetYieldIndex:  big.NewRat(1, 1).String(),
+			expectedPerpetualPositions: []*types.PerpetualPosition{
+				{
+					PerpetualId:  uint32(9),
+					Quantums:     dtypes.NewInt(1_000_000_000),
+					FundingIndex: dtypes.NewInt(0),
+					YieldIndex:   big.NewRat(0, 1).String(),
+				},
+			},
+			expectedAssetPositions: []*types.AssetPosition{
+				{
+					AssetId:  uint32(1),
+					Quantums: dtypes.NewInt(100_000_000_001),
+				},
+			},
+			expectedUpdatedAssetPositions: map[types.SubaccountId][]*types.AssetPosition{
+				defaultSubaccountId: {
+					{
+						AssetId:  uint32(1),
+						Quantums: dtypes.NewInt(100_000_000_001),
+					},
+				},
+			},
+			updates: []types.Update{
+				{
+					AssetUpdates: testutil.CreateBTCAssetUpdate(big.NewInt(1)),
+				},
+			},
+			expectedTDaiYieldPoolBalance: big.NewInt(200_000_000_000),
+			expectedCollateralPoolTDaiBalances: map[string]int64{
+				types.CollateralPoolZeroAddress.String(): 100_000_000_000,
+			},
+			msgSenderEnabled: true,
+		},
 		"Successfully claims yield for tDai asset": {
 			assetPositions:            testutil.CreateTDaiAssetPosition(big.NewInt(100_000_000_000)),
 			subaccountAssetYieldIndex: constants.AssetYieldIndex_Zero,
@@ -3221,6 +3797,77 @@ func TestUpdateSubaccounts(t *testing.T) {
 			expectedTDaiYieldPoolBalance: big.NewInt(100_000_000_000),
 			expectedCollateralPoolTDaiBalances: map[string]int64{
 				types.CollateralPoolZeroAddress.String(): 200_000_000_000,
+			},
+			msgSenderEnabled: true,
+		},
+		"Successfully doesn't claim yield for BTC asset": {
+			assetPositions:            testutil.CreateBtcAssetPosition(big.NewInt(100_000_000_000)),
+			subaccountAssetYieldIndex: constants.AssetYieldIndex_Zero,
+			globalAssetYieldIndex:     big.NewRat(2, 1),
+			fundsInTDaiPool:           big.NewInt(200_000_000_000),
+			collateralPoolTDaiBalances: map[string]int64{
+				types.CollateralPoolZeroAddress.String(): 100_000_000_000,
+			},
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcBtc_SmallMarginRequirement_CollatPool1_Id8,
+			},
+			perpetualPositions: []*types.PerpetualPosition{
+				{
+					PerpetualId:  uint32(9),
+					Quantums:     dtypes.NewInt(100_000_000), // 1 BTC
+					FundingIndex: dtypes.NewInt(0),
+					YieldIndex:   big.NewRat(0, 1).String(),
+				},
+			},
+			expectedSuccess:          true,
+			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
+			expectedAssetYieldIndex:  big.NewRat(2, 1).String(),
+			expectedPerpetualPositions: []*types.PerpetualPosition{
+				{
+					PerpetualId:  uint32(9),
+					Quantums:     dtypes.NewInt(150_000_000), // 1.5 BTC
+					FundingIndex: dtypes.NewInt(0),
+					YieldIndex:   big.NewRat(0, 1).String(),
+				},
+			},
+			expectedUpdatedPerpetualPositions: map[types.SubaccountId][]*types.PerpetualPosition{
+				defaultSubaccountId: {
+					{
+						PerpetualId:  uint32(9),
+						Quantums:     dtypes.NewInt(150_000_000), // 1.5 BTC
+						FundingIndex: dtypes.NewInt(0),
+						YieldIndex:   big.NewRat(0, 1).String(),
+					},
+				},
+			},
+			expectedAssetPositions: []*types.AssetPosition{
+				{
+					AssetId:  uint32(1),
+					Quantums: dtypes.NewInt(75_000_000_000),
+				},
+			},
+			expectedUpdatedAssetPositions: map[types.SubaccountId][]*types.AssetPosition{
+				defaultSubaccountId: {
+					{
+						AssetId:  uint32(1),
+						Quantums: dtypes.NewInt(75_000_000_000),
+					},
+				},
+			},
+			updates: []types.Update{
+				{
+					AssetUpdates: testutil.CreateBTCAssetUpdate(big.NewInt(-25_000_000_000)), // -$25,000
+					PerpetualUpdates: []types.PerpetualUpdate{
+						{
+							PerpetualId:      uint32(9),
+							BigQuantumsDelta: big.NewInt(50_000_000), // .5 BTC
+						},
+					},
+				},
+			},
+			expectedTDaiYieldPoolBalance: big.NewInt(200_000_000_000),
+			expectedCollateralPoolTDaiBalances: map[string]int64{
+				types.CollateralPoolZeroAddress.String(): 100_000_000_000,
 			},
 			msgSenderEnabled: true,
 		},
@@ -3352,6 +3999,104 @@ func TestUpdateSubaccounts(t *testing.T) {
 			expectedTDaiYieldPoolBalance: big.NewInt(100_000_000_000),
 			expectedCollateralPoolTDaiBalances: map[string]int64{
 				types.CollateralPoolZeroAddress.String(): 200_000_000_000,
+			},
+			msgSenderEnabled: true,
+		},
+		"Successfully claims yield for tDai deposit when there is also BTC": {
+			assetPositions: append(
+				testutil.CreateTDaiAssetPosition(big.NewInt(100_000_000_000)),
+				testutil.CreateBtcAssetPosition(big.NewInt(100_000_000_000))...,
+			),
+			collateralPoolTDaiBalances: map[string]int64{
+				types.ModuleAddress.String(): 100_000_000_000,
+			},
+			subaccountAssetYieldIndex: constants.AssetYieldIndex_Zero,
+			globalAssetYieldIndex:     big.NewRat(2, 1),
+			fundsInTDaiPool:           big.NewInt(200_000_000_000),
+			expectedSuccess:           true,
+			expectedSuccessPerUpdate:  []types.UpdateResult{types.Success},
+			expectedAssetYieldIndex:   big.NewRat(2, 1).String(),
+			expectedAssetPositions: []*types.AssetPosition{
+				{
+					AssetId:  uint32(0),
+					Quantums: dtypes.NewInt(210_000_000_000),
+				},
+				{
+					AssetId:  uint32(1),
+					Quantums: dtypes.NewInt(100_000_000_000),
+				},
+			},
+			expectedUpdatedAssetPositions: map[types.SubaccountId][]*types.AssetPosition{
+				defaultSubaccountId: {
+					{
+						AssetId:  uint32(0),
+						Quantums: dtypes.NewInt(210_000_000_000),
+					},
+				},
+			},
+			updates: []types.Update{
+				{
+					AssetUpdates: testutil.CreateTDaiAssetUpdate(big.NewInt(10_000_000_000)),
+				},
+			},
+			expectedTDaiYieldPoolBalance: big.NewInt(100_000_000_000),
+			expectedCollateralPoolTDaiBalances: map[string]int64{
+				types.ModuleAddress.String(): 200_000_000_000,
+			},
+			msgSenderEnabled: true,
+		},
+		"Successfully doesn't claims yield for BTC deposit": {
+			assetPositions: testutil.CreateBtcAssetPosition(big.NewInt(100_000_000_000)),
+			collateralPoolTDaiBalances: map[string]int64{
+				types.CollateralPoolZeroAddress.String(): 100_000_000_000,
+			},
+			subaccountAssetYieldIndex: constants.AssetYieldIndex_Zero,
+			globalAssetYieldIndex:     big.NewRat(2, 1),
+			fundsInTDaiPool:           big.NewInt(200_000_000_000),
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcBtc_SmallMarginRequirement_CollatPool1_Id8,
+			},
+			perpetualPositions: []*types.PerpetualPosition{
+				{
+					PerpetualId:  uint32(9),
+					Quantums:     dtypes.NewInt(100_000_000), // 1 BTC
+					FundingIndex: dtypes.NewInt(0),
+					YieldIndex:   big.NewRat(0, 1).String(),
+				},
+			},
+			expectedSuccess:          true,
+			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
+			expectedAssetYieldIndex:  big.NewRat(2, 1).String(),
+			expectedPerpetualPositions: []*types.PerpetualPosition{
+				{
+					PerpetualId:  uint32(9),
+					Quantums:     dtypes.NewInt(100_000_000),
+					FundingIndex: dtypes.NewInt(0),
+					YieldIndex:   big.NewRat(0, 1).String(),
+				},
+			},
+			expectedAssetPositions: []*types.AssetPosition{
+				{
+					AssetId:  uint32(1),
+					Quantums: dtypes.NewInt(110_000_000_000),
+				},
+			},
+			expectedUpdatedAssetPositions: map[types.SubaccountId][]*types.AssetPosition{
+				defaultSubaccountId: {
+					{
+						AssetId:  uint32(1),
+						Quantums: dtypes.NewInt(110_000_000_000),
+					},
+				},
+			},
+			updates: []types.Update{
+				{
+					AssetUpdates: testutil.CreateBTCAssetUpdate(big.NewInt(10_000_000_000)),
+				},
+			},
+			expectedTDaiYieldPoolBalance: big.NewInt(200_000_000_000),
+			expectedCollateralPoolTDaiBalances: map[string]int64{
+				types.CollateralPoolZeroAddress.String(): 100_000_000_000,
 			},
 			msgSenderEnabled: true,
 		},
@@ -6641,6 +7386,328 @@ func TestUpdateSubaccounts_WithdrawalsBlocked(t *testing.T) {
 				for i, ap := range expectedAssetPositions {
 					require.Equal(t, *ap, *newSubaccount.AssetPositions[i])
 				}
+			}
+		})
+	}
+}
+
+func TestUpdateSubaccountWithTwoSeparateUpdates(t *testing.T) {
+
+	tests := map[string]struct {
+		// state
+		perpetuals        []perptypes.Perpetual
+		newFundingIndices []*big.Int // 1:1 mapped to perpetuals list
+		assets            []*asstypes.Asset
+		marketParamPrices []pricestypes.MarketParamPrice
+
+		// Only set when specified. Defaults to 0/1.
+		initialGlobalAssetYieldIndex         *big.Rat
+		postFirstUpdateGlobalAssetYieldIndex *big.Rat
+		postFirstUpdatePerpetualYieldIndices map[uint32]string
+		fundsInTDaiPool                      *big.Int
+
+		// subaccount state
+		perpetualPositions        []*types.PerpetualPosition
+		assetPositions            []*types.AssetPosition
+		subaccountAssetYieldIndex string
+
+		// collateral pool state
+		collateralPoolTDaiBalances map[string]int64
+
+		// updates
+		// If not specified, default to `CollatCheck`
+		firstUpdateType types.UpdateType
+		firstUpdates    []types.Update
+
+		secondUpdateType types.UpdateType
+		secondUpdates    []types.Update
+
+		// expectations
+		expectedCollateralPoolTDaiBalances map[string]int64
+		expectedPerpetualPositions         []*types.PerpetualPosition
+		expectedAssetPositions             []*types.AssetPosition
+		expectedTDaiYieldPoolBalance       *big.Int
+
+		expectedSuccessFirstUpdate          bool
+		expectedSuccessPerUpdateFirstUpdate []types.UpdateResult
+		expectedErrFirstUpdate              error
+
+		expectedSuccessSecondUpdate          bool
+		expectedSuccessPerUpdateSecondUpdate []types.UpdateResult
+		expectedErrSecondUpdate              error
+
+		// Only contains the updated perpetual positions, to assert against the events included.
+		expectedAssetYieldIndex string
+	}{
+		"Closes an open subaccount, updates global asset yield index, and opens a new subaccount": {
+			assetPositions:               testutil.CreateTDaiAssetPosition(big.NewInt(100_000_000_000)),
+			subaccountAssetYieldIndex:    "2/1",
+			initialGlobalAssetYieldIndex: big.NewRat(2, 1),
+			fundsInTDaiPool:              big.NewInt(200_000_000_000),
+			collateralPoolTDaiBalances: map[string]int64{
+				types.CollateralPoolZeroAddress.String(): 100_000_000_000,
+			},
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcUsd_NoMarginRequirement,
+			},
+			perpetualPositions: []*types.PerpetualPosition{
+				{
+					PerpetualId:  uint32(0),
+					Quantums:     dtypes.NewInt(100_000_000), // 1 BTC
+					FundingIndex: dtypes.NewInt(0),
+					YieldIndex:   big.NewRat(0, 1).String(),
+				},
+			},
+			expectedSuccessFirstUpdate:          true,
+			expectedSuccessPerUpdateFirstUpdate: []types.UpdateResult{types.Success},
+			firstUpdates: []types.Update{
+				{
+					AssetUpdates: testutil.CreateTDaiAssetUpdate(big.NewInt(-100_000_000_000)),
+					PerpetualUpdates: []types.PerpetualUpdate{
+						{
+							PerpetualId:      uint32(0),
+							BigQuantumsDelta: big.NewInt(-100_000_000), // close position
+						},
+					},
+				},
+			},
+			postFirstUpdateGlobalAssetYieldIndex: big.NewRat(3, 1),
+			postFirstUpdatePerpetualYieldIndices: map[uint32]string{
+				uint32(0): "2/1",
+			},
+			expectedSuccessSecondUpdate:          true,
+			expectedSuccessPerUpdateSecondUpdate: []types.UpdateResult{types.Success},
+			secondUpdates: []types.Update{
+				{
+					AssetUpdates: testutil.CreateTDaiAssetUpdate(big.NewInt(25_000_000_000)),
+					PerpetualUpdates: []types.PerpetualUpdate{
+						{
+							PerpetualId:      uint32(0),
+							BigQuantumsDelta: big.NewInt(50_000_000), // .5 BTC
+						},
+					},
+				},
+			},
+			expectedAssetYieldIndex: big.NewRat(3, 1).String(),
+			expectedPerpetualPositions: []*types.PerpetualPosition{
+				{
+					PerpetualId:  uint32(0),
+					Quantums:     dtypes.NewInt(50_000_000), // 1.5 BTC
+					FundingIndex: dtypes.NewInt(0),
+					YieldIndex:   big.NewRat(2, 1).String(),
+				},
+			},
+			expectedAssetPositions: []*types.AssetPosition{
+				{
+					AssetId:  uint32(0),
+					Quantums: dtypes.NewInt(25_000_000_000),
+				},
+			},
+			expectedTDaiYieldPoolBalance: big.NewInt(200_000_000_000),
+			expectedCollateralPoolTDaiBalances: map[string]int64{
+				types.CollateralPoolZeroAddress.String(): 100_000_000_000,
+			},
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+
+			// Initialization
+			ctx, keeper, pricesKeeper, perpetualsKeeper, accountKeeper, bankKeeper, assetsKeeper, rateLimitKeeper, _, _ := testutil.SubaccountsKeepers(
+				t,
+				true,
+			)
+			ctx = ctx.WithTxBytes(constants.TestTxBytes)
+			testutil.CreateTestMarkets(t, ctx, pricesKeeper)
+
+			// Always creates TDai asset first
+			require.NoError(t, testutil.CreateTDaiAsset(ctx, assetsKeeper))
+			require.NoError(t, testutil.CreateBTCAsset(ctx, assetsKeeper))
+
+			testutil.CreateTestLiquidityTiers(t, ctx, perpetualsKeeper)
+			testutil.CreateTestCollateralPools(t, ctx, perpetualsKeeper)
+
+			// Set up initial sdai price
+			rateString := sdaiservertypes.TestSDAIEventRequest.ConversionRate
+			rate, conversionErr := ratelimitkeeper.ConvertStringToBigInt(rateString)
+			require.NoError(t, conversionErr)
+
+			rateLimitKeeper.SetSDAIPrice(ctx, rate)
+			globalAssetYieldIndex := big.NewRat(1, 1)
+			if tc.initialGlobalAssetYieldIndex != nil {
+				globalAssetYieldIndex = tc.initialGlobalAssetYieldIndex
+			}
+			rateLimitKeeper.SetAssetYieldIndex(ctx, globalAssetYieldIndex)
+
+			for _, m := range tc.marketParamPrices {
+				_, err := pricesKeeper.CreateMarket(
+					ctx,
+					m.Param,
+					m.Price,
+				)
+				require.NoError(t, err)
+			}
+
+			for _, a := range tc.assets {
+				_, err := assetsKeeper.CreateAsset(
+					ctx,
+					a.Id,
+					a.Symbol,
+					a.Denom,
+					a.DenomExponent,
+					a.HasMarket,
+					a.MarketId,
+					a.AtomicResolution,
+					a.AssetYieldIndex,
+					a.MaxSlippagePpm,
+				)
+				require.NoError(t, err)
+			}
+
+			for i, p := range tc.perpetuals {
+				perpetualsKeeper.SetPerpetualForTest(ctx, p)
+
+				// Update FundingIndex for testing settlements.
+				if i < len(tc.newFundingIndices) {
+					err := perpetualsKeeper.ModifyFundingIndex(
+						ctx,
+						p.Params.Id,
+						tc.newFundingIndices[i],
+					)
+					require.NoError(t, err)
+				}
+			}
+
+			for collateralPoolAddr, TDaiBal := range tc.collateralPoolTDaiBalances {
+				err := bank_testutil.FundAccount(
+					ctx,
+					sdk.MustAccAddressFromBech32(collateralPoolAddr),
+					sdk.Coins{
+						sdk.NewCoin(asstypes.AssetTDai.Denom, sdkmath.NewInt(TDaiBal)),
+					},
+					*bankKeeper,
+				)
+				require.NoError(t, err)
+			}
+
+			if tc.fundsInTDaiPool != nil {
+				err := bank_testutil.FundModuleAccount(
+					ctx,
+					ratelimittypes.TDaiPoolAccount,
+					sdk.Coins{
+						sdk.NewCoin(asstypes.AssetTDai.Denom, sdkmath.NewIntFromBigInt(tc.fundsInTDaiPool)),
+					},
+					*bankKeeper,
+				)
+				require.NoError(t, err)
+			}
+
+			subaccount := createNSubaccount(keeper, ctx, 1, big.NewInt(1_000))[0]
+			subaccount.PerpetualPositions = tc.perpetualPositions
+			subaccount.AssetPositions = tc.assetPositions
+			subaccountYieldIndex := constants.AssetYieldIndex_Zero
+			if tc.subaccountAssetYieldIndex != "" {
+				subaccountYieldIndex = tc.subaccountAssetYieldIndex
+			}
+			subaccount.AssetYieldIndex = subaccountYieldIndex
+			keeper.SetSubaccount(ctx, subaccount)
+			subaccountId := *subaccount.Id
+
+			// First update
+			for i, u := range tc.firstUpdates {
+				if u.SubaccountId == (types.SubaccountId{}) {
+					u.SubaccountId = subaccountId
+				}
+				tc.firstUpdates[i] = u
+			}
+
+			updateType := types.CollatCheck
+			if tc.firstUpdateType != types.UpdateTypeUnspecified {
+				updateType = tc.firstUpdateType
+			}
+			success, successPerUpdate, err := keeper.UpdateSubaccounts(ctx, tc.firstUpdates, updateType)
+			if tc.expectedErrFirstUpdate != nil {
+				require.ErrorIs(t, err, tc.expectedErrFirstUpdate)
+			} else {
+				require.NoError(t, err)
+				require.Equal(t, tc.expectedSuccessPerUpdateFirstUpdate, successPerUpdate)
+				require.Equal(t, tc.expectedSuccessFirstUpdate, success)
+			}
+
+			// Update global asset yield index
+			if tc.postFirstUpdateGlobalAssetYieldIndex != nil {
+				rateLimitKeeper.SetAssetYieldIndex(ctx, tc.postFirstUpdateGlobalAssetYieldIndex)
+			}
+
+			if len(tc.postFirstUpdatePerpetualYieldIndices) > 0 {
+				for perpetualId, yieldIndex := range tc.postFirstUpdatePerpetualYieldIndices {
+					perpetual, err := perpetualsKeeper.GetPerpetual(ctx, perpetualId)
+					require.NoError(t, err)
+
+					perpetual.YieldIndex = yieldIndex
+					perpetualsKeeper.SetPerpetualForTest(ctx, perpetual)
+				}
+			}
+
+			// Second update
+			for i, u := range tc.secondUpdates {
+				if u.SubaccountId == (types.SubaccountId{}) {
+					u.SubaccountId = subaccountId
+				}
+				tc.secondUpdates[i] = u
+			}
+
+			updateType = types.CollatCheck
+			if tc.secondUpdateType != types.UpdateTypeUnspecified {
+				updateType = tc.secondUpdateType
+			}
+			success, successPerUpdate, err = keeper.UpdateSubaccounts(ctx, tc.secondUpdates, updateType)
+			if tc.expectedErrSecondUpdate != nil {
+				require.ErrorIs(t, err, tc.expectedErrSecondUpdate)
+			} else {
+				require.NoError(t, err)
+				require.Equal(t, tc.expectedSuccessPerUpdateSecondUpdate, successPerUpdate)
+				require.Equal(t, tc.expectedSuccessSecondUpdate, success)
+			}
+
+			// Checks
+			newSubaccount := keeper.GetSubaccount(ctx, subaccountId)
+			require.Equal(t, len(newSubaccount.PerpetualPositions), len(tc.expectedPerpetualPositions))
+			for i, ep := range tc.expectedPerpetualPositions {
+				require.Equal(t, *ep, *newSubaccount.PerpetualPositions[i])
+			}
+			require.Equal(t, len(newSubaccount.AssetPositions), len(tc.expectedAssetPositions))
+			for i, ep := range tc.expectedAssetPositions {
+				require.Equal(t, *ep, *newSubaccount.AssetPositions[i])
+			}
+			if tc.expectedErrFirstUpdate == nil && tc.expectedErrSecondUpdate == nil {
+				require.Equal(t, 0, tc.postFirstUpdateGlobalAssetYieldIndex.Cmp(ratelimitkeeper.ConvertStringToBigRatWithPanicOnErr(newSubaccount.AssetYieldIndex)),
+					"Expected AssetYieldIndex %v. Got %v.", tc.postFirstUpdateGlobalAssetYieldIndex, newSubaccount.AssetYieldIndex,
+				)
+			}
+
+			for collateralPoolAddr, expectedTDaiBal := range tc.expectedCollateralPoolTDaiBalances {
+				TDaiBal := bankKeeper.GetBalance(
+					ctx,
+					sdk.MustAccAddressFromBech32(collateralPoolAddr),
+					asstypes.AssetTDai.Denom,
+				)
+				require.Equal(t,
+					sdk.NewCoin(asstypes.AssetTDai.Denom, sdkmath.NewInt(expectedTDaiBal)),
+					TDaiBal,
+				)
+			}
+
+			if tc.expectedTDaiYieldPoolBalance != nil {
+				TDaiBal := bankKeeper.GetBalance(
+					ctx,
+					accountKeeper.GetModuleAddress(ratelimittypes.TDaiPoolAccount),
+					asstypes.AssetTDai.Denom,
+				)
+				require.Equal(t,
+					sdk.NewCoin(asstypes.AssetTDai.Denom, sdkmath.NewIntFromBigInt(tc.expectedTDaiYieldPoolBalance)),
+					TDaiBal,
+				)
 			}
 		})
 	}

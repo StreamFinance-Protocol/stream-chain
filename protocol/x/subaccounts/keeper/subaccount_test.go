@@ -7403,6 +7403,7 @@ func TestUpdateSubaccountWithTwoSeparateUpdates(t *testing.T) {
 		// Only set when specified. Defaults to 0/1.
 		initialGlobalAssetYieldIndex         *big.Rat
 		postFirstUpdateGlobalAssetYieldIndex *big.Rat
+		postFirstUpdatePerpetualYieldIndices map[uint32]string
 		fundsInTDaiPool                      *big.Int
 
 		// subaccount state
@@ -7471,6 +7472,9 @@ func TestUpdateSubaccountWithTwoSeparateUpdates(t *testing.T) {
 				},
 			},
 			postFirstUpdateGlobalAssetYieldIndex: big.NewRat(3, 1),
+			postFirstUpdatePerpetualYieldIndices: map[uint32]string{
+				uint32(0): "2/1",
+			},
 			expectedSuccessSecondUpdate:          true,
 			expectedSuccessPerUpdateSecondUpdate: []types.UpdateResult{types.Success},
 			secondUpdates: []types.Update{
@@ -7490,7 +7494,7 @@ func TestUpdateSubaccountWithTwoSeparateUpdates(t *testing.T) {
 					PerpetualId:  uint32(0),
 					Quantums:     dtypes.NewInt(50_000_000), // 1.5 BTC
 					FundingIndex: dtypes.NewInt(0),
-					YieldIndex:   big.NewRat(0, 1).String(),
+					YieldIndex:   big.NewRat(2, 1).String(),
 				},
 			},
 			expectedAssetPositions: []*types.AssetPosition{
@@ -7633,6 +7637,16 @@ func TestUpdateSubaccountWithTwoSeparateUpdates(t *testing.T) {
 			// Update global asset yield index
 			if tc.postFirstUpdateGlobalAssetYieldIndex != nil {
 				rateLimitKeeper.SetAssetYieldIndex(ctx, tc.postFirstUpdateGlobalAssetYieldIndex)
+			}
+
+			if len(tc.postFirstUpdatePerpetualYieldIndices) > 0 {
+				for perpetualId, yieldIndex := range tc.postFirstUpdatePerpetualYieldIndices {
+					perpetual, err := perpetualsKeeper.GetPerpetual(ctx, perpetualId)
+					require.NoError(t, err)
+
+					perpetual.YieldIndex = yieldIndex
+					perpetualsKeeper.SetPerpetualForTest(ctx, perpetual)
+				}
 			}
 
 			// Second update

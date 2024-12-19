@@ -789,7 +789,7 @@ var (
 		YieldIndex:   big.NewRat(0, 1).String(),
 	}
 
-	BtcBtc_SmallMarginRequirement_CollatPool1_Params_Id8 = perptypes.PerpetualParams{
+	BtcBtc_SmallMarginRequirement_CollatPool1_Params_Id9 = perptypes.PerpetualParams{
 		Id:                9,
 		Ticker:            "BTC-BTC small margin requirement",
 		MarketId:          uint32(0),
@@ -800,8 +800,26 @@ var (
 		CollateralPoolId:  uint32(1),
 	}
 
-	BtcBtc_SmallMarginRequirement_CollatPool1_Id8 = perptypes.Perpetual{
-		Params:       BtcBtc_SmallMarginRequirement_CollatPool1_Params_Id8,
+	BtcBtc_SmallMarginRequirement_CollatPool1_Id9 = perptypes.Perpetual{
+		Params:       BtcBtc_SmallMarginRequirement_CollatPool1_Params_Id9,
+		FundingIndex: dtypes.ZeroInt(),
+		OpenInterest: dtypes.ZeroInt(),
+		YieldIndex:   big.NewRat(0, 1).String(),
+	}
+
+	BtcBtc_10_20MarginRequirement_CollatPool1_Params_Id10 = perptypes.PerpetualParams{
+		Id:                10,
+		Ticker:            "BTC-BTC 10/20 margin requirement",
+		MarketId:          uint32(0),
+		AtomicResolution:  int32(-8),
+		DefaultFundingPpm: int32(0),
+		LiquidityTier:     uint32(3),
+		DangerIndexPpm:    uint32(0),
+		CollateralPoolId:  uint32(1),
+	}
+
+	BtcBtc_10_20MarginRequirement_CollatPool1_Id10 = perptypes.Perpetual{
+		Params:       BtcBtc_10_20MarginRequirement_CollatPool1_Params_Id10,
 		FundingIndex: dtypes.ZeroInt(),
 		OpenInterest: dtypes.ZeroInt(),
 		YieldIndex:   big.NewRat(0, 1).String(),

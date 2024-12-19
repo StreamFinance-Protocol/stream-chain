@@ -330,10 +330,11 @@ func (s *CancelOrderIntegrationTestSuite) TestCLICancelPendingOrder() {
 	}
 
 	// Check that the `subaccounts` module account balance has not changed.
-	saModuleTDaiBalance, err := testutil_bank.GetModuleAccTDaiBalance(
+	saModuleTDaiBalance, err := testutil_bank.GetModuleAccAssetBalance(
 		val,
 		s.network.Config.Codec,
 		satypes.ModuleName,
+		"utdai",
 	)
 	s.Require().NoError(err)
 	s.Require().Equal(
@@ -341,10 +342,11 @@ func (s *CancelOrderIntegrationTestSuite) TestCLICancelPendingOrder() {
 		saModuleTDaiBalance,
 	)
 
-	distrModuleTDaiBalance, err := testutil_bank.GetModuleAccTDaiBalance(
+	distrModuleTDaiBalance, err := testutil_bank.GetModuleAccAssetBalance(
 		val,
 		s.network.Config.Codec,
 		distrtypes.ModuleName,
+		"utdai",
 	)
 
 	s.Require().NoError(err)
@@ -497,10 +499,11 @@ func (s *CancelOrderIntegrationTestSuite) TestCLICancelMatchingOrders() {
 	// Check that the `subaccounts` module account has expected remaining TDAI balance.
 	collateralPoolAddress := satypes.ModuleName + ":0"
 
-	saModuleTDaiBalance, err := testutil_bank.GetModuleAccTDaiBalance(
+	saModuleTDaiBalance, err := testutil_bank.GetModuleAccAssetBalance(
 		val,
 		s.network.Config.Codec,
 		satypes.ModuleName,
+		"utdai",
 	)
 
 	s.Require().NoError(err)
@@ -509,10 +512,11 @@ func (s *CancelOrderIntegrationTestSuite) TestCLICancelMatchingOrders() {
 		saModuleTDaiBalance,
 	)
 
-	collateralPoolModuleTDaiBalance, err := testutil_bank.GetModuleAccTDaiBalance(
+	collateralPoolModuleTDaiBalance, err := testutil_bank.GetModuleAccAssetBalance(
 		val,
 		s.network.Config.Codec,
 		collateralPoolAddress,
+		"utdai",
 	)
 
 	s.Require().NoError(err)
@@ -521,10 +525,11 @@ func (s *CancelOrderIntegrationTestSuite) TestCLICancelMatchingOrders() {
 		collateralPoolModuleTDaiBalance,
 	)
 
-	distrModuleTDaiBalance, err := testutil_bank.GetModuleAccTDaiBalance(
+	distrModuleTDaiBalance, err := testutil_bank.GetModuleAccAssetBalance(
 		val,
 		s.network.Config.Codec,
 		distrtypes.ModuleName,
+		"utdai",
 	)
 
 	s.Require().NoError(err)

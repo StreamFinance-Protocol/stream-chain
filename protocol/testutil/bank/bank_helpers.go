@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	sdkmath "cosmossdk.io/math"
-	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/constants"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/testutil"
 	"github.com/cosmos/cosmos-sdk/testutil/network"
@@ -15,12 +14,13 @@ import (
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 )
 
-// GetModuleAccTDaiBalance is a test utility function to query TDAI balance
+// GetModuleAccAssetBalance is a test utility function to query asset balance
 // of a module account from the bank module.
-func GetModuleAccTDaiBalance(
+func GetModuleAccAssetBalance(
 	val *network.Validator,
 	codec codec.Codec,
 	moduleName string,
+	assetDenom string,
 ) (
 	balance int64,
 	err error,
@@ -43,7 +43,7 @@ func GetModuleAccTDaiBalance(
 	}
 
 	for _, coin := range balRes.Balances {
-		if coin.Denom == constants.TDai.Denom {
+		if coin.Denom == assetDenom {
 			return coin.Amount.Int64(), nil
 		}
 	}

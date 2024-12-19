@@ -93,6 +93,10 @@ func CreateBankGenesisState(
 						"utdai",
 						10000000000,
 					),
+					sdk.NewInt64Coin(
+						"btc-denom",
+						10000000000,
+					),
 				},
 			},
 			{
@@ -126,6 +130,10 @@ func CreateBankGenesisStateForLiquidationTest(
 						"utdai",
 						1000000000000,
 					),
+					sdk.NewInt64Coin(
+						"btc-denom",
+						1000000000000,
+					),
 				},
 			},
 			{
@@ -133,6 +141,15 @@ func CreateBankGenesisStateForLiquidationTest(
 				Coins: []sdk.Coin{
 					sdk.NewInt64Coin(
 						"utdai",
+						1000000000000,
+					),
+				},
+			},
+			{
+				Address: "klyra1daqtvgfdcsgne505p4cltcwq5cfum94a7par8n",
+				Coins: []sdk.Coin{
+					sdk.NewInt64Coin(
+						"btc-denom",
 						1000000000000,
 					),
 				},

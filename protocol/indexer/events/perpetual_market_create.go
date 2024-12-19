@@ -19,6 +19,7 @@ func NewPerpetualMarketCreateEvent(
 	stepBaseQuantums uint64,
 	liquidityTier uint32,
 	dangerIndexPpm uint32,
+	collateralPoolId uint32,
 ) *PerpetualMarketCreateEventV2 {
 	return &PerpetualMarketCreateEventV2{
 		Id:                        id,
@@ -32,5 +33,6 @@ func NewPerpetualMarketCreateEvent(
 		StepBaseQuantums:          stepBaseQuantums,
 		LiquidityTier:             liquidityTier,
 		DangerIndexPpm:            dangerIndexPpm,
+		CollateralPoolId:          collateralPoolId,
 	}
 }

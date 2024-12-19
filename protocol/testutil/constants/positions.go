@@ -121,13 +121,25 @@ var (
 		FundingIndex: dtypes.NewInt(0),
 		YieldIndex:   big.NewRat(0, 1).String(),
 	}
+	PerpetualPosition_MaxUintIsoBtcLong = satypes.PerpetualPosition{
+		PerpetualId:  5,
+		Quantums:     dtypes.NewIntFromUint64(math.MaxUint64),
+		FundingIndex: dtypes.NewInt(0),
+		YieldIndex:   big.NewRat(0, 1).String(),
+	}
+	PerpetualPosition_MaxUintIsoBtcShort = satypes.PerpetualPosition{
+		PerpetualId:  5,
+		Quantums:     dtypes.NewIntFromBigInt(BigNegMaxUint64()),
+		FundingIndex: dtypes.NewInt(0),
+		YieldIndex:   big.NewRat(0, 1).String(),
+	}
 	PerpetualPosition_OneIsoBtcLong_CollatPool4 = satypes.PerpetualPosition{
 		PerpetualId:  6,
 		Quantums:     dtypes.NewInt(10_000_000),
 		FundingIndex: dtypes.NewInt(0),
 		YieldIndex:   big.NewRat(0, 1).String(),
 	}
-	// Short position for arbitrary isolated market
+	// Short positions for isolated markets
 	PerpetualPosition_OneISOShort = satypes.PerpetualPosition{
 		PerpetualId:  3,
 		Quantums:     dtypes.NewInt(-100_000_000),
@@ -136,6 +148,12 @@ var (
 	}
 	PerpetualPosition_OneISO2Short = satypes.PerpetualPosition{
 		PerpetualId:  4,
+		Quantums:     dtypes.NewInt(-10_000_000),
+		FundingIndex: dtypes.NewInt(0),
+		YieldIndex:   big.NewRat(0, 1).String(),
+	}
+	PerpetualPosition_OneIsoBtcLongShort = satypes.PerpetualPosition{
+		PerpetualId:  5,
 		Quantums:     dtypes.NewInt(-10_000_000),
 		FundingIndex: dtypes.NewInt(0),
 		YieldIndex:   big.NewRat(0, 1).String(),

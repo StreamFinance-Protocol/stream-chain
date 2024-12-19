@@ -4148,6 +4148,157 @@ func TestGetBestPerpetualPositionToLiquidate(t *testing.T) {
 				),
 			),
 		},
+		`Full position size is returned when subaccount has one perpetual long
+		position with non-TDAI backed perpetual`: {
+			perpetualPositions: []*satypes.PerpetualPosition{
+				&constants.PerpetualPosition_OneIsoBtcLong,
+			},
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcUsd_20PercentInitial_10PercentMaintenance,
+				constants.EthUsd_20PercentInitial_10PercentMaintenance,
+				constants.SolUsd_20PercentInitial_10PercentMaintenance,
+				constants.IsoUsd_IsolatedMarket,
+				constants.Iso2Usd_IsolatedMarket,
+				constants.IsoBtc_CollatPool1_Id5,
+			},
+			liquidationConfig: constants.LiquidationsConfig_No_Limit,
+
+			clobPairs: []types.ClobPair{
+				constants.ClobPair_Btc,
+				constants.ClobPair_Eth,
+				constants.ClobPair_2_Sol,
+				constants.ClobPair_3_Iso,
+				constants.ClobPair_4_Iso2,
+				constants.ClobPair_5_IsoBtc,
+			},
+
+			expectedClobPair: constants.ClobPair_5_IsoBtc,
+			expectedQuantums: new(big.Int).Neg(
+				constants.PerpetualPosition_OneIsoBtcLong.GetBigQuantums(),
+			),
+		},
+		`Full position is returned when position size of non-TDAI backed perpetual is smaller than StepBaseQuantums`: {
+			perpetualPositions: []*satypes.PerpetualPosition{
+				{
+					PerpetualId: constants.PerpetualPosition_OneIsoBtcLong.PerpetualId,
+					Quantums:    dtypes.NewInt(1),
+				},
+			},
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcUsd_20PercentInitial_10PercentMaintenance,
+				constants.EthUsd_20PercentInitial_10PercentMaintenance,
+				constants.SolUsd_20PercentInitial_10PercentMaintenance,
+				constants.IsoUsd_IsolatedMarket,
+				constants.Iso2Usd_IsolatedMarket,
+				constants.IsoBtc_CollatPool1_Id5,
+			},
+			liquidationConfig: types.LiquidationsConfig{
+				InsuranceFundFeePpm: 5_000,
+				ValidatorFeePpm:     0,
+				LiquidityFeePpm:     0,
+				FillablePriceConfig: constants.FillablePriceConfig_Default,
+			},
+
+			clobPairs: []types.ClobPair{
+				constants.ClobPair_Btc,
+				constants.ClobPair_Eth,
+				constants.ClobPair_2_Sol,
+				constants.ClobPair_3_Iso,
+				constants.ClobPair_4_Iso2,
+				constants.ClobPair_5_IsoBtc,
+			},
+
+			expectedClobPair: constants.ClobPair_5_IsoBtc,
+			expectedQuantums: new(big.Int).SetInt64(-1),
+		},
+		`Full position size is returned when subaccount has one perpetual short position with non-TDAI backed perpetual`: {
+			perpetualPositions: []*satypes.PerpetualPosition{
+				&constants.PerpetualPosition_OneIsoBtcLongShort,
+			},
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcUsd_20PercentInitial_10PercentMaintenance,
+				constants.EthUsd_20PercentInitial_10PercentMaintenance,
+				constants.SolUsd_20PercentInitial_10PercentMaintenance,
+				constants.IsoUsd_IsolatedMarket,
+				constants.Iso2Usd_IsolatedMarket,
+				constants.IsoBtc_CollatPool1_Id5,
+			},
+			liquidationConfig: constants.LiquidationsConfig_No_Limit,
+
+			clobPairs: []types.ClobPair{
+				constants.ClobPair_Btc,
+				constants.ClobPair_Eth,
+				constants.ClobPair_2_Sol,
+				constants.ClobPair_3_Iso,
+				constants.ClobPair_4_Iso2,
+				constants.ClobPair_5_IsoBtc,
+			},
+
+			expectedClobPair: constants.ClobPair_5_IsoBtc,
+			expectedQuantums: new(big.Int).Neg(
+				constants.PerpetualPosition_OneIsoBtcLongShort.GetBigQuantums(),
+			),
+		},
+		`Full position size of max uint64 of perpetual and CLOB pair are returned when subaccount
+		has one long perpetual position at max position size with non-TDAI backed perpetual`: {
+			perpetualPositions: []*satypes.PerpetualPosition{
+				&constants.PerpetualPosition_MaxUintIsoBtcLong,
+			},
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcUsd_20PercentInitial_10PercentMaintenance,
+				constants.EthUsd_20PercentInitial_10PercentMaintenance,
+				constants.SolUsd_20PercentInitial_10PercentMaintenance,
+				constants.IsoUsd_IsolatedMarket,
+				constants.Iso2Usd_IsolatedMarket,
+				constants.IsoBtc_CollatPool1_Id5,
+			},
+			liquidationConfig: constants.LiquidationsConfig_No_Limit,
+
+			clobPairs: []types.ClobPair{
+				constants.ClobPair_Btc,
+				constants.ClobPair_Eth,
+				constants.ClobPair_2_Sol,
+				constants.ClobPair_3_Iso,
+				constants.ClobPair_4_Iso2,
+				constants.ClobPair_5_IsoBtc,
+			},
+
+			expectedClobPair: constants.ClobPair_5_IsoBtc,
+			expectedQuantums: new(big.Int).Neg(
+				new(big.Int).SetUint64(18446744073709551615),
+			),
+		},
+		`Full position size of negated max uint64 of perpetual and CLOB pair are returned when
+		subaccount has one short perpetual position at max position size with non-TDAI backed perpetual`: {
+			perpetualPositions: []*satypes.PerpetualPosition{
+				&constants.PerpetualPosition_MaxUintIsoBtcShort,
+			},
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcUsd_20PercentInitial_10PercentMaintenance,
+				constants.EthUsd_20PercentInitial_10PercentMaintenance,
+				constants.SolUsd_20PercentInitial_10PercentMaintenance,
+				constants.IsoUsd_IsolatedMarket,
+				constants.Iso2Usd_IsolatedMarket,
+				constants.IsoBtc_CollatPool1_Id5,
+			},
+			liquidationConfig: constants.LiquidationsConfig_No_Limit,
+
+			clobPairs: []types.ClobPair{
+				constants.ClobPair_Btc,
+				constants.ClobPair_Eth,
+				constants.ClobPair_2_Sol,
+				constants.ClobPair_3_Iso,
+				constants.ClobPair_4_Iso2,
+				constants.ClobPair_5_IsoBtc,
+			},
+
+			expectedClobPair: constants.ClobPair_5_IsoBtc,
+			expectedQuantums: new(big.Int).Neg(
+				big_testutil.MustFirst(
+					new(big.Int).SetString("-18446744073709551615", 10),
+				),
+			),
+		},
 		// `Handles non-TDAI collateral pool correctly`: {
 		// 	perpetualPositions: []*satypes.PerpetualPosition{
 		// 		&constants.PerpetualPosition_OneIsoBtcLong,

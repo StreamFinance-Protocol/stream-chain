@@ -174,7 +174,6 @@ func (k Keeper) MaybeGetLiquidationOrder(
 		metrics.ConstructLiquidationOrder,
 	)
 
-	// The subaccount is liquidatable. Get the perpetual position and position size to liquidate.
 	perpetualId, err := k.GetBestPerpetualPositionToLiquidate(ctx, subaccountId)
 	if err != nil {
 		return nil, err

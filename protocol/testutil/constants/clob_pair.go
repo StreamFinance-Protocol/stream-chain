@@ -127,6 +127,18 @@ var (
 		QuantumConversionExponent: -8,
 		Status:                    clobtypes.ClobPair_STATUS_PAUSED,
 	}
+	ClobPair_2_Sol = clobtypes.ClobPair{
+		Id: 2,
+		Metadata: &clobtypes.ClobPair_PerpetualClobMetadata{
+			PerpetualClobMetadata: &clobtypes.PerpetualClobMetadata{
+				PerpetualId: 2,
+			},
+		},
+		StepBaseQuantums:          5,
+		SubticksPerTick:           5,
+		QuantumConversionExponent: -8,
+		Status:                    clobtypes.ClobPair_STATUS_ACTIVE,
+	}
 	ClobPair_3_Iso = clobtypes.ClobPair{
 		Id: 3,
 		Metadata: &clobtypes.ClobPair_PerpetualClobMetadata{

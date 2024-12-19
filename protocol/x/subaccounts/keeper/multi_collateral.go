@@ -74,5 +74,13 @@ func (k Keeper) isValidAssetUpdate(
 		}
 	}
 
+	// handle existing assets when opening a new position
+	for _, existingAsset := range settledUpdate.SettledSubaccount.AssetPositions {
+		_, ok := supportedAssetIds[existingAsset.AssetId]
+		if !ok {
+			return types.ViolatesMultiCollateralConstraints, nil
+		}
+	}
+
 	return types.Success, nil
 }

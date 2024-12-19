@@ -1249,6 +1249,7 @@ func (k Keeper) GetMaxQuantumsInsuranceDelta(
 	if err != nil {
 		return nil, err
 	}
+
 	bigCurrentInsuranceFundLost, err := k.GetCumulativeInsuranceFundDelta(ctx, perpetualId)
 	if err != nil {
 		return nil, err
@@ -1427,20 +1428,24 @@ func (k Keeper) CheckInsuranceFundLimits(
 	perpetualId uint32,
 	insuranceFundDelta *big.Int,
 ) error {
-	if insuranceFundDelta.Sign() == -1 {
-		bigMaxQuantumsInsuranceLost, err := k.GetMaxQuantumsInsuranceDelta(ctx, perpetualId)
-		if err != nil {
-			return err
-		}
-		if insuranceFundDelta.CmpAbs(bigMaxQuantumsInsuranceLost) > 0 {
-			return errorsmod.Wrapf(
-				types.ErrLiquidationExceedsMaxInsuranceLost,
-				"Max Insurance Lost: %v, Insurance Lost: %v",
-				bigMaxQuantumsInsuranceLost,
-				insuranceFundDelta,
-			)
-		}
+	if insuranceFundDelta.Sign() != -1 {
+		return nil
 	}
+
+	bigMaxQuantumsInsuranceLost, err := k.GetMaxQuantumsInsuranceDelta(ctx, perpetualId)
+	if err != nil {
+		return err
+	}
+
+	if insuranceFundDelta.CmpAbs(bigMaxQuantumsInsuranceLost) > 0 {
+		return errorsmod.Wrapf(
+			types.ErrLiquidationExceedsMaxInsuranceLost,
+			"Max Insurance Lost: %v, Insurance Lost: %v",
+			bigMaxQuantumsInsuranceLost,
+			insuranceFundDelta,
+		)
+	}
+
 	return nil
 }
 

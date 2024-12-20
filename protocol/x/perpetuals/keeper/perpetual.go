@@ -1847,7 +1847,7 @@ func (k Keeper) UpsertCollateralPool(
 				indexerevents.NewCollateralPoolCreateEvent(
 					collateralPoolId,
 					maxCumulativeInsuranceFundDeltaPerBlock,
-					multiCollateralAssets,
+					multiCollateralAssets.MultiCollateralAssets,
 					quoteAssetId,
 				),
 			),

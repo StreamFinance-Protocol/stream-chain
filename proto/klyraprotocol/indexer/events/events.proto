@@ -6,7 +6,6 @@ import "gogoproto/gogo.proto";
 import "klyraprotocol/indexer/shared/removal_reason.proto";
 import "klyraprotocol/indexer/protocol/v1/clob.proto";
 import "klyraprotocol/indexer/protocol/v1/subaccount.proto";
-import "klyraprotocol/perpetuals/perpetual.proto";
 
 
 option go_package = "github.com/StreamFinance-Protocol/stream-chain/protocol/indexer/events";
@@ -370,7 +369,7 @@ message CollateralPoolCreateEvent {
   uint64 max_cumulative_insurance_fund_delta_per_block = 2;
 
   // The multi collateral assets for the collateral pool.
-  klyraprotocol.perpetuals.MultiCollateralAssetsArray multi_collateral_assets = 3;
+  repeated uint32 multi_collateral_assets = 3;
 
   // The id of the quote asset.
   uint32 quote_asset_id = 4;

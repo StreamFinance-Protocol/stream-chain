@@ -13,6 +13,7 @@ const (
 	SubtypeStatefulOrder      = "stateful_order"
 	SubtypeAsset              = "asset"
 	SubtypePerpetualMarket    = "perpetual_market"
+	SubtypeCollateralPool     = "collateral_pool"
 	SubtypeLiquidityTier      = "liquidity_tier"
 	SubtypeUpdatePerpetual    = "update_perpetual"
 	SubtypeUpdateClobPair     = "update_clob_pair"
@@ -31,6 +32,7 @@ const (
 	StatefulOrderEventVersion     uint32 = 1
 	AssetEventVersion             uint32 = 1
 	PerpetualMarketEventVersion   uint32 = 2
+	CollateralPoolEventVersion    uint32 = 1
 	LiquidityTierEventVersion     uint32 = 2
 	UpdatePerpetualEventVersion   uint32 = 1
 	UpdateClobPairEventVersion    uint32 = 1
@@ -48,6 +50,7 @@ var OnChainEventSubtypes = []string{
 	SubtypeStatefulOrder,
 	SubtypeAsset,
 	SubtypePerpetualMarket,
+	SubtypeCollateralPool,
 	SubtypeLiquidityTier,
 	SubtypeUpdatePerpetual,
 	SubtypeUpdateClobPair,

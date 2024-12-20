@@ -150,7 +150,7 @@ const GenesisState = `{
             },
             {
               "denom": "btc-denom",
-              "amount": "100000000000000000"
+              "amount": "500000000000000000"
             }
           ]
         },
@@ -1566,11 +1566,6 @@ const GenesisState = `{
               "asset_id": 0,
               "index": 0,
               "quantums": "100000000000000000"
-            },
-            {
-              "asset_id": 1,
-              "index": 0,
-              "quantums": "1000000000"
             }
           ],
           "id": {
@@ -1583,18 +1578,43 @@ const GenesisState = `{
         {
           "asset_positions": [
             {
+              "asset_id": 1,
+              "index": 0,
+              "quantums": "100000000000000000"
+            }
+          ],
+          "id": {
+            "number": 11,
+            "owner": "klyra199tqg4wdlnu4qjlxchpd7seg454937hju8xa57"
+          },
+          "margin_enabled": true,
+          "asset_yield_index": "1/1"
+        },
+        {
+          "asset_positions": [
+            {
               "asset_id": 0,
               "index": 0,
               "quantums": "100000000000000000"
-            },
-            {
-              "asset_id": 1,
-              "index": 0,
-              "quantums": "1000000000"
             }
           ],
           "id": {
             "number": 0,
+            "owner": "klyra10fx7sy6ywd5senxae9dwytf8jxek3t2g8gx9ym"
+          },
+          "margin_enabled": true,
+          "asset_yield_index": "1/1"
+        },
+        {
+          "asset_positions": [
+            {
+              "asset_id": 1,
+              "index": 0,
+              "quantums": "100000000000000000"
+            }
+          ],
+          "id": {
+            "number": 11,
             "owner": "klyra10fx7sy6ywd5senxae9dwytf8jxek3t2g8gx9ym"
           },
           "margin_enabled": true,
@@ -1648,6 +1668,21 @@ const GenesisState = `{
         {
           "asset_positions": [
             {
+              "asset_id": 1,
+              "index": 0,
+              "quantums": "100000000000000000"
+            }
+          ],
+          "id": {
+            "number": 11,
+            "owner": "klyra1wau5mja7j7zdavtfq9lu7ejef05hm6ffxz2hcc"
+          },
+          "margin_enabled": true,
+          "asset_yield_index": "1/1"
+        },
+        {
+          "asset_positions": [
+            {
               "asset_id": 0,
               "index": 0,
               "quantums": "900000000000000000"
@@ -1655,6 +1690,21 @@ const GenesisState = `{
           ],
           "id": {
             "number": 0,
+            "owner": "klyra1nzuttarf5k2j0nug5yzhr6p74t9avehn6x2c0s"
+          },
+          "margin_enabled": true,
+          "asset_yield_index": "1/1"
+        },
+        {
+          "asset_positions": [
+            {
+              "asset_id": 1,
+              "index": 0,
+              "quantums": "100000000000000000"
+            }
+          ],
+          "id": {
+            "number": 11,
             "owner": "klyra1nzuttarf5k2j0nug5yzhr6p74t9avehn6x2c0s"
           },
           "margin_enabled": true,

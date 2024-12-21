@@ -76,6 +76,16 @@ var (
 		},
 		testapp.DefaultGenesis(),
 	))
+	PlaceOrder_Alice_Num11_Id0_Clob2_Buy5_Price10_GTB20 = *clobtypes.NewMsgPlaceOrder(testapp.MustScaleOrder(
+		clobtypes.Order{
+			OrderId:      clobtypes.OrderId{SubaccountId: constants.Alice_Num11, ClientId: 0, ClobPairId: 2},
+			Side:         clobtypes.Order_SIDE_BUY,
+			Quantums:     5,
+			Subticks:     10,
+			GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
+		},
+		testapp.DefaultGenesis(),
+	))
 	PlaceOrder_Alice_Num0_Id0_Clob0_Buy5_Price10_GTB23 = *clobtypes.NewMsgPlaceOrder(testapp.MustScaleOrder(
 		clobtypes.Order{
 			OrderId:      clobtypes.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 0, ClobPairId: 0},
@@ -198,6 +208,16 @@ var (
 		},
 		testapp.DefaultGenesis(),
 	))
+	PlaceOrder_Alice_Num11_Id0_Clob2_Buy7_Price10_GTB21 = *clobtypes.NewMsgPlaceOrder(testapp.MustScaleOrder(
+		clobtypes.Order{
+			OrderId:      clobtypes.OrderId{SubaccountId: constants.Alice_Num11, ClientId: 0, ClobPairId: 2},
+			Side:         clobtypes.Order_SIDE_BUY,
+			Quantums:     7,
+			Subticks:     10,
+			GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 21},
+		},
+		testapp.DefaultGenesis(),
+	))
 	PlaceOrder_Alice_Num2_Id2_Clob0_Buy7_Price10_GTB21 = *clobtypes.NewMsgPlaceOrder(testapp.MustScaleOrder(
 		clobtypes.Order{
 			OrderId:      clobtypes.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 0, ClobPairId: 2},
@@ -212,6 +232,16 @@ var (
 	PlaceOrder_Alice_Num0_Id0_Clob0_Sell6_Price10_GTB21 = *clobtypes.NewMsgPlaceOrder(testapp.MustScaleOrder(
 		clobtypes.Order{
 			OrderId:      clobtypes.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 0, ClobPairId: 0},
+			Side:         clobtypes.Order_SIDE_SELL,
+			Quantums:     6,
+			Subticks:     10,
+			GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 21},
+		},
+		testapp.DefaultGenesis(),
+	))
+	PlaceOrder_Alice_Num11_Id0_Clob2_Sell6_Price10_GTB21 = *clobtypes.NewMsgPlaceOrder(testapp.MustScaleOrder(
+		clobtypes.Order{
+			OrderId:      clobtypes.OrderId{SubaccountId: constants.Alice_Num11, ClientId: 0, ClobPairId: 2},
 			Side:         clobtypes.Order_SIDE_SELL,
 			Quantums:     6,
 			Subticks:     10,

@@ -40,10 +40,6 @@ func (k Keeper) IsValidMultiCollateralUpdate(
 	perpIdToParams map[uint32]perptypes.PerpetualParams,
 ) (types.UpdateResult, error) {
 
-	if len(settledUpdate.AssetUpdates) == 0 {
-		return types.Success, nil
-	}
-
 	if len(settledUpdate.PerpetualUpdates) == 0 && len(settledUpdate.SettledSubaccount.PerpetualPositions) == 0 {
 		return types.Success, nil
 	}
@@ -69,6 +65,14 @@ func (k Keeper) isValidAssetUpdate(
 	supportedAssetIds := getValidAssetIdMap(collateralPool.MultiCollateralAssets.MultiCollateralAssets)
 	for _, assetUpdate := range settledUpdate.AssetUpdates {
 		_, ok := supportedAssetIds[assetUpdate.AssetId]
+		if !ok {
+			return types.ViolatesMultiCollateralConstraints, nil
+		}
+	}
+
+	// handle existing assets when opening a new position
+	for _, existingAsset := range settledUpdate.SettledSubaccount.AssetPositions {
+		_, ok := supportedAssetIds[existingAsset.AssetId]
 		if !ok {
 			return types.ViolatesMultiCollateralConstraints, nil
 		}

@@ -211,4 +211,16 @@ var (
 		QuantumConversionExponent: -8,
 		Status:                    clobtypes.ClobPair_STATUS_ACTIVE,
 	}
+	ClobPair_BtcBtc = clobtypes.ClobPair{
+		Id: 9,
+		Metadata: &clobtypes.ClobPair_PerpetualClobMetadata{
+			PerpetualClobMetadata: &clobtypes.PerpetualClobMetadata{
+				PerpetualId: 10,
+			},
+		},
+		StepBaseQuantums:          5,
+		SubticksPerTick:           5,
+		QuantumConversionExponent: -8,
+		Status:                    clobtypes.ClobPair_STATUS_ACTIVE,
+	}
 )

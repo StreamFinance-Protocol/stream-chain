@@ -14,6 +14,7 @@ export interface PerpetualMarketCreateObject {
   quantumConversionExponent: number;
   atomicResolution: number;
   dangerIndexPpm: number;
+  collateralPoolId: number;
   subticksPerTick: number;
   stepBaseQuantums: number;
   liquidityTierId: number;
@@ -55,6 +56,7 @@ export enum PerpetualMarketColumns {
   quantumConversionExponent = 'quantumConversionExponent',
   atomicResolution = 'atomicResolution',
   dangerIndexPpm = 'dangerIndexPpm',
+  collateralPoolId = 'collateralPoolId',
   subticksPerTick = 'subticksPerTick',
   stepBaseQuantums = 'stepBaseQuantums',
   liquidityTierId = 'liquidityTierId',
@@ -69,4 +71,3 @@ export enum PerpetualMarketStatus {
   INITIALIZING = 'INITIALIZING',
   FINAL_SETTLEMENT = 'FINAL_SETTLEMENT',
 }
-

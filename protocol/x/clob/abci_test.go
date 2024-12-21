@@ -707,6 +707,7 @@ func TestEndBlocker_Success(t *testing.T) {
 						constants.ClobPair_Btc.StepBaseQuantums,
 						constants.BtcUsd_20PercentInitial_10PercentMaintenance.Params.LiquidityTier,
 						constants.BtcUsd_20PercentInitial_10PercentMaintenance.Params.DangerIndexPpm,
+						constants.BtcUsd_20PercentInitial_10PercentMaintenance.Params.CollateralPoolId,
 					),
 				),
 			).Once().Return()
@@ -740,6 +741,7 @@ func TestEndBlocker_Success(t *testing.T) {
 						constants.ClobPair_Eth.StepBaseQuantums,
 						constants.EthUsd_20PercentInitial_10PercentMaintenance.Params.LiquidityTier,
 						constants.EthUsd_20PercentInitial_10PercentMaintenance.Params.DangerIndexPpm,
+						constants.EthUsd_20PercentInitial_10PercentMaintenance.Params.CollateralPoolId,
 					),
 				),
 			).Once().Return()

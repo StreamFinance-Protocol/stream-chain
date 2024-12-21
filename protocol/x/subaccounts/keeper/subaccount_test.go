@@ -565,7 +565,7 @@ func TestUpdateSubaccounts(t *testing.T) {
 			expectedSuccess:          true,
 			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
 			perpetuals: []perptypes.Perpetual{
-				constants.BtcBtc_SmallMarginRequirement_CollatPool1_Id8,
+				constants.BtcBtc_SmallMarginRequirement_CollatPool1_Id9,
 			},
 			perpetualPositions: []*types.PerpetualPosition{
 				{
@@ -669,7 +669,7 @@ func TestUpdateSubaccounts(t *testing.T) {
 			expectedSuccess:          true,
 			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
 			perpetuals: []perptypes.Perpetual{
-				constants.BtcBtc_SmallMarginRequirement_CollatPool1_Id8,
+				constants.BtcBtc_SmallMarginRequirement_CollatPool1_Id9,
 			},
 			newFundingIndices: []*big.Int{big.NewInt(-10)},
 			perpetualPositions: []*types.PerpetualPosition{
@@ -991,7 +991,7 @@ func TestUpdateSubaccounts(t *testing.T) {
 			expectedSuccessPerUpdate: []types.UpdateResult{types.ViolatesCollateralPoolConstraints},
 			perpetuals: []perptypes.Perpetual{
 				constants.BtcUsd_NoMarginRequirement,
-				constants.BtcBtc_SmallMarginRequirement_CollatPool1_Id8,
+				constants.BtcBtc_SmallMarginRequirement_CollatPool1_Id9,
 			},
 			perpetualPositions: []*types.PerpetualPosition{
 				{
@@ -1102,7 +1102,7 @@ func TestUpdateSubaccounts(t *testing.T) {
 			expectedSuccess:          true,
 			expectedSuccessPerUpdate: []types.UpdateResult{types.Success},
 			perpetuals: []perptypes.Perpetual{
-				constants.BtcBtc_SmallMarginRequirement_CollatPool1_Id8,
+				constants.BtcBtc_SmallMarginRequirement_CollatPool1_Id9,
 			},
 			perpetualPositions: []*types.PerpetualPosition{
 				{
@@ -1163,7 +1163,7 @@ func TestUpdateSubaccounts(t *testing.T) {
 			expectedSuccessPerUpdate: []types.UpdateResult{types.ViolatesCollateralPoolConstraints},
 			perpetuals: []perptypes.Perpetual{
 				constants.BtcUsd_NoMarginRequirement,
-				constants.BtcBtc_SmallMarginRequirement_CollatPool1_Id8,
+				constants.BtcBtc_SmallMarginRequirement_CollatPool1_Id9,
 			},
 			perpetualPositions: []*types.PerpetualPosition{
 				{
@@ -1215,7 +1215,7 @@ func TestUpdateSubaccounts(t *testing.T) {
 			expectedSuccessPerUpdate: []types.UpdateResult{types.ViolatesCollateralPoolConstraints},
 			perpetuals: []perptypes.Perpetual{
 				constants.BtcUsd_NoMarginRequirement,
-				constants.BtcBtc_SmallMarginRequirement_CollatPool1_Id8,
+				constants.BtcBtc_SmallMarginRequirement_CollatPool1_Id9,
 			},
 			perpetualPositions: []*types.PerpetualPosition{
 				{
@@ -3679,9 +3679,9 @@ func TestUpdateSubaccounts(t *testing.T) {
 			},
 			perpetuals: []perptypes.Perpetual{
 				{
-					Params:       constants.BtcBtc_SmallMarginRequirement_CollatPool1_Id8.Params,
-					FundingIndex: constants.BtcBtc_SmallMarginRequirement_CollatPool1_Id8.FundingIndex,
-					OpenInterest: constants.BtcBtc_SmallMarginRequirement_CollatPool1_Id8.OpenInterest,
+					Params:       constants.BtcBtc_SmallMarginRequirement_CollatPool1_Id9.Params,
+					FundingIndex: constants.BtcBtc_SmallMarginRequirement_CollatPool1_Id9.FundingIndex,
+					OpenInterest: constants.BtcBtc_SmallMarginRequirement_CollatPool1_Id9.OpenInterest,
 					YieldIndex:   big.NewRat(1, 1).String(),
 				},
 			},
@@ -3809,7 +3809,7 @@ func TestUpdateSubaccounts(t *testing.T) {
 				types.CollateralPoolZeroAddress.String(): 100_000_000_000,
 			},
 			perpetuals: []perptypes.Perpetual{
-				constants.BtcBtc_SmallMarginRequirement_CollatPool1_Id8,
+				constants.BtcBtc_SmallMarginRequirement_CollatPool1_Id9,
 			},
 			perpetualPositions: []*types.PerpetualPosition{
 				{
@@ -4054,7 +4054,7 @@ func TestUpdateSubaccounts(t *testing.T) {
 			globalAssetYieldIndex:     big.NewRat(2, 1),
 			fundsInTDaiPool:           big.NewInt(200_000_000_000),
 			perpetuals: []perptypes.Perpetual{
-				constants.BtcBtc_SmallMarginRequirement_CollatPool1_Id8,
+				constants.BtcBtc_SmallMarginRequirement_CollatPool1_Id9,
 			},
 			perpetualPositions: []*types.PerpetualPosition{
 				{

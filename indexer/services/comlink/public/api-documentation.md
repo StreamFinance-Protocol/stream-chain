@@ -3595,6 +3595,7 @@ func main() {
       "openInterest": "string",
       "atomicResolution": 0.1,
       "dangerIndexPpm": 0.1,
+      "collateralPoolId": 0.1,
       "quantumConversionExponent": 0.1,
       "tickSize": "string",
       "stepSize": "string",
@@ -3620,6 +3621,7 @@ func main() {
       "openInterest": "string",
       "atomicResolution": 0.1,
       "dangerIndexPpm": 0.1,
+      "collateralPoolId": 0.1,
       "quantumConversionExponent": 0.1,
       "tickSize": "string",
       "stepSize": "string",
@@ -3824,9 +3826,9 @@ func main() {
       "sumClose": "string",
       "netFunding": "string",
       "unrealizedPnl": "string",
+      "perpYieldIndex": "string",
       "closedAt": "string",
-      "exitPrice": "string",
-      "perpYieldIndex": "string"
+      "exitPrice": "string"
     }
   ]
 }
@@ -5801,24 +5803,6 @@ This operation does not require authentication
 |*anonymous*|DELEVERAGED|
 |*anonymous*|OFFSETTING|
 
-```json
-"PERPETUAL"
-
-```
-
-### Properties
-
-|Name|Type|Required|Restrictions|Description|
-|---|---|---|---|---|
-|*anonymous*|string|false|none|none|
-
-#### Enumerated Values
-
-|Property|Value|
-|---|---|
-|*anonymous*|PERPETUAL|
-|*anonymous*|SPOT|
-
 ## FillResponseObject
 
 <a id="schemafillresponseobject"></a>
@@ -6330,19 +6314,6 @@ or
 |*anonymous*|INITIALIZING|
 |*anonymous*|FINAL_SETTLEMENT|
 
-### Properties
-
-|Name|Type|Required|Restrictions|Description|
-|---|---|---|---|---|
-|*anonymous*|string|false|none|none|
-
-#### Enumerated Values
-
-|Property|Value|
-|---|---|
-|*anonymous*|CROSS|
-|*anonymous*|ISOLATED|
-
 ## PerpetualMarketResponseObject
 
 <a id="schemaperpetualmarketresponseobject"></a>
@@ -6366,6 +6337,7 @@ or
   "openInterest": "string",
   "atomicResolution": 0.1,
   "dangerIndexPpm": 0.1,
+  "collateralPoolId": 0.1,
   "quantumConversionExponent": 0.1,
   "tickSize": "string",
   "stepSize": "string",
@@ -6397,6 +6369,7 @@ or
 |openInterest|string|true|none|none|
 |atomicResolution|number(double)|true|none|none|
 |dangerIndexPpm|number(double)|true|none|none|
+|collateralPoolId|number(double)|true|none|none|
 |quantumConversionExponent|number(double)|true|none|none|
 |tickSize|string|true|none|none|
 |stepSize|string|true|none|none|
@@ -6406,6 +6379,7 @@ or
 |openInterestUpperCap|string|false|none|none|
 |baseOpenInterest|string|true|none|none|
 |perpYieldIndex|string|true|none|none|
+
 ## PerpetualMarketResponse
 
 <a id="schemaperpetualmarketresponse"></a>
@@ -6431,6 +6405,7 @@ or
       "openInterest": "string",
       "atomicResolution": 0.1,
       "dangerIndexPpm": 0.1,
+      "collateralPoolId": 0.1,
       "quantumConversionExponent": 0.1,
       "tickSize": "string",
       "stepSize": "string",
@@ -6456,6 +6431,7 @@ or
       "openInterest": "string",
       "atomicResolution": 0.1,
       "dangerIndexPpm": 0.1,
+      "collateralPoolId": 0.1,
       "quantumConversionExponent": 0.1,
       "tickSize": "string",
       "stepSize": "string",
@@ -6502,9 +6478,9 @@ or
       "sumClose": "string",
       "netFunding": "string",
       "unrealizedPnl": "string",
+      "perpYieldIndex": "string",
       "closedAt": "string",
-      "exitPrice": "string",
-      "perpYieldIndex": "string"
+      "exitPrice": "string"
     }
   ]
 }

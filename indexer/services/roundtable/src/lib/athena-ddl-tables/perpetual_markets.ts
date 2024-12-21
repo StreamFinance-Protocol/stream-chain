@@ -19,6 +19,7 @@ const RAW_TABLE_COLUMNS: string = `
   \`quantumConversionExponent\` int,
   \`atomicResolution\` int,
   \`dangerIndexPpm\` int,
+  \`collateralPoolId\` int,
   \`subticksPerTick\` int,
   \`stepBaseQuantums\` int,
   \`liquidityTierId\` int
@@ -37,17 +38,21 @@ const TABLE_COLUMNS: string = `
   "quantumConversionExponent",
   "atomicResolution",
   "dangerIndexPpm",
+  "collateralPoolId",
   "subticksPerTick",
   "stepBaseQuantums",
   "liquidityTierId"
 `;
 
-export function generateRawTable(tablePrefix: string, rdsExportIdentifier: string): string {
+export function generateRawTable(
+  tablePrefix: string,
+  rdsExportIdentifier: string
+): string {
   return getExternalAthenaTableCreationStatement(
     tablePrefix,
     rdsExportIdentifier,
     TABLE_NAME,
-    RAW_TABLE_COLUMNS,
+    RAW_TABLE_COLUMNS
   );
 }
 
@@ -55,6 +60,6 @@ export function generateTable(tablePrefix: string): string {
   return getAthenaTableCreationStatement(
     tablePrefix,
     TABLE_NAME,
-    TABLE_COLUMNS,
+    TABLE_COLUMNS
   );
 }

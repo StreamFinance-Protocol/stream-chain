@@ -21,6 +21,10 @@ var (
 		Owner:  types.MustBech32ifyAddressBytes(config.Bech32PrefixAccAddr, AliceAccAddress),
 		Number: 1,
 	}
+	Alice_Num11 = satypes.SubaccountId{
+		Owner:  types.MustBech32ifyAddressBytes(config.Bech32PrefixAccAddr, AliceAccAddress),
+		Number: 11,
+	}
 	Bob_Num0 = satypes.SubaccountId{
 		Owner:  types.MustBech32ifyAddressBytes(config.Bech32PrefixAccAddr, BobAccAddress),
 		Number: 0,
@@ -28,6 +32,10 @@ var (
 	Bob_Num1 = satypes.SubaccountId{
 		Owner:  types.MustBech32ifyAddressBytes(config.Bech32PrefixAccAddr, BobAccAddress),
 		Number: 1,
+	}
+	Bob_Num11 = satypes.SubaccountId{
+		Owner:  types.MustBech32ifyAddressBytes(config.Bech32PrefixAccAddr, BobAccAddress),
+		Number: 11,
 	}
 	Bob_Num2 = satypes.SubaccountId{
 		Owner:  types.MustBech32ifyAddressBytes(config.Bech32PrefixAccAddr, BobAccAddress),
@@ -45,6 +53,10 @@ var (
 		Owner:  types.MustBech32ifyAddressBytes(config.Bech32PrefixAccAddr, CarlAccAddress),
 		Number: 11,
 	}
+	Carl_Num11 = satypes.SubaccountId{
+		Owner:  types.MustBech32ifyAddressBytes(config.Bech32PrefixAccAddr, CarlAccAddress),
+		Number: 11,
+	}
 	Dave_Num0 = satypes.SubaccountId{
 		Owner:  types.MustBech32ifyAddressBytes(config.Bech32PrefixAccAddr, DaveAccAddress),
 		Number: 0,
@@ -56,5 +68,9 @@ var (
 	Dave_Num2 = satypes.SubaccountId{
 		Owner:  types.MustBech32ifyAddressBytes(config.Bech32PrefixAccAddr, DaveAccAddress),
 		Number: 2,
+	}
+	Dave_Num11 = satypes.SubaccountId{
+		Owner:  types.MustBech32ifyAddressBytes(config.Bech32PrefixAccAddr, DaveAccAddress),
+		Number: 11,
 	}
 )

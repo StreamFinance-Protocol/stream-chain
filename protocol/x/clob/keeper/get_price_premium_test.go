@@ -184,6 +184,7 @@ func TestGetPricePremiumForPerpetual(t *testing.T) {
 						tc.args.clobPair.StepBaseQuantums,
 						perpetual.Params.LiquidityTier,
 						perpetual.Params.DangerIndexPpm,
+						perpetual.Params.CollateralPoolId,
 					),
 				),
 			).Return()

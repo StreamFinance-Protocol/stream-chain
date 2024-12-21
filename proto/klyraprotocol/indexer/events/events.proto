@@ -412,6 +412,10 @@ message PerpetualMarketCreateEventV2 {
   // The danger index is used to prioritze certain accounts and positions in
   // liquidations
   uint32 danger_index_ppm = 11;
+
+  // The collateral pool id is used to signify which collateral pool this
+  // perpetual belongs to
+  uint32 collateral_pool_id = 12;
 }
 
 // LiquidityTierUpsertEventV1 message contains all the information to

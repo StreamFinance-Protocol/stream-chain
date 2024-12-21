@@ -53,8 +53,10 @@ export const createdHeight: string = '2';
 export const createdHeightPlusOne: string = '3';
 export const invalidTicker: string = 'INVALID-INVALID';
 export const klyraChain: string = 'klyra';
-export const defaultAddress: string = 'klyra1n88uc38xhjgxzw9nwre4ep2c8ga4fjxcttpsmz';
-export const blockedAddress: string = 'klyra1f9k5qldwmqrnwy8hcgp4fw6heuvszt35xeeywp';
+export const defaultAddress: string =
+  'klyra1n88uc38xhjgxzw9nwre4ep2c8ga4fjxcttpsmz';
+export const blockedAddress: string =
+  'klyra1f9k5qldwmqrnwy8hcgp4fw6heuvszt35xeeywp';
 export const zeroAssetYieldIndex: string = '0/1';
 export const oneAssetYieldIndex: string = '1/1';
 export const defaultZeroPerpYieldIndex: string = '0/1';
@@ -89,15 +91,15 @@ export const defaultWalletAddress: string = 'defaultWalletAddress';
 
 export const defaultSubaccountId: string = SubaccountTable.uuid(
   defaultAddress,
-  defaultSubaccount.subaccountNumber,
+  defaultSubaccount.subaccountNumber
 );
 export const defaultSubaccountId2: string = SubaccountTable.uuid(
   defaultAddress,
-  defaultSubaccount2.subaccountNumber,
+  defaultSubaccount2.subaccountNumber
 );
 export const defaultSubaccountId3: string = SubaccountTable.uuid(
   defaultAddress,
-  defaultSubaccount3.subaccountNumber,
+  defaultSubaccount3.subaccountNumber
 );
 
 export const isolatedSubaccount: SubaccountCreateObject = {
@@ -118,11 +120,11 @@ export const isolatedSubaccount2: SubaccountCreateObject = {
 
 export const isolatedSubaccountId: string = SubaccountTable.uuid(
   defaultAddress,
-  isolatedSubaccount.subaccountNumber,
+  isolatedSubaccount.subaccountNumber
 );
 export const isolatedSubaccountId2: string = SubaccountTable.uuid(
   defaultAddress,
-  isolatedSubaccount2.subaccountNumber,
+  isolatedSubaccount2.subaccountNumber
 );
 
 // ============== Assets ==============
@@ -157,7 +159,7 @@ export const defaultAssetPosition: AssetPositionCreateObject = {
 };
 export const defaultAssetPositionId: string = AssetPositionTable.uuid(
   defaultAssetPosition.subaccountId,
-  defaultAssetPosition.assetId,
+  defaultAssetPosition.assetId
 );
 export const defaultAssetPosition2: AssetPositionCreateObject = {
   subaccountId: defaultSubaccountId2,
@@ -167,7 +169,7 @@ export const defaultAssetPosition2: AssetPositionCreateObject = {
 };
 export const defaultAssetPositionId2: string = AssetPositionTable.uuid(
   defaultAssetPosition2.subaccountId,
-  defaultAssetPosition2.assetId,
+  defaultAssetPosition2.assetId
 );
 export const isolatedSubaccountAssetPosition: AssetPositionCreateObject = {
   subaccountId: isolatedSubaccountId,
@@ -175,10 +177,11 @@ export const isolatedSubaccountAssetPosition: AssetPositionCreateObject = {
   size: '5000',
   isLong: true,
 };
-export const isolatedSubaccountAssetPositionId: string = AssetPositionTable.uuid(
-  isolatedSubaccountAssetPosition.subaccountId,
-  isolatedSubaccountAssetPosition.assetId,
-);
+export const isolatedSubaccountAssetPositionId: string =
+  AssetPositionTable.uuid(
+    isolatedSubaccountAssetPosition.subaccountId,
+    isolatedSubaccountAssetPosition.assetId
+  );
 
 // ============== PerpetualMarkets ==============
 
@@ -196,6 +199,7 @@ export const defaultPerpetualMarket: PerpetualMarketCreateObject = {
   quantumConversionExponent: -8,
   atomicResolution: -10,
   dangerIndexPpm: 1000000,
+  collateralPoolId: 0,
   subticksPerTick: 100,
   stepBaseQuantums: 10,
   liquidityTierId: 0,
@@ -216,6 +220,7 @@ export const defaultPerpetualMarket2: PerpetualMarketCreateObject = {
   quantumConversionExponent: -6,
   atomicResolution: -18,
   dangerIndexPpm: 1000000,
+  collateralPoolId: 0,
   subticksPerTick: 10,
   stepBaseQuantums: 1,
   liquidityTierId: 0,
@@ -236,6 +241,8 @@ export const defaultPerpetualMarket3: PerpetualMarketCreateObject = {
   quantumConversionExponent: -16,
   atomicResolution: -2,
   dangerIndexPpm: 1000000,
+  collateralPoolId: 0,
+
   subticksPerTick: 10,
   stepBaseQuantums: 1,
   liquidityTierId: 0,
@@ -257,6 +264,7 @@ export const isolatedPerpetualMarket: PerpetualMarketCreateObject = {
   quantumConversionExponent: -16,
   atomicResolution: -2,
   dangerIndexPpm: 1000000,
+  collateralPoolId: 1,
   subticksPerTick: 10,
   stepBaseQuantums: 1,
   liquidityTierId: 0,
@@ -278,6 +286,7 @@ export const isolatedPerpetualMarket2: PerpetualMarketCreateObject = {
   quantumConversionExponent: -16,
   atomicResolution: -2,
   dangerIndexPpm: 1000000,
+  collateralPoolId: 2,
   subticksPerTick: 10,
   stepBaseQuantums: 1,
   liquidityTierId: 0,
@@ -350,28 +359,28 @@ export const defaultOrderId: string = OrderTable.uuid(
   defaultOrder.subaccountId,
   defaultOrder.clientId,
   defaultOrder.clobPairId,
-  defaultOrder.orderFlags,
+  defaultOrder.orderFlags
 );
 
 export const defaultOrderGoodTilBlockTimeId: string = OrderTable.uuid(
   defaultOrderGoodTilBlockTime.subaccountId,
   defaultOrderGoodTilBlockTime.clientId,
   defaultOrderGoodTilBlockTime.clobPairId,
-  defaultOrderGoodTilBlockTime.orderFlags,
+  defaultOrderGoodTilBlockTime.orderFlags
 );
 
 export const defaultConditionalOrderId: string = OrderTable.uuid(
   defaultConditionalOrder.subaccountId,
   defaultConditionalOrder.clientId,
   defaultConditionalOrder.clobPairId,
-  defaultConditionalOrder.orderFlags,
+  defaultConditionalOrder.orderFlags
 );
 
 export const isolatedMarketOrderId: string = OrderTable.uuid(
   isolatedMarketOrder.subaccountId,
   isolatedMarketOrder.clientId,
   isolatedMarketOrder.clobPairId,
-  isolatedMarketOrder.orderFlags,
+  isolatedMarketOrder.orderFlags
 );
 
 // ============== Blocks ==============
@@ -407,26 +416,30 @@ export const defaultTendermintEvent4: TendermintEventCreateObject = {
   transactionIndex: 1,
   eventIndex: 1,
 };
-export const defaultTendermintEventId: Buffer = TendermintEventTable.createEventId(
-  defaultTendermintEvent.blockHeight,
-  defaultTendermintEvent.transactionIndex,
-  defaultTendermintEvent.eventIndex,
-);
-export const defaultTendermintEventId2: Buffer = TendermintEventTable.createEventId(
-  defaultTendermintEvent2.blockHeight,
-  defaultTendermintEvent2.transactionIndex,
-  defaultTendermintEvent2.eventIndex,
-);
-export const defaultTendermintEventId3: Buffer = TendermintEventTable.createEventId(
-  defaultTendermintEvent3.blockHeight,
-  defaultTendermintEvent3.transactionIndex,
-  defaultTendermintEvent3.eventIndex,
-);
-export const defaultTendermintEventId4: Buffer = TendermintEventTable.createEventId(
-  defaultTendermintEvent4.blockHeight,
-  defaultTendermintEvent4.transactionIndex,
-  defaultTendermintEvent4.eventIndex,
-);
+export const defaultTendermintEventId: Buffer =
+  TendermintEventTable.createEventId(
+    defaultTendermintEvent.blockHeight,
+    defaultTendermintEvent.transactionIndex,
+    defaultTendermintEvent.eventIndex
+  );
+export const defaultTendermintEventId2: Buffer =
+  TendermintEventTable.createEventId(
+    defaultTendermintEvent2.blockHeight,
+    defaultTendermintEvent2.transactionIndex,
+    defaultTendermintEvent2.eventIndex
+  );
+export const defaultTendermintEventId3: Buffer =
+  TendermintEventTable.createEventId(
+    defaultTendermintEvent3.blockHeight,
+    defaultTendermintEvent3.transactionIndex,
+    defaultTendermintEvent3.eventIndex
+  );
+export const defaultTendermintEventId4: Buffer =
+  TendermintEventTable.createEventId(
+    defaultTendermintEvent4.blockHeight,
+    defaultTendermintEvent4.transactionIndex,
+    defaultTendermintEvent4.eventIndex
+  );
 
 // ============== Transactions ==============
 
@@ -437,7 +450,7 @@ export const defaultTransaction: TransactionCreateObject = {
 };
 export const defaultTransactionId: string = TransactionTable.uuid(
   defaultTransaction.blockHeight,
-  defaultTransaction.transactionIndex,
+  defaultTransaction.transactionIndex
 );
 
 // ============== PerpetualPositions ==============
@@ -462,7 +475,7 @@ export const defaultPerpetualPosition: PerpetualPositionCreateObject = {
 
 export const defaultPerpetualPositionId: string = PerpetualPositionTable.uuid(
   defaultPerpetualPosition.subaccountId,
-  defaultPerpetualPosition.openEventId,
+  defaultPerpetualPosition.openEventId
 );
 
 export const isolatedPerpetualPosition: PerpetualPositionCreateObject = {
@@ -485,7 +498,7 @@ export const isolatedPerpetualPosition: PerpetualPositionCreateObject = {
 
 export const isolatedPerpetualPositionId: string = PerpetualPositionTable.uuid(
   isolatedPerpetualPosition.subaccountId,
-  isolatedPerpetualPosition.openEventId,
+  isolatedPerpetualPosition.openEventId
 );
 
 // ============== Fills ==============
@@ -574,7 +587,7 @@ export const defaultTransferId: string = TransferTable.uuid(
   defaultTransfer.senderSubaccountId,
   defaultTransfer.recipientSubaccountId,
   defaultTransfer.senderWalletAddress,
-  defaultTransfer.recipientWalletAddress,
+  defaultTransfer.recipientWalletAddress
 );
 
 export const defaultWithdrawal: TransferCreateObject = {
@@ -594,7 +607,7 @@ export const defaultWithdrawalId: string = TransferTable.uuid(
   defaultWithdrawal.senderSubaccountId,
   defaultWithdrawal.recipientSubaccountId,
   defaultWithdrawal.senderWalletAddress,
-  defaultWithdrawal.recipientWalletAddress,
+  defaultWithdrawal.recipientWalletAddress
 );
 
 export const defaultDeposit: TransferCreateObject = {
@@ -614,7 +627,7 @@ export const defaultDepositId: string = TransferTable.uuid(
   defaultDeposit.senderSubaccountId,
   defaultDeposit.recipientSubaccountId,
   defaultDeposit.senderWalletAddress,
-  defaultDeposit.recipientWalletAddress,
+  defaultDeposit.recipientWalletAddress
 );
 
 // ============== Markets ==============
@@ -694,7 +707,7 @@ export const defaultOraclePrice: OraclePriceCreateObject = {
 
 export const defaultOraclePriceId: string = OraclePriceTable.uuid(
   defaultOraclePrice.marketId,
-  defaultOraclePrice.effectiveAtHeight,
+  defaultOraclePrice.effectiveAtHeight
 );
 
 export const defaultOraclePrice2: OraclePriceCreateObject = {
@@ -707,7 +720,7 @@ export const defaultOraclePrice2: OraclePriceCreateObject = {
 
 export const defaultOraclePriceId2: string = OraclePriceTable.uuid(
   defaultOraclePrice2.marketId,
-  defaultOraclePrice2.effectiveAtHeight,
+  defaultOraclePrice2.effectiveAtHeight
 );
 
 // ============== Candle ==============
@@ -729,7 +742,7 @@ export const defaultCandle: CandleCreateObject = {
 export const defaultCandleId: string = CandleTable.uuid(
   defaultCandle.startedAt,
   defaultCandle.ticker,
-  defaultCandle.resolution,
+  defaultCandle.resolution
 );
 
 // ============== Pnl Ticks ==============
@@ -756,27 +769,30 @@ export const defaultFundingIndexUpdate: FundingIndexUpdatesCreateObject = {
   effectiveAtHeight: createdHeight,
 };
 
-export const defaultFundingIndexUpdateId: string = FundingIndexUpdatesTable.uuid(
-  defaultFundingIndexUpdate.effectiveAtHeight,
-  defaultFundingIndexUpdate.eventId,
-  defaultFundingIndexUpdate.perpetualId,
-);
+export const defaultFundingIndexUpdateId: string =
+  FundingIndexUpdatesTable.uuid(
+    defaultFundingIndexUpdate.effectiveAtHeight,
+    defaultFundingIndexUpdate.eventId,
+    defaultFundingIndexUpdate.perpetualId
+  );
 
-export const isolatedMarketFundingIndexUpdate: FundingIndexUpdatesCreateObject = {
-  perpetualId: isolatedPerpetualMarket.id,
-  eventId: defaultTendermintEventId,
-  rate: '0.0004',
-  oraclePrice: '10000',
-  fundingIndex: '10200',
-  effectiveAt: createdDateTime.toISO() ?? '',
-  effectiveAtHeight: createdHeight,
-};
+export const isolatedMarketFundingIndexUpdate: FundingIndexUpdatesCreateObject =
+  {
+    perpetualId: isolatedPerpetualMarket.id,
+    eventId: defaultTendermintEventId,
+    rate: '0.0004',
+    oraclePrice: '10000',
+    fundingIndex: '10200',
+    effectiveAt: createdDateTime.toISO() ?? '',
+    effectiveAtHeight: createdHeight,
+  };
 
-export const isolatedMarketFundingIndexUpdateId: string = FundingIndexUpdatesTable.uuid(
-  isolatedMarketFundingIndexUpdate.effectiveAtHeight,
-  isolatedMarketFundingIndexUpdate.eventId,
-  isolatedMarketFundingIndexUpdate.perpetualId,
-);
+export const isolatedMarketFundingIndexUpdateId: string =
+  FundingIndexUpdatesTable.uuid(
+    isolatedMarketFundingIndexUpdate.effectiveAtHeight,
+    isolatedMarketFundingIndexUpdate.eventId,
+    isolatedMarketFundingIndexUpdate.perpetualId
+  );
 
 // ========= Compliance Data ==========
 

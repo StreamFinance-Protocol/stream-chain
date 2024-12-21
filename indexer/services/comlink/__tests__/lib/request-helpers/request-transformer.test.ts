@@ -59,11 +59,13 @@ describe('request-transformer', () => {
 
   describe('perpetualMarketToResponseObject', () => {
     it('successfully converts a perpetual market to a response object', () => {
-      const perpetualMarket: PerpetualMarketFromDatabase = testConstants.defaultPerpetualMarket;
+      const perpetualMarket: PerpetualMarketFromDatabase =
+        testConstants.defaultPerpetualMarket;
       const market: MarketFromDatabase = testConstants.defaultMarket;
-      const liquidityTier: LiquidityTiersFromDatabase = testConstants.defaultLiquidityTier;
+      const liquidityTier: LiquidityTiersFromDatabase =
+        testConstants.defaultLiquidityTier;
       expect(
-        perpetualMarketToResponseObject(perpetualMarket, liquidityTier, market),
+        perpetualMarketToResponseObject(perpetualMarket, liquidityTier, market)
       ).toEqual({
         clobPairId: perpetualMarket.clobPairId,
         ticker: perpetualMarket.ticker,
@@ -75,33 +77,34 @@ describe('request-transformer', () => {
         trades24H: perpetualMarket.trades24H,
         nextFundingRate: perpetualMarket.nextFundingRate,
         initialMarginFraction: helpers.ppmToString(
-          Number(liquidityTier.initialMarginPpm),
+          Number(liquidityTier.initialMarginPpm)
         ),
         maintenanceMarginFraction: helpers.ppmToString(
           helpers.getMaintenanceMarginPpm(
             Number(liquidityTier.initialMarginPpm),
-            Number(liquidityTier.maintenanceFractionPpm),
-          ),
+            Number(liquidityTier.maintenanceFractionPpm)
+          )
         ),
         openInterest: perpetualMarket.openInterest,
         atomicResolution: perpetualMarket.atomicResolution,
         dangerIndexPpm: perpetualMarket.dangerIndexPpm,
-          quantumConversionExponent: perpetualMarket.quantumConversionExponent,
-          tickSize: Big(10).pow(-2).toFixed(), // 100 * 1e-8 * 1e-6 / 10e-10 = 1e-2
-          stepSize: Big(10).pow(-9).toFixed(), // 10 * 1e-10 = 1e-9
-          stepBaseQuantums: perpetualMarket.stepBaseQuantums,
-          subticksPerTick: perpetualMarket.subticksPerTick,
-          openInterestLowerCap: liquidityTier.openInterestLowerCap,
-          openInterestUpperCap: liquidityTier.openInterestUpperCap,
-          baseOpenInterest: perpetualMarket.baseOpenInterest,
-          perpYieldIndex: perpetualMarket.perpYieldIndex,
-        },
-      );
+        collateralPoolId: perpetualMarket.collateralPoolId,
+        quantumConversionExponent: perpetualMarket.quantumConversionExponent,
+        tickSize: Big(10).pow(-2).toFixed(), // 100 * 1e-8 * 1e-6 / 10e-10 = 1e-2
+        stepSize: Big(10).pow(-9).toFixed(), // 10 * 1e-10 = 1e-9
+        stepBaseQuantums: perpetualMarket.stepBaseQuantums,
+        subticksPerTick: perpetualMarket.subticksPerTick,
+        openInterestLowerCap: liquidityTier.openInterestLowerCap,
+        openInterestUpperCap: liquidityTier.openInterestUpperCap,
+        baseOpenInterest: perpetualMarket.baseOpenInterest,
+        perpYieldIndex: perpetualMarket.perpYieldIndex,
+      });
     });
   });
 
   describe('OrderbookLevelsToResponseObject', () => {
-    const perpetualMarket: PerpetualMarketFromDatabase = testConstants.defaultPerpetualMarket;
+    const perpetualMarket: PerpetualMarketFromDatabase =
+      testConstants.defaultPerpetualMarket;
     const orderbookLevels: OrderbookLevels = {
       bids: [
         {
@@ -139,7 +142,7 @@ describe('request-transformer', () => {
       ],
     };
     expect(
-      OrderbookLevelsToResponseObject(orderbookLevels, perpetualMarket),
+      OrderbookLevelsToResponseObject(orderbookLevels, perpetualMarket)
     ).toEqual({
       bids: [
         { price: '300.0', size: '0.1' }, // 1,000,000,000 * 1e-10
@@ -160,32 +163,34 @@ describe('request-transformer', () => {
         ...order,
         status: OrderStatus.FILLED,
       };
-      const responseObject: OrderResponseObject | undefined = postgresAndRedisOrderToResponseObject(
-        filledOrder,
-        {
-          [testConstants.defaultSubaccountId]:
+      const responseObject: OrderResponseObject | undefined =
+        postgresAndRedisOrderToResponseObject(
+          filledOrder,
+          {
+            [testConstants.defaultSubaccountId]:
               testConstants.defaultSubaccount.subaccountNumber,
-        },
-        redisTestConstants.defaultRedisOrder,
-      );
-      const expectedRedisOrderTIF: TimeInForce = protocolTranslations.protocolOrderTIFToTIF(
-        redisTestConstants.defaultRedisOrder.order!.timeInForce,
-      );
+          },
+          redisTestConstants.defaultRedisOrder
+        );
+      const expectedRedisOrderTIF: TimeInForce =
+        protocolTranslations.protocolOrderTIFToTIF(
+          redisTestConstants.defaultRedisOrder.order!.timeInForce
+        );
 
       expect(responseObject).not.toBeUndefined();
       expect(responseObject).not.toEqual(
         postgresOrderToResponseObject(
           filledOrder,
-          testConstants.defaultSubaccount.subaccountNumber,
-        ),
+          testConstants.defaultSubaccount.subaccountNumber
+        )
       );
       expect(responseObject).not.toEqual(
-        redisOrderToResponseObject(redisTestConstants.defaultRedisOrder),
+        redisOrderToResponseObject(redisTestConstants.defaultRedisOrder)
       );
       expect(responseObject).toEqual({
         ...postgresOrderToResponseObject(
           filledOrder,
-          testConstants.defaultSubaccount.subaccountNumber,
+          testConstants.defaultSubaccount.subaccountNumber
         ),
         size: redisTestConstants.defaultRedisOrder.size,
         price: redisTestConstants.defaultRedisOrder.price,
@@ -196,7 +201,7 @@ describe('request-transformer', () => {
           .getGoodTilBlock(redisTestConstants.defaultRedisOrder.order!)
           ?.toString(),
         goodTilBlockTime: protocolTranslations.getGoodTilBlockTime(
-          redisTestConstants.defaultRedisOrder.order!,
+          redisTestConstants.defaultRedisOrder.order!
         ),
         clientMetadata:
           redisTestConstants.defaultRedisOrder.order!.clientMetadata.toString(),
@@ -209,56 +214,54 @@ describe('request-transformer', () => {
           testConstants.defaultSubaccount.subaccountNumber,
       };
 
-      const responseObject: OrderResponseObject | undefined = (
-        postgresAndRedisOrderToResponseObject(
-          order,
-          subaccountMap,
-        )
-      );
+      const responseObject: OrderResponseObject | undefined =
+        postgresAndRedisOrderToResponseObject(order, subaccountMap);
 
       expect(responseObject).not.toBeUndefined();
       expect(responseObject).not.toEqual(
-        redisOrderToResponseObject(redisTestConstants.defaultRedisOrder),
+        redisOrderToResponseObject(redisTestConstants.defaultRedisOrder)
       );
       expect(responseObject).toEqual(
         postgresOrderToResponseObject(
           order,
-          testConstants.defaultSubaccount.subaccountNumber,
-        ),
+          testConstants.defaultSubaccount.subaccountNumber
+        )
       );
     });
 
     it('successfully converts a redis order to a response object', () => {
-      const responseObject: OrderResponseObject | undefined = postgresAndRedisOrderToResponseObject(
-        undefined,
-        {
-          [testConstants.defaultSubaccountId]:
+      const responseObject: OrderResponseObject | undefined =
+        postgresAndRedisOrderToResponseObject(
+          undefined,
+          {
+            [testConstants.defaultSubaccountId]:
               testConstants.defaultSubaccount.subaccountNumber,
-        },
-        redisTestConstants.defaultRedisOrder,
-      );
+          },
+          redisTestConstants.defaultRedisOrder
+        );
 
       expect(responseObject).not.toBeUndefined();
       expect(responseObject).not.toEqual(
         postgresOrderToResponseObject(
           order,
-          testConstants.defaultSubaccount.subaccountNumber,
-        ),
+          testConstants.defaultSubaccount.subaccountNumber
+        )
       );
       expect(responseObject).toEqual(
-        redisOrderToResponseObject(redisTestConstants.defaultRedisOrder),
+        redisOrderToResponseObject(redisTestConstants.defaultRedisOrder)
       );
     });
 
     it('successfully converts undefined postgres order and null redis orderto undefined', () => {
-      const responseObject: OrderResponseObject | undefined = postgresAndRedisOrderToResponseObject(
-        undefined,
-        {
-          [testConstants.defaultSubaccountId]:
+      const responseObject: OrderResponseObject | undefined =
+        postgresAndRedisOrderToResponseObject(
+          undefined,
+          {
+            [testConstants.defaultSubaccountId]:
               testConstants.defaultSubaccount.subaccountNumber,
-        },
-        null,
-      );
+          },
+          null
+        );
 
       expect(responseObject).toBeUndefined();
     });
@@ -268,7 +271,7 @@ describe('request-transformer', () => {
     it('successfully converts a postgres order with null `goodTilBlockTime` to a response object', () => {
       const responseObject: OrderResponseObject = postgresOrderToResponseObject(
         order,
-        testConstants.defaultSubaccount.subaccountNumber,
+        testConstants.defaultSubaccount.subaccountNumber
       );
 
       expect(responseObject).toEqual({
@@ -287,7 +290,7 @@ describe('request-transformer', () => {
       };
       const responseObject: OrderResponseObject = postgresOrderToResponseObject(
         orderWithGoodTilBlockTime,
-        testConstants.defaultSubaccount.subaccountNumber,
+        testConstants.defaultSubaccount.subaccountNumber
       );
 
       expect(responseObject).toEqual({
@@ -304,7 +307,7 @@ describe('request-transformer', () => {
     it('successfully converts yield params from DB to response object', () => {
       const yieldParamsFromDatabase: YieldParamsFromDatabase = {
         id: YieldParamsTable.uuid(
-          testConstants.defaultYieldParams1.createdAtHeight,
+          testConstants.defaultYieldParams1.createdAtHeight
         ),
         sDAIPrice: testConstants.defaultYieldParams1.sDAIPrice,
         assetYieldIndex: testConstants.defaultYieldParams1.assetYieldIndex,
@@ -312,9 +315,8 @@ describe('request-transformer', () => {
         createdAtHeight: testConstants.defaultYieldParams1.createdAtHeight,
       };
 
-      const responseObject: YieldParamsResponseObject = yieldParamsToResponseObject(
-        yieldParamsFromDatabase,
-      );
+      const responseObject: YieldParamsResponseObject =
+        yieldParamsToResponseObject(yieldParamsFromDatabase);
 
       expect(responseObject).toEqual({
         id: yieldParamsFromDatabase.id,
@@ -376,10 +378,12 @@ describe('request-transformer', () => {
     ])(
       'successfully converts a redis order to a response object: %s',
       (_name: string, redisOrder: RedisOrder) => {
-        const responseObject: OrderResponseObject = redisOrderToResponseObject(redisOrder);
-        const expectedRedisOrderTIF: TimeInForce = protocolTranslations.protocolOrderTIFToTIF(
-          redisOrder.order!.timeInForce,
-        );
+        const responseObject: OrderResponseObject =
+          redisOrderToResponseObject(redisOrder);
+        const expectedRedisOrderTIF: TimeInForce =
+          protocolTranslations.protocolOrderTIFToTIF(
+            redisOrder.order!.timeInForce
+          );
 
         expect(responseObject).toEqual({
           id: redisOrder.id,
@@ -387,7 +391,7 @@ describe('request-transformer', () => {
           clientId: redisOrder.order!.orderId!.clientId.toString(),
           clobPairId: testConstants.defaultPerpetualMarket.clobPairId,
           side: protocolTranslations.protocolOrderSideToOrderSide(
-            redisOrder.order!.side,
+            redisOrder.order!.side
           ),
           size: redisTestConstants.defaultSize,
           totalFilled: '0',
@@ -402,7 +406,7 @@ describe('request-transformer', () => {
             .getGoodTilBlock(redisOrder.order!)
             ?.toString(),
           goodTilBlockTime: protocolTranslations.getGoodTilBlockTime(
-            redisOrder.order!,
+            redisOrder.order!
           ),
           ticker,
           clientMetadata: redisOrder.order!.clientMetadata.toString(),
@@ -410,7 +414,7 @@ describe('request-transformer', () => {
           routerFeePpm: '0',
           routerFeeOwner: 'klyra1xxxxxx',
         });
-      },
+      }
     );
   });
 });

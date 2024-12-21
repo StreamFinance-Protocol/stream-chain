@@ -56,9 +56,9 @@ var (
 		},
 		testapp.DefaultGenesis(),
 	))
-	PlaceOrder_Alice_Num0_Id0_Clob2_Buy5_Price10_GTB5 = *clobtypes.NewMsgPlaceOrder(testapp.MustScaleOrder(
+	PlaceOrder_Alice_Num11_Id0_Clob2_Buy5_Price10_GTB5 = *clobtypes.NewMsgPlaceOrder(testapp.MustScaleOrder(
 		clobtypes.Order{
-			OrderId:      clobtypes.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 0, ClobPairId: 2},
+			OrderId:      clobtypes.OrderId{SubaccountId: constants.Alice_Num11, ClientId: 0, ClobPairId: 2},
 			Side:         clobtypes.Order_SIDE_BUY,
 			Quantums:     5,
 			Subticks:     10,
@@ -86,9 +86,9 @@ var (
 		},
 		testapp.DefaultGenesis(),
 	))
-	PlaceOrder_Alice_Num0_Id2_Clob2_Buy5_Price10_GTB23 = *clobtypes.NewMsgPlaceOrder(testapp.MustScaleOrder(
+	PlaceOrder_Alice_Num11_Id2_Clob2_Buy5_Price10_GTB23 = *clobtypes.NewMsgPlaceOrder(testapp.MustScaleOrder(
 		clobtypes.Order{
-			OrderId:      clobtypes.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 0, ClobPairId: 2},
+			OrderId:      clobtypes.OrderId{SubaccountId: constants.Alice_Num11, ClientId: 0, ClobPairId: 2},
 			Side:         clobtypes.Order_SIDE_BUY,
 			Quantums:     5,
 			Subticks:     10,
@@ -106,9 +106,9 @@ var (
 		},
 		testapp.DefaultGenesis(),
 	))
-	PlaceOrder_Alice_Num0_Id2_Clob2_Buy5_Price10_GTB24 = *clobtypes.NewMsgPlaceOrder(testapp.MustScaleOrder(
+	PlaceOrder_Alice_Num11_Id2_Clob2_Buy5_Price10_GTB24 = *clobtypes.NewMsgPlaceOrder(testapp.MustScaleOrder(
 		clobtypes.Order{
-			OrderId:      clobtypes.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 0, ClobPairId: 2},
+			OrderId:      clobtypes.OrderId{SubaccountId: constants.Alice_Num11, ClientId: 0, ClobPairId: 2},
 			Side:         clobtypes.Order_SIDE_BUY,
 			Quantums:     5,
 			Subticks:     10,
@@ -126,9 +126,9 @@ var (
 		},
 		testapp.DefaultGenesis(),
 	))
-	PlaceOrder_Alice_Num0_Id2_Clob2_Buy5_Price10_GTB27 = *clobtypes.NewMsgPlaceOrder(testapp.MustScaleOrder(
+	PlaceOrder_Alice_Num11_Id2_Clob2_Buy5_Price10_GTB27 = *clobtypes.NewMsgPlaceOrder(testapp.MustScaleOrder(
 		clobtypes.Order{
-			OrderId:      clobtypes.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 0, ClobPairId: 2},
+			OrderId:      clobtypes.OrderId{SubaccountId: constants.Alice_Num11, ClientId: 0, ClobPairId: 2},
 			Side:         clobtypes.Order_SIDE_BUY,
 			Quantums:     5,
 			Subticks:     10,
@@ -146,16 +146,6 @@ var (
 		},
 		testapp.DefaultGenesis(),
 	))
-	PlaceOrder_Alice_Num1_Id2_Clob2_Buy5_Price10_GTB20 = *clobtypes.NewMsgPlaceOrder(testapp.MustScaleOrder(
-		clobtypes.Order{
-			OrderId:      clobtypes.OrderId{SubaccountId: constants.Alice_Num1, ClientId: 0, ClobPairId: 2},
-			Side:         clobtypes.Order_SIDE_BUY,
-			Quantums:     5,
-			Subticks:     10,
-			GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
-		},
-		testapp.DefaultGenesis(),
-	))
 	PlaceOrder_Alice_Num0_Id0_Clob0_Buy6_Price10_GTB20 = *clobtypes.NewMsgPlaceOrder(testapp.MustScaleOrder(
 		clobtypes.Order{
 			OrderId:      clobtypes.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 0, ClobPairId: 0},
@@ -166,9 +156,9 @@ var (
 		},
 		testapp.DefaultGenesis(),
 	))
-	PlaceOrder_Alice_Num0_Id2_Clob2_Buy6_Price10_GTB20 = *clobtypes.NewMsgPlaceOrder(testapp.MustScaleOrder(
+	PlaceOrder_Alice_Num11_Id2_Clob2_Buy6_Price10_GTB20 = *clobtypes.NewMsgPlaceOrder(testapp.MustScaleOrder(
 		clobtypes.Order{
-			OrderId:      clobtypes.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 0, ClobPairId: 2},
+			OrderId:      clobtypes.OrderId{SubaccountId: constants.Alice_Num11, ClientId: 0, ClobPairId: 2},
 			Side:         clobtypes.Order_SIDE_BUY,
 			Quantums:     6,
 			Subticks:     10,
@@ -187,9 +177,9 @@ var (
 		},
 		testapp.DefaultGenesis(),
 	))
-	PlaceOrder_Alice_Num0_Id2_Clob2_Buy5_Price10_GTB21 = *clobtypes.NewMsgPlaceOrder(testapp.MustScaleOrder(
+	PlaceOrder_Alice_Num11_Id2_Clob2_Buy5_Price10_GTB21 = *clobtypes.NewMsgPlaceOrder(testapp.MustScaleOrder(
 		clobtypes.Order{
-			OrderId:      clobtypes.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 0, ClobPairId: 2},
+			OrderId:      clobtypes.OrderId{SubaccountId: constants.Alice_Num11, ClientId: 0, ClobPairId: 2},
 			Side:         clobtypes.Order_SIDE_BUY,
 			Quantums:     5,
 			Subticks:     10,
@@ -249,9 +239,9 @@ var (
 		},
 		testapp.DefaultGenesis(),
 	))
-	PlaceOrder_Alice_Num0_Id2_Clob2_Buy5_Price10_GTB20 = *clobtypes.NewMsgPlaceOrder(testapp.MustScaleOrder(
+	PlaceOrder_Alice_Num11_Id2_Clob2_Buy5_Price10_GTB20 = *clobtypes.NewMsgPlaceOrder(testapp.MustScaleOrder(
 		clobtypes.Order{
-			OrderId:      clobtypes.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 0, ClobPairId: 2},
+			OrderId:      clobtypes.OrderId{SubaccountId: constants.Alice_Num11, ClientId: 0, ClobPairId: 2},
 			Side:         clobtypes.Order_SIDE_BUY,
 			Quantums:     5,
 			Subticks:     10,
@@ -267,9 +257,9 @@ var (
 		},
 		5,
 	)
-	CancelOrder_Alice_Num0_Id2_Clob2_GTB5 = *clobtypes.NewMsgCancelOrderShortTerm(
+	CancelOrder_Alice_Num11_Id2_Clob2_GTB5 = *clobtypes.NewMsgCancelOrderShortTerm(
 		clobtypes.OrderId{
-			SubaccountId: constants.Alice_Num0,
+			SubaccountId: constants.Alice_Num11,
 			ClientId:     0,
 			ClobPairId:   2,
 		},
@@ -291,9 +281,9 @@ var (
 		},
 		20,
 	)
-	CancelOrder_Alice_Num0_Id2_Clob2_GTB20 = *clobtypes.NewMsgCancelOrderShortTerm(
+	CancelOrder_Alice_Num11_Id2_Clob2_GTB20 = *clobtypes.NewMsgCancelOrderShortTerm(
 		clobtypes.OrderId{
-			SubaccountId: constants.Alice_Num0,
+			SubaccountId: constants.Alice_Num11,
 			ClientId:     0,
 			ClobPairId:   2,
 		},
@@ -307,9 +297,9 @@ var (
 		},
 		27,
 	)
-	CancelOrder_Alice_Num0_Id2_Clob2_GTB27 = *clobtypes.NewMsgCancelOrderShortTerm(
+	CancelOrder_Alice_Num11_Id2_Clob2_GTB27 = *clobtypes.NewMsgCancelOrderShortTerm(
 		clobtypes.OrderId{
-			SubaccountId: constants.Alice_Num0,
+			SubaccountId: constants.Alice_Num11,
 			ClientId:     0,
 			ClobPairId:   2,
 		},
@@ -323,9 +313,9 @@ var (
 		},
 		23,
 	)
-	CancelOrder_Alice_Num0_Id2_Clob2_GTB23 = *clobtypes.NewMsgCancelOrderShortTerm(
+	CancelOrder_Alice_Num11_Id2_Clob2_GTB23 = *clobtypes.NewMsgCancelOrderShortTerm(
 		clobtypes.OrderId{
-			SubaccountId: constants.Alice_Num0,
+			SubaccountId: constants.Alice_Num11,
 			ClientId:     0,
 			ClobPairId:   2,
 		},
@@ -358,9 +348,9 @@ var (
 		},
 		testapp.DefaultGenesis(),
 	))
-	PlaceOrder_Bob_Num0_Id2_Clob2_Sell5_Price10_GTB20 = *clobtypes.NewMsgPlaceOrder(testapp.MustScaleOrder(
+	PlaceOrder_Bob_Num11_Id2_Clob2_Sell5_Price10_GTB20 = *clobtypes.NewMsgPlaceOrder(testapp.MustScaleOrder(
 		clobtypes.Order{
-			OrderId:      clobtypes.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 0, ClobPairId: 2},
+			OrderId:      clobtypes.OrderId{SubaccountId: constants.Bob_Num11, ClientId: 0, ClobPairId: 2},
 			Side:         clobtypes.Order_SIDE_SELL,
 			Quantums:     5,
 			Subticks:     10,
@@ -379,9 +369,9 @@ var (
 		},
 		testapp.DefaultGenesis(),
 	))
-	PlaceOrder_Bob_Num0_Id0_Clob2_Sell4_Price10_GTB20 = *clobtypes.NewMsgPlaceOrder(testapp.MustScaleOrder(
+	PlaceOrder_Bob_Num11_Id0_Clob2_Sell4_Price10_GTB20 = *clobtypes.NewMsgPlaceOrder(testapp.MustScaleOrder(
 		clobtypes.Order{
-			OrderId:      clobtypes.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 0, ClobPairId: 2},
+			OrderId:      clobtypes.OrderId{SubaccountId: constants.Bob_Num11, ClientId: 0, ClobPairId: 2},
 			Side:         clobtypes.Order_SIDE_SELL,
 			Quantums:     4,
 			Subticks:     10,
@@ -397,9 +387,9 @@ var (
 		},
 		20,
 	)
-	CancelOrder_Bob_Num0_Id2_Clob2_GTB20 = *clobtypes.NewMsgCancelOrderShortTerm(
+	CancelOrder_Bob_Num11_Id2_Clob2_GTB20 = *clobtypes.NewMsgCancelOrderShortTerm(
 		clobtypes.OrderId{
-			SubaccountId: constants.Bob_Num0,
+			SubaccountId: constants.Bob_Num11,
 			ClientId:     0,
 			ClobPairId:   2,
 		},

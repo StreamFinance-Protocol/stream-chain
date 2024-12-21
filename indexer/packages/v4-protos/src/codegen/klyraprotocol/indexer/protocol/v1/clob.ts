@@ -582,12 +582,9 @@ export interface IndexerOrder {
   /** Router fee ppm for the order. */
 
   routerFeePpm: number;
-  /** Router fee subaccount owner. */
+  /** Router fee owner. */
 
   routerFeeOwner: string;
-  /** Router fee subaccount number. */
-
-  routerFeeSubaccountNumber: number;
 }
 /**
  * IndexerOrderV1 represents a single order belonging to a `Subaccount`
@@ -661,12 +658,9 @@ export interface IndexerOrderSDKType {
   /** Router fee ppm for the order. */
 
   router_fee_ppm: number;
-  /** Router fee subaccount owner. */
+  /** Router fee owner. */
 
   router_fee_owner: string;
-  /** Router fee subaccount number. */
-
-  router_fee_subaccount_number: number;
 }
 
 function createBaseIndexerOrderId(): IndexerOrderId {
@@ -758,8 +752,7 @@ function createBaseIndexerOrder(): IndexerOrder {
     conditionType: 0,
     conditionalOrderTriggerSubticks: Long.UZERO,
     routerFeePpm: 0,
-    routerFeeOwner: "",
-    routerFeeSubaccountNumber: 0
+    routerFeeOwner: ""
   };
 }
 
@@ -815,10 +808,6 @@ export const IndexerOrder = {
 
     if (message.routerFeeOwner !== "") {
       writer.uint32(106).string(message.routerFeeOwner);
-    }
-
-    if (message.routerFeeSubaccountNumber !== 0) {
-      writer.uint32(112).uint32(message.routerFeeSubaccountNumber);
     }
 
     return writer;
@@ -885,10 +874,6 @@ export const IndexerOrder = {
           message.routerFeeOwner = reader.string();
           break;
 
-        case 14:
-          message.routerFeeSubaccountNumber = reader.uint32();
-          break;
-
         default:
           reader.skipType(tag & 7);
           break;
@@ -913,7 +898,6 @@ export const IndexerOrder = {
     message.conditionalOrderTriggerSubticks = object.conditionalOrderTriggerSubticks !== undefined && object.conditionalOrderTriggerSubticks !== null ? Long.fromValue(object.conditionalOrderTriggerSubticks) : Long.UZERO;
     message.routerFeePpm = object.routerFeePpm ?? 0;
     message.routerFeeOwner = object.routerFeeOwner ?? "";
-    message.routerFeeSubaccountNumber = object.routerFeeSubaccountNumber ?? 0;
     return message;
   }
 

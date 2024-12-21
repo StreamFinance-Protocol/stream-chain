@@ -387,6 +387,7 @@ func TestGenesis(t *testing.T) {
 								clobPair.StepBaseQuantums,
 								perpetual.Params.LiquidityTier,
 								perpetual.Params.DangerIndexPpm,
+								perpetual.Params.CollateralPoolId,
 							),
 						),
 					).Once().Return()

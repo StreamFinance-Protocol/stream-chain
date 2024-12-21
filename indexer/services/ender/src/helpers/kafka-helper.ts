@@ -49,32 +49,39 @@ export function addPositionsToContents(
   updateObjects: UpdatedPerpetualPositionSubaccountKafkaObject[],
   perpetualMarketsMapping: PerpetualMarketsMap,
   assetPositions: AssetPositionFromDatabase[],
-  assetsMap: AssetsMap,
+  assetsMap: AssetsMap
 ): SubaccountMessageContents {
   return {
     ...contents,
-    perpetualPositions: updateObjects.length === 0 ? undefined : generatePerpetualPositionsContents(
-      subaccountIdProto,
-      updateObjects,
-      perpetualMarketsMapping,
-    ),
-    assetPositions: assetPositions.length === 0 ? undefined : generateAssetPositionsContents(
-      subaccountIdProto,
-      assetPositions,
-      assetsMap,
-    ),
+    perpetualPositions:
+      updateObjects.length === 0
+        ? undefined
+        : generatePerpetualPositionsContents(
+            subaccountIdProto,
+            updateObjects,
+            perpetualMarketsMapping
+          ),
+    assetPositions:
+      assetPositions.length === 0
+        ? undefined
+        : generateAssetPositionsContents(
+            subaccountIdProto,
+            assetPositions,
+            assetsMap
+          ),
   };
 }
 
 export function generatePerpetualPositionsContents(
   subaccountIdProto: SubaccountId,
   perpetualPositions: UpdatedPerpetualPositionSubaccountKafkaObject[],
-  perpetualMarketsMapping: PerpetualMarketsMap,
+  perpetualMarketsMapping: PerpetualMarketsMap
 ): PerpetualPositionSubaccountMessageContents[] {
   return _.map(
     perpetualPositions,
-    (perpetualPosition: UpdatedPerpetualPositionSubaccountKafkaObject):
-    PerpetualPositionSubaccountMessageContents => {
+    (
+      perpetualPosition: UpdatedPerpetualPositionSubaccountKafkaObject
+    ): PerpetualPositionSubaccountMessageContents => {
       return {
         address: subaccountIdProto.owner,
         subaccountNumber: subaccountIdProto.number,
@@ -95,18 +102,20 @@ export function generatePerpetualPositionsContents(
         realizedPnl: perpetualPosition.realizedPnl,
         unrealizedPnl: perpetualPosition.unrealizedPnl,
       };
-    },
+    }
   );
 }
 
 export function generateAssetPositionsContents(
   subaccountIdProto: SubaccountId,
   assetPositions: AssetPositionFromDatabase[],
-  assetsMap: AssetsMap,
+  assetsMap: AssetsMap
 ): AssetPositionSubaccountMessageContents[] {
   return _.map(
     assetPositions,
-    (position: AssetPositionFromDatabase): AssetPositionSubaccountMessageContents => {
+    (
+      position: AssetPositionFromDatabase
+    ): AssetPositionSubaccountMessageContents => {
       return {
         address: subaccountIdProto.owner,
         subaccountNumber: subaccountIdProto.number,
@@ -116,7 +125,7 @@ export function generateAssetPositionsContents(
         side: position.isLong ? PositionSide.LONG : PositionSide.SHORT,
         size: position.size,
       };
-    },
+    }
   );
 }
 
@@ -131,19 +140,24 @@ export function generateAssetPositionsContents(
 export function getPnl(
   updateObject: UpdatedPerpetualPositionSubaccountKafkaObject,
   perpetualMarket: PerpetualMarketFromDatabase,
-  marketIdToMarket: MarketsMap,
-): { realizedPnl: string | undefined, unrealizedPnl: string | undefined } {
+  marketIdToMarket: MarketsMap
+): { realizedPnl: string | undefined; unrealizedPnl: string | undefined } {
   let realizedPnl: string | undefined;
   let unrealizedPnl: string | undefined;
   if (updateObject !== undefined) {
-    const priceDiff: Big = (updateObject.side === PositionSide.LONG)
-      ? Big(updateObject.exitPrice ?? 0).minus(updateObject.entryPrice)
-      : Big(updateObject.entryPrice).minus(updateObject.exitPrice ?? 0);
+    const priceDiff: Big =
+      updateObject.side === PositionSide.LONG
+        ? Big(updateObject.exitPrice ?? 0).minus(updateObject.entryPrice)
+        : Big(updateObject.entryPrice).minus(updateObject.exitPrice ?? 0);
     realizedPnl = priceDiff
       .mul(updateObject.sumClose)
       .plus(updateObject.settledFunding)
       .toFixed();
-    unrealizedPnl = helpers.getUnrealizedPnl(updateObject, perpetualMarket, marketIdToMarket);
+    unrealizedPnl = helpers.getUnrealizedPnl(
+      updateObject,
+      perpetualMarket,
+      marketIdToMarket
+    );
   }
   return { realizedPnl, unrealizedPnl };
 }
@@ -158,11 +172,15 @@ export function getPnl(
 export function annotateWithPnl(
   updateObject: UpdatedPerpetualPositionSubaccountKafkaObject,
   perpetualMarketMap: PerpetualMarketsMap,
-  marketIdToMarket: MarketsMap,
+  marketIdToMarket: MarketsMap
 ): UpdatedPerpetualPositionSubaccountKafkaObject {
   return {
     ...updateObject,
-    ...getPnl(updateObject, perpetualMarketMap[updateObject.perpetualId], marketIdToMarket),
+    ...getPnl(
+      updateObject,
+      perpetualMarketMap[updateObject.perpetualId],
+      marketIdToMarket
+    ),
   };
 }
 
@@ -173,7 +191,7 @@ export function annotateWithPnl(
  * @param position
  */
 export function convertPerpetualPosition(
-  position: PerpetualPositionFromDatabase,
+  position: PerpetualPositionFromDatabase
 ): UpdatedPerpetualPositionSubaccountKafkaObject {
   const {
     id,
@@ -232,25 +250,28 @@ export function generateTransferContents(
   asset: AssetFromDatabase,
   subaccountId: SubaccountId,
   senderSubaccountId?: SubaccountId,
-  recipientSubaccountId?: SubaccountId,
+  recipientSubaccountId?: SubaccountId
 ): SubaccountMessageContents {
   return {
     transfers: {
       sender: {
         address: transfer.senderWalletAddress ?? senderSubaccountId!.owner,
-        subaccountNumber: transfer.senderWalletAddress ? undefined
+        subaccountNumber: transfer.senderWalletAddress
+          ? undefined
           : senderSubaccountId!.number,
       },
       recipient: {
-        address: transfer.recipientWalletAddress ?? recipientSubaccountId!.owner,
-        subaccountNumber: transfer.recipientWalletAddress ? undefined
+        address:
+          transfer.recipientWalletAddress ?? recipientSubaccountId!.owner,
+        subaccountNumber: transfer.recipientWalletAddress
+          ? undefined
           : recipientSubaccountId!.number,
       },
       symbol: asset.symbol,
       size: transfer.size,
       type: helpers.getTransferType(
         transfer,
-        SubaccountTable.uuid(subaccountId.owner, subaccountId.number),
+        SubaccountTable.uuid(subaccountId.owner, subaccountId.number)
       ),
       createdAt: transfer.createdAt,
       createdAtHeight: transfer.createdAtHeight,
@@ -261,7 +282,7 @@ export function generateTransferContents(
 
 export function generateOraclePriceContents(
   oraclePrice: OraclePriceFromDatabase,
-  ticker: string,
+  ticker: string
 ): MarketMessageContents {
   return {
     oraclePrices: {
@@ -278,7 +299,7 @@ export function generateOraclePriceContents(
 
 export function generateFillSubaccountMessage(
   fill: FillFromDatabase,
-  ticker: string,
+  ticker: string
 ): FillSubaccountMessageContents {
   return {
     ...fill!,
@@ -289,7 +310,7 @@ export function generateFillSubaccountMessage(
 
 export function generateOrderSubaccountMessage(
   order: OrderFromDatabase,
-  ticker: string,
+  ticker: string
 ): OrderSubaccountMessageContents {
   return {
     ...order,
@@ -302,38 +323,48 @@ export function generateOrderSubaccountMessage(
 }
 
 export function generatePerpetualMarketMessage(
-  perpetualMarkets: PerpetualMarketFromDatabase[],
+  perpetualMarkets: PerpetualMarketFromDatabase[]
 ): MarketMessageContents {
-  const liquidityTierMap: LiquidityTiersMap = liquidityTierRefresher.getLiquidityTiersMap();
+  const liquidityTierMap: LiquidityTiersMap =
+    liquidityTierRefresher.getLiquidityTiersMap();
 
-  const tradingMarketMessageContents: TradingMarketMessageContents = _.chain(perpetualMarkets)
+  const tradingMarketMessageContents: TradingMarketMessageContents = _.chain(
+    perpetualMarkets
+  )
     .keyBy(PerpetualMarketColumns.ticker)
-    .mapValues((perpetualMarket: PerpetualMarketFromDatabase): TradingPerpetualMarketMessage => {
-      const liquidityTier:
-      LiquidityTiersFromDatabase = liquidityTierMap[perpetualMarket.liquidityTierId];
+    .mapValues(
+      (
+        perpetualMarket: PerpetualMarketFromDatabase
+      ): TradingPerpetualMarketMessage => {
+        const liquidityTier: LiquidityTiersFromDatabase =
+          liquidityTierMap[perpetualMarket.liquidityTierId];
 
-      return {
-        id: perpetualMarket.id,
-        clobPairId: perpetualMarket.clobPairId.toString(),
-        ticker: perpetualMarket.ticker,
-        marketId: perpetualMarket.marketId,
-        status: perpetualMarket.status,
-        quantumConversionExponent: perpetualMarket.quantumConversionExponent,
-        atomicResolution: perpetualMarket.atomicResolution,
-        dangerIndexPpm: perpetualMarket.dangerIndexPpm,
-        subticksPerTick: perpetualMarket.subticksPerTick,
-        stepBaseQuantums: perpetualMarket.stepBaseQuantums,
-        initialMarginFraction: helpers.ppmToString(Number(liquidityTier.initialMarginPpm)),
-        maintenanceMarginFraction: helpers.ppmToString(
-          helpers.getMaintenanceMarginPpm(
-            Number(liquidityTier.initialMarginPpm),
-            Number(liquidityTier.maintenanceFractionPpm),
+        return {
+          id: perpetualMarket.id,
+          clobPairId: perpetualMarket.clobPairId.toString(),
+          ticker: perpetualMarket.ticker,
+          marketId: perpetualMarket.marketId,
+          status: perpetualMarket.status,
+          quantumConversionExponent: perpetualMarket.quantumConversionExponent,
+          atomicResolution: perpetualMarket.atomicResolution,
+          dangerIndexPpm: perpetualMarket.dangerIndexPpm,
+          collateralPoolId: perpetualMarket.collateralPoolId,
+          subticksPerTick: perpetualMarket.subticksPerTick,
+          stepBaseQuantums: perpetualMarket.stepBaseQuantums,
+          initialMarginFraction: helpers.ppmToString(
+            Number(liquidityTier.initialMarginPpm)
           ),
-        ),
-        openInterestLowerCap: liquidityTier.openInterestLowerCap,
-        openInterestUpperCap: liquidityTier.openInterestUpperCap,
-      };
-    })
+          maintenanceMarginFraction: helpers.ppmToString(
+            helpers.getMaintenanceMarginPpm(
+              Number(liquidityTier.initialMarginPpm),
+              Number(liquidityTier.maintenanceFractionPpm)
+            )
+          ),
+          openInterestLowerCap: liquidityTier.openInterestLowerCap,
+          openInterestUpperCap: liquidityTier.openInterestUpperCap,
+        };
+      }
+    )
     .value();
 
   return {

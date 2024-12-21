@@ -37,6 +37,8 @@ var (
 	initialSubaccountModuleAccBalance = int64(10_000_000_000) // $10,000.
 	subaccountNumberZero              = uint32(0)
 	subaccountNumberOne               = uint32(1)
+	subaccountNumberTwo               = uint32(2)
+	subaccountNumberThree             = uint32(3)
 )
 
 type PlaceOrderIntegrationTestSuite struct {
@@ -98,18 +100,18 @@ func (s *PlaceOrderIntegrationTestSuite) SetupSuite() {
 
 	s.cfg.MinGasPrices = fmt.Sprintf("0%s", sdk.DefaultBondDenom)
 
-	clobPair := constants.ClobPair_Btc
 	state := types.GenesisState{}
 
-	state.ClobPairs = append(state.ClobPairs, clobPair)
+	state.ClobPairs = append(state.ClobPairs, constants.ClobPair_Btc)
+	state.ClobPairs = append(state.ClobPairs, constants.ClobPair_BtcBtc)
 	state.LiquidationsConfig = types.LiquidationsConfig_NoFee
 
 	perpstate := perptypes.GenesisState{}
 	perpstate.LiquidityTiers = constants.LiquidityTiers
 	perpstate.CollateralPools = constants.CollateralPools
 	perpstate.Params = constants.PerpetualsGenesisParams
-	perpetual := constants.BtcUsd_50PercentInitial_40PercentMaintenance
-	perpstate.Perpetuals = append(perpstate.Perpetuals, perpetual)
+	perpstate.Perpetuals = append(perpstate.Perpetuals, constants.BtcUsd_50PercentInitial_40PercentMaintenance)
+	perpstate.Perpetuals = append(perpstate.Perpetuals, constants.BtcBtc_10_20MarginRequirement_CollatPool1_Id10)
 
 	pricesstate := constants.Prices_DefaultGenesisState
 
@@ -141,6 +143,26 @@ func (s *PlaceOrderIntegrationTestSuite) SetupSuite() {
 			AssetPositions: []*satypes.AssetPosition{
 				{
 					AssetId:  0,
+					Quantums: dtypes.NewInt(initialQuoteBalance),
+				},
+			},
+			PerpetualPositions: []*satypes.PerpetualPosition{},
+		},
+		satypes.Subaccount{
+			Id: &satypes.SubaccountId{Owner: s.validatorAddress.String(), Number: subaccountNumberTwo},
+			AssetPositions: []*satypes.AssetPosition{
+				{
+					AssetId:  1,
+					Quantums: dtypes.NewInt(initialQuoteBalance),
+				},
+			},
+			PerpetualPositions: []*satypes.PerpetualPosition{},
+		},
+		satypes.Subaccount{
+			Id: &satypes.SubaccountId{Owner: s.validatorAddress.String(), Number: subaccountNumberThree},
+			AssetPositions: []*satypes.AssetPosition{
+				{
+					AssetId:  1,
 					Quantums: dtypes.NewInt(initialQuoteBalance),
 				},
 			},
@@ -285,10 +307,11 @@ func (s *PlaceOrderIntegrationTestSuite) TestCLIPlaceOrder() {
 
 	collateralPoolAddress := satypes.ModuleName + ":0"
 
-	saModuleTDaiBalance, err := testutil_bank.GetModuleAccTDaiBalance(
+	saModuleTDaiBalance, err := testutil_bank.GetModuleAccAssetBalance(
 		val,
 		s.network.Config.Codec,
 		satypes.ModuleName,
+		"utdai",
 	)
 
 	s.Require().NoError(err)
@@ -297,10 +320,11 @@ func (s *PlaceOrderIntegrationTestSuite) TestCLIPlaceOrder() {
 		saModuleTDaiBalance,
 	)
 
-	collateralPoolModuleTDaiBalance, err := testutil_bank.GetModuleAccTDaiBalance(
+	collateralPoolModuleTDaiBalance, err := testutil_bank.GetModuleAccAssetBalance(
 		val,
 		s.network.Config.Codec,
 		collateralPoolAddress,
+		"utdai",
 	)
 
 	s.Require().NoError(err)
@@ -314,12 +338,156 @@ func (s *PlaceOrderIntegrationTestSuite) TestCLIPlaceOrder() {
 	// to the `distribution` module account, and the fees will stay in `distribution`
 	// until withdrawn. More details at:
 	// https://docs.cosmos.network/v0.45/modules/distribution/03_begin_block.html#the-distribution-scheme
-	distrModuleTDaiBalance, err := testutil_bank.GetModuleAccTDaiBalance(
+	distrModuleTDaiBalance, err := testutil_bank.GetModuleAccAssetBalance(
 		val,
 		s.network.Config.Codec,
 		distrtypes.ModuleName,
+		"utdai",
 	)
 
 	s.Require().NoError(err)
 	s.Require().Equal(makerFee+takerFee, distrModuleTDaiBalance)
+}
+
+func (s *PlaceOrderIntegrationTestSuite) TestCLIPlaceOrderBTCCollat() {
+
+	val := s.network.Validators[0]
+	ctx := val.ClientCtx
+
+	currentHeight, err := s.network.LatestHeight()
+	s.Require().NoError(err)
+
+	goodTilBlock := uint32(currentHeight) + types.ShortBlockWindow
+	clientId := uint64(1)
+	quantums := satypes.BaseQuantums(1_000)
+	subticks := types.Subticks(50_000_000_000)
+
+	// Place the first order.
+	_, err = cli_testutil.MsgPlaceOrderExec(
+		ctx,
+		s.validatorAddress,
+		subaccountNumberTwo,
+		clientId,
+		constants.ClobPair_BtcBtc.Id,
+		types.Order_SIDE_BUY,
+		quantums,
+		subticks.ToUint64(),
+		goodTilBlock,
+	)
+	s.Require().NoError(err)
+
+	// Place the second order.
+	_, err = cli_testutil.MsgPlaceOrderExec(
+		ctx,
+		s.validatorAddress,
+		subaccountNumberThree,
+		clientId,
+		constants.ClobPair_BtcBtc.Id,
+		types.Order_SIDE_SELL,
+		quantums,
+		subticks.ToUint64(),
+		goodTilBlock,
+	)
+	s.Require().NoError(err)
+
+	currentHeight, err = s.network.LatestHeight()
+	s.Require().NoError(err)
+
+	// Wait for a few blocks to ensure the orders were matched and included in a block.
+	_, err = s.network.WaitForHeight(currentHeight + 3)
+	s.Require().NoError(err)
+
+	// Query both subaccounts.
+	resp, err := sa_testutil.MsgQuerySubaccountExec(ctx, s.validatorAddress, subaccountNumberTwo)
+	s.Require().NoError(err)
+
+	var subaccountResp satypes.QuerySubaccountResponse
+	s.Require().NoError(s.network.Config.Codec.UnmarshalJSON(resp.Bytes(), &subaccountResp))
+	subaccountTwo := subaccountResp.Subaccount
+
+	resp, err = sa_testutil.MsgQuerySubaccountExec(ctx, s.validatorAddress, subaccountNumberThree)
+	s.Require().NoError(err)
+
+	s.Require().NoError(s.network.Config.Codec.UnmarshalJSON(resp.Bytes(), &subaccountResp))
+	subaccountThree := subaccountResp.Subaccount
+
+	// Compute the fill price so as to know how much QuoteBalance should be remaining.
+	fillSizeQuoteQuantums := types.FillAmountToQuoteQuantums(
+		subticks,
+		quantums,
+		constants.ClobPair_BtcBtc.QuantumConversionExponent,
+	).Int64()
+
+	// Assert that both Subaccounts have the appropriate state.
+	// Order could be maker or taker after Uncross, so assert that account could have been either.
+	takerFee := fillSizeQuoteQuantums *
+		int64(constants.PerpetualFeeParamsMakerRebate.Tiers[0].TakerFeePpm) / int64(lib.OneMillion)
+	makerFee := fillSizeQuoteQuantums *
+		int64(constants.PerpetualFeeParamsMakerRebate.Tiers[0].MakerFeePpm) / int64(lib.OneMillion)
+
+	s.Require().Contains(
+		[]*big.Int{
+			new(big.Int).SetInt64(initialQuoteBalance - fillSizeQuoteQuantums - takerFee),
+			new(big.Int).SetInt64(initialQuoteBalance - fillSizeQuoteQuantums - makerFee),
+		},
+		subaccountTwo.GetAssetPosition(1),
+	)
+	s.Require().Len(subaccountTwo.PerpetualPositions, 1)
+	s.Require().Equal(quantums.ToBigInt(), subaccountTwo.PerpetualPositions[0].GetBigQuantums())
+
+	s.Require().Contains(
+		[]*big.Int{
+			new(big.Int).SetInt64(initialQuoteBalance + fillSizeQuoteQuantums - takerFee),
+			new(big.Int).SetInt64(initialQuoteBalance + fillSizeQuoteQuantums - makerFee),
+		},
+		subaccountThree.GetAssetPosition(1),
+	)
+	s.Require().Len(subaccountThree.PerpetualPositions, 1)
+	// Check that position is short and has the right size.
+	s.Require().Equal(new(big.Int).Neg(quantums.ToBigInt()), subaccountThree.PerpetualPositions[0].GetBigQuantums())
+
+	// Check that the `subaccounts` module account has expected remaining TDai balance.
+
+	collateralPoolAddress := satypes.ModuleName + ":1"
+
+	saModuleBtcBalance, err := testutil_bank.GetModuleAccAssetBalance(
+		val,
+		s.network.Config.Codec,
+		satypes.ModuleName,
+		"btc-denom",
+	)
+
+	s.Require().NoError(err)
+	s.Require().Equal(
+		initialSubaccountModuleAccBalance-initialQuoteBalance-initialQuoteBalance,
+		saModuleBtcBalance,
+	)
+
+	collateralPoolModuleBtcBalance, err := testutil_bank.GetModuleAccAssetBalance(
+		val,
+		s.network.Config.Codec,
+		collateralPoolAddress,
+		"btc-denom",
+	)
+
+	s.Require().NoError(err)
+	s.Require().Equal(
+		initialQuoteBalance+initialQuoteBalance-takerFee-makerFee,
+		collateralPoolModuleBtcBalance,
+	)
+
+	// Check that the `distribution` module account has expected remaining TDai balance.
+	// During `BeginBlock()`, the `fee-collector` module account will send all fees
+	// to the `distribution` module account, and the fees will stay in `distribution`
+	// until withdrawn. More details at:
+	// https://docs.cosmos.network/v0.45/modules/distribution/03_begin_block.html#the-distribution-scheme
+	distrModuleBtcBalance, err := testutil_bank.GetModuleAccAssetBalance(
+		val,
+		s.network.Config.Codec,
+		distrtypes.ModuleName,
+		"btc-denom",
+	)
+
+	s.Require().NoError(err)
+	s.Require().Equal(makerFee+takerFee, distrModuleBtcBalance)
 }

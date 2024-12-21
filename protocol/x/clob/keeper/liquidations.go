@@ -246,8 +246,10 @@ func (k Keeper) GetBestPerpetualPositionToLiquidate(
 	subaccount := k.subaccountsKeeper.GetSubaccount(ctx, subaccountId)
 	subaccountLiquidationInfo := k.GetSubaccountLiquidationInfo(ctx, subaccountId)
 
-	bestPriority := big.NewFloat(-1)
+	//bestPriority := new(big.Float)
+	var bestPriority *big.Float = nil
 	bestPerpetualId := uint32(0)
+	foundPerpetual := false
 
 	if len(subaccount.PerpetualPositions) == 1 {
 		if subaccountLiquidationInfo.HasPerpetualBeenLiquidatedForSubaccount(subaccount.PerpetualPositions[0].PerpetualId) {
@@ -258,16 +260,17 @@ func (k Keeper) GetBestPerpetualPositionToLiquidate(
 	}
 
 	for _, position := range subaccount.PerpetualPositions {
-		err := k.SimulatePriorityWithClosedPosition(ctx, subaccount, subaccountLiquidationInfo, position, bestPriority, &bestPerpetualId)
+		err := k.SimulatePriorityWithClosedPosition(ctx, subaccount, subaccountLiquidationInfo, position, bestPriority, &bestPerpetualId, &foundPerpetual)
 		if err != nil {
 			return 0, err
 		}
 	}
 
-	if bestPriority.Sign() >= 0 {
-		return bestPerpetualId, nil
+	if !foundPerpetual {
+		return 0, types.ErrNoPerpetualPositionsToLiquidate
 	}
-	return 0, types.ErrNoPerpetualPositionsToLiquidate
+
+	return bestPerpetualId, nil
 }
 
 func (k Keeper) GetLiquidationOrderForPerpetual(
@@ -392,18 +395,20 @@ func (k Keeper) SimulatePriorityWithClosedPosition(
 	position *satypes.PerpetualPosition,
 	bestPriority *big.Float,
 	bestPerpetualId *uint32,
+	foundPerpetual *bool,
 ) error {
 	perpetual, err := k.perpetualsKeeper.GetPerpetual(ctx, position.PerpetualId)
 	if err != nil {
 		return err
 	}
+
 	price, err := k.pricesKeeper.GetMarketPrice(ctx, perpetual.Params.MarketId)
 	if err != nil {
 		return err
 	}
 
 	if !subaccountLiquidationInfo.HasPerpetualBeenLiquidatedForSubaccount(position.PerpetualId) {
-		err := k.simulatePriorityWithClosedPosition(ctx, subaccount, position, price, bestPriority, bestPerpetualId)
+		err := k.simulatePriorityWithClosedPosition(ctx, subaccount, position, price, bestPriority, bestPerpetualId, foundPerpetual)
 		if err != nil {
 			return err
 		}
@@ -518,26 +523,6 @@ func CanLiquidateSubaccount(
 	return bigMaintenanceMargin.Sign() > 0 && bigMaintenanceMargin.Cmp(bigNetCollateral) == 1
 }
 
-func GetHealth(
-	bigNetCollateral *big.Int,
-	bigMaintenanceMargin *big.Int,
-) *big.Float {
-	// If net collateral is less than 0, return 0
-	if bigNetCollateral.Sign() < 0 {
-		return big.NewFloat(0)
-	}
-
-	// If maintenance margin is less than or equal to 0, return a large number
-	if bigMaintenanceMargin.Sign() <= 0 {
-		return big.NewFloat(math.MaxFloat64)
-	}
-
-	// Calculate the collateral/maintenance margin ratio
-	health := new(big.Float).Quo(new(big.Float).SetInt(bigNetCollateral), new(big.Float).SetInt(bigMaintenanceMargin))
-
-	return health
-}
-
 func CalculateLiquidationPriority(
 	bigTotalNetCollateral *big.Int,
 	bigTotalMaintenanceMargin *big.Int,
@@ -551,6 +536,21 @@ func CalculateLiquidationPriority(
 
 	health := GetHealth(bigTotalNetCollateral, bigTotalMaintenanceMargin)
 	return new(big.Float).Quo(health, new(big.Float).SetInt(bigWeightedMaintenanceMargin))
+}
+
+func GetHealth(
+	bigNetCollateral *big.Int,
+	bigMaintenanceMargin *big.Int,
+) *big.Float {
+	// If maintenance margin is less than or equal to 0, return a large number
+	if bigMaintenanceMargin.Sign() <= 0 {
+		return big.NewFloat(math.MaxFloat64)
+	}
+
+	// Calculate the collateral/maintenance margin ratio
+	health := new(big.Float).Quo(new(big.Float).SetInt(bigNetCollateral), new(big.Float).SetInt(bigMaintenanceMargin))
+
+	return health
 }
 
 // EnsureIsLiquidatable returns an error if the subaccount is not liquidatable.
@@ -1165,6 +1165,7 @@ func (k Keeper) simulatePriorityWithClosedPosition(
 	price pricestypes.MarketPrice,
 	bestPriority *big.Float,
 	bestPerpetualId *uint32,
+	foundPerpetual *bool,
 ) error {
 	closedSubaccount := deepCopySubaccount(subaccount)
 
@@ -1178,10 +1179,12 @@ func (k Keeper) simulatePriorityWithClosedPosition(
 		return err
 	}
 
-	if priority.Cmp(bestPriority) > 0 {
-		*bestPriority = *priority
+	if bestPriority == nil || priority.Cmp(bestPriority) > 0 {
+		bestPriority = priority
 		*bestPerpetualId = position.PerpetualId
+		*foundPerpetual = true
 	}
+
 	return nil
 }
 

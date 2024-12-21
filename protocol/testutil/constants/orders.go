@@ -207,8 +207,22 @@ var (
 		Subticks:     10,
 		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
 	}
+	Order_Alice_Num11_Id0_Clob2_Sell10_Price10_GTB20 = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num11, ClientId: 0, ClobPairId: 2},
+		Side:         clobtypes.Order_SIDE_SELL,
+		Quantums:     10,
+		Subticks:     10,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
+	}
 	Order_Alice_Num1_Id0_Clob0_Sell10_Price10_GTB30 = clobtypes.Order{
 		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num1, ClientId: 0, ClobPairId: 0},
+		Side:         clobtypes.Order_SIDE_SELL,
+		Quantums:     10,
+		Subticks:     10,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 30},
+	}
+	Order_Alice_Num11_Id0_Clob2_Sell10_Price10_GTB30 = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num11, ClientId: 0, ClobPairId: 2},
 		Side:         clobtypes.Order_SIDE_SELL,
 		Quantums:     10,
 		Subticks:     10,
@@ -228,6 +242,13 @@ var (
 		Subticks:     10,
 		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
 	}
+	Order_Alice_Num11_Id2_Clob2_Buy10_Price10_GTB20 = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num11, ClientId: 2, ClobPairId: 2},
+		Side:         clobtypes.Order_SIDE_BUY,
+		Quantums:     10,
+		Subticks:     10,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
+	}
 	Order_Alice_Num1_Id2_Clob1_Buy10_Price10_GTB26 = clobtypes.Order{
 		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num1, ClientId: 2, ClobPairId: 1},
 		Side:         clobtypes.Order_SIDE_BUY,
@@ -235,8 +256,22 @@ var (
 		Subticks:     10,
 		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 26},
 	}
+	Order_Alice_Num11_Id2_Clob2_Buy10_Price10_GTB26 = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num11, ClientId: 2, ClobPairId: 2},
+		Side:         clobtypes.Order_SIDE_BUY,
+		Quantums:     10,
+		Subticks:     10,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 26},
+	}
 	Order_Alice_Num1_Id1_Clob1_Sell10_Price15_GTB20 = clobtypes.Order{
 		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num1, ClientId: 1, ClobPairId: 1},
+		Side:         clobtypes.Order_SIDE_SELL,
+		Quantums:     10,
+		Subticks:     15,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
+	}
+	Order_Alice_Num11_Id1_Clob2_Sell10_Price15_GTB20 = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num11, ClientId: 1, ClobPairId: 2},
 		Side:         clobtypes.Order_SIDE_SELL,
 		Quantums:     10,
 		Subticks:     15,
@@ -410,8 +445,22 @@ var (
 		Subticks:     1_000_000_000_000,
 		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
 	}
+	Order_Alice_Num11_Id3_Clob2_Sell100_Price100000_GTB20 = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num11, ClientId: 3, ClobPairId: 2},
+		Side:         clobtypes.Order_SIDE_SELL,
+		Quantums:     100,
+		Subticks:     1_000_000_000_000,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
+	}
 	Order_Alice_Num1_Id5_Clob1_Buy10_Price15_GTB23 = clobtypes.Order{
 		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num1, ClientId: 5, ClobPairId: 1},
+		Side:         clobtypes.Order_SIDE_BUY,
+		Quantums:     10,
+		Subticks:     15,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 23},
+	}
+	Order_Alice_Num11_Id5_Clob2_Buy10_Price15_GTB23 = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num11, ClientId: 5, ClobPairId: 2},
 		Side:         clobtypes.Order_SIDE_BUY,
 		Quantums:     10,
 		Subticks:     15,
@@ -1764,6 +1813,14 @@ var (
 	}
 	Order_Alice_Num1_Id4_Clob1_Sell10_Price15_GTB20_PO = clobtypes.Order{
 		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num1, ClientId: 4, ClobPairId: 1},
+		Side:         clobtypes.Order_SIDE_SELL,
+		Quantums:     10,
+		Subticks:     15,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
+		TimeInForce:  clobtypes.Order_TIME_IN_FORCE_POST_ONLY,
+	}
+	Order_Alice_Num11_Id4_Clob2_Sell10_Price15_GTB20_PO = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num11, ClientId: 4, ClobPairId: 2},
 		Side:         clobtypes.Order_SIDE_SELL,
 		Quantums:     10,
 		Subticks:     15,

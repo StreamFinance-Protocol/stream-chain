@@ -728,8 +728,26 @@ var (
 		CollateralPoolId:  uint32(1),
 	}
 
+	IsoBtc_CollatPool1_Params_Id5_DangerIndex1 = perptypes.PerpetualParams{
+		Id:                5,
+		Ticker:            "ISO-BTC1",
+		MarketId:          uint32(5),
+		AtomicResolution:  int32(-8),
+		DefaultFundingPpm: int32(0),
+		LiquidityTier:     uint32(3),
+		DangerIndexPpm:    uint32(1),
+		CollateralPoolId:  uint32(1),
+	}
+
 	IsoBtc_CollatPool1_Id5 = perptypes.Perpetual{
 		Params:       IsoBtc_CollatPool1_Params_Id5,
+		FundingIndex: dtypes.ZeroInt(),
+		OpenInterest: dtypes.ZeroInt(),
+		YieldIndex:   big.NewRat(0, 1).String(),
+	}
+
+	IsoBtc_CollatPool1_Id5_DangerIndex1 = perptypes.Perpetual{
+		Params:       IsoBtc_CollatPool1_Params_Id5_DangerIndex1,
 		FundingIndex: dtypes.ZeroInt(),
 		OpenInterest: dtypes.ZeroInt(),
 		YieldIndex:   big.NewRat(0, 1).String(),
@@ -764,8 +782,26 @@ var (
 		CollateralPoolId:  uint32(1),
 	}
 
+	Iso2Btc_CollatPool1_Params_Id7_DangerIndex1 = perptypes.PerpetualParams{
+		Id:                7,
+		Ticker:            "ISO2-BTC1",
+		MarketId:          uint32(6),
+		AtomicResolution:  int32(-8),
+		DefaultFundingPpm: int32(0),
+		LiquidityTier:     uint32(3),
+		DangerIndexPpm:    uint32(1),
+		CollateralPoolId:  uint32(1),
+	}
+
 	Iso2Btc_CollatPool1_Id7 = perptypes.Perpetual{
 		Params:       Iso2Btc_CollatPool1_Params_Id7,
+		FundingIndex: dtypes.ZeroInt(),
+		OpenInterest: dtypes.ZeroInt(),
+		YieldIndex:   big.NewRat(0, 1).String(),
+	}
+
+	Iso2Btc_CollatPool1_Id7_DangerIndex1 = perptypes.Perpetual{
+		Params:       Iso2Btc_CollatPool1_Params_Id7_DangerIndex1,
 		FundingIndex: dtypes.ZeroInt(),
 		OpenInterest: dtypes.ZeroInt(),
 		YieldIndex:   big.NewRat(0, 1).String(),

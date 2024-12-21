@@ -1348,7 +1348,7 @@ func TestGetFillablePrice(t *testing.T) {
 			// This means we should close the 0.1 BTC long with a $4,999.8 notional sell order.
 			expectedFillablePrice: big.NewRat(49_998, 100),
 		},
-		`Can calculate fillable price for a subaccount with one long position when 
+		`Can calculate fillable price for a subaccount with one long position when
 		spreadToMaintenanceMarginRatioPpm is 200_000`: {
 			perpetualId: 0,
 
@@ -1423,7 +1423,7 @@ func TestGetFillablePrice(t *testing.T) {
 			// This means we should close the 0.1 BTC short with a $5,000.2 notional buy order.
 			expectedFillablePrice: big.NewRat(50_002, 100),
 		},
-		`Can calculate fillable price for a subaccount with one short position when 
+		`Can calculate fillable price for a subaccount with one short position when
 		SpreadToMaintenanceMarginRatioPpm is 200_000`: {
 			perpetualId: 0,
 
@@ -3431,7 +3431,7 @@ func TestGetLiquidationInsuranceFundFeeAndRemainingAvailableCollateral(t *testin
 			expectedLiquidationInsuranceFundDeltaBig: big.NewInt(28_050_000),
 			expectedRemainingQuoteQuantumsBig:        big.NewInt(481_950_000),
 		},
-		`Fully closing one long position above the bankruptcy price pays max liquidation fee 
+		`Fully closing one long position above the bankruptcy price pays max liquidation fee
 		when InsuranceFundFeePpm is 25_000`: {
 			perpetualId: 0,
 			isBuy:       false,
@@ -3462,7 +3462,7 @@ func TestGetLiquidationInsuranceFundFeeAndRemainingAvailableCollateral(t *testin
 			expectedLiquidationInsuranceFundDeltaBig: big.NewInt(140_250_000),
 			expectedRemainingQuoteQuantumsBig:        big.NewInt(369_750_000),
 		},
-		`Fully closing one long position above the bankruptcy price pays less than max liquidation fee 
+		`Fully closing one long position above the bankruptcy price pays less than max liquidation fee
 		when InsuranceFundFeePpm is one million`: {
 			perpetualId: 0,
 			isBuy:       false,
@@ -5675,6 +5675,68 @@ func TestGetBestPerpetualPositionToLiquidateMultiplePositions(t *testing.T) {
 
 			expectedPerpetualId: 1,
 		},
+		`Expect more valuable position to be liquidated when we have negative TnC after closing any of the
+		 two positions`: {
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcUsd_SmallMarginRequirement_DangerIndex,
+				constants.EthUsd_20PercentInitial_10PercentMaintenance_DangerIndex,
+			},
+			subaccount: satypes.Subaccount{
+				Id: &constants.Dave_Num0,
+				AssetPositions: []*satypes.AssetPosition{
+					&satypes.AssetPosition{
+						AssetId:  0,
+						Quantums: dtypes.NewInt(-1_000_000_000),
+					},
+				},
+				PerpetualPositions: []*satypes.PerpetualPosition{
+					{
+						PerpetualId: 0,
+						Quantums:    dtypes.NewInt(1), // tiny BTC
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+					{
+						PerpetualId: 1,
+						Quantums:    dtypes.NewInt(100_000_000), // 0.1 ETH
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+				},
+				AssetYieldIndex: big.NewRat(1, 1).String(),
+			},
+
+			expectedPerpetualId: 1,
+		},
+		`Expect more valuable position to be liquidated when we have negative TnC after closing one of the
+		 two positions`: {
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcUsd_SmallMarginRequirement_DangerIndex,
+				constants.EthUsd_20PercentInitial_10PercentMaintenance_DangerIndex,
+			},
+			subaccount: satypes.Subaccount{
+				Id: &constants.Dave_Num0,
+				AssetPositions: []*satypes.AssetPosition{
+					&satypes.AssetPosition{
+						AssetId:  0,
+						Quantums: dtypes.NewInt(-1_000_000_000),
+					},
+				},
+				PerpetualPositions: []*satypes.PerpetualPosition{
+					{
+						PerpetualId: 0,
+						Quantums:    dtypes.NewInt(1), // tiny BTC
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+					{
+						PerpetualId: 1,
+						Quantums:    dtypes.NewInt(1_000_000_000), // 1 ETH
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+				},
+				AssetYieldIndex: big.NewRat(1, 1).String(),
+			},
+
+			expectedPerpetualId: 1,
+		},
 		"Expect BTC position to be liquidated when it's the only position": {
 			perpetuals: []perptypes.Perpetual{
 				constants.BtcUsd_SmallMarginRequirement_DangerIndex,
@@ -5682,7 +5744,16 @@ func TestGetBestPerpetualPositionToLiquidateMultiplePositions(t *testing.T) {
 			subaccount:          constants.Carl_Num0_1BTC_Short,
 			expectedPerpetualId: 0,
 		},
-		"Expect error when all positions have been previously liquidated": {
+		"Expect error when we have one position and it has been previously liquidated": {
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcUsd_SmallMarginRequirement_DangerIndex,
+			},
+			subaccount:                     constants.Carl_Num0_1BTC_Short,
+			previouslyLiquidatedPerpetuals: []uint32{0},
+			expectedError:                  true,
+			expectedExactError:             "Subaccount has no perpetual positions to liquidate",
+		},
+		"Expect error when we have multiple positions and all have been previously liquidated": {
 			perpetuals: []perptypes.Perpetual{
 				constants.BtcUsd_SmallMarginRequirement_DangerIndex,
 				constants.EthUsd_20PercentInitial_10PercentMaintenance_DangerIndex,
@@ -5716,6 +5787,23 @@ func TestGetBestPerpetualPositionToLiquidateMultiplePositions(t *testing.T) {
 			},
 			expectedError:      true,
 			expectedExactError: "Subaccount has no perpetual positions to liquidate",
+		},
+		`Expect small ISO-BTC position to be liquidated since it's the only position`: {
+			perpetuals: []perptypes.Perpetual{
+				constants.IsoBtc_CollatPool1_Id5,
+			},
+			subaccount: constants.Dave_Num0_TinyIso_Long_SmallBTC_Short,
+
+			expectedPerpetualId: 5,
+		},
+		`Expect ISO2-BTC position to be liquidated first as ISO-BTC position is negligeable`: {
+			perpetuals: []perptypes.Perpetual{
+				constants.IsoBtc_CollatPool1_Id5,
+				constants.Iso2Btc_CollatPool1_Id7,
+			},
+			subaccount: constants.Dave_Num0_TinyIso_Long_LargerIso2_Long_1BTC_Short,
+
+			expectedPerpetualId: 7,
 		},
 	}
 	for name, tc := range tests {

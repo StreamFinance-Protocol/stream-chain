@@ -2,7 +2,6 @@ package keeper_test
 
 import (
 	"errors"
-	"fmt"
 	"math"
 	"math/big"
 	"testing"
@@ -4747,8 +4746,6 @@ func TestGetNextSubaccountToLiquidate(t *testing.T) {
 				require.Equal(t, tc.expectedSubaccountId, subaccountId.SubaccountId)
 			}
 
-			fmt.Println("EXPECTED NUM ISOLATED", tc.expectedNumIsolated)
-			fmt.Println("NUM ISOLATED", tc.numIsolatedLiquidations)
 			require.Equal(t, tc.expectedNumIsolated, tc.numIsolatedLiquidations)
 			require.Equal(t, tc.expectedIsolatedPositionsPriorityHeap.Len(), isolatedPositionsPriorityHeap.Len())
 			require.Equal(t, tc.expectedSubaccountIds.Len(), subaccountIds.Len())
@@ -4762,10 +4759,10 @@ func TestGetHealth(t *testing.T) {
 		maintenanceMargin *big.Int
 		expectedHealth    *big.Float
 	}{
-		"negative net collateral returns 0": {
+		"negative net collateral returns negative health": {
 			netCollateral:     big.NewInt(-100),
 			maintenanceMargin: big.NewInt(50),
-			expectedHealth:    big.NewFloat(0),
+			expectedHealth:    big.NewFloat(-2),
 		},
 		"zero maintenance margin returns max float64": {
 			netCollateral:     big.NewInt(100),
@@ -4858,7 +4855,7 @@ func TestCalculateLiquidationPriority(t *testing.T) {
 			totalNetCollateral:        big.NewInt(-100),
 			totalMaintenanceMargin:    big.NewInt(50),
 			weightedMaintenanceMargin: big.NewInt(200),
-			expectedPriority:          big.NewFloat(0), // (0/50) / 200 = 0
+			expectedPriority:          big.NewFloat(-0.01),
 		},
 		"zero maintenance margin": {
 			totalNetCollateral:        big.NewInt(100),

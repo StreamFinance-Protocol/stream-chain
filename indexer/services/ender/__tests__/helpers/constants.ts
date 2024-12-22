@@ -40,6 +40,7 @@ import {
   UpdateClobPairEventV1,
   UpdatePerpetualEventV1,
   UpdateYieldParamsEventV1,
+  CollateralPoolCreateEvent,
 } from '@klyraprotocol-indexer/v4-protos';
 import Long from 'long';
 import { DateTime } from 'luxon';
@@ -194,6 +195,13 @@ export const defaultLiquidityTierUpsertEventV1: LiquidityTierUpsertEventV1 = {
   initialMarginPpm: 50000, // 5%
   maintenanceFractionPpm: 600000, // 60% of IM = 3%
   basePositionNotional: Long.fromValue(1_000_000_000_000, true), // 1_000_000 TDAI
+};
+
+export const defaultCreateCollateralPoolEvent: CollateralPoolCreateEvent = {
+  id: 0,
+  maxCumulativeInsuranceFundDeltaPerBlock: Long.fromValue(1000000, true),
+  multiCollateralAssets: [0],
+  quoteAssetId: 0,
 };
 
 const defaultOpenInterestUpdate1: OpenInterestUpdate = {

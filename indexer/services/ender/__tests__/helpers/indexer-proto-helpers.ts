@@ -31,6 +31,7 @@ import {
   IsoString,
   fillTypeToTradeType,
   OrderSubaccountMessageContents,
+  CollateralPoolFromDatabase,
 } from '@klyraprotocol-indexer/postgres';
 import {
   getOrderIdHash,
@@ -63,6 +64,7 @@ import Long from 'long';
 
 import {
   convertPerpetualPosition,
+  generateCollateralPoolMessage,
   generateFillSubaccountMessage,
   generatePerpetualMarketMessage,
   generatePerpetualPositionsContents,
@@ -223,6 +225,15 @@ export function expectPerpetualMarketKafkaMessage(
   });
 }
 
+export function expectCollateralPoolKafkaMessage(
+  producerSendMock: jest.SpyInstance,
+  collateralPools: CollateralPoolFromDatabase[]
+) {
+  expectMarketKafkaMessage({
+    producerSendMock,
+    contents: JSON.stringify(generateCollateralPoolMessage(collateralPools)),
+  });
+}
 export function expectMarketKafkaMessage({
   producerSendMock,
   contents,

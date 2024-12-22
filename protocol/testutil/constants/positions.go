@@ -209,11 +209,15 @@ var (
 	}
 	Btc_Asset_10_000 = satypes.AssetPosition{
 		AssetId:  1,
-		Quantums: dtypes.NewInt(10_000_000_000), // $10,000
+		Quantums: dtypes.NewInt(10_000_000_000), // 10k BTC
 	}
 	Btc_Asset_1 = satypes.AssetPosition{
 		AssetId:  1,
-		Quantums: dtypes.NewInt(100_000_000), // $10,000
+		Quantums: dtypes.NewInt(100_000_000), // 1 BTC
+	}
+	Btc_Asset_0_1 = satypes.AssetPosition{
+		AssetId:  1,
+		Quantums: dtypes.NewInt(10_000_000), // 0.1 BTC
 	}
 	TDai_Asset_10_100 = satypes.AssetPosition{
 		AssetId:  0,

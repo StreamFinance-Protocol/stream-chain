@@ -46,6 +46,7 @@ import {
   TransactionCreateObject,
   TransferCreateObject,
   YieldParamsCreateObject,
+  CollateralPoolsCreateObject,
 } from '../../src/types';
 
 export const createdDateTime: DateTime = DateTime.utc();
@@ -693,6 +694,22 @@ export const defaultLiquidityTier2: LiquidityTiersCreateObject = {
   maintenanceFractionPpm: '500000', // 50%
   openInterestLowerCap: '0',
   openInterestUpperCap: '5000000',
+};
+
+// ============== CollateralPools ==============
+
+export const defaultCollateralPool: CollateralPoolsCreateObject = {
+  id: 0,
+  maxCumulativeInsuranceFundDeltaPerBlock: 100000,
+  multiCollateralAssets: '{0}',
+  quoteAssetId: 0,
+};
+
+export const defaultCollateralPool2: CollateralPoolsCreateObject = {
+  id: 1,
+  maxCumulativeInsuranceFundDeltaPerBlock: 100000,
+  multiCollateralAssets: '{1}',
+  quoteAssetId: 1,
 };
 
 // ============== OraclePrices ==============

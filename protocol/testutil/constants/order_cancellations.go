@@ -106,6 +106,15 @@ var (
 		},
 		GoodTilOneof: &clobtypes.MsgCancelOrder_GoodTilBlockTime{GoodTilBlockTime: 15},
 	}
+	CancelLongTermOrder_Alice_Num11_Id0_Clob2_GTBT15 = clobtypes.MsgCancelOrder{
+		OrderId: clobtypes.OrderId{
+			SubaccountId: Alice_Num11,
+			ClientId:     0,
+			OrderFlags:   clobtypes.OrderIdFlags_LongTerm,
+			ClobPairId:   2,
+		},
+		GoodTilOneof: &clobtypes.MsgCancelOrder_GoodTilBlockTime{GoodTilBlockTime: 15},
+	}
 	CancelLongTermOrder_Bob_Num0_Id0_Clob0_GTBT5 = clobtypes.MsgCancelOrder{
 		OrderId: clobtypes.OrderId{
 			SubaccountId: Bob_Num0,

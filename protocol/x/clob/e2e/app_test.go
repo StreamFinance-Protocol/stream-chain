@@ -434,6 +434,10 @@ var (
 		constants.LongTermOrder_Alice_Num0_Id0_Clob0_Buy5_Price10_GTBT5,
 		testapp.DefaultGenesis(),
 	))
+	LongTermPlaceOrder_Alice_Num11_Id0_Clob2_Buy5_Price10_GTBT5 = *clobtypes.NewMsgPlaceOrder(testapp.MustScaleOrder(
+		constants.LongTermOrder_Alice_Num11_Id0_Clob2_Buy5_Price10_GTBT5,
+		testapp.DefaultGenesis(),
+	))
 	LongTermPlaceOrder_Alice_Num0_Id0_Clob1_Buy5_Price10_GTBT5 = *clobtypes.NewMsgPlaceOrder(testapp.MustScaleOrder(
 		constants.LongTermOrder_Alice_Num0_Id0_Clob1_Buy5_Price10_GTBT5,
 		testapp.DefaultGenesis(),

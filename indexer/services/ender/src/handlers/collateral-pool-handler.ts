@@ -23,11 +23,10 @@ export class CollateralPoolCreationHandler extends Handler<CollateralPoolCreateE
   ): Promise<ConsolidatedKafkaEvent[]> {
     const collateralPool: CollateralPoolFromDatabase =
       CollateralPoolsModel.fromJson(
-        resultRow.colleteral_pool
+        resultRow.collateral_pool
       ) as CollateralPoolFromDatabase;
 
     collateralPoolRefresher.upsertCollateralPool(collateralPool);
-    console.log('XXX--UPDSERTED COLLAT POOL--XXX', collateralPool);
     return [
       this.generateConsolidatedMarketKafkaEvent(
         JSON.stringify(generateCollateralPoolMessage([collateralPool]))

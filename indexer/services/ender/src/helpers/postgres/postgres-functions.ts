@@ -19,7 +19,9 @@ export type PostgresFunction = {
  * @returns The created script object
  */
 function newScript(name: string, scriptPath: string): PostgresFunction {
-  const script: string = readFileSync(path.resolve(__dirname, scriptPath)).toString();
+  const script: string = readFileSync(
+    path.resolve(__dirname, scriptPath)
+  ).toString();
   return {
     name,
     script,
@@ -38,6 +40,7 @@ const HANDLER_SCRIPTS: string[] = [
   'klyra_market_price_update_handler.sql',
   'klyra_open_interest_update_handler.sql',
   'klyra_perpetual_market_v1_handler.sql',
+  'klyra_collateral_pool_handler.sql',
   'klyra_perpetual_market_v2_handler.sql',
   'klyra_stateful_order_handler.sql',
   'klyra_subaccount_update_handler.sql',
@@ -89,9 +92,7 @@ const HELPER_SCRIPTS: string[] = [
   'klyra_uuid_from_yield_params_parts.sql',
 ];
 
-const MAIN_SCRIPTS: string[] = [
-  'klyra_block_processor.sql',
-];
+const MAIN_SCRIPTS: string[] = ['klyra_block_processor.sql'];
 
 const SCRIPTS: string[] = [
   ...HANDLER_SCRIPTS.map((script: string) => `handlers/${script}`),
@@ -103,15 +104,17 @@ const SCRIPTS: string[] = [
 export async function createPostgresFunctions(): Promise<void> {
   await Promise.all([
     dbHelpers.createModelToJsonFunctions(),
-    ...SCRIPTS.map((script: string) => storeHelpers.rawQuery(newScript(script, `../../scripts/${script}`).script, {})
-      .catch((error: Error) => {
-        logger.error({
-          at: 'postgres-functions#createPostgresFunctions',
-          message: `Failed to create or replace function contained in ${script}`,
-          error,
-        });
-        throw error;
-      }),
+    ...SCRIPTS.map((script: string) =>
+      storeHelpers
+        .rawQuery(newScript(script, `../../scripts/${script}`).script, {})
+        .catch((error: Error) => {
+          logger.error({
+            at: 'postgres-functions#createPostgresFunctions',
+            message: `Failed to create or replace function contained in ${script}`,
+            error,
+          });
+          throw error;
+        })
     ),
   ]);
 }

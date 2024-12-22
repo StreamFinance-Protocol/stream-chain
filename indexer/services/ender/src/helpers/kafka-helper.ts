@@ -15,6 +15,10 @@ import {
   OraclePriceFromDatabase,
   OrderFromDatabase,
   OrderSubaccountMessageContents,
+  CollateralPoolFromDatabase,
+  CollateralPoolContents,
+  CollateralPoolMessage,
+  CollateralPoolsMap,
   PerpetualMarketColumns,
   PerpetualMarketFromDatabase,
   PerpetualMarketsMap,
@@ -321,7 +325,22 @@ export function generateOrderSubaccountMessage(
     ticker,
   };
 }
-
+export function generateCollateralPoolMessage(
+  collateralPools: CollateralPoolFromDatabase[]
+): CollateralPoolContents {
+  return _.chain(collateralPools)
+    .keyBy('id')
+    .mapValues(
+      (collateralPool: CollateralPoolFromDatabase): CollateralPoolMessage => ({
+        id: collateralPool.id,
+        maxCumulativeInsuranceFundDeltaPerBlock:
+          collateralPool.maxCumulativeInsuranceFundDeltaPerBlock,
+        multiCollateralAssets: collateralPool.multiCollateralAssets,
+        quoteAssetId: collateralPool.quoteAssetId,
+      })
+    )
+    .value();
+}
 export function generatePerpetualMarketMessage(
   perpetualMarkets: PerpetualMarketFromDatabase[]
 ): MarketMessageContents {

@@ -32,6 +32,8 @@ export const postgresConfigSchema = {
   PG_POOL_MAX: parseInteger({ default: 2 }),
   PG_ACQUIRE_CONNECTION_TIMEOUT_MS: parseInteger({ default: 10_000 }),
   PERPETUAL_MARKETS_REFRESHER_INTERVAL_MS: parseInteger({ default: 30_000 }), // 30 seconds
+  COLLATERAL_POOLS_REFRESHER_INTERVAL_MS: parseInteger({ default: 30_000 }), // 30 seconds
+
   ASSET_REFRESHER_INTERVAL_MS: parseInteger({ default: 30_000 }), // 30 seconds
   MARKET_REFRESHER_INTERVAL_MS: parseInteger({ default: 30_000 }), // 30 seconds
   LIQUIDITY_TIER_REFRESHER_INTERVAL_MS: parseInteger({ default: 30_000 }), // 30 seconds

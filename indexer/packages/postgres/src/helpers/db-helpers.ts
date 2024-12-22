@@ -5,10 +5,7 @@ import { SQL_TO_JSON_DEFINED_MODELS } from '../constants';
 import { knexPrimary, knexReadReplica } from './knex';
 import { rawQuery } from './stores-helpers';
 
-const layer2Tables = [
-  'perpetual_positions',
-  'fills',
-];
+const layer2Tables = ['perpetual_positions', 'fills'];
 
 const layer1Tables = [
   'subaccounts',
@@ -17,6 +14,7 @@ const layer1Tables = [
   'perpetual_markets',
   'tendermint_events',
   'transactions',
+  'collateral_pools',
   'blocks',
   'assets',
   'candles',
@@ -31,7 +29,10 @@ const layer1Tables = [
  *
  * Raises an error if an unknown conversion is requested.
  */
-function getSqlConversionForKlyraModelTypes(fieldName: string, type: string): string {
+function getSqlConversionForKlyraModelTypes(
+  fieldName: string,
+  type: string
+): string {
   switch (type) {
     case 'integer':
       return `row_t."${fieldName}"::int`;
@@ -58,9 +59,15 @@ function getSqlConversionForKlyraModelTypes(fieldName: string, type: string): st
 export async function createModelToJsonFunctions(): Promise<void> {
   await Promise.all(
     SQL_TO_JSON_DEFINED_MODELS.map(async (model) => {
-      const sqlProperties: string[] = Object.entries(model.sqlToJsonConversions)
-        .map(([key, value]) => `'${key}', ${getSqlConversionForKlyraModelTypes(key, value)}`);
-      const sqlFn: string = `CREATE OR REPLACE FUNCTION klyra_to_jsonb(row_t ${model.tableName}) RETURNS jsonb AS $$
+      const sqlProperties: string[] = Object.entries(
+        model.sqlToJsonConversions
+      ).map(
+        ([key, value]) =>
+          `'${key}', ${getSqlConversionForKlyraModelTypes(key, value)}`
+      );
+      const sqlFn: string = `CREATE OR REPLACE FUNCTION klyra_to_jsonb(row_t ${
+        model.tableName
+      }) RETURNS jsonb AS $$
 BEGIN
     RETURN jsonb_build_object(
         ${sqlProperties.join(',\n        ')}
@@ -75,17 +82,15 @@ $$ LANGUAGE plpgsql IMMUTABLE PARALLEL SAFE;`;
         });
         throw error;
       });
-    }),
+    })
   );
 }
 
 async function dropData() {
   await Promise.all(
-    layer2Tables.map(
-      async (table) => {
-        return knexPrimary(table).del();
-      },
-    ),
+    layer2Tables.map(async (table) => {
+      return knexPrimary(table).del();
+    })
   );
 
   // need to use for... of to ensure tables are removed sequentially
@@ -141,7 +146,7 @@ export async function clearData() {
       if (tableExists) {
         return knexPrimary.raw(`truncate table "${table}" cascade`);
       }
-    }),
+    })
   );
 }
 

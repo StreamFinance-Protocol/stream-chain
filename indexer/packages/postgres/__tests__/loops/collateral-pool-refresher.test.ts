@@ -30,6 +30,8 @@ describe('collateralPoolRefresher', () => {
         const result = getCollateralPoolFromId(collateralPool.id);
         expect(result).toEqual({
           ...collateralPool,
+          maxCumulativeInsuranceFundDeltaPerBlock:
+            result.maxCumulativeInsuranceFundDeltaPerBlock.toString(),
           // Convert the array back to the expected format for comparison
           multiCollateralAssets: Array.isArray(result.multiCollateralAssets)
             ? result.multiCollateralAssets

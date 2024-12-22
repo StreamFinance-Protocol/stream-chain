@@ -1,4 +1,7 @@
-import { CandleMessage_Resolution, ClobPairStatus } from '@klyraprotocol-indexer/v4-protos';
+import {
+  CandleMessage_Resolution,
+  ClobPairStatus,
+} from '@klyraprotocol-indexer/v4-protos';
 
 import config from './config';
 import AssetModel from './models/asset-model';
@@ -21,6 +24,7 @@ import {
   PerpetualMarketStatus,
   TimeInForce,
 } from './types';
+import CollateralPoolsModel from './models/collateral-pool-model';
 
 export const BUFFER_ENCODING_UTF_8: BufferEncoding = 'utf-8';
 
@@ -34,7 +38,10 @@ export const ZERO_TIME_ISO_8601: string = '1970-01-01T00:00:00.000Z';
 
 export const ONE_MILLION: number = 1_000_000;
 
-export const NUM_SECONDS_IN_CANDLE_RESOLUTIONS: Record<CandleResolution, number> = {
+export const NUM_SECONDS_IN_CANDLE_RESOLUTIONS: Record<
+  CandleResolution,
+  number
+> = {
   [CandleResolution.ONE_DAY]: 60 * 60 * 24,
   [CandleResolution.FOUR_HOURS]: 60 * 60 * 4,
   [CandleResolution.ONE_HOUR]: 60 * 60,
@@ -44,7 +51,10 @@ export const NUM_SECONDS_IN_CANDLE_RESOLUTIONS: Record<CandleResolution, number>
   [CandleResolution.ONE_MINUTE]: 60,
 };
 
-export const CANDLE_RESOLUTION_TO_PROTO: Record<CandleResolution, CandleMessage_Resolution> = {
+export const CANDLE_RESOLUTION_TO_PROTO: Record<
+  CandleResolution,
+  CandleMessage_Resolution
+> = {
   [CandleResolution.ONE_DAY]: CandleMessage_Resolution.ONE_DAY,
   [CandleResolution.FOUR_HOURS]: CandleMessage_Resolution.FOUR_HOURS,
   [CandleResolution.ONE_HOUR]: CandleMessage_Resolution.ONE_HOUR,
@@ -57,9 +67,12 @@ export const CANDLE_RESOLUTION_TO_PROTO: Record<CandleResolution, CandleMessage_
 export type SpecifiedCandleResolution = Exclude<
   CandleMessage_Resolution,
   CandleMessage_Resolution.UNRECOGNIZED
-  >;
+>;
 
-export const PROTO_TO_CANDLE_RESOLUTION: Record<SpecifiedCandleResolution, CandleResolution> = {
+export const PROTO_TO_CANDLE_RESOLUTION: Record<
+  SpecifiedCandleResolution,
+  CandleResolution
+> = {
   [CandleMessage_Resolution.ONE_DAY]: CandleResolution.ONE_DAY,
   [CandleMessage_Resolution.FOUR_HOURS]: CandleResolution.FOUR_HOURS,
   [CandleMessage_Resolution.ONE_HOUR]: CandleResolution.ONE_HOUR,
@@ -78,7 +91,10 @@ export const PPM_EXPONENT: number = -6;
 // increments
 export const FUNDING_RATE_FROM_PROTOCOL_IN_HOURS: number = 8;
 
-export const TIME_IN_FORCE_TO_API_TIME_IN_FORCE: Record<TimeInForce, APITimeInForce> = {
+export const TIME_IN_FORCE_TO_API_TIME_IN_FORCE: Record<
+  TimeInForce,
+  APITimeInForce
+> = {
   [TimeInForce.GTT]: APITimeInForce.GTT,
   [TimeInForce.IOC]: APITimeInForce.IOC,
   [TimeInForce.FOK]: APITimeInForce.FOK,
@@ -92,6 +108,7 @@ export const SQL_TO_JSON_DEFINED_MODELS = [
   FillModel,
   FundingIndexUpdatesModel,
   LiquidityTiersModel,
+  CollateralPoolsModel,
   MarketModel,
   OraclePriceModel,
   OrderModel,
@@ -102,24 +119,32 @@ export const SQL_TO_JSON_DEFINED_MODELS = [
   YieldParamsModel,
 ];
 
-export type SpecifiedClobPairStatus =
-  Exclude<ClobPairStatus, ClobPairStatus.CLOB_PAIR_STATUS_UNSPECIFIED> &
+export type SpecifiedClobPairStatus = Exclude<
+  ClobPairStatus,
+  ClobPairStatus.CLOB_PAIR_STATUS_UNSPECIFIED
+> &
   Exclude<ClobPairStatus, ClobPairStatus.UNRECOGNIZED>;
 
-export const CLOB_STATUS_TO_MARKET_STATUS:
-Record<SpecifiedClobPairStatus, PerpetualMarketStatus> = {
+export const CLOB_STATUS_TO_MARKET_STATUS: Record<
+  SpecifiedClobPairStatus,
+  PerpetualMarketStatus
+> = {
   [ClobPairStatus.CLOB_PAIR_STATUS_ACTIVE]: PerpetualMarketStatus.ACTIVE,
-  [ClobPairStatus.CLOB_PAIR_STATUS_CANCEL_ONLY]: PerpetualMarketStatus.CANCEL_ONLY,
+  [ClobPairStatus.CLOB_PAIR_STATUS_CANCEL_ONLY]:
+    PerpetualMarketStatus.CANCEL_ONLY,
   [ClobPairStatus.CLOB_PAIR_STATUS_PAUSED]: PerpetualMarketStatus.PAUSED,
   [ClobPairStatus.CLOB_PAIR_STATUS_POST_ONLY]: PerpetualMarketStatus.POST_ONLY,
-  [ClobPairStatus.CLOB_PAIR_STATUS_INITIALIZING]: PerpetualMarketStatus.INITIALIZING,
-  [ClobPairStatus.CLOB_PAIR_STATUS_FINAL_SETTLEMENT]: PerpetualMarketStatus.FINAL_SETTLEMENT,
+  [ClobPairStatus.CLOB_PAIR_STATUS_INITIALIZING]:
+    PerpetualMarketStatus.INITIALIZING,
+  [ClobPairStatus.CLOB_PAIR_STATUS_FINAL_SETTLEMENT]:
+    PerpetualMarketStatus.FINAL_SETTLEMENT,
 };
 
-export const DEFAULT_POSTGRES_OPTIONS : Options = config.USE_READ_REPLICA
+export const DEFAULT_POSTGRES_OPTIONS: Options = config.USE_READ_REPLICA
   ? {
-    readReplica: true,
-  } : {};
+      readReplica: true,
+    }
+  : {};
 
 export const MAX_PARENT_SUBACCOUNTS: number = 128;
 

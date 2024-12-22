@@ -76,6 +76,8 @@ describe('CollateralPool store', () => {
 function normalizeCollateralPool(pool: CollateralPoolFromDatabase) {
   return {
     ...pool,
+    maxCumulativeInsuranceFundDeltaPerBlock:
+      pool.maxCumulativeInsuranceFundDeltaPerBlock.toString(),
     multiCollateralAssets: Array.isArray(pool.multiCollateralAssets)
       ? pool.multiCollateralAssets
       : JSON.parse(

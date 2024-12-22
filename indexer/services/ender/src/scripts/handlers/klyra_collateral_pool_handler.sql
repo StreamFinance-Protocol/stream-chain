@@ -13,8 +13,10 @@ DECLARE
     QUOTE_CURRENCY_ATOMIC_RESOLUTION constant numeric = -6;
 BEGIN
     collateral_pool_record."id" = (event_data->'id')::integer;
-    collateral_pool_record."maxCumulativeInsuranceFundDeltaPerBlock" = (event_data->'maxCumulativeInsuranceFundDeltaPerBlock')::integer;
-    collateral_pool_record."multiCollateralAssets" = (event_data->'multiCollateralAssets');
+    collateral_pool_record."maxCumulativeInsuranceFundDeltaPerBlock" = (klyra_from_jsonlib_long(event_data->'maxCumulativeInsuranceFundDeltaPerBlock'))::bigint;
+    collateral_pool_record."multiCollateralAssets" = ARRAY(
+        SELECT jsonb_array_elements(event_data->'multiCollateralAssets')::text::integer
+    );
     collateral_pool_record."quoteAssetId" = (event_data->'quoteAssetId')::integer;
 
     INSERT INTO collateral_pools

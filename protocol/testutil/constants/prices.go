@@ -32,6 +32,7 @@ const (
 	Iso2UsdExponent  = -7
 	IsoBtcExponent   = -8
 	Iso2BtcExponent  = -8
+	LinkBtcExponent  = -8
 
 	CoinbaseExchangeName  = "Coinbase"
 	BinanceExchangeName   = "Binance"
@@ -365,6 +366,7 @@ var TestMarketIdsToExponents = map[uint32]int32{
 	0: BtcUsdExponent,
 	1: EthUsdExponent,
 	2: SolUsdExponent,
+	5: LinkBtcExponent,
 }
 
 var TestPricesGenesisState = types.GenesisState{

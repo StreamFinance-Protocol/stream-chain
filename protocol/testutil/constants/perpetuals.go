@@ -860,6 +860,24 @@ var (
 		OpenInterest: dtypes.ZeroInt(),
 		YieldIndex:   big.NewRat(0, 1).String(),
 	}
+
+	LinkBtc_10_20MarginRequirement_CollatPool1_Params_Id11 = perptypes.PerpetualParams{
+		Id:                11,
+		Ticker:            "Link-BTC 10/20 margin requirement",
+		MarketId:          uint32(5),
+		AtomicResolution:  int32(-8),
+		DefaultFundingPpm: int32(0),
+		LiquidityTier:     uint32(3),
+		DangerIndexPpm:    uint32(0),
+		CollateralPoolId:  uint32(1),
+	}
+
+	LinkBtc_10_20MarginRequirement_CollatPool1_Id11_OpenInterest20 = perptypes.Perpetual{
+		Params:       LinkBtc_10_20MarginRequirement_CollatPool1_Params_Id11,
+		FundingIndex: dtypes.ZeroInt(),
+		OpenInterest: dtypes.NewInt(2_000_000_000),
+		YieldIndex:   big.NewRat(0, 1).String(),
+	}
 )
 
 var TestMarketPerpetuals = []perptypes.Perpetual{

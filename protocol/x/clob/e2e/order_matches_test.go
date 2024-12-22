@@ -140,6 +140,31 @@ func TestDeliverTxMatchValidation(t *testing.T) {
 				},
 			},
 		},
+		"Success: BTC collat IOC order is taker with multiple maker fills": {
+			subaccounts: []satypes.Subaccount{
+				constants.Alice_Num11_10_000BTC,
+				constants.Bob_Num11_10_000BTC,
+			},
+			blockAdvancements: []testapp.BlockAdvancementWithErrors{
+				{
+					BlockAdvancement: testapp.BlockAdvancement{
+						ShortTermOrdersAndOperations: []interface{}{
+							testapp.MustScaleOrder(constants.Order_Bob_Num11_Id11_Clob2_Buy5_Price40_GTB20, testapp.DefaultGenesis()),
+							testapp.MustScaleOrder(constants.Order_Alice_Num11_Id1_Clob2_Sell10_Price15_GTB20_IOC, testapp.DefaultGenesis()),
+							clobtestutils.NewMatchOperationRaw(
+								&constants.Order_Alice_Num11_Id1_Clob2_Sell10_Price15_GTB20_IOC,
+								[]clobtypes.MakerFill{
+									{
+										FillAmount:   50,
+										MakerOrderId: constants.Order_Bob_Num11_Id11_Clob2_Buy5_Price40_GTB20.OrderId,
+									},
+								},
+							),
+						},
+					},
+				},
+			},
+		},
 		"Error: IOC order is taker in multiple matches": {
 			subaccounts: []satypes.Subaccount{
 				constants.Alice_Num1_10_000USD,

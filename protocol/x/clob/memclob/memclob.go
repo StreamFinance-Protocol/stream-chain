@@ -294,7 +294,6 @@ func (m *MemClobPriceTimePriority) PlaceOrder(
 
 	// Validate the order and return an error if any validation fails.
 	if err := m.validateNewOrder(ctx, order); err != nil {
-		fmt.Println("VALIDATE NEW ORDER: ", err)
 		return 0, 0, offchainUpdates, err
 	}
 
@@ -302,8 +301,6 @@ func (m *MemClobPriceTimePriority) PlaceOrder(
 
 	// Attempt to match the order against the orderbook.
 	takerOrderStatus, takerOffchainUpdates, _, err := m.matchOrder(ctx, &order)
-	fmt.Println("takerOrderStatus: ", takerOrderStatus)
-	fmt.Println("err: ", err)
 	offchainUpdates.Append(takerOffchainUpdates)
 
 	if err != nil {
@@ -1639,11 +1636,7 @@ func (m *MemClobPriceTimePriority) ensureOrderbookNotCrossed(
 	orderbook := m.openOrders.mustGetOrderbook(order.GetClobPairId())
 	bestAsk, hasAsk, bestBid, hasBid := m.getBestOrdersOnBothSidesOfOrderbook(orderbook)
 
-	fmt.Println("EASPN")
-	fmt.Println("Order.subticks: ", order.Subticks)
-
 	if m.generalIsOrderbookCrossed(bestAsk, hasAsk, bestBid, hasBid) {
-		fmt.Println("ORDERBOOK CROSSED")
 		panic(
 			fmt.Sprintf(
 				"PlaceOrder: orderbook ID %v is crossed. Best bid: (%+v), best ask: (%+v), placed order: (%+v)",
@@ -1974,7 +1967,6 @@ func (m *MemClobPriceTimePriority) determineRemovalReason(
 		}
 		return types.OrderRemoval_REMOVAL_REASON_CONDITIONAL_FOK_COULD_NOT_BE_FULLY_FILLED
 	case errors.Is(err, types.ErrPostOnlyWouldCrossMakerOrder):
-		fmt.Println("in determineRemovalReason")
 		return types.OrderRemoval_REMOVAL_REASON_POST_ONLY_WOULD_CROSS_MAKER_ORDER
 	case errors.Is(err, types.ErrWouldViolateCollateralPoolConstraints):
 		return types.OrderRemoval_REMOVAL_REASON_VIOLATES_COLLATERAL_POOL_CONSTRAINTS
@@ -1989,14 +1981,6 @@ func (m *MemClobPriceTimePriority) generalIsOrderbookCrossed(
 	bestBid *list.Node[types.ClobOrder],
 	hasBid bool,
 ) bool {
-	fmt.Println("hashBid: ", hasBid)
-	if hasBid {
-		fmt.Println("bestBid.Value.Order.Subticks: ", bestBid.Value.Order.Subticks)
-	}
-	fmt.Println("hasAsk: ", hasAsk)
-	if hasAsk {
-		fmt.Println("bestAsk.Value.Order.Subticks: ", bestAsk.Value.Order.Subticks)
-	}
 
 	return hasBid && hasAsk && bestBid.Value.Order.Subticks >= bestAsk.Value.Order.Subticks
 }
@@ -2059,9 +2043,7 @@ func (m *MemClobPriceTimePriority) determineMatchingError(
 		return types.ErrFokOrderCouldNotBeFullyFilled
 	}
 
-	fmt.Println("running isPostOnlyAndNotRewind")
 	if m.isPostOnlyAndNotRewind(order, newMakerFills) {
-		fmt.Println("in determineMatchingError")
 		return types.ErrPostOnlyWouldCrossMakerOrder
 	}
 
@@ -2101,7 +2083,6 @@ func (m *MemClobPriceTimePriority) isPostOnlyAndNotRewind(
 	order types.MatchableOrder,
 	newMakerFills []types.MakerFill,
 ) bool {
-	fmt.Println("len maker fills: ", len(newMakerFills))
 	return len(newMakerFills) > 0 &&
 		!order.IsLiquidation() &&
 		order.MustGetOrder().TimeInForce == types.Order_TIME_IN_FORCE_POST_ONLY

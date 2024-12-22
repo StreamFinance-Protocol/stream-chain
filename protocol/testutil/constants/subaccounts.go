@@ -57,6 +57,22 @@ var (
 		PerpetualPositions: []*satypes.PerpetualPosition{},
 		AssetYieldIndex:    big.NewRat(0, 1).String(),
 	}
+	Alice_Num11_1BTC = satypes.Subaccount{
+		Id: &Alice_Num11,
+		AssetPositions: []*satypes.AssetPosition{
+			&Btc_Asset_1,
+		},
+		PerpetualPositions: []*satypes.PerpetualPosition{},
+		AssetYieldIndex:    big.NewRat(1, 1).String(),
+	}
+	Alice_Num11_5BTC = satypes.Subaccount{
+		Id: &Alice_Num11,
+		AssetPositions: []*satypes.AssetPosition{
+			&Btc_Asset_5,
+		},
+		PerpetualPositions: []*satypes.PerpetualPosition{},
+		AssetYieldIndex:    big.NewRat(1, 1).String(),
+	}
 	Alice_Num1_100_000USD = satypes.Subaccount{
 		Id: &Alice_Num1,
 		AssetPositions: []*satypes.AssetPosition{
@@ -174,6 +190,14 @@ var (
 		Id: &Bob_Num0,
 		AssetPositions: []*satypes.AssetPosition{
 			&TDai_Asset_100_000,
+		},
+		PerpetualPositions: []*satypes.PerpetualPosition{},
+		AssetYieldIndex:    big.NewRat(1, 1).String(),
+	}
+	Bob_Num11_1BTC = satypes.Subaccount{
+		Id: &Bob_Num11,
+		AssetPositions: []*satypes.AssetPosition{
+			&Btc_Asset_1,
 		},
 		PerpetualPositions: []*satypes.PerpetualPosition{},
 		AssetYieldIndex:    big.NewRat(1, 1).String(),
@@ -520,6 +544,22 @@ var (
 		Id: &Carl_Num1,
 		AssetPositions: []*satypes.AssetPosition{
 			&TDai_Asset_100_000,
+		},
+		PerpetualPositions: []*satypes.PerpetualPosition{},
+		AssetYieldIndex:    big.NewRat(1, 1).String(),
+	}
+	Carl_Num11_1BTC = satypes.Subaccount{
+		Id: &Carl_Num11,
+		AssetPositions: []*satypes.AssetPosition{
+			&Btc_Asset_1,
+		},
+		PerpetualPositions: []*satypes.PerpetualPosition{},
+		AssetYieldIndex:    big.NewRat(1, 1).String(),
+	}
+	Carl_Num11_5BTC = satypes.Subaccount{
+		Id: &Carl_Num11,
+		AssetPositions: []*satypes.AssetPosition{
+			&Btc_Asset_5,
 		},
 		PerpetualPositions: []*satypes.PerpetualPosition{},
 		AssetYieldIndex:    big.NewRat(1, 1).String(),
@@ -1022,6 +1062,14 @@ var (
 		Id: &Dave_Num1,
 		AssetPositions: []*satypes.AssetPosition{
 			&TDai_Asset_500_000,
+		},
+		PerpetualPositions: []*satypes.PerpetualPosition{},
+		AssetYieldIndex:    big.NewRat(1, 1).String(),
+	}
+	Dave_Num11_5Btc = satypes.Subaccount{
+		Id: &Dave_Num11,
+		AssetPositions: []*satypes.AssetPosition{
+			&Btc_Asset_5,
 		},
 		PerpetualPositions: []*satypes.PerpetualPosition{},
 		AssetYieldIndex:    big.NewRat(1, 1).String(),

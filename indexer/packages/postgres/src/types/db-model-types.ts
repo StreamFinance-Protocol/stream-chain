@@ -93,6 +93,13 @@ export interface PerpetualMarketFromDatabase {
   perpYieldIndex: string;
 }
 
+export interface CollateralPoolFromDatabase {
+  id: number;
+  maxCumulativeInsuranceFundDeltaPerBlock: number;
+  multiCollateralAssets: string;
+  quoteAssetId: number;
+}
+
 export interface FillFromDatabase {
   id: string;
   subaccountId: string;
@@ -253,6 +260,9 @@ export type PerpetualMarketsMap = {
 export type AssetsMap = { [assetId: string]: AssetFromDatabase };
 export type LiquidityTiersMap = {
   [liquidityTierId: number]: LiquidityTiersFromDatabase;
+};
+export type CollateralPoolsMap = {
+  [collateralPoolId: number]: CollateralPoolFromDatabase;
 };
 export type SubaccountTDaiMap = { [subaccountId: string]: Big };
 export type AssetPositionsMap = {

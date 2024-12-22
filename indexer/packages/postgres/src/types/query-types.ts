@@ -294,6 +294,10 @@ export interface LiquidityTiersQueryConfig extends QueryConfig {
   [QueryableField.ID]?: string[];
 }
 
+export interface CollateralPoolsQueryConfig extends QueryConfig {
+  [QueryableField.ID]?: string[];
+}
+
 export interface ComplianceDataQueryConfig extends QueryConfig {
   [QueryableField.ADDRESS]?: string[];
   [QueryableField.UPDATED_BEFORE_OR_AT]?: string;

@@ -216,6 +216,17 @@ export interface TradingPerpetualMarketMessage {
   nextFundingRate?: string;
 }
 
+export interface CollateralPoolContents {
+  [id: string]: CollateralPoolMessage;
+}
+
+export interface CollateralPoolMessage {
+  id?: number;
+  maxCumulativeInsuranceFundDeltaPerBlock?: number;
+  multiCollateralAssets?: string;
+  quoteAssetId: number;
+}
+
 export type OraclePriceMarketMessageContentsMapping = {
   [ticker: string]: OraclePriceMarket;
 };

@@ -936,6 +936,32 @@ export interface PerpetualMarketCreateEventV1SDKType {
 
   liquidity_tier: number;
 }
+export interface CollateralPoolCreateEvent {
+  /** The id of the collateral pool. */
+  id: number;
+  /** The maximum insurance fund delta per block for isolated perpetual markets. */
+
+  maxCumulativeInsuranceFundDeltaPerBlock: Long;
+  /** The multi collateral assets for the collateral pool. */
+
+  multiCollateralAssets: number[];
+  /** The id of the quote asset. */
+
+  quoteAssetId: number;
+}
+export interface CollateralPoolCreateEventSDKType {
+  /** The id of the collateral pool. */
+  id: number;
+  /** The maximum insurance fund delta per block for isolated perpetual markets. */
+
+  max_cumulative_insurance_fund_delta_per_block: Long;
+  /** The multi collateral assets for the collateral pool. */
+
+  multi_collateral_assets: number[];
+  /** The id of the quote asset. */
+
+  quote_asset_id: number;
+}
 /**
  * PerpetualMarketCreateEventV2 message contains all the information about a
  * new Perpetual Market on the Klyra chain.
@@ -2959,6 +2985,94 @@ export const PerpetualMarketCreateEventV1 = {
     message.subticksPerTick = object.subticksPerTick ?? 0;
     message.stepBaseQuantums = object.stepBaseQuantums !== undefined && object.stepBaseQuantums !== null ? Long.fromValue(object.stepBaseQuantums) : Long.UZERO;
     message.liquidityTier = object.liquidityTier ?? 0;
+    return message;
+  }
+
+};
+
+function createBaseCollateralPoolCreateEvent(): CollateralPoolCreateEvent {
+  return {
+    id: 0,
+    maxCumulativeInsuranceFundDeltaPerBlock: Long.UZERO,
+    multiCollateralAssets: [],
+    quoteAssetId: 0
+  };
+}
+
+export const CollateralPoolCreateEvent = {
+  encode(message: CollateralPoolCreateEvent, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.id !== 0) {
+      writer.uint32(8).uint32(message.id);
+    }
+
+    if (!message.maxCumulativeInsuranceFundDeltaPerBlock.isZero()) {
+      writer.uint32(16).uint64(message.maxCumulativeInsuranceFundDeltaPerBlock);
+    }
+
+    writer.uint32(26).fork();
+
+    for (const v of message.multiCollateralAssets) {
+      writer.uint32(v);
+    }
+
+    writer.ldelim();
+
+    if (message.quoteAssetId !== 0) {
+      writer.uint32(32).uint32(message.quoteAssetId);
+    }
+
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): CollateralPoolCreateEvent {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCollateralPoolCreateEvent();
+
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+
+      switch (tag >>> 3) {
+        case 1:
+          message.id = reader.uint32();
+          break;
+
+        case 2:
+          message.maxCumulativeInsuranceFundDeltaPerBlock = (reader.uint64() as Long);
+          break;
+
+        case 3:
+          if ((tag & 7) === 2) {
+            const end2 = reader.uint32() + reader.pos;
+
+            while (reader.pos < end2) {
+              message.multiCollateralAssets.push(reader.uint32());
+            }
+          } else {
+            message.multiCollateralAssets.push(reader.uint32());
+          }
+
+          break;
+
+        case 4:
+          message.quoteAssetId = reader.uint32();
+          break;
+
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+
+    return message;
+  },
+
+  fromPartial(object: DeepPartial<CollateralPoolCreateEvent>): CollateralPoolCreateEvent {
+    const message = createBaseCollateralPoolCreateEvent();
+    message.id = object.id ?? 0;
+    message.maxCumulativeInsuranceFundDeltaPerBlock = object.maxCumulativeInsuranceFundDeltaPerBlock !== undefined && object.maxCumulativeInsuranceFundDeltaPerBlock !== null ? Long.fromValue(object.maxCumulativeInsuranceFundDeltaPerBlock) : Long.UZERO;
+    message.multiCollateralAssets = object.multiCollateralAssets?.map(e => e) || [];
+    message.quoteAssetId = object.quoteAssetId ?? 0;
     return message;
   }
 

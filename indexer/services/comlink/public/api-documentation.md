@@ -1237,6 +1237,179 @@ func main() {
 This operation does not require authentication
 </aside>
 
+## GetCollateralPools
+
+<a id="opIdGetCollateralPools"></a>
+
+> Code samples
+
+```shell
+# You can also use wget
+curl -X GET https://klyra-testnet.imperator.co/v4/collateralPools \
+  -H 'Accept: application/json'
+
+```
+
+```http
+GET https://klyra-testnet.imperator.co/v4/collateralPools HTTP/1.1
+Host: klyra-testnet.imperator.co
+Accept: application/json
+
+```
+
+```javascript
+const headers = {
+  'Accept':'application/json'
+};
+const baseURL = 'https://klyra-testnet.imperator.co/v4';
+fetch(`${baseURL}/collateralPools`,
+{
+  method: 'GET',
+  headers: headers
+})
+.then(function(res) {
+    return res.json();
+}).then(function(body) {
+    console.log(body);
+});
+```
+
+```ruby
+require 'rest-client'
+require 'json'
+
+headers = {
+  'Accept' => 'application/json'
+}
+
+result = RestClient.get 'https://klyra-testnet.imperator.co/v4/collateralPools',
+  params: {
+  }, headers: headers
+
+p JSON.parse(result)
+
+```
+
+```python
+import requests
+headers = {
+  'Accept': 'application/json'
+}
+baseURL = 'https://klyra-testnet.imperator.co/v4'
+r = requests.get(f'{baseURL}/collateralPools', headers = headers)
+print(r.json())
+```
+
+```php
+<?php
+
+require 'vendor/autoload.php';
+
+$headers = array(
+    'Accept' => 'application/json',
+);
+
+$client = new \GuzzleHttp\Client();
+
+// Define array of request body.
+$request_body = array();
+
+try {
+    $response = $client->request('GET','https://klyra-testnet.imperator.co/v4/collateralPools', array(
+        'headers' => $headers,
+        'json' => $request_body,
+       )
+    );
+    print_r($response->getBody()->getContents());
+ }
+ catch (\GuzzleHttp\Exception\BadResponseException $e) {
+    // handle exception or api errors.
+    print_r($e->getMessage());
+ }
+
+ // ...
+
+```
+
+```java
+URL obj = new URL("https://klyra-testnet.imperator.co/v4/collateralPools");
+HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+con.setRequestMethod("GET");
+int responseCode = con.getResponseCode();
+BufferedReader in = new BufferedReader(
+    new InputStreamReader(con.getInputStream()));
+String inputLine;
+StringBuffer response = new StringBuffer();
+while ((inputLine = in.readLine()) != null) {
+    response.append(inputLine);
+}
+in.close();
+System.out.println(response.toString());
+
+```
+
+```go
+package main
+
+import (
+       "bytes"
+       "net/http"
+)
+
+func main() {
+
+    headers := map[string][]string{
+        "Accept": []string{"application/json"},
+    }
+
+    data := bytes.NewBuffer([]byte{jsonReq})
+    req, err := http.NewRequest("GET", "https://klyra-testnet.imperator.co/v4/collateralPools", data)
+    req.Header = headers
+
+    client := &http.Client{}
+    resp, err := client.Do(req)
+    // ...
+}
+
+```
+
+`GET /collateralPools`
+
+### Parameters
+
+|Name|In|Type|Required|Description|
+|---|---|---|---|---|
+|id|query|string|false|none|
+
+> Example responses
+
+> 200 Response
+
+```json
+{
+  "collateralPools": [
+    {
+      "id": "string",
+      "maxCumulativeInsuranceFundDeltaPerBlock": "string",
+      "multiCollateralAssets": [
+        0.1
+      ],
+      "quoteAssetId": "string"
+    }
+  ]
+}
+```
+
+### Responses
+
+|Status|Meaning|Description|Schema|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Ok|[CollateralPoolsResponse](#schemacollateralpoolsresponse)|
+
+<aside class="success">
+This operation does not require authentication
+</aside>
+
 ## Screen
 
 <a id="opIdScreen"></a>
@@ -5702,6 +5875,63 @@ This operation does not require authentication
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
 |candles|[[CandleResponseObject](#schemacandleresponseobject)]|true|none|none|
+
+## CollateralPoolsResponseObject
+
+<a id="schemacollateralpoolsresponseobject"></a>
+<a id="schema_CollateralPoolsResponseObject"></a>
+<a id="tocScollateralpoolsresponseobject"></a>
+<a id="tocscollateralpoolsresponseobject"></a>
+
+```json
+{
+  "id": "string",
+  "maxCumulativeInsuranceFundDeltaPerBlock": "string",
+  "multiCollateralAssets": [
+    0.1
+  ],
+  "quoteAssetId": "string"
+}
+
+```
+
+### Properties
+
+|Name|Type|Required|Restrictions|Description|
+|---|---|---|---|---|
+|id|string|true|none|none|
+|maxCumulativeInsuranceFundDeltaPerBlock|string|true|none|none|
+|multiCollateralAssets|[number]|true|none|none|
+|quoteAssetId|string|true|none|none|
+
+## CollateralPoolsResponse
+
+<a id="schemacollateralpoolsresponse"></a>
+<a id="schema_CollateralPoolsResponse"></a>
+<a id="tocScollateralpoolsresponse"></a>
+<a id="tocscollateralpoolsresponse"></a>
+
+```json
+{
+  "collateralPools": [
+    {
+      "id": "string",
+      "maxCumulativeInsuranceFundDeltaPerBlock": "string",
+      "multiCollateralAssets": [
+        0.1
+      ],
+      "quoteAssetId": "string"
+    }
+  ]
+}
+
+```
+
+### Properties
+
+|Name|Type|Required|Restrictions|Description|
+|---|---|---|---|---|
+|collateralPools|[[CollateralPoolsResponseObject](#schemacollateralpoolsresponseobject)]|true|none|none|
 
 ## ComplianceResponse
 

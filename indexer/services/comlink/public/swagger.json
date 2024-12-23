@@ -330,6 +330,49 @@
         "type": "object",
         "additionalProperties": false
       },
+      "CollateralPoolsResponseObject": {
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "maxCumulativeInsuranceFundDeltaPerBlock": {
+            "type": "string"
+          },
+          "multiCollateralAssets": {
+            "items": {
+              "type": "number",
+              "format": "double"
+            },
+            "type": "array"
+          },
+          "quoteAssetId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "maxCumulativeInsuranceFundDeltaPerBlock",
+          "multiCollateralAssets",
+          "quoteAssetId"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "CollateralPoolsResponse": {
+        "properties": {
+          "collateralPools": {
+            "items": {
+              "$ref": "#/components/schemas/CollateralPoolsResponseObject"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "collateralPools"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
       "ComplianceResponse": {
         "properties": {
           "restricted": {
@@ -1379,6 +1422,34 @@
           {
             "in": "query",
             "name": "toISO",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/collateralPools": {
+      "get": {
+        "operationId": "GetCollateralPools",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollateralPoolsResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
             "required": false,
             "schema": {
               "type": "string"

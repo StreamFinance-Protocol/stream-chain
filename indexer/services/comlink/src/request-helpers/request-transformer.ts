@@ -26,6 +26,7 @@ import {
   TransferType,
   parentSubaccountHelpers,
   YieldParamsFromDatabase,
+  CollateralPoolFromDatabase,
 } from '@klyraprotocol-indexer/postgres';
 import { OrderbookLevels, PriceLevel } from '@klyraprotocol-indexer/redis';
 import { RedisOrder } from '@klyraprotocol-indexer/v4-protos';
@@ -57,6 +58,7 @@ import {
   TradeResponseObject,
   TransferResponseObject,
   YieldParamsResponseObject,
+  CollateralPoolsResponseObject,
 } from '../types';
 
 /**
@@ -577,5 +579,18 @@ export function yieldParamsToResponseObject(
     assetYieldIndex: yieldParams.assetYieldIndex,
     createdAt: yieldParams.createdAt,
     createdAtHeight: yieldParams.createdAtHeight,
+  };
+}
+
+export function collateralPoolToResponseObject(
+  collateralPool: CollateralPoolFromDatabase
+): CollateralPoolsResponseObject {
+  return {
+    id: collateralPool.id.toString(),
+    maxCumulativeInsuranceFundDeltaPerBlock:
+      collateralPool.maxCumulativeInsuranceFundDeltaPerBlock.toString(),
+    multiCollateralAssets:
+      collateralPool.multiCollateralAssets as unknown as number[],
+    quoteAssetId: collateralPool.quoteAssetId.toString(),
   };
 }

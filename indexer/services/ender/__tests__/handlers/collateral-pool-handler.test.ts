@@ -1,5 +1,5 @@
 import {
-  CollateralPoolCreateEvent,
+  CollateralPoolUpsertEvent,
   IndexerTendermintBlock,
   IndexerTendermintEvent,
   Timestamp,
@@ -76,7 +76,7 @@ describe('collateralPoolHandler', () => {
         const indexerTendermintEvent: IndexerTendermintEvent =
           createIndexerTendermintEvent(
             KlyraIndexerSubtypes.COLLATERAL_POOL,
-            CollateralPoolCreateEvent.encode(
+            CollateralPoolUpsertEvent.encode(
               defaultCreateCollateralPoolEvent
             ).finish(),
             transactionIndex,
@@ -104,12 +104,12 @@ describe('collateralPoolHandler', () => {
 
     it('creates new collateral pool', async () => {
       const transactionIndex: number = 0;
-      const collateralPoolEvent: CollateralPoolCreateEvent =
+      const collateralPoolEvent: CollateralPoolUpsertEvent =
         defaultCreateCollateralPoolEvent;
       const kafkaMessage: KafkaMessage =
-        createKafkaMessageFromCollateralPoolCreateEvent({
+        createKafkaMessageFromCollateralPoolUpsertEvent({
           collateralPoolEvent:
-            CollateralPoolCreateEvent.encode(collateralPoolEvent).finish(),
+            CollateralPoolUpsertEvent.encode(collateralPoolEvent).finish(),
           transactionIndex,
           height: defaultHeight,
           time: defaultTime,
@@ -156,7 +156,7 @@ export function expectCollateralPool(
   ).toEqual(event.multiCollateralAssets);
 }
 
-function createKafkaMessageFromCollateralPoolCreateEvent({
+function createKafkaMessageFromCollateralPoolUpsertEvent({
   collateralPoolEvent,
   transactionIndex,
   height,
@@ -204,7 +204,7 @@ async function expectNoExistingCollateralPools() {
 }
 
 function validateCollateralPoolRefresher(
-  collateralPoolEvent: CollateralPoolCreateEvent
+  collateralPoolEvent: CollateralPoolUpsertEvent
 ) {
   const collateralPool: CollateralPoolFromDatabase =
     collateralPoolRefresher.getCollateralPoolFromId(collateralPoolEvent.id);

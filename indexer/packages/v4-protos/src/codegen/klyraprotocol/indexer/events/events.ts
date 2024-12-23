@@ -936,7 +936,7 @@ export interface PerpetualMarketCreateEventV1SDKType {
 
   liquidity_tier: number;
 }
-export interface CollateralPoolCreateEvent {
+export interface CollateralPoolUpsertEvent {
   /** The id of the collateral pool. */
   id: number;
   /** The maximum insurance fund delta per block for isolated perpetual markets. */
@@ -949,7 +949,7 @@ export interface CollateralPoolCreateEvent {
 
   quoteAssetId: number;
 }
-export interface CollateralPoolCreateEventSDKType {
+export interface CollateralPoolUpsertEventSDKType {
   /** The id of the collateral pool. */
   id: number;
   /** The maximum insurance fund delta per block for isolated perpetual markets. */
@@ -2990,7 +2990,7 @@ export const PerpetualMarketCreateEventV1 = {
 
 };
 
-function createBaseCollateralPoolCreateEvent(): CollateralPoolCreateEvent {
+function createBaseCollateralPoolUpsertEvent(): CollateralPoolUpsertEvent {
   return {
     id: 0,
     maxCumulativeInsuranceFundDeltaPerBlock: Long.UZERO,
@@ -2999,8 +2999,8 @@ function createBaseCollateralPoolCreateEvent(): CollateralPoolCreateEvent {
   };
 }
 
-export const CollateralPoolCreateEvent = {
-  encode(message: CollateralPoolCreateEvent, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const CollateralPoolUpsertEvent = {
+  encode(message: CollateralPoolUpsertEvent, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.id !== 0) {
       writer.uint32(8).uint32(message.id);
     }
@@ -3024,10 +3024,10 @@ export const CollateralPoolCreateEvent = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): CollateralPoolCreateEvent {
+  decode(input: _m0.Reader | Uint8Array, length?: number): CollateralPoolUpsertEvent {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseCollateralPoolCreateEvent();
+    const message = createBaseCollateralPoolUpsertEvent();
 
     while (reader.pos < end) {
       const tag = reader.uint32();
@@ -3067,8 +3067,8 @@ export const CollateralPoolCreateEvent = {
     return message;
   },
 
-  fromPartial(object: DeepPartial<CollateralPoolCreateEvent>): CollateralPoolCreateEvent {
-    const message = createBaseCollateralPoolCreateEvent();
+  fromPartial(object: DeepPartial<CollateralPoolUpsertEvent>): CollateralPoolUpsertEvent {
+    const message = createBaseCollateralPoolUpsertEvent();
     message.id = object.id ?? 0;
     message.maxCumulativeInsuranceFundDeltaPerBlock = object.maxCumulativeInsuranceFundDeltaPerBlock !== undefined && object.maxCumulativeInsuranceFundDeltaPerBlock !== null ? Long.fromValue(object.maxCumulativeInsuranceFundDeltaPerBlock) : Long.UZERO;
     message.multiCollateralAssets = object.multiCollateralAssets?.map(e => e) || [];

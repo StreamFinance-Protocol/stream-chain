@@ -26,7 +26,7 @@ import {
   OpenInterestUpdateEventV1,
   DeleveragingEventV1,
   UpdateYieldParamsEventV1,
-  CollateralPoolCreateEvent,
+  CollateralPoolUpsertEvent,
 } from '@klyraprotocol-indexer/v4-protos';
 import Big from 'big.js';
 import _ from 'lodash';
@@ -201,7 +201,7 @@ export function indexerTendermintEventToEventProtoWithType(
     case KlyraIndexerSubtypes.COLLATERAL_POOL.toString(): {
       return {
         type: KlyraIndexerSubtypes.COLLATERAL_POOL,
-        eventProto: CollateralPoolCreateEvent.decode(eventDataBinary),
+        eventProto: CollateralPoolUpsertEvent.decode(eventDataBinary),
         indexerTendermintEvent: event,
         version,
         blockEventIndex,

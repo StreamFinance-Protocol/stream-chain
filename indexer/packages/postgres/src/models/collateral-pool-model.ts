@@ -1,4 +1,5 @@
 import { Model } from 'objection';
+import UpsertQueryBuilder from '../query-builders/upsert';
 
 export default class CollateralPoolsModel extends Model {
   static get tableName() {
@@ -49,6 +50,8 @@ export default class CollateralPoolsModel extends Model {
   }
 
   id!: number;
+
+  QueryBuilderType!: UpsertQueryBuilder<this>;
 
   maxCumulativeInsuranceFundDeltaPerBlock!: number;
 

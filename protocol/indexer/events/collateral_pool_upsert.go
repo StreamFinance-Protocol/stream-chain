@@ -1,6 +1,6 @@
 package events
 
-// NewCollateralPoolCreateEvent creates a CollateralPoolCreateEvent
+// NewCollateralPoolUpsertEvent creates a CollateralPoolUpsertEvent
 // representing creation of a perpetual market.
 func NewCollateralPoolUpsertEvent(
 	id uint32,

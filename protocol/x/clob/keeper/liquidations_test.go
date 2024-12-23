@@ -4760,15 +4760,27 @@ func TestGetNextSubaccountToLiquidate(t *testing.T) {
 }
 
 func TestGetHealth(t *testing.T) {
+	largeNegativeExpectedHealth, _ := new(big.Float).SetString("-15241578780673678515622620750190521")
+
 	tests := map[string]struct {
 		netCollateral     *big.Int
 		maintenanceMargin *big.Int
 		expectedHealth    *big.Float
 	}{
-		"negative net collateral returns negative health": {
+		"negative net collateral, health computed as TNC*WMM, health exactly -1": {
+			netCollateral:     big.NewInt(-1),
+			maintenanceMargin: big.NewInt(1),
+			expectedHealth:    big.NewFloat(-1),
+		},
+		"negative net collateral, health computed as TNC*WMM, health less than -1": {
 			netCollateral:     big.NewInt(-100),
 			maintenanceMargin: big.NewInt(50),
-			expectedHealth:    big.NewFloat(-2),
+			expectedHealth:    big.NewFloat(-5000),
+		},
+		"negative net collateral large number": {
+			netCollateral:     big.NewInt(-123456789123456789),
+			maintenanceMargin: big.NewInt(123456789123456789),
+			expectedHealth:    largeNegativeExpectedHealth,
 		},
 		"zero maintenance margin returns max float64": {
 			netCollateral:     big.NewInt(100),
@@ -4780,7 +4792,7 @@ func TestGetHealth(t *testing.T) {
 			maintenanceMargin: big.NewInt(-50),
 			expectedHealth:    big.NewFloat(math.MaxFloat64),
 		},
-		"normal case - health less than 1": {
+		"normal positiive case, health computed as TNC/WMM, health less than 1": {
 			netCollateral:     big.NewInt(50),
 			maintenanceMargin: big.NewInt(100),
 			expectedHealth:    big.NewFloat(0.5),

@@ -361,7 +361,7 @@ message PerpetualMarketCreateEventV1 {
   uint32 liquidity_tier = 10;
 }
 
-message CollateralPoolCreateEvent {
+message CollateralPoolUpsertEvent {
   // The id of the collateral pool.
   uint32 id = 1;
 

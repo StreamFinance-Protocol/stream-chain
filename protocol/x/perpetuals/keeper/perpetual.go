@@ -1829,6 +1829,7 @@ func (k Keeper) UpsertCollateralPool(
 	}
 
 	doesCollatPoolExits := k.HasCollateralPool(ctx, collateralPoolId)
+
 	if doesCollatPoolExits {
 		if err := k.HandleExistingCollateralPool(ctx, collateralPoolId, multiCollateralAssets, quoteAssetId); err != nil {
 			return collateralPool, err
@@ -1838,21 +1839,19 @@ func (k Keeper) UpsertCollateralPool(
 	// Set collateral pool in store.
 	k.writeCollateralPoolToStore(ctx, collateralPool)
 
-	if !doesCollatPoolExits {
-		k.GetIndexerEventManager().AddTxnEvent(
-			ctx,
-			indexerevents.SubtypeCollateralPool,
-			indexerevents.CollateralPoolEventVersion,
-			indexer_manager.GetBytes(
-				indexerevents.NewCollateralPoolCreateEvent(
-					collateralPoolId,
-					maxCumulativeInsuranceFundDeltaPerBlock,
-					multiCollateralAssets.MultiCollateralAssets,
-					quoteAssetId,
-				),
+	k.GetIndexerEventManager().AddTxnEvent(
+		ctx,
+		indexerevents.SubtypeCollateralPool,
+		indexerevents.CollateralPoolEventVersion,
+		indexer_manager.GetBytes(
+			indexerevents.NewCollateralPoolUpsertEvent(
+				collateralPoolId,
+				maxCumulativeInsuranceFundDeltaPerBlock,
+				multiCollateralAssets.MultiCollateralAssets,
+				quoteAssetId,
 			),
-		)
-	}
+		),
+	)
 
 	return collateralPool, nil
 }

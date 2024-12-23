@@ -15,9 +15,13 @@ export const CheckSubaccountSchema = checkSchema({
   subaccountNumber: {
     in: ['params', 'query'],
     isInt: {
-      options: { gt: -1, lt: MAX_PARENT_SUBACCOUNTS * CHILD_SUBACCOUNT_MULTIPLIER + 1 },
+      options: {
+        gt: -1,
+        lt: MAX_PARENT_SUBACCOUNTS * CHILD_SUBACCOUNT_MULTIPLIER + 1,
+      },
     },
-    errorMessage: 'subaccountNumber must be a non-negative integer less than 128001',
+    errorMessage:
+      'subaccountNumber must be a non-negative integer less than 128001',
   },
 });
 
@@ -31,7 +35,8 @@ export const CheckParentSubaccountSchema = checkSchema({
     isInt: {
       options: { gt: -1, lt: MAX_PARENT_SUBACCOUNTS },
     },
-    errorMessage: 'parentSubaccountNumber must be a non-negative integer less than 128',
+    errorMessage:
+      'parentSubaccountNumber must be a non-negative integer less than 128',
   },
 });
 
@@ -47,7 +52,8 @@ export const CheckAddressSchema = checkSchema(checkAddressSchemaRecord);
 const limitSchemaRecord: Record<string, ParamSchema> = {
   limit: {
     in: ['query'],
-    errorMessage: 'limit must be a positive integer that is not greater than max: ' +
+    errorMessage:
+      'limit must be a positive integer that is not greater than max: ' +
       `${config.API_LIMIT_V4}`,
     customSanitizer: {
       options: (value?: number | string): number => {
@@ -57,8 +63,14 @@ const limitSchemaRecord: Record<string, ParamSchema> = {
     custom: {
       options: (value: number) => {
         // Custom validator to ensure the value is a positive integer
-        if (value <= 0 || value > config.API_LIMIT_V4 || !Number.isInteger(value)) {
-          throw new Error(`limit must be a positive integer that is not greater than max: ${config.API_LIMIT_V4}`);
+        if (
+          value <= 0 ||
+          value > config.API_LIMIT_V4 ||
+          !Number.isInteger(value)
+        ) {
+          throw new Error(
+            `limit must be a positive integer that is not greater than max: ${config.API_LIMIT_V4}`
+          );
         }
         return true;
       },
@@ -148,6 +160,15 @@ const checkTickerOptionalQuerySchema: ParamSchema = {
 
 export const CheckTickerParamSchema = checkSchema({
   ticker: checkTickerParamSchema,
+});
+
+export const CheckIdParamSchema = checkSchema({
+  id: {
+    in: 'query',
+    optional: true,
+    isString: true,
+    errorMessage: 'id must be a string',
+  },
 });
 
 export const CheckTickerOptionalQuerySchema = checkSchema({

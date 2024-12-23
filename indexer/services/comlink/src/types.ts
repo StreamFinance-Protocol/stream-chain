@@ -349,6 +349,19 @@ export interface YieldParamsResponseObject {
   createdAtHeight: string;
 }
 
+/* ------- COLLATERAL POOLS TYPES ------- */
+
+export interface CollateralPoolsResponse {
+  collateralPools: CollateralPoolsResponseObject[];
+}
+
+export interface CollateralPoolsResponseObject {
+  id: string;
+  maxCumulativeInsuranceFundDeltaPerBlock: string;
+  multiCollateralAssets: number[];
+  quoteAssetId: string;
+}
+
 /* ------- GET REQUEST TYPES ------- */
 
 export interface AddressRequest {
@@ -373,6 +386,10 @@ export interface TickerRequest {
 
 export interface YieldParamsRequest {
   createdBeforeOrAtHeight?: string;
+}
+
+export interface CollateralPoolsRequest {
+  id?: string;
 }
 
 export interface LimitAndCreatedBeforeRequest extends LimitRequest {

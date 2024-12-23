@@ -1,4 +1,4 @@
-import { QueryBuilder } from 'objection';
+import { PartialModelObject, QueryBuilder } from 'objection';
 
 import { DEFAULT_POSTGRES_OPTIONS } from '../constants';
 import {
@@ -14,6 +14,7 @@ import {
   Ordering,
   QueryableField,
   QueryConfig,
+  CollateralPoolsUpdateObject,
 } from '../types';
 import { CollateralPoolsColumns, CollateralPoolsCreateObject } from '../types';
 
@@ -74,34 +75,34 @@ export async function findById(
   return baseQuery.findById(id).returning('*');
 }
 
-// export async function update(
-//   { id, ...fields }: CollateralPoolsUpdateObject,
-//   options: Options = { txId: undefined }
-// ): Promise<CollateralPoolsFromDatabase | undefined> {
-//   const liquidityTier = await CollateralPoolsModel.query(
-//     Transaction.get(options.txId)
-//     // TODO fix expression typing so we dont have to use any
-//     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-//   ).findById(id);
-//   const updatedCollateralPools = await liquidityTier
-//     .$query()
-//     .patch(fields as PartialModelObject<CollateralPoolsModel>)
-//     .returning('*');
-//   // The objection types mistakenly think the query returns an array of liquidityTiers.
-//   return updatedCollateralPools as unknown as
-//     | CollateralPoolsFromDatabase
-//     | undefined;
-// }
+export async function update(
+  { id, ...fields }: CollateralPoolsUpdateObject,
+  options: Options = { txId: undefined }
+): Promise<CollateralPoolFromDatabase | undefined> {
+  const collateralPool = await CollateralPoolsModel.query(
+    Transaction.get(options.txId)
+    // TODO fix expression typing so we dont have to use any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ).findById(id);
+  const updatedCollateralPools = await collateralPool
+    .$query()
+    .patch(fields as PartialModelObject<CollateralPoolsModel>)
+    .returning('*');
+  // The objection types mistakenly think the query returns an array of liquidityTiers.
+  return updatedCollateralPools as unknown as
+    | CollateralPoolFromDatabase
+    | undefined;
+}
 
-// export async function upsert(
-//   tierToUpsert: CollateralPoolsCreateObject,
-//   options: Options = { txId: undefined }
-// ): Promise<CollateralPoolsFromDatabase> {
-//   const tiers: CollateralPoolsModel[] = await CollateralPoolsModel.query(
-//     Transaction.get(options.txId)
-//   )
-//     .upsert(tierToUpsert)
-//     .returning('*');
-//   // should only ever be one tier
-//   return tiers[0];
-// }
+export async function upsert(
+  tierToUpsert: CollateralPoolsCreateObject,
+  options: Options = { txId: undefined }
+): Promise<CollateralPoolFromDatabase> {
+  const tiers: CollateralPoolsModel[] = await CollateralPoolsModel.query(
+    Transaction.get(options.txId)
+  )
+    .upsert(tierToUpsert)
+    .returning('*');
+  // should only ever be one tier
+  return tiers[0];
+}

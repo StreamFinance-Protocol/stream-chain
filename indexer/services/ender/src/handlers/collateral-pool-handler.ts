@@ -3,15 +3,15 @@ import {
   CollateralPoolsModel,
   collateralPoolRefresher,
 } from '@klyraprotocol-indexer/postgres';
-import { CollateralPoolCreateEvent } from '@klyraprotocol-indexer/v4-protos';
+import { CollateralPoolUpsertEvent } from '@klyraprotocol-indexer/v4-protos';
 import * as pg from 'pg';
 
 import { Handler } from './handler';
 import { generateCollateralPoolMessage } from '../helpers/kafka-helper';
 import { ConsolidatedKafkaEvent } from '../lib/types';
 
-export class CollateralPoolCreationHandler extends Handler<CollateralPoolCreateEvent> {
-  eventType: string = 'CollateralPoolCreateEvent';
+export class CollateralPoolCreationHandler extends Handler<CollateralPoolUpsertEvent> {
+  eventType: string = 'CollateralPoolUpsertEvent';
 
   public getParallelizationIds(): string[] {
     return [];

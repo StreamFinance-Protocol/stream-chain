@@ -13,3 +13,10 @@ export enum CollateralPoolsColumns {
   multiCollateralAssets = 'multiCollateralAssets',
   quoteAssetId = 'quoteAssetId',
 }
+
+export interface CollateralPoolsUpdateObject {
+  id: number;
+  maxCumulativeInsuranceFundDeltaPerBlock?: number;
+  multiCollateralAssets?: string;
+  quoteAssetId?: number;
+}

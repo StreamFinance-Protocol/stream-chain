@@ -343,13 +343,10 @@ func CreatePerpetualMarkets(
 	perpetuals []types.Perpetual,
 ) {
 	// Create liquidity tiers.
-	fmt.Println("CREATING COLLATERAL POOLS")
 	CreateTestCollateralPools(t, ctx, perpKeeper)
-	fmt.Println("CREATING LIQUIDITY TIERS")
 	CreateTestLiquidityTiers(t, ctx, perpKeeper)
 
 	for _, perp := range perpetuals {
-		fmt.Println("CREATING PERP ", perp)
 		_, err := perpKeeper.CreatePerpetual(
 			ctx,
 			perp.Params.Id,

@@ -1285,8 +1285,6 @@ func TestConditionalOrder_TriggeringUsingMatchedPrice(t *testing.T) {
 
 		expectedInTriggeredStateAfterBlock map[uint32]map[clobtypes.OrderId]bool
 
-		genesisPriceChanges map[uint32]uint64
-
 		// these expectations are asserted after all blocks are processed
 		expectedExistInState    map[clobtypes.OrderId]bool
 		expectedOrderFillAmount map[clobtypes.OrderId]uint64
@@ -1564,33 +1562,6 @@ func TestConditionalOrder_TriggeringUsingMatchedPrice(t *testing.T) {
 				2: {constants.ConditionalOrder_Alice_Num0_Id0_Clob0_Buy1BTC_Price50000_GTBT10_TP_49999.OrderId: false},
 				3: {constants.ConditionalOrder_Alice_Num0_Id0_Clob0_Buy1BTC_Price50000_GTBT10_TP_49999.OrderId: true},
 				4: {constants.ConditionalOrder_Alice_Num0_Id0_Clob0_Buy1BTC_Price50000_GTBT10_TP_49999.OrderId: true},
-			},
-		},
-		"BTC Collat: TakeProfit/Buy conditional order is placed and triggered in later blocks": {
-			subaccounts: []satypes.Subaccount{
-				constants.Alice_Num11_5BTC,
-				constants.Carl_Num11_5BTC,
-				constants.Dave_Num11_5Btc,
-			},
-			genesisPriceChanges: map[uint32]uint64{
-				0: 100_000,
-			},
-			ordersForFirstBlock: []clobtypes.Order{
-				constants.ConditionalOrder_Alice_Num11_Id0_Clob10_Buy1Link_Price7_GTBT10_TP_6_999,
-			},
-			ordersForSecondBlock: []clobtypes.Order{
-				// Create a match with price $6_997.
-				constants.Order_Dave_Num11_Id0_Clob10_Sell1Link_Price6_997_GTB10,
-				constants.Order_Carl_Num11_Id0_Clob10_Buy1Link_Price7_003_GTB10,
-			},
-
-			expectedExistInState: map[clobtypes.OrderId]bool{
-				constants.ConditionalOrder_Alice_Num11_Id0_Clob10_Buy1Link_Price7_GTBT10_TP_6_999.OrderId: true,
-			},
-			expectedInTriggeredStateAfterBlock: map[uint32]map[clobtypes.OrderId]bool{
-				2: {constants.ConditionalOrder_Alice_Num11_Id0_Clob10_Buy1Link_Price7_GTBT10_TP_6_999.OrderId: false},
-				3: {constants.ConditionalOrder_Alice_Num11_Id0_Clob10_Buy1Link_Price7_GTBT10_TP_6_999.OrderId: true},
-				4: {constants.ConditionalOrder_Alice_Num11_Id0_Clob10_Buy1Link_Price7_GTBT10_TP_6_999.OrderId: true},
 			},
 		},
 		"TakeProfit/Buy conditional order is placed and triggered in later blocks (bounded)": {
@@ -2219,6 +2190,30 @@ func TestConditionalOrder_TriggeringUsingMatchedPrice(t *testing.T) {
 				},
 			},
 		},
+		"BTC Collat: TakeProfit/Buy conditional order is placed and triggered in later blocks": {
+			subaccounts: []satypes.Subaccount{
+				constants.Alice_Num11_500BTC,
+				constants.Carl_Num11_500BTC,
+				constants.Dave_Num11_500BTC,
+			},
+			ordersForFirstBlock: []clobtypes.Order{
+				constants.ConditionalOrder_Alice_Num11_Id0_Clob10_Buy1Link_Price7_GTBT10_TP_6_999,
+			},
+			ordersForSecondBlock: []clobtypes.Order{
+				// Create a match with price $6_997.
+				constants.Order_Dave_Num11_Id0_Clob10_Sell1Link_Price6_997_GTB10,
+				constants.Order_Carl_Num11_Id0_Clob10_Buy1Link_Price7_003_GTB10,
+			},
+
+			expectedExistInState: map[clobtypes.OrderId]bool{
+				constants.ConditionalOrder_Alice_Num11_Id0_Clob10_Buy1Link_Price7_GTBT10_TP_6_999.OrderId: true,
+			},
+			expectedInTriggeredStateAfterBlock: map[uint32]map[clobtypes.OrderId]bool{
+				2: {constants.ConditionalOrder_Alice_Num11_Id0_Clob10_Buy1Link_Price7_GTBT10_TP_6_999.OrderId: false},
+				3: {constants.ConditionalOrder_Alice_Num11_Id0_Clob10_Buy1Link_Price7_GTBT10_TP_6_999.OrderId: true},
+				4: {constants.ConditionalOrder_Alice_Num11_Id0_Clob10_Buy1Link_Price7_GTBT10_TP_6_999.OrderId: true},
+			},
+		},
 		"TakeProfit/Buy post-only conditional order can place, trigger, not cross, and partially fill in a later block": {
 			subaccounts: []satypes.Subaccount{
 				constants.Carl_Num0_10000USD,
@@ -2317,30 +2312,40 @@ func TestConditionalOrder_TriggeringUsingMatchedPrice(t *testing.T) {
 				testapp.UpdateGenesisDocWithAppStateForModule(
 					&genesis,
 					func(genesisState *prices.GenesisState) {
-						*genesisState = constants.TestPricesGenesisState
+						*genesisState = prices.GenesisState{
+							MarketParams: []prices.MarketParam{
+								{
+									Id:                 0,
+									Pair:               constants.BtcUsdPair,
+									Exponent:           constants.BtcUsdExponent,
+									MinExchanges:       1,
+									MinPriceChangePpm:  1_000,
+									ExchangeConfigJson: constants.TestMarketExchangeConfigs[exchange_config.MARKET_BTC_USD],
+								},
+								{
+									Id:                 5,
+									Pair:               constants.IsoBtcPair,
+									Exponent:           constants.IsoBtcExponent,
+									MinExchanges:       1,
+									MinPriceChangePpm:  50,
+									ExchangeConfigJson: constants.TestMarketExchangeConfigs[exchange_config.MARKET_ISO_BTC],
+								},
+							},
 
-						genesisState.MarketParams[0] = prices.MarketParam{
-							Id:                 0,
-							Pair:               constants.BtcUsdPair,
-							Exponent:           constants.BtcUsdExponent,
-							MinExchanges:       1,
-							MinPriceChangePpm:  1_000,
-							ExchangeConfigJson: constants.TestMarketExchangeConfigs[exchange_config.MARKET_BTC_USD],
-						}
-
-						genesisState.MarketPrices[0] = prices.MarketPrice{
-							Id:        0,
-							Exponent:  constants.BtcUsdExponent,
-							SpotPrice: constants.FiveBillion, // $50,000 == 1 BTC
-							PnlPrice:  constants.FiveBillion, // $50,000 == 1 BTC
-						}
-
-						genesisState.MarketPrices[5].SpotPrice = uint64(700_000_000)
-						genesisState.MarketPrices[5].PnlPrice = uint64(700_000_000)
-
-						for marketId, price := range tc.genesisPriceChanges {
-							genesisState.MarketPrices[marketId].SpotPrice = price
-							genesisState.MarketPrices[marketId].PnlPrice = price
+							MarketPrices: []prices.MarketPrice{
+								{
+									Id:        0,
+									Exponent:  constants.BtcUsdExponent,
+									SpotPrice: constants.FiveBillion, // $50,000 == 1 BTC
+									PnlPrice:  constants.FiveBillion, // $50,000 == 1 BTC
+								},
+								{
+									Id:        5,
+									Exponent:  -8,
+									SpotPrice: 700_000_000,
+									PnlPrice:  700_000_000,
+								},
+							},
 						}
 					},
 				)

@@ -105,16 +105,16 @@ describe('CollateralPool store', () => {
       })
     );
   });
+
+  it('Successfully upserts a collateral pool', async () => {
+    const collateralPool: CollateralPoolFromDatabase | undefined =
+      await CollateralPoolTable.upsert(defaultCollateralPool);
+
+    expect(collateralPool).toEqual(
+      normalizeCollateralPool(defaultCollateralPool)
+    );
+  });
 });
-
-// it('Successfully upserts a collateral pool', async () => {
-//   const collateralPool: CollateralPoolFromDatabase | undefined =
-//     await CollateralPoolTable.upsert(defaultCollateralPool);
-
-//   expect(collateralPool).toEqual(
-//     normalizeCollateralPool(defaultCollateralPool)
-//   );
-// });
 
 function normalizeCollateralPool(pool: CollateralPoolFromDatabase) {
   return {

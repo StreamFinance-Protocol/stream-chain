@@ -4827,6 +4827,8 @@ func TestGetHealth(t *testing.T) {
 }
 
 func TestCalculateLiquidationPriority(t *testing.T) {
+	largeNegativeExpectedHealth, _ := new(big.Float).SetString("-1881676377434183981909562699940347954480361860897069")
+
 	tests := map[string]struct {
 		totalNetCollateral        *big.Int
 		totalMaintenanceMargin    *big.Int
@@ -4844,6 +4846,24 @@ func TestCalculateLiquidationPriority(t *testing.T) {
 			totalMaintenanceMargin:    big.NewInt(50),
 			weightedMaintenanceMargin: big.NewInt(-10),
 			expectedPriority:          big.NewFloat(math.MaxFloat64),
+		},
+		"zero total maintenance margin returns max float64": {
+			totalNetCollateral:        big.NewInt(100),
+			totalMaintenanceMargin:    big.NewInt(0),
+			weightedMaintenanceMargin: big.NewInt(1),
+			expectedPriority:          big.NewFloat(math.MaxFloat64), // MaxFloat64
+		},
+		"negative total maintenance margin returns max float64": {
+			totalNetCollateral:        big.NewInt(100),
+			totalMaintenanceMargin:    big.NewInt(-1),
+			weightedMaintenanceMargin: big.NewInt(1),
+			expectedPriority:          big.NewFloat(math.MaxFloat64), // MaxFloat64
+		},
+		"zero total maintenance margin and zero weighted maintenance margin returns max float64": {
+			totalNetCollateral:        big.NewInt(100),
+			totalMaintenanceMargin:    big.NewInt(0),
+			weightedMaintenanceMargin: big.NewInt(0),
+			expectedPriority:          big.NewFloat(math.MaxFloat64), // MaxFloat64
 		},
 		"normal case - health less than 1": {
 			totalNetCollateral:        big.NewInt(50),
@@ -4869,17 +4889,23 @@ func TestCalculateLiquidationPriority(t *testing.T) {
 			weightedMaintenanceMargin: new(big.Int).Exp(big.NewInt(10), big.NewInt(16), nil), // 10^16
 			expectedPriority:          new(big.Float).SetFloat64(1e-13),                      // (10^18/10^15) / 10^16 = 1000 / 10^16 = 10^-13
 		},
-		"negative net collateral": {
+		"negative net collateral, health equal to -1": {
+			totalNetCollateral:        big.NewInt(-1),
+			totalMaintenanceMargin:    big.NewInt(1),
+			weightedMaintenanceMargin: big.NewInt(1),
+			expectedPriority:          big.NewFloat(-1),
+		},
+		"negative net collateral, health less than -1": {
 			totalNetCollateral:        big.NewInt(-100),
 			totalMaintenanceMargin:    big.NewInt(50),
 			weightedMaintenanceMargin: big.NewInt(200),
-			expectedPriority:          big.NewFloat(-0.01),
+			expectedPriority:          big.NewFloat(-1_000_000),
 		},
-		"zero maintenance margin": {
-			totalNetCollateral:        big.NewInt(100),
-			totalMaintenanceMargin:    big.NewInt(0),
-			weightedMaintenanceMargin: big.NewInt(1),
-			expectedPriority:          big.NewFloat(math.MaxFloat64), // MaxFloat64
+		"negative net collateral, large numbers": {
+			totalNetCollateral:        big.NewInt(-123456789123456789),
+			totalMaintenanceMargin:    big.NewInt(123456789123456789),
+			weightedMaintenanceMargin: big.NewInt(123456789123456789),
+			expectedPriority:          largeNegativeExpectedHealth,
 		},
 	}
 

@@ -140,7 +140,14 @@ type PerpetualsKeeper interface {
 		ctx sdk.Context,
 		perpetual Perpetual,
 	) error
-	GetQuoteCurrencyAtomicResolutionFromPerpetualId(ctx sdk.Context, perpetualId uint32) (int32, error)
+	GetQuoteCurrencyAtomicResolutionFromPerpetualId(
+		ctx sdk.Context,
+		perpetualId uint32,
+	) (int32, error)
+	GetQuoteAssetIdFromPerpetualId(
+		ctx sdk.Context,
+		perpetualId uint32,
+	) (uint32, error)
 }
 
 // OpenInterestDelta represents a (perpId, openInterestDelta) tuple.

@@ -1766,17 +1766,36 @@ func (k Keeper) setLiquidityTier(
 
 /* === COLLATERAL POOL FUNCTIONS === */
 
-func (k Keeper) GetQuoteCurrencyAtomicResolutionFromPerpetualId(ctx sdk.Context, perpetualId uint32) (int32, error) {
-	collateralPool, err := k.GetCollateralPoolFromPerpetualId(ctx, perpetualId)
+func (k Keeper) GetQuoteAssetIdFromPerpetualId(ctx sdk.Context, perpetualId uint32) (uint32, error) {
+	quoteAsset, err := k.GetQuoteAssetFromPerpetualId(ctx, perpetualId)
 	if err != nil {
 		return 0, err
 	}
 
+	return quoteAsset.Id, nil
+}
+
+func (k Keeper) GetQuoteCurrencyAtomicResolutionFromPerpetualId(ctx sdk.Context, perpetualId uint32) (int32, error) {
+	quoteAsset, err := k.GetQuoteAssetFromPerpetualId(ctx, perpetualId)
+	if err != nil {
+		return 0, err
+	}
+
+	return quoteAsset.AtomicResolution, nil
+}
+
+func (k Keeper) GetQuoteAssetFromPerpetualId(ctx sdk.Context, perpetualId uint32) (assettypes.Asset, error) {
+	collateralPool, err := k.GetCollateralPoolFromPerpetualId(ctx, perpetualId)
+	if err != nil {
+		return assettypes.Asset{}, err
+	}
+
 	quoteAsset, exists := k.assetsKeeper.GetAsset(ctx, collateralPool.QuoteAssetId)
 	if !exists {
-		return 0, errorsmod.Wrapf(assettypes.ErrAssetDoesNotExist, "Quote asset not found for perpetual Id %+v", perpetualId)
+		return assettypes.Asset{}, errorsmod.Wrapf(assettypes.ErrAssetDoesNotExist, "Quote asset not found for perpetual Id %+v", perpetualId)
 	}
-	return quoteAsset.AtomicResolution, nil
+
+	return quoteAsset, nil
 }
 
 func (k Keeper) GetCollateralPoolFromPerpetualId(ctx sdk.Context, perpetualId uint32) (

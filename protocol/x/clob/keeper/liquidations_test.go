@@ -4163,7 +4163,7 @@ func TestGetBestPerpetualPositionToLiquidate(t *testing.T) {
 				constants.SolUsd_20PercentInitial_10PercentMaintenance,
 				constants.IsoUsd_IsolatedMarket,
 				constants.Iso2Usd_IsolatedMarket,
-				constants.IsoBtc_CollatPool1_Id5,
+				constants.IsoBtc_20PercentInitial_10PercentMaintenance_CollatPool1_Id5,
 			},
 			liquidationConfig: constants.LiquidationsConfig_No_Limit,
 
@@ -4194,7 +4194,7 @@ func TestGetBestPerpetualPositionToLiquidate(t *testing.T) {
 				constants.SolUsd_20PercentInitial_10PercentMaintenance,
 				constants.IsoUsd_IsolatedMarket,
 				constants.Iso2Usd_IsolatedMarket,
-				constants.IsoBtc_CollatPool1_Id5,
+				constants.IsoBtc_20PercentInitial_10PercentMaintenance_CollatPool1_Id5,
 			},
 			liquidationConfig: types.LiquidationsConfig{
 				InsuranceFundFeePpm: 5_000,
@@ -4225,7 +4225,7 @@ func TestGetBestPerpetualPositionToLiquidate(t *testing.T) {
 				constants.SolUsd_20PercentInitial_10PercentMaintenance,
 				constants.IsoUsd_IsolatedMarket,
 				constants.Iso2Usd_IsolatedMarket,
-				constants.IsoBtc_CollatPool1_Id5,
+				constants.IsoBtc_20PercentInitial_10PercentMaintenance_CollatPool1_Id5,
 			},
 			liquidationConfig: constants.LiquidationsConfig_No_Limit,
 
@@ -4254,7 +4254,7 @@ func TestGetBestPerpetualPositionToLiquidate(t *testing.T) {
 				constants.SolUsd_20PercentInitial_10PercentMaintenance,
 				constants.IsoUsd_IsolatedMarket,
 				constants.Iso2Usd_IsolatedMarket,
-				constants.IsoBtc_CollatPool1_Id5,
+				constants.IsoBtc_20PercentInitial_10PercentMaintenance_CollatPool1_Id5,
 			},
 			liquidationConfig: constants.LiquidationsConfig_No_Limit,
 
@@ -4283,7 +4283,7 @@ func TestGetBestPerpetualPositionToLiquidate(t *testing.T) {
 				constants.SolUsd_20PercentInitial_10PercentMaintenance,
 				constants.IsoUsd_IsolatedMarket,
 				constants.Iso2Usd_IsolatedMarket,
-				constants.IsoBtc_CollatPool1_Id5,
+				constants.IsoBtc_20PercentInitial_10PercentMaintenance_CollatPool1_Id5,
 			},
 			liquidationConfig: constants.LiquidationsConfig_No_Limit,
 
@@ -5743,6 +5743,222 @@ func TestGetBestPerpetualPositionToLiquidateMultiplePositions(t *testing.T) {
 
 			expectedPerpetualId: 1,
 		},
+		`Expect most valuable perpetual position to be liquidated with three perpetual positions (perpetual position ordering in subaccount: permutation 0`: {
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcUsd_SmallMarginRequirement_DangerIndex,
+				constants.EthUsd_20PercentInitial_10PercentMaintenance_DangerIndex,
+				constants.SolUsd_20PercentInitial_10PercentMaintenance_DangerIndex,
+			},
+			subaccount: satypes.Subaccount{
+				Id: &constants.Dave_Num0,
+				AssetPositions: []*satypes.AssetPosition{
+					&satypes.AssetPosition{
+						AssetId:  0,
+						Quantums: dtypes.NewInt(-1_000_000_000),
+					},
+				},
+				PerpetualPositions: []*satypes.PerpetualPosition{
+					{
+						PerpetualId: 0,
+						Quantums:    dtypes.NewInt(1), // tiny BTC
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+					{
+						PerpetualId: 1,
+						Quantums:    dtypes.NewInt(1_000_000_000), // 1 ETH
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+					{
+						PerpetualId: 2,
+						Quantums:    dtypes.NewInt(10), // tiny SOL
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+				},
+				AssetYieldIndex: big.NewRat(1, 1).String(),
+			},
+
+			expectedPerpetualId: 1,
+		},
+		`Expect most valuable perpetual position to be liquidated with three perpetual positions with positions not in Id-order (permutation 1)`: {
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcUsd_SmallMarginRequirement_DangerIndex,
+				constants.EthUsd_20PercentInitial_10PercentMaintenance_DangerIndex,
+				constants.SolUsd_20PercentInitial_10PercentMaintenance_DangerIndex,
+			},
+			subaccount: satypes.Subaccount{
+				Id: &constants.Dave_Num0,
+				AssetPositions: []*satypes.AssetPosition{
+					&satypes.AssetPosition{
+						AssetId:  0,
+						Quantums: dtypes.NewInt(-1_000_000_000),
+					},
+				},
+				PerpetualPositions: []*satypes.PerpetualPosition{
+					{
+						PerpetualId: 0,
+						Quantums:    dtypes.NewInt(1), // tiny BTC
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+					{
+						PerpetualId: 2,
+						Quantums:    dtypes.NewInt(10), // tiny SOL
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+					{
+						PerpetualId: 1,
+						Quantums:    dtypes.NewInt(1_000_000_000), // 1 ETH
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+				},
+				AssetYieldIndex: big.NewRat(1, 1).String(),
+			},
+
+			expectedPerpetualId: 1,
+		},
+		`Expect most valuable perpetual position to be liquidated with three perpetual positions with positions not in Id-order (permutation 2)`: {
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcUsd_SmallMarginRequirement_DangerIndex,
+				constants.EthUsd_20PercentInitial_10PercentMaintenance_DangerIndex,
+				constants.SolUsd_20PercentInitial_10PercentMaintenance_DangerIndex,
+			},
+			subaccount: satypes.Subaccount{
+				Id: &constants.Dave_Num0,
+				AssetPositions: []*satypes.AssetPosition{
+					&satypes.AssetPosition{
+						AssetId:  0,
+						Quantums: dtypes.NewInt(-1_000_000_000),
+					},
+				},
+				PerpetualPositions: []*satypes.PerpetualPosition{
+					{
+						PerpetualId: 1,
+						Quantums:    dtypes.NewInt(1_000_000_000), // 1 ETH
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+					{
+						PerpetualId: 0,
+						Quantums:    dtypes.NewInt(1), // tiny BTC
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+					{
+						PerpetualId: 2,
+						Quantums:    dtypes.NewInt(10), // tiny SOL
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+				},
+				AssetYieldIndex: big.NewRat(1, 1).String(),
+			},
+
+			expectedPerpetualId: 1,
+		},
+		`Expect most valuable perpetual position to be liquidated with three perpetual positions with positions not in Id-order (permutation 3)`: {
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcUsd_SmallMarginRequirement_DangerIndex,
+				constants.EthUsd_20PercentInitial_10PercentMaintenance_DangerIndex,
+				constants.SolUsd_20PercentInitial_10PercentMaintenance_DangerIndex,
+			},
+			subaccount: satypes.Subaccount{
+				Id: &constants.Dave_Num0,
+				AssetPositions: []*satypes.AssetPosition{
+					&satypes.AssetPosition{
+						AssetId:  0,
+						Quantums: dtypes.NewInt(-1_000_000_000),
+					},
+				},
+				PerpetualPositions: []*satypes.PerpetualPosition{
+					{
+						PerpetualId: 1,
+						Quantums:    dtypes.NewInt(1_000_000_000), // 1 ETH
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+					{
+						PerpetualId: 2,
+						Quantums:    dtypes.NewInt(10), // tiny SOL
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+					{
+						PerpetualId: 0,
+						Quantums:    dtypes.NewInt(1), // tiny BTC
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+				},
+				AssetYieldIndex: big.NewRat(1, 1).String(),
+			},
+
+			expectedPerpetualId: 1,
+		},
+		`Expect most valuable perpetual position to be liquidated with three perpetual positions with positions not in Id-order (permutation 4)`: {
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcUsd_SmallMarginRequirement_DangerIndex,
+				constants.EthUsd_20PercentInitial_10PercentMaintenance_DangerIndex,
+				constants.SolUsd_20PercentInitial_10PercentMaintenance_DangerIndex,
+			},
+			subaccount: satypes.Subaccount{
+				Id: &constants.Dave_Num0,
+				AssetPositions: []*satypes.AssetPosition{
+					&satypes.AssetPosition{
+						AssetId:  0,
+						Quantums: dtypes.NewInt(-1_000_000_000),
+					},
+				},
+				PerpetualPositions: []*satypes.PerpetualPosition{
+					{
+						PerpetualId: 2,
+						Quantums:    dtypes.NewInt(10), // tiny SOL
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+					{
+						PerpetualId: 0,
+						Quantums:    dtypes.NewInt(1), // tiny BTC
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+					{
+						PerpetualId: 1,
+						Quantums:    dtypes.NewInt(1_000_000_000), // 1 ETH
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+				},
+				AssetYieldIndex: big.NewRat(1, 1).String(),
+			},
+
+			expectedPerpetualId: 1,
+		},
+		`Expect most valuable perpetual position to be liquidated with three perpetual positions with positions not in Id-order (permutation 5)`: {
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcUsd_SmallMarginRequirement_DangerIndex,
+				constants.EthUsd_20PercentInitial_10PercentMaintenance_DangerIndex,
+				constants.SolUsd_20PercentInitial_10PercentMaintenance_DangerIndex,
+			},
+			subaccount: satypes.Subaccount{
+				Id: &constants.Dave_Num0,
+				AssetPositions: []*satypes.AssetPosition{
+					&satypes.AssetPosition{
+						AssetId:  0,
+						Quantums: dtypes.NewInt(-1_000_000_000),
+					},
+				},
+				PerpetualPositions: []*satypes.PerpetualPosition{
+					{
+						PerpetualId: 2,
+						Quantums:    dtypes.NewInt(10), // tiny SOL
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+					{
+						PerpetualId: 1,
+						Quantums:    dtypes.NewInt(1_000_000_000), // 1 ETH
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+					{
+						PerpetualId: 0,
+						Quantums:    dtypes.NewInt(1), // tiny BTC
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+				},
+				AssetYieldIndex: big.NewRat(1, 1).String(),
+			},
+
+			expectedPerpetualId: 1,
+		},
 		"Expect BTC position to be liquidated when it's the only position": {
 			perpetuals: []perptypes.Perpetual{
 				constants.BtcUsd_SmallMarginRequirement_DangerIndex,
@@ -5796,7 +6012,7 @@ func TestGetBestPerpetualPositionToLiquidateMultiplePositions(t *testing.T) {
 		},
 		`Expect small ISO-BTC position to be liquidated since it's the only position`: {
 			perpetuals: []perptypes.Perpetual{
-				constants.IsoBtc_CollatPool1_Id5,
+				constants.IsoBtc_20PercentInitial_10PercentMaintenance_CollatPool1_Id5_DangerIndex1,
 			},
 			subaccount: constants.Dave_Num0_TinyIso_Long_SmallBTC_Short,
 
@@ -5804,10 +6020,226 @@ func TestGetBestPerpetualPositionToLiquidateMultiplePositions(t *testing.T) {
 		},
 		`Expect ISO2-BTC position to be liquidated first as ISO-BTC position is negligeable`: {
 			perpetuals: []perptypes.Perpetual{
-				constants.IsoBtc_CollatPool1_Id5,
-				constants.Iso2Btc_CollatPool1_Id7,
+				constants.IsoBtc_20PercentInitial_10PercentMaintenance_CollatPool1_Id5_DangerIndex1,
+				constants.Iso2Btc_20PercentInitial_10PercentMaintenance_CollatPool1_Id7_DangerIndex1,
 			},
 			subaccount: constants.Dave_Num0_TinyIso_Long_LargerIso2_Long_1BTC_Short,
+
+			expectedPerpetualId: 7,
+		},
+		`Expect most valuable perpetual position to be liquidated in non-TDAI collateral pool with three perpetual positions (perpetual position ordering in subaccount: permutation 0)`: {
+			perpetuals: []perptypes.Perpetual{
+				constants.IsoBtc_20PercentInitial_10PercentMaintenance_CollatPool1_Id5_DangerIndex1,
+				constants.Iso2Btc_20PercentInitial_10PercentMaintenance_CollatPool1_Id7_DangerIndex1,
+				constants.BtcBtc_10_20MarginRequirement_CollatPool1_Id10_DangerIndex1,
+			},
+			subaccount: satypes.Subaccount{
+				Id: &constants.Dave_Num0,
+				AssetPositions: []*satypes.AssetPosition{
+					&satypes.AssetPosition{
+						AssetId:  1,
+						Quantums: dtypes.NewInt(-1_000_000),
+					},
+				},
+				PerpetualPositions: []*satypes.PerpetualPosition{
+					{
+						PerpetualId: constants.IsoBtc_20PercentInitial_10PercentMaintenance_CollatPool1_Id5_DangerIndex1.Params.Id,
+						Quantums:    dtypes.NewInt(1),
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+					{
+						PerpetualId: constants.Iso2Btc_20PercentInitial_10PercentMaintenance_CollatPool1_Id7_DangerIndex1.Params.Id,
+						Quantums:    dtypes.NewInt(1_000_000_000),
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+					{
+						PerpetualId: constants.BtcBtc_10_20MarginRequirement_CollatPool1_Id10_DangerIndex1.Params.Id,
+						Quantums:    dtypes.NewInt(1),
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+				},
+				AssetYieldIndex: big.NewRat(1, 1).String(),
+			},
+
+			expectedPerpetualId: 7,
+		},
+		`Expect most valuable perpetual position to be liquidated in non-TDAI collateral pool with three perpetual positions with positions not in Id-order (permutation 1)`: {
+			perpetuals: []perptypes.Perpetual{
+				constants.IsoBtc_20PercentInitial_10PercentMaintenance_CollatPool1_Id5_DangerIndex1,
+				constants.Iso2Btc_20PercentInitial_10PercentMaintenance_CollatPool1_Id7_DangerIndex1,
+				constants.BtcBtc_10_20MarginRequirement_CollatPool1_Id10_DangerIndex1,
+			},
+			subaccount: satypes.Subaccount{
+				Id: &constants.Dave_Num0,
+				AssetPositions: []*satypes.AssetPosition{
+					&satypes.AssetPosition{
+						AssetId:  1,
+						Quantums: dtypes.NewInt(-1_000_000),
+					},
+				},
+				PerpetualPositions: []*satypes.PerpetualPosition{
+					{
+						PerpetualId: constants.IsoBtc_20PercentInitial_10PercentMaintenance_CollatPool1_Id5_DangerIndex1.Params.Id,
+						Quantums:    dtypes.NewInt(1),
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+					{
+						PerpetualId: constants.BtcBtc_10_20MarginRequirement_CollatPool1_Id10_DangerIndex1.Params.Id,
+						Quantums:    dtypes.NewInt(1),
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+					{
+						PerpetualId: constants.Iso2Btc_20PercentInitial_10PercentMaintenance_CollatPool1_Id7_DangerIndex1.Params.Id,
+						Quantums:    dtypes.NewInt(1_000_000_000),
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+				},
+				AssetYieldIndex: big.NewRat(1, 1).String(),
+			},
+
+			expectedPerpetualId: 7,
+		},
+		`Expect most valuable perpetual position to be liquidated in non-TDAI collateral pool with three perpetual positions with positions not in Id-order (permutation 2)`: {
+			perpetuals: []perptypes.Perpetual{
+				constants.IsoBtc_20PercentInitial_10PercentMaintenance_CollatPool1_Id5_DangerIndex1,
+				constants.Iso2Btc_20PercentInitial_10PercentMaintenance_CollatPool1_Id7_DangerIndex1,
+				constants.BtcBtc_10_20MarginRequirement_CollatPool1_Id10_DangerIndex1,
+			},
+			subaccount: satypes.Subaccount{
+				Id: &constants.Dave_Num0,
+				AssetPositions: []*satypes.AssetPosition{
+					&satypes.AssetPosition{
+						AssetId:  1,
+						Quantums: dtypes.NewInt(-1_000_000),
+					},
+				},
+				PerpetualPositions: []*satypes.PerpetualPosition{
+					{
+						PerpetualId: constants.Iso2Btc_20PercentInitial_10PercentMaintenance_CollatPool1_Id7_DangerIndex1.Params.Id,
+						Quantums:    dtypes.NewInt(1_000_000_000),
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+					{
+						PerpetualId: constants.IsoBtc_20PercentInitial_10PercentMaintenance_CollatPool1_Id5_DangerIndex1.Params.Id,
+						Quantums:    dtypes.NewInt(1),
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+					{
+						PerpetualId: constants.BtcBtc_10_20MarginRequirement_CollatPool1_Id10_DangerIndex1.Params.Id,
+						Quantums:    dtypes.NewInt(1),
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+				},
+				AssetYieldIndex: big.NewRat(1, 1).String(),
+			},
+
+			expectedPerpetualId: 7,
+		},
+		`Expect most valuable perpetual position to be liquidated in non-TDAI collateral pool with three perpetual positions with positions not in Id-order (permutation 3)`: {
+			perpetuals: []perptypes.Perpetual{
+				constants.IsoBtc_20PercentInitial_10PercentMaintenance_CollatPool1_Id5_DangerIndex1,
+				constants.Iso2Btc_20PercentInitial_10PercentMaintenance_CollatPool1_Id7_DangerIndex1,
+				constants.BtcBtc_10_20MarginRequirement_CollatPool1_Id10_DangerIndex1,
+			},
+			subaccount: satypes.Subaccount{
+				Id: &constants.Dave_Num0,
+				AssetPositions: []*satypes.AssetPosition{
+					&satypes.AssetPosition{
+						AssetId:  1,
+						Quantums: dtypes.NewInt(-1_000_000),
+					},
+				},
+				PerpetualPositions: []*satypes.PerpetualPosition{
+					{
+						PerpetualId: constants.Iso2Btc_20PercentInitial_10PercentMaintenance_CollatPool1_Id7_DangerIndex1.Params.Id,
+						Quantums:    dtypes.NewInt(1_000_000_000),
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+					{
+						PerpetualId: constants.BtcBtc_10_20MarginRequirement_CollatPool1_Id10_DangerIndex1.Params.Id,
+						Quantums:    dtypes.NewInt(1),
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+					{
+						PerpetualId: constants.IsoBtc_20PercentInitial_10PercentMaintenance_CollatPool1_Id5_DangerIndex1.Params.Id,
+						Quantums:    dtypes.NewInt(1),
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+				},
+				AssetYieldIndex: big.NewRat(1, 1).String(),
+			},
+
+			expectedPerpetualId: 7,
+		},
+		`Expect most valuable perpetual position to be liquidated in non-TDAI collateral pool with three perpetual positions with positions not in Id-order (permutation 4)`: {
+			perpetuals: []perptypes.Perpetual{
+				constants.IsoBtc_20PercentInitial_10PercentMaintenance_CollatPool1_Id5_DangerIndex1,
+				constants.Iso2Btc_20PercentInitial_10PercentMaintenance_CollatPool1_Id7_DangerIndex1,
+				constants.BtcBtc_10_20MarginRequirement_CollatPool1_Id10_DangerIndex1,
+			},
+			subaccount: satypes.Subaccount{
+				Id: &constants.Dave_Num0,
+				AssetPositions: []*satypes.AssetPosition{
+					&satypes.AssetPosition{
+						AssetId:  1,
+						Quantums: dtypes.NewInt(-1_000_000),
+					},
+				},
+				PerpetualPositions: []*satypes.PerpetualPosition{
+					{
+						PerpetualId: constants.BtcBtc_10_20MarginRequirement_CollatPool1_Id10_DangerIndex1.Params.Id,
+						Quantums:    dtypes.NewInt(1),
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+					{
+						PerpetualId: constants.IsoBtc_20PercentInitial_10PercentMaintenance_CollatPool1_Id5_DangerIndex1.Params.Id,
+						Quantums:    dtypes.NewInt(1),
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+					{
+						PerpetualId: constants.Iso2Btc_20PercentInitial_10PercentMaintenance_CollatPool1_Id7_DangerIndex1.Params.Id,
+						Quantums:    dtypes.NewInt(1_000_000_000),
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+				},
+				AssetYieldIndex: big.NewRat(1, 1).String(),
+			},
+
+			expectedPerpetualId: 7,
+		},
+		`Expect most valuable perpetual position to be liquidated in non-TDAI collateral pool with three perpetual positions with positions not in Id-order (permutation 5)`: {
+			perpetuals: []perptypes.Perpetual{
+				constants.IsoBtc_20PercentInitial_10PercentMaintenance_CollatPool1_Id5_DangerIndex1,
+				constants.Iso2Btc_20PercentInitial_10PercentMaintenance_CollatPool1_Id7_DangerIndex1,
+				constants.BtcBtc_10_20MarginRequirement_CollatPool1_Id10_DangerIndex1,
+			},
+			subaccount: satypes.Subaccount{
+				Id: &constants.Dave_Num0,
+				AssetPositions: []*satypes.AssetPosition{
+					&satypes.AssetPosition{
+						AssetId:  1,
+						Quantums: dtypes.NewInt(-1_000_000),
+					},
+				},
+				PerpetualPositions: []*satypes.PerpetualPosition{
+					{
+						PerpetualId: constants.BtcBtc_10_20MarginRequirement_CollatPool1_Id10_DangerIndex1.Params.Id,
+						Quantums:    dtypes.NewInt(1),
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+					{
+						PerpetualId: constants.Iso2Btc_20PercentInitial_10PercentMaintenance_CollatPool1_Id7_DangerIndex1.Params.Id,
+						Quantums:    dtypes.NewInt(1_000_000_000),
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+					{
+						PerpetualId: constants.IsoBtc_20PercentInitial_10PercentMaintenance_CollatPool1_Id5_DangerIndex1.Params.Id,
+						Quantums:    dtypes.NewInt(1),
+						YieldIndex:  big.NewRat(0, 1).String(),
+					},
+				},
+				AssetYieldIndex: big.NewRat(1, 1).String(),
+			},
 
 			expectedPerpetualId: 7,
 		},
@@ -6062,7 +6494,7 @@ func TestCheckInsuranceFundLimits(t *testing.T) {
 		},
 		"success - insurance fund delta within limits for non-TDAI backed perpetual": {
 			perpetuals: []perptypes.Perpetual{
-				constants.IsoBtc_CollatPool1_Id5,
+				constants.IsoBtc_20PercentInitial_10PercentMaintenance_CollatPool1_Id5,
 			},
 			liquidationsConfig: types.LiquidationsConfig{
 				InsuranceFundFeePpm: 10_000,
@@ -6078,7 +6510,7 @@ func TestCheckInsuranceFundLimits(t *testing.T) {
 		},
 		"failure - insurance fund delta exceeds limits for non-TDAI backed perpetual": {
 			perpetuals: []perptypes.Perpetual{
-				constants.IsoBtc_CollatPool1_Id5,
+				constants.IsoBtc_20PercentInitial_10PercentMaintenance_CollatPool1_Id5,
 			},
 			liquidationsConfig: types.LiquidationsConfig{
 				InsuranceFundFeePpm: 10_000,
@@ -6094,7 +6526,7 @@ func TestCheckInsuranceFundLimits(t *testing.T) {
 		},
 		"success - insurance fund delta at limit for non-TDAI backed perpetual": {
 			perpetuals: []perptypes.Perpetual{
-				constants.IsoBtc_CollatPool1_Id5,
+				constants.IsoBtc_20PercentInitial_10PercentMaintenance_CollatPool1_Id5,
 			},
 			liquidationsConfig: types.LiquidationsConfig{
 				InsuranceFundFeePpm: 10_000,
@@ -6110,7 +6542,7 @@ func TestCheckInsuranceFundLimits(t *testing.T) {
 		},
 		"success - insurance fund positive for non-TDAI backed perpetual": {
 			perpetuals: []perptypes.Perpetual{
-				constants.IsoBtc_CollatPool1_Id5,
+				constants.IsoBtc_20PercentInitial_10PercentMaintenance_CollatPool1_Id5,
 			},
 			liquidationsConfig: types.LiquidationsConfig{
 				InsuranceFundFeePpm: 10_000,

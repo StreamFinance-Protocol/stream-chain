@@ -977,12 +977,12 @@ var (
 		},
 		PerpetualPositions: []*satypes.PerpetualPosition{
 			{
-				PerpetualId: IsoBtc_CollatPool1_Id5_DangerIndex1.Params.Id,
+				PerpetualId: IsoBtc_20PercentInitial_10PercentMaintenance_CollatPool1_Id5_DangerIndex1.Params.Id,
 				Quantums:    dtypes.NewInt(1_000),
 				YieldIndex:  big.NewRat(0, 1).String(),
 			},
 			{
-				PerpetualId: Iso2Btc_CollatPool1_Id7_DangerIndex1.Params.Id,
+				PerpetualId: Iso2Btc_20PercentInitial_10PercentMaintenance_CollatPool1_Id7_DangerIndex1.Params.Id,
 				Quantums:    dtypes.NewInt(100_000_000),
 				YieldIndex:  big.NewRat(0, 1).String(),
 			},
@@ -1000,7 +1000,7 @@ var (
 		},
 		PerpetualPositions: []*satypes.PerpetualPosition{
 			{
-				PerpetualId: IsoBtc_CollatPool1_Id5_DangerIndex1.Params.Id,
+				PerpetualId: IsoBtc_20PercentInitial_10PercentMaintenance_CollatPool1_Id5_DangerIndex1.Params.Id,
 				Quantums:    dtypes.NewInt(1_000),
 				YieldIndex:  big.NewRat(0, 1).String(),
 			},

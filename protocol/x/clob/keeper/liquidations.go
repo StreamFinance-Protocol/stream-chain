@@ -247,7 +247,7 @@ func (k Keeper) GetBestPerpetualPositionToLiquidate(
 	subaccountLiquidationInfo := k.GetSubaccountLiquidationInfo(ctx, subaccountId)
 
 	//bestPriority := new(big.Float)
-	var bestPriority *big.Float = nil
+	bestPriority := new(big.Float)
 	bestPerpetualId := uint32(0)
 	foundPerpetual := false
 
@@ -535,6 +535,11 @@ func CalculateLiquidationPriority(
 	}
 
 	health := GetHealth(bigTotalNetCollateral, bigTotalMaintenanceMargin)
+
+	if bigTotalNetCollateral.Sign() < 0 {
+		return new(big.Float).Mul(health, new(big.Float).SetInt(bigWeightedMaintenanceMargin))
+	}
+
 	return new(big.Float).Quo(health, new(big.Float).SetInt(bigWeightedMaintenanceMargin))
 }
 
@@ -547,10 +552,11 @@ func GetHealth(
 		return big.NewFloat(math.MaxFloat64)
 	}
 
-	// Calculate the collateral/maintenance margin ratio
-	health := new(big.Float).Quo(new(big.Float).SetInt(bigNetCollateral), new(big.Float).SetInt(bigMaintenanceMargin))
+	if bigNetCollateral.Sign() < 0 {
+		return new(big.Float).Mul(new(big.Float).SetInt(bigNetCollateral), new(big.Float).SetInt(bigMaintenanceMargin))
+	}
 
-	return health
+	return new(big.Float).Quo(new(big.Float).SetInt(bigNetCollateral), new(big.Float).SetInt(bigMaintenanceMargin))
 }
 
 // EnsureIsLiquidatable returns an error if the subaccount is not liquidatable.
@@ -1179,8 +1185,8 @@ func (k Keeper) simulatePriorityWithClosedPosition(
 		return err
 	}
 
-	if bestPriority == nil || priority.Cmp(bestPriority) > 0 {
-		bestPriority = priority
+	if !*foundPerpetual || priority.Cmp(bestPriority) > 0 {
+		*bestPriority = *priority
 		*bestPerpetualId = position.PerpetualId
 		*foundPerpetual = true
 	}

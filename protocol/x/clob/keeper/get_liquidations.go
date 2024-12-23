@@ -111,6 +111,7 @@ func (k Keeper) GetSubaccountCollateralizationInfo(
 		if err != nil {
 			return false, false, nil, err
 		}
+
 		updateCollateralizationInfoGivenPerp(perpetual, price, liquidityTier, perpetualPosition.GetBigQuantums(), bigTotalNetCollateral, bigWeightedMaintenanceMargin, bigTotalMaintenanceMargin, quoteCurrencyAtomicResolution)
 	}
 

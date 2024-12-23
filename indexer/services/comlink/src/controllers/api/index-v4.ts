@@ -16,6 +16,7 @@ import SparklinesController from './v4/sparklines-controller';
 import TimeController from './v4/time-controller';
 import TradesController from './v4/trades-controller';
 import TransfersController from './v4/transfers-controller';
+import CollateralPoolsController from './v4/collateral-pools-controller';
 import YieldParamsController from './v4/yield-params-controller';
 
 // Keep routers in alphabetical order
@@ -35,6 +36,7 @@ router.use('/perpetualPositions', PerpetualPositionsController);
 router.use('/sparklines', SparklinesController);
 router.use('/time', TimeController);
 router.use('/trades', TradesController);
+router.use('/collateralPools', CollateralPoolsController);
 router.use('/transfers', TransfersController);
 router.use('/screen', ComplianceController);
 router.use('/yieldParams', YieldParamsController);

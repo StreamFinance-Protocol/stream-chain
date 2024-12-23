@@ -35,6 +35,7 @@ import {
   DeleveragingEventV1,
   OpenInterestUpdateEventV1,
   UpdateYieldParamsEventV1,
+  CollateralPoolCreateEvent,
 } from '@klyraprotocol-indexer/v4-protos';
 import { IHeaders } from 'kafkajs';
 import Long from 'long';
@@ -134,6 +135,13 @@ export type EventProtoWithTypeAndVersion = {
   | {
       type: KlyraIndexerSubtypes.LIQUIDITY_TIER;
       eventProto: LiquidityTierUpsertEventV1;
+      indexerTendermintEvent: IndexerTendermintEvent;
+      version: number;
+      blockEventIndex: number;
+    }
+  | {
+      type: KlyraIndexerSubtypes.COLLATERAL_POOL;
+      eventProto: CollateralPoolCreateEvent;
       indexerTendermintEvent: IndexerTendermintEvent;
       version: number;
       blockEventIndex: number;

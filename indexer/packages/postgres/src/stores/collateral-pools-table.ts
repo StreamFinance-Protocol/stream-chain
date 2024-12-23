@@ -95,14 +95,13 @@ export async function update(
 }
 
 export async function upsert(
-  tierToUpsert: CollateralPoolsCreateObject,
+  collateralPoolToUpsert: CollateralPoolsCreateObject,
   options: Options = { txId: undefined }
 ): Promise<CollateralPoolFromDatabase> {
-  const tiers: CollateralPoolsModel[] = await CollateralPoolsModel.query(
-    Transaction.get(options.txId)
-  )
-    .upsert(tierToUpsert)
-    .returning('*');
-  // should only ever be one tier
-  return tiers[0];
+  const collateralPools: CollateralPoolsModel[] =
+    await CollateralPoolsModel.query(Transaction.get(options.txId))
+      .upsert(collateralPoolToUpsert)
+      .returning('*');
+  // should only ever be one collateral pool
+  return collateralPools[0];
 }

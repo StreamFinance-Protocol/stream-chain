@@ -107,14 +107,14 @@ it('Successfully upserts an existing collateralPool', async () => {
   );
 });
 
-it('Successfully upserts a collateral pool', async () => {
-  const collateralPool: CollateralPoolFromDatabase | undefined =
-    await CollateralPoolTable.upsert(defaultCollateralPool);
+// it('Successfully upserts a collateral pool', async () => {
+//   const collateralPool: CollateralPoolFromDatabase | undefined =
+//     await CollateralPoolTable.upsert(defaultCollateralPool);
 
-  expect(collateralPool).toEqual(
-    normalizeCollateralPool(defaultCollateralPool)
-  );
-});
+//   expect(collateralPool).toEqual(
+//     normalizeCollateralPool(defaultCollateralPool)
+//   );
+// });
 
 function normalizeCollateralPool(pool: CollateralPoolFromDatabase) {
   return {

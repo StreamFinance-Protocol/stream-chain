@@ -1,10 +1,15 @@
-import { IndexerTendermintBlock, IndexerTendermintEvent } from '@klyraprotocol-indexer/v4-protos';
+import {
+  IndexerTendermintBlock,
+  IndexerTendermintEvent,
+} from '@klyraprotocol-indexer/v4-protos';
 
-export interface AnnotatedIndexerTendermintEvent extends IndexerTendermintEvent {
+export interface AnnotatedIndexerTendermintEvent
+  extends IndexerTendermintEvent {
   data: string;
 }
 
-export interface AnnotatedIndexerTendermintBlock extends IndexerTendermintBlock {
+export interface AnnotatedIndexerTendermintBlock
+  extends IndexerTendermintBlock {
   annotatedEvents: AnnotatedIndexerTendermintEvent[];
 }
 
@@ -18,6 +23,7 @@ export enum KlyraIndexerSubtypes {
   ASSET = 'asset',
   PERPETUAL_MARKET = 'perpetual_market',
   LIQUIDITY_TIER = 'liquidity_tier',
+  COLLATERAL_POOL = 'collateral_pool',
   UPDATE_PERPETUAL = 'update_perpetual',
   UPDATE_CLOB_PAIR = 'update_clob_pair',
   DELEVERAGING = 'deleveraging',

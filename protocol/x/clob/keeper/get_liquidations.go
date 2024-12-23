@@ -7,6 +7,7 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib"
 	assettypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/heap"
+	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	perpkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/keeper"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
@@ -182,7 +183,33 @@ func (k Keeper) UpdateCollateralizationInfoGivenAssets(
 	bigTotalNetCollateral *big.Int,
 	quoteCurrencyAtomicResolution int32,
 ) error {
+
+	if len(settledSubaccount.AssetPositions) == 0 {
+		return nil
+	}
+
 	// Note that we only expect QuoteAsset before multi-collateral support is added.
+	if len(settledSubaccount.AssetPositions) > 1 {
+		return types.ErrMultiCollateralNotImplemented
+	}
+
+	if len(settledSubaccount.PerpetualPositions) > 0 {
+		perpetualPosition := settledSubaccount.PerpetualPositions[0]
+		perpetualId := perpetualPosition.PerpetualId
+		quoteAssetId, err := k.perpetualsKeeper.GetQuoteAssetIdFromPerpetualId(ctx, perpetualId)
+		if err != nil {
+			return err
+		}
+
+		if settledSubaccount.AssetPositions[0].AssetId != quoteAssetId {
+			return types.ErrMultiCollateralNotImplemented
+		}
+	} else {
+		if settledSubaccount.AssetPositions[0].AssetId != assettypes.AssetTDai.Id {
+			return assettypes.ErrTDaiMustBeQuoteAssetOfBaseCollateralPool
+		}
+	}
+
 	for _, assetPosition := range settledSubaccount.AssetPositions {
 		bigNetCollateralQuoteQuantums, err := k.assetsKeeper.GetNetCollateral(ctx, assetPosition.AssetId, assetPosition.GetBigQuantums(), quoteCurrencyAtomicResolution)
 		if err != nil {

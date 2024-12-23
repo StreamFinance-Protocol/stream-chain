@@ -196,6 +196,13 @@ type PerpetualsKeeper interface {
 		int32,
 		error,
 	)
+	GetQuoteAssetIdFromPerpetualId(
+		ctx sdk.Context,
+		perpetualId uint32,
+	) (
+		uint32,
+		error,
+	)
 }
 
 type PricesKeeper interface {

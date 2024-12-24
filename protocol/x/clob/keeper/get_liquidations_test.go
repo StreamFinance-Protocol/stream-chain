@@ -6,6 +6,7 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	sdaiservertypes "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/server/types/sdaioracle"
+	"github.com/StreamFinance-Protocol/stream-chain/protocol/dtypes"
 	vetesting "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/ve"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -21,6 +22,7 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/app/ve"
 	testapp "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/app"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/constants"
+	assettypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/memclob"
 	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	feetiertypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers/types"
@@ -297,6 +299,164 @@ func TestGetSubaccountCollateralizationInfo(t *testing.T) {
 				require.Equal(t, tc.expectedIsLiquidatable, isLiquidatable)
 				require.Equal(t, tc.expectedHasNegativeTnc, hasNegativeTnc)
 				require.Equal(t, tc.expectedLiquidationPriority, liquidationPriority)
+			}
+		})
+	}
+}
+
+func TestUpdateCollateralizationInfoGivenAssets(t *testing.T) {
+	tests := map[string]struct {
+		settledSubaccount             satypes.Subaccount
+		perpetuals                    []perptypes.Perpetual
+		totalNetCollateral            *big.Int
+		quoteCurrencyAtomicResolution int32
+		expectedTotalNetCollateral    *big.Int
+		expectedError                 error
+	}{
+		`Success: Correctly adds no collateral for subaccount with no asset positions`: {
+			settledSubaccount: satypes.Subaccount{
+				Id:                 &constants.Carl_Num0,
+				AssetPositions:     []*satypes.AssetPosition{},
+				PerpetualPositions: []*satypes.PerpetualPosition{},
+			},
+			perpetuals:                    []perptypes.Perpetual{},
+			totalNetCollateral:            big.NewInt(1_000_000_000),
+			quoteCurrencyAtomicResolution: assettypes.AssetTDai.AtomicResolution,
+			expectedTotalNetCollateral:    big.NewInt(1_000_000_000),
+			expectedError:                 nil,
+		},
+		`Success: Correctly adds up collateral for TDAI quote asset`: {
+			settledSubaccount:             constants.Carl_Num0_1BTC_Short_50000USD,
+			perpetuals:                    []perptypes.Perpetual{constants.BtcUsd_20PercentInitial_10PercentMaintenance},
+			totalNetCollateral:            big.NewInt(0),
+			quoteCurrencyAtomicResolution: assettypes.AssetTDai.AtomicResolution,
+			expectedTotalNetCollateral:    big.NewInt(50_000_000_000),
+			expectedError:                 nil,
+		},
+		`Success: Correctly adds up collateral for non-TDAI quote asset`: {
+			settledSubaccount:             constants.Dave_Num0_TinyIso_Long_SmallBTC_Short,
+			perpetuals:                    []perptypes.Perpetual{constants.IsoBtc_20PercentInitial_10PercentMaintenance_CollatPool1_Id5_DangerIndex1},
+			totalNetCollateral:            big.NewInt(100),
+			quoteCurrencyAtomicResolution: constants.BtcUsd.AtomicResolution,
+			expectedTotalNetCollateral:    big.NewInt(-49999900),
+			expectedError:                 nil,
+		},
+		`Failure: Errors out if more than one asset position is found`: {
+			settledSubaccount: satypes.Subaccount{
+				Id: &constants.Carl_Num0,
+				AssetPositions: []*satypes.AssetPosition{
+					{
+						AssetId:  0,
+						Quantums: dtypes.NewInt(50_000_000_000),
+					},
+					{
+						AssetId:  1,
+						Quantums: dtypes.NewInt(50_000),
+					},
+				},
+			},
+			perpetuals:                    []perptypes.Perpetual{},
+			totalNetCollateral:            big.NewInt(100),
+			quoteCurrencyAtomicResolution: assettypes.AssetTDai.AtomicResolution,
+			expectedTotalNetCollateral:    nil,
+			expectedError:                 clobtypes.ErrMultiCollateralNotImplemented,
+		},
+		`Failure: Errors out if quote asset id does not match asset position in subaccount`: {
+			settledSubaccount: satypes.Subaccount{
+				Id: &constants.Carl_Num0,
+				AssetPositions: []*satypes.AssetPosition{
+					{
+						AssetId:  1,
+						Quantums: dtypes.NewInt(50_000),
+					},
+				},
+				PerpetualPositions: []*satypes.PerpetualPosition{
+					{
+						PerpetualId:  0,
+						Quantums:     dtypes.NewInt(-100_000_000),
+						FundingIndex: dtypes.NewInt(0),
+						YieldIndex:   big.NewRat(0, 1).String(),
+					},
+				},
+			},
+			perpetuals:                    []perptypes.Perpetual{constants.BtcUsd_20PercentInitial_10PercentMaintenance},
+			totalNetCollateral:            big.NewInt(100),
+			quoteCurrencyAtomicResolution: constants.BtcUsd.AtomicResolution,
+			expectedTotalNetCollateral:    nil,
+			expectedError:                 clobtypes.ErrMultiCollateralNotImplemented,
+		},
+		`Failure: Errors out if no perpetuals present in subaccount and asset position is not TDAI`: {
+			settledSubaccount: satypes.Subaccount{
+				Id: &constants.Carl_Num0,
+				AssetPositions: []*satypes.AssetPosition{
+					{
+						AssetId:  1,
+						Quantums: dtypes.NewInt(50_000),
+					},
+				},
+			},
+			perpetuals:                    []perptypes.Perpetual{},
+			totalNetCollateral:            big.NewInt(100),
+			quoteCurrencyAtomicResolution: constants.BtcUsd.AtomicResolution,
+			expectedTotalNetCollateral:    nil,
+			expectedError:                 assettypes.ErrTDaiMustBeQuoteAssetOfBaseCollateralPool,
+		},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			memClob := memclob.NewMemClobPriceTimePriority(false)
+			mockBankKeeper := &mocks.BankKeeper{}
+			mockBankKeeper.On(
+				"GetBalance",
+				mock.Anything,
+				mock.Anything,
+				constants.TDai.Denom,
+			).Return(
+				sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int))),
+			)
+
+			ks := keepertest.NewClobKeepersTestContext(t, memClob, mockBankKeeper, indexer_manager.NewIndexerEventManagerNoop(), nil)
+			ks.RatelimitKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+
+			ctx := ks.Ctx.WithIsCheckTx(true)
+
+			// Create liquidity tiers.
+			keepertest.CreateTestLiquidityTiers(t, ctx, ks.PerpetualsKeeper)
+			keepertest.CreateTestCollateralPools(t, ctx, ks.PerpetualsKeeper)
+
+			// Create all perpetuals.
+			for _, p := range tc.perpetuals {
+				_, err := ks.PerpetualsKeeper.CreatePerpetual(
+					ctx,
+					p.Params.Id,
+					p.Params.Ticker,
+					p.Params.MarketId,
+					p.Params.AtomicResolution,
+					p.Params.DefaultFundingPpm,
+					p.Params.LiquidityTier,
+					p.Params.DangerIndexPpm,
+					p.Params.CollateralPoolId,
+					p.YieldIndex,
+				)
+				require.NoError(t, err)
+			}
+
+			ks.SubaccountsKeeper.SetSubaccount(ctx, tc.settledSubaccount)
+
+			err := ks.ClobKeeper.UpdateCollateralizationInfoGivenAssets(
+				ctx,
+				tc.settledSubaccount,
+				tc.totalNetCollateral,
+				tc.quoteCurrencyAtomicResolution,
+			)
+
+			if tc.expectedError != nil {
+				require.Error(t, err)
+				require.Equal(t, tc.expectedError.Error(), err.Error())
+			} else {
+				require.NoError(t, err)
+				require.Equal(t, tc.expectedTotalNetCollateral, tc.totalNetCollateral)
 			}
 		})
 	}

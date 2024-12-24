@@ -1,7 +1,7 @@
-import { Model } from 'objection';
+import BaseModel from './base-model';
 import UpsertQueryBuilder from '../query-builders/upsert';
 
-export default class CollateralPoolsModel extends Model {
+export default class CollateralPoolsModel extends BaseModel {
   static get tableName() {
     return 'collateral_pools';
   }

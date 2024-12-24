@@ -526,21 +526,21 @@ func CanLiquidateSubaccount(
 func CalculateLiquidationPriority(
 	bigTotalNetCollateral *big.Int,
 	bigTotalMaintenanceMargin *big.Int,
-	bigWeightedMaintenanceMargin *big.Int,
+	bigWeightedPositionSizeQuoteQuantums *big.Int,
 ) (
 	liquidationPriority *big.Float,
 ) {
-	if bigWeightedMaintenanceMargin.Sign() <= 0 {
+	if bigWeightedPositionSizeQuoteQuantums.Sign() <= 0 {
 		return big.NewFloat(math.MaxFloat64)
 	}
 
 	health := GetHealth(bigTotalNetCollateral, bigTotalMaintenanceMargin)
 
 	if bigTotalNetCollateral.Sign() < 0 {
-		return new(big.Float).Mul(health, new(big.Float).SetInt(bigWeightedMaintenanceMargin))
+		return new(big.Float).Mul(health, new(big.Float).SetInt(bigWeightedPositionSizeQuoteQuantums))
 	}
 
-	return new(big.Float).Quo(health, new(big.Float).SetInt(bigWeightedMaintenanceMargin))
+	return new(big.Float).Quo(health, new(big.Float).SetInt(bigWeightedPositionSizeQuoteQuantums))
 }
 
 func GetHealth(

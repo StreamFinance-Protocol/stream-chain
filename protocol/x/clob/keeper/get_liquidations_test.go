@@ -23,6 +23,7 @@ import (
 	testapp "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/app"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/constants"
 	assettypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets/types"
+	heap "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/heap"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/memclob"
 	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	feetiertypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers/types"
@@ -673,6 +674,402 @@ func TestUpdateCollateralizationInfoGivenAssets(t *testing.T) {
 			} else {
 				require.NoError(t, err)
 				require.Equal(t, tc.expectedTotalNetCollateral, tc.totalNetCollateral)
+			}
+		})
+	}
+}
+
+func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
+	largeNegativeLiquidationPriority, _ := new(big.Float).SetString("-2500000000000000000000000000000")
+	largeNegativeLiquidationPriority2, _ := new(big.Float).SetString("-62500000000000000000000000000000000000")
+
+	tests := map[string]struct {
+		subaccounts                       []satypes.Subaccount
+		perpetuals                        []perptypes.Perpetual
+		feeParams                         feetiertypes.PerpetualFeeParams
+		expectedLiquidatableSubaccountIds []heap.LiquidationPriority
+		expectedNegativeTncSubaccountIds  map[satypes.SubaccountId]struct{}
+		expectedError                     error
+	}{
+		`Success: Handles no liquidatable subaccounts`: {
+			subaccounts:                       []satypes.Subaccount{constants.Carl_Num0_1BTC_Short_50000USD},
+			perpetuals:                        []perptypes.Perpetual{constants.BtcUsd_NoMarginRequirement},
+			feeParams:                         constants.PerpetualFeeParams,
+			expectedLiquidatableSubaccountIds: []heap.LiquidationPriority{},
+			expectedNegativeTncSubaccountIds:  map[satypes.SubaccountId]struct{}{},
+			expectedError:                     nil,
+		},
+		`Success: Handles one liquidatable subaccount`: {
+			subaccounts: []satypes.Subaccount{constants.Carl_Num1_99999TDAI_Long_1BTC_Short},
+			perpetuals:  []perptypes.Perpetual{constants.BtcUsd_100PercentMarginRequirement_Danger_Index},
+			feeParams:   constants.PerpetualFeeParams,
+			expectedLiquidatableSubaccountIds: []heap.LiquidationPriority{
+				{
+					SubaccountId: constants.Carl_Num1,
+					Priority:     new(big.Float).Quo(big.NewFloat(49999000000), big.NewFloat(50000000000*50000000000)),
+				},
+			},
+			expectedNegativeTncSubaccountIds: map[satypes.SubaccountId]struct{}{},
+			expectedError:                    nil,
+		},
+		`Success: Handles one liquidatable subaccount that also has negative TNC`: {
+			subaccounts: []satypes.Subaccount{
+				satypes.Subaccount{
+					Id: &constants.Carl_Num1,
+					AssetPositions: []*satypes.AssetPosition{
+						{
+							AssetId:  0,
+							Quantums: dtypes.NewInt(49_000_000_000), // $49,000
+						},
+					},
+					PerpetualPositions: []*satypes.PerpetualPosition{
+						{
+							PerpetualId: 0,
+							Quantums:    dtypes.NewInt(-100_000_000), // -1 BTC
+							YieldIndex:  big.NewRat(0, 1).String(),
+						},
+					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
+				},
+			},
+			perpetuals: []perptypes.Perpetual{constants.BtcUsd_100PercentMarginRequirement_Danger_Index},
+			feeParams:  constants.PerpetualFeeParams,
+			expectedLiquidatableSubaccountIds: []heap.LiquidationPriority{
+				{
+					SubaccountId: constants.Carl_Num1,
+					Priority:     largeNegativeLiquidationPriority,
+				},
+			},
+			expectedNegativeTncSubaccountIds: map[satypes.SubaccountId]struct{}{
+				constants.Carl_Num1: {},
+			},
+			expectedError: nil,
+		},
+		`Success: Handles one liquidatable non-TDAI backed subaccount`: {
+			subaccounts: []satypes.Subaccount{
+				satypes.Subaccount{
+					Id: &constants.Carl_Num1,
+					AssetPositions: []*satypes.AssetPosition{
+						{
+							AssetId:  1,
+							Quantums: dtypes.NewInt(101_000_000),
+						},
+					},
+					PerpetualPositions: []*satypes.PerpetualPosition{
+						{
+							PerpetualId: 8,
+							Quantums:    dtypes.NewInt(-100_000_000),
+							YieldIndex:  big.NewRat(0, 1).String(),
+						},
+					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
+				},
+			},
+			perpetuals: []perptypes.Perpetual{constants.BtcBtc_100PercentMarginRequirement_CollatPool1_Id8_DangerIndex1},
+			feeParams:  constants.PerpetualFeeParams,
+			expectedLiquidatableSubaccountIds: []heap.LiquidationPriority{
+				{
+					SubaccountId: constants.Carl_Num1,
+					Priority:     new(big.Float).Quo(big.NewFloat(50_000_000_000), big.NewFloat(5_000_000_000_000*5_000_000_000_000)),
+				},
+			},
+			expectedNegativeTncSubaccountIds: map[satypes.SubaccountId]struct{}{},
+			expectedError:                    nil,
+		},
+		`Success: Handles one liquidatable non-TDAI backed subaccount with negative TNC`: {
+			subaccounts: []satypes.Subaccount{
+				satypes.Subaccount{
+					Id: &constants.Carl_Num1,
+					AssetPositions: []*satypes.AssetPosition{
+						{
+							AssetId:  1,
+							Quantums: dtypes.NewInt(50_000_000),
+						},
+					},
+					PerpetualPositions: []*satypes.PerpetualPosition{
+						{
+							PerpetualId: 8,
+							Quantums:    dtypes.NewInt(-100_000_000),
+							YieldIndex:  big.NewRat(0, 1).String(),
+						},
+					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
+				},
+			},
+			perpetuals: []perptypes.Perpetual{constants.BtcBtc_100PercentMarginRequirement_CollatPool1_Id8_DangerIndex1},
+			feeParams:  constants.PerpetualFeeParams,
+			expectedLiquidatableSubaccountIds: []heap.LiquidationPriority{
+				{
+					SubaccountId: constants.Carl_Num1,
+					Priority:     largeNegativeLiquidationPriority2,
+				},
+			},
+			expectedNegativeTncSubaccountIds: map[satypes.SubaccountId]struct{}{
+				constants.Carl_Num1: {},
+			},
+			expectedError: nil,
+		},
+		`Success: Handles multiple liquidatable non-TDAI backed subaccounts`: {
+			subaccounts: []satypes.Subaccount{
+				satypes.Subaccount{
+					Id: &constants.Carl_Num0,
+					AssetPositions: []*satypes.AssetPosition{
+						{
+							AssetId:  1,
+							Quantums: dtypes.NewInt(50_000_000),
+						},
+					},
+					PerpetualPositions: []*satypes.PerpetualPosition{
+						{
+							PerpetualId: 8,
+							Quantums:    dtypes.NewInt(-100_000_000),
+							YieldIndex:  big.NewRat(0, 1).String(),
+						},
+					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
+				},
+				satypes.Subaccount{
+					Id: &constants.Dave_Num1,
+					AssetPositions: []*satypes.AssetPosition{
+						{
+							AssetId:  1,
+							Quantums: dtypes.NewInt(101_000_000),
+						},
+					},
+					PerpetualPositions: []*satypes.PerpetualPosition{
+						{
+							PerpetualId: 8,
+							Quantums:    dtypes.NewInt(-100_000_000),
+							YieldIndex:  big.NewRat(0, 1).String(),
+						},
+					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
+				},
+			},
+			perpetuals: []perptypes.Perpetual{constants.BtcBtc_100PercentMarginRequirement_CollatPool1_Id8_DangerIndex1},
+			feeParams:  constants.PerpetualFeeParams,
+			expectedLiquidatableSubaccountIds: []heap.LiquidationPriority{
+				{
+					SubaccountId: constants.Carl_Num0,
+					Priority:     largeNegativeLiquidationPriority2,
+				},
+				{
+					SubaccountId: constants.Dave_Num1,
+					Priority:     new(big.Float).Quo(big.NewFloat(50_000_000_000), big.NewFloat(5_000_000_000_000*5_000_000_000_000)),
+				},
+			},
+			expectedNegativeTncSubaccountIds: map[satypes.SubaccountId]struct{}{
+				constants.Carl_Num0: {},
+			},
+			expectedError: nil,
+		},
+		`Success: Handles multiple liquidatable TDAI backed subaccounts`: {
+			subaccounts: []satypes.Subaccount{
+				constants.Carl_Num1_99999TDAI_Long_1BTC_Short,
+				satypes.Subaccount{
+					Id: &constants.Dave_Num0,
+					AssetPositions: []*satypes.AssetPosition{
+						{
+							AssetId:  0,
+							Quantums: dtypes.NewInt(49_000_000_000), // $49,000
+						},
+					},
+					PerpetualPositions: []*satypes.PerpetualPosition{
+						{
+							PerpetualId: 0,
+							Quantums:    dtypes.NewInt(-100_000_000), // -1 BTC
+							YieldIndex:  big.NewRat(0, 1).String(),
+						},
+					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
+				},
+			},
+			perpetuals: []perptypes.Perpetual{constants.BtcUsd_100PercentMarginRequirement_Danger_Index},
+			feeParams:  constants.PerpetualFeeParams,
+			expectedLiquidatableSubaccountIds: []heap.LiquidationPriority{
+				{
+					SubaccountId: constants.Dave_Num0,
+					Priority:     largeNegativeLiquidationPriority,
+				},
+				{
+					SubaccountId: constants.Carl_Num1,
+					Priority:     new(big.Float).Quo(big.NewFloat(49999000000), big.NewFloat(50000000000*50000000000)),
+				},
+			},
+			expectedNegativeTncSubaccountIds: map[satypes.SubaccountId]struct{}{
+				constants.Dave_Num0: {},
+			},
+			expectedError: nil,
+		},
+		`Success: Handles a mix of multiple liquidatable TDAI backed and non-TDAI backed subaccounts`: {
+			subaccounts: []satypes.Subaccount{
+				constants.Carl_Num1_99999TDAI_Long_1BTC_Short,
+				satypes.Subaccount{
+					Id: &constants.Dave_Num0,
+					AssetPositions: []*satypes.AssetPosition{
+						{
+							AssetId:  0,
+							Quantums: dtypes.NewInt(49_000_000_000), // $49,000
+						},
+					},
+					PerpetualPositions: []*satypes.PerpetualPosition{
+						{
+							PerpetualId: 0,
+							Quantums:    dtypes.NewInt(-100_000_000), // -1 BTC
+							YieldIndex:  big.NewRat(0, 1).String(),
+						},
+					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
+				},
+				satypes.Subaccount{
+					Id: &constants.Alice_Num0,
+					AssetPositions: []*satypes.AssetPosition{
+						{
+							AssetId:  1,
+							Quantums: dtypes.NewInt(50_000_000),
+						},
+					},
+					PerpetualPositions: []*satypes.PerpetualPosition{
+						{
+							PerpetualId: 8,
+							Quantums:    dtypes.NewInt(-100_000_000),
+							YieldIndex:  big.NewRat(0, 1).String(),
+						},
+					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
+				},
+				satypes.Subaccount{
+					Id: &constants.Bob_Num0,
+					AssetPositions: []*satypes.AssetPosition{
+						{
+							AssetId:  1,
+							Quantums: dtypes.NewInt(101_000_000),
+						},
+					},
+					PerpetualPositions: []*satypes.PerpetualPosition{
+						{
+							PerpetualId: 8,
+							Quantums:    dtypes.NewInt(-100_000_000),
+							YieldIndex:  big.NewRat(0, 1).String(),
+						},
+					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
+				},
+			},
+			perpetuals: []perptypes.Perpetual{constants.BtcUsd_100PercentMarginRequirement_Danger_Index, constants.BtcBtc_100PercentMarginRequirement_CollatPool1_Id8_DangerIndex1},
+			feeParams:  constants.PerpetualFeeParams,
+			expectedLiquidatableSubaccountIds: []heap.LiquidationPriority{
+				{
+					SubaccountId: constants.Alice_Num0,
+					Priority:     largeNegativeLiquidationPriority2,
+				},
+				{
+					SubaccountId: constants.Dave_Num0,
+					Priority:     largeNegativeLiquidationPriority,
+				},
+				{
+					SubaccountId: constants.Bob_Num0,
+					Priority:     new(big.Float).Quo(big.NewFloat(50_000_000_000), big.NewFloat(5_000_000_000_000*5_000_000_000_000)),
+				},
+				{
+					SubaccountId: constants.Carl_Num1,
+					Priority:     new(big.Float).Quo(big.NewFloat(49999000000), big.NewFloat(50000000000*50000000000)),
+				},
+			},
+			expectedNegativeTncSubaccountIds: map[satypes.SubaccountId]struct{}{
+				constants.Dave_Num0:  {},
+				constants.Alice_Num0: {},
+			},
+			expectedError: nil,
+		},
+		`Throws error when perpetual does not exist`: {
+			subaccounts: []satypes.Subaccount{constants.Carl_Num0_1BTC_Short_50000USD},
+			perpetuals:  []perptypes.Perpetual{},
+			feeParams:   constants.PerpetualFeeParams,
+			expectedError: errors.New(
+				"Error checking collateralization status: 0: Perpetual does not exist",
+			),
+		},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			memClob := memclob.NewMemClobPriceTimePriority(false)
+			mockBankKeeper := &mocks.BankKeeper{}
+			mockBankKeeper.On(
+				"GetBalance",
+				mock.Anything,
+				mock.Anything,
+				constants.TDai.Denom,
+			).Return(
+				sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int))),
+			)
+
+			ks := keepertest.NewClobKeepersTestContext(t, memClob, mockBankKeeper, indexer_manager.NewIndexerEventManagerNoop(), nil)
+			ks.RatelimitKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+
+			ctx := ks.Ctx.WithIsCheckTx(true)
+
+			// Create liquidity tiers.
+			keepertest.CreateTestLiquidityTiers(t, ctx, ks.PerpetualsKeeper)
+			keepertest.CreateTestCollateralPools(t, ctx, ks.PerpetualsKeeper)
+
+			require.NoError(t, ks.FeeTiersKeeper.SetPerpetualFeeParams(ctx, tc.feeParams))
+
+			// Create all perpetuals.
+			for _, p := range tc.perpetuals {
+				_, err := ks.PerpetualsKeeper.CreatePerpetual(
+					ctx,
+					p.Params.Id,
+					p.Params.Ticker,
+					p.Params.MarketId,
+					p.Params.AtomicResolution,
+					p.Params.DefaultFundingPpm,
+					p.Params.LiquidityTier,
+					p.Params.DangerIndexPpm,
+					p.Params.CollateralPoolId,
+					p.YieldIndex,
+				)
+				require.NoError(t, err)
+			}
+
+			perptest.SetUpDefaultPerpOIsForTest(
+				t,
+				ks.Ctx,
+				ks.PerpetualsKeeper,
+				tc.perpetuals,
+			)
+
+			for _, subaccount := range tc.subaccounts {
+				ks.SubaccountsKeeper.SetSubaccount(ctx, subaccount)
+			}
+
+			require.NoError(
+				t,
+				ks.ClobKeeper.InitializeLiquidationsConfig(ctx, clobtypes.LiquidationsConfig_Default),
+			)
+
+			liquidatableSubaccountIds, negativeTncSubaccountIds, err := ks.ClobKeeper.GetLiquidatableAndNegativeTncSubaccountIds(ctx)
+
+			if tc.expectedError != nil {
+				require.Error(t, err)
+				require.Equal(t, tc.expectedError.Error(), err.Error())
+				require.Nil(t, liquidatableSubaccountIds)
+				require.Nil(t, negativeTncSubaccountIds)
+			} else {
+				require.NoError(t, err)
+				require.Equal(t, len(tc.expectedLiquidatableSubaccountIds), liquidatableSubaccountIds.Len())
+
+				for _, gotSubaccountId := range negativeTncSubaccountIds {
+					_, exists := tc.expectedNegativeTncSubaccountIds[gotSubaccountId]
+					require.True(t, exists, "Subaccount ID %v was not expected to have negative TNC", gotSubaccountId)
+				}
+
+				for _, expectedLiquidationSubaccount := range tc.expectedLiquidatableSubaccountIds {
+					gotLiquidationSubaccount := liquidatableSubaccountIds.PopLowestPriority()
+					require.Equal(t, expectedLiquidationSubaccount.SubaccountId, gotLiquidationSubaccount.SubaccountId)
+					require.Equal(t, expectedLiquidationSubaccount.Priority.SetPrec(20).Cmp(gotLiquidationSubaccount.Priority.SetPrec(20)), 0)
+				}
 			}
 		})
 	}

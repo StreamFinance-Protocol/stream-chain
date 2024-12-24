@@ -404,6 +404,17 @@ var (
 		CollateralPoolId:  uint32(0),
 	}
 
+	BtcUsd_100PercentMarginRequirement_Params_Danger_Index = perptypes.PerpetualParams{
+		Id:                0,
+		Ticker:            "BTC-USD 100% margin requirement",
+		MarketId:          uint32(0),
+		AtomicResolution:  int32(-8),
+		DefaultFundingPpm: int32(0),
+		LiquidityTier:     uint32(0),
+		DangerIndexPpm:    uint32(1),
+		CollateralPoolId:  uint32(0),
+	}
+
 	BtcUsd_50PercentInitial_40PercentMaintenance_Params = perptypes.PerpetualParams{
 		Id:                0,
 		Ticker:            "BTC-USD 50/40 margin requirements",
@@ -417,6 +428,13 @@ var (
 
 	BtcUsd_100PercentMarginRequirement = perptypes.Perpetual{
 		Params:       BtcUsd_100PercentMarginRequirement_Params,
+		FundingIndex: dtypes.ZeroInt(),
+		OpenInterest: dtypes.ZeroInt(),
+		YieldIndex:   big.NewRat(0, 1).String(),
+	}
+
+	BtcUsd_100PercentMarginRequirement_Danger_Index = perptypes.Perpetual{
+		Params:       BtcUsd_100PercentMarginRequirement_Params_Danger_Index,
 		FundingIndex: dtypes.ZeroInt(),
 		OpenInterest: dtypes.ZeroInt(),
 		YieldIndex:   big.NewRat(0, 1).String(),
@@ -440,6 +458,17 @@ var (
 		CollateralPoolId:  uint32(0),
 	}
 
+	BtcUsd_20PercentInitial_10PercentMaintenance_Params_Danger_Index = perptypes.PerpetualParams{
+		Id:                0,
+		Ticker:            "BTC-USD 20/10 margin requirements",
+		MarketId:          uint32(0),
+		AtomicResolution:  int32(-8),
+		DefaultFundingPpm: int32(0),
+		LiquidityTier:     uint32(3),
+		DangerIndexPpm:    uint32(1),
+		CollateralPoolId:  uint32(0),
+	}
+
 	// Note: These share the same params
 	BtcUsd_20PercentInitial_10PercentMaintenance_OpenInterest1_Params = perptypes.PerpetualParams{
 		Id:                0,
@@ -454,6 +483,13 @@ var (
 
 	BtcUsd_20PercentInitial_10PercentMaintenance = perptypes.Perpetual{
 		Params:       BtcUsd_20PercentInitial_10PercentMaintenance_Params,
+		FundingIndex: dtypes.ZeroInt(),
+		OpenInterest: dtypes.ZeroInt(),
+		YieldIndex:   big.NewRat(0, 1).String(),
+	}
+
+	BtcUsd_20PercentInitial_10PercentMaintenance_Danger_Index = perptypes.Perpetual{
+		Params:       BtcUsd_20PercentInitial_10PercentMaintenance_Params_Danger_Index,
 		FundingIndex: dtypes.ZeroInt(),
 		OpenInterest: dtypes.ZeroInt(),
 		YieldIndex:   big.NewRat(0, 1).String(),
@@ -649,6 +685,17 @@ var (
 		CollateralPoolId:  uint32(0),
 	}
 
+	EthUsd_100PercentMarginRequirement_Params_DangerIndex = perptypes.PerpetualParams{
+		Id:                1,
+		Ticker:            "ETH-USD 100/100 margin requirements",
+		MarketId:          uint32(1),
+		AtomicResolution:  int32(-9),
+		DefaultFundingPpm: int32(0),
+		LiquidityTier:     uint32(0),
+		DangerIndexPpm:    uint32(1),
+		CollateralPoolId:  uint32(0),
+	}
+
 	EthUsd_20PercentInitial_10PercentMaintenance_Isolated = perptypes.Perpetual{
 		Params:       EthUsd_20PercentInitial_10PercentMaintenance_Isolated_Params,
 		FundingIndex: dtypes.ZeroInt(),
@@ -658,6 +705,13 @@ var (
 
 	EthUsd_100PercentMarginRequirement = perptypes.Perpetual{
 		Params:       EthUsd_100PercentMarginRequirement_Params,
+		FundingIndex: dtypes.ZeroInt(),
+		OpenInterest: dtypes.ZeroInt(),
+		YieldIndex:   big.NewRat(0, 1).String(),
+	}
+
+	EthUsd_100PercentMarginRequirement_DangerIndex = perptypes.Perpetual{
+		Params:       EthUsd_100PercentMarginRequirement_Params_DangerIndex,
 		FundingIndex: dtypes.ZeroInt(),
 		OpenInterest: dtypes.ZeroInt(),
 		YieldIndex:   big.NewRat(0, 1).String(),
@@ -838,6 +892,24 @@ var (
 
 	BtcBtc_100PercentMarginRequirement_CollatPool1_Id8 = perptypes.Perpetual{
 		Params:       BtcBtc_100PercentMarginRequirement_CollatPool1_Params_Id8,
+		FundingIndex: dtypes.ZeroInt(),
+		OpenInterest: dtypes.ZeroInt(),
+		YieldIndex:   big.NewRat(0, 1).String(),
+	}
+
+	BtcBtc_100PercentMarginRequirement_CollatPool1_Params_Id8_DangerIndex1 = perptypes.PerpetualParams{
+		Id:                8,
+		Ticker:            "BTC-BTC 100% margin requirement",
+		MarketId:          uint32(0),
+		AtomicResolution:  int32(-8),
+		DefaultFundingPpm: int32(0),
+		LiquidityTier:     uint32(0),
+		DangerIndexPpm:    uint32(1),
+		CollateralPoolId:  uint32(1),
+	}
+
+	BtcBtc_100PercentMarginRequirement_CollatPool1_Id8_DangerIndex1 = perptypes.Perpetual{
+		Params:       BtcBtc_100PercentMarginRequirement_CollatPool1_Params_Id8_DangerIndex1,
 		FundingIndex: dtypes.ZeroInt(),
 		OpenInterest: dtypes.ZeroInt(),
 		YieldIndex:   big.NewRat(0, 1).String(),

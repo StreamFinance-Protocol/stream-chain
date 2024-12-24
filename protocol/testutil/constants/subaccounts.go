@@ -280,6 +280,20 @@ var (
 		},
 		AssetYieldIndex: big.NewRat(1, 1).String(),
 	}
+	Carl_Num1_99999TDAI_Long_1BTC_Short = satypes.Subaccount{
+		Id: &Carl_Num1,
+		AssetPositions: []*satypes.AssetPosition{
+			&TDai_Asset_99_999,
+		},
+		PerpetualPositions: []*satypes.PerpetualPosition{
+			{
+				PerpetualId: 0,
+				Quantums:    dtypes.NewInt(-100_000_000), // -1 BTC
+				YieldIndex:  big.NewRat(0, 1).String(),
+			},
+		},
+		AssetYieldIndex: big.NewRat(1, 1).String(),
+	}
 	Carl_Num0_1BTC_Short_49999USD = satypes.Subaccount{
 		Id: &Carl_Num0,
 		AssetPositions: []*satypes.AssetPosition{

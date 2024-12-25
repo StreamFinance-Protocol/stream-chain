@@ -11,7 +11,6 @@ import {
 import { FillResponseObject, RequestMethod } from '../../../../src/types';
 import request from 'supertest';
 import {
-  getQueryString,
   sendRequest,
   fillResponseObjectFromFillCreateObject,
 } from '../../../helpers/helpers';
@@ -26,11 +25,7 @@ describe('fills-controller#V4', () => {
   });
 
   describe('GET', () => {
-    const defaultSubaccountNumber: number =
-      testConstants.defaultSubaccount.subaccountNumber;
-    const defaultAddress: string = testConstants.defaultSubaccount.address;
-    const defaultMarket: string = testConstants.defaultPerpetualMarket.ticker;
-    const invalidMarket: string = 'UNKNOWN';
+    const defaultSubaccountNumber: number = testConstants.defaultSubaccount.subaccountNumber;
 
     beforeEach(async () => {
       await testMocks.seedData();
@@ -72,7 +67,7 @@ describe('fills-controller#V4', () => {
           expect.objectContaining({
             ...expected,
           }),
-        ])
+        ]),
       );
     });
 
@@ -123,7 +118,7 @@ describe('fills-controller#V4', () => {
           expect.objectContaining({
             ...expected,
           }),
-        ])
+        ]),
       );
     });
 
@@ -192,7 +187,7 @@ describe('fills-controller#V4', () => {
           expect.objectContaining({
             ...expected[1],
           }),
-        ])
+        ]),
       );
     });
 
@@ -231,15 +226,15 @@ describe('fills-controller#V4', () => {
       const expectedFills: Partial<FillResponseObject>[] = [
         fillResponseObjectFromFillCreateObject(
           testConstants.defaultFill,
-          defaultSubaccountNumber
+          defaultSubaccountNumber,
         ),
         fillResponseObjectFromFillCreateObject(
           testConstants.isolatedMarketFill,
-          testConstants.isolatedSubaccount.subaccountNumber
+          testConstants.isolatedSubaccount.subaccountNumber,
         ),
         fillResponseObjectFromFillCreateObject(
           testConstants.isolatedMarketFill2,
-          testConstants.isolatedSubaccount2.subaccountNumber
+          testConstants.isolatedSubaccount2.subaccountNumber,
         ),
       ];
 
@@ -255,7 +250,7 @@ describe('fills-controller#V4', () => {
           expect.objectContaining({
             ...expectedFills[2],
           }),
-        ])
+        ]),
       );
     });
 
@@ -279,11 +274,11 @@ describe('fills-controller#V4', () => {
       const expectedFills: Partial<FillResponseObject>[] = [
         fillResponseObjectFromFillCreateObject(
           testConstants.isolatedMarketFill,
-          testConstants.isolatedSubaccount.subaccountNumber
+          testConstants.isolatedSubaccount.subaccountNumber,
         ),
         fillResponseObjectFromFillCreateObject(
           testConstants.isolatedMarketFill2,
-          testConstants.isolatedSubaccount2.subaccountNumber
+          testConstants.isolatedSubaccount2.subaccountNumber,
         ),
       ];
 
@@ -296,7 +291,7 @@ describe('fills-controller#V4', () => {
           expect.objectContaining({
             ...expectedFills[1],
           }),
-        ])
+        ]),
       );
     });
 

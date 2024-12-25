@@ -70,124 +70,124 @@ export type EventProtoWithTypeAndVersion = {
   blockEventIndex: number;
 } & (
   | {
-      type: KlyraIndexerSubtypes.ORDER_FILL;
-      eventProto: OrderFillEventV1;
-      indexerTendermintEvent: IndexerTendermintEvent;
-      version: number;
-      blockEventIndex: number;
-    }
+    type: KlyraIndexerSubtypes.ORDER_FILL;
+    eventProto: OrderFillEventV1;
+    indexerTendermintEvent: IndexerTendermintEvent;
+    version: number;
+    blockEventIndex: number;
+  }
   | {
-      type: KlyraIndexerSubtypes.SUBACCOUNT_UPDATE;
-      eventProto: SubaccountUpdateEventV1;
-      indexerTendermintEvent: IndexerTendermintEvent;
-      version: number;
-      blockEventIndex: number;
-    }
+    type: KlyraIndexerSubtypes.SUBACCOUNT_UPDATE;
+    eventProto: SubaccountUpdateEventV1;
+    indexerTendermintEvent: IndexerTendermintEvent;
+    version: number;
+    blockEventIndex: number;
+  }
   | {
-      type: KlyraIndexerSubtypes.TRANSFER;
-      eventProto: TransferEventV1;
-      indexerTendermintEvent: IndexerTendermintEvent;
-      version: number;
-      blockEventIndex: number;
-    }
+    type: KlyraIndexerSubtypes.TRANSFER;
+    eventProto: TransferEventV1;
+    indexerTendermintEvent: IndexerTendermintEvent;
+    version: number;
+    blockEventIndex: number;
+  }
   | {
-      type: KlyraIndexerSubtypes.MARKET;
-      eventProto: MarketEventV1;
-      indexerTendermintEvent: IndexerTendermintEvent;
-      version: number;
-      blockEventIndex: number;
-    }
+    type: KlyraIndexerSubtypes.MARKET;
+    eventProto: MarketEventV1;
+    indexerTendermintEvent: IndexerTendermintEvent;
+    version: number;
+    blockEventIndex: number;
+  }
   | {
-      type: KlyraIndexerSubtypes.STATEFUL_ORDER;
-      eventProto: StatefulOrderEventV1;
-      indexerTendermintEvent: IndexerTendermintEvent;
-      version: number;
-      blockEventIndex: number;
-    }
+    type: KlyraIndexerSubtypes.STATEFUL_ORDER;
+    eventProto: StatefulOrderEventV1;
+    indexerTendermintEvent: IndexerTendermintEvent;
+    version: number;
+    blockEventIndex: number;
+  }
   | {
-      type: KlyraIndexerSubtypes.FUNDING;
-      eventProto: FundingEventV1;
-      indexerTendermintEvent: IndexerTendermintEvent;
-      version: number;
-      blockEventIndex: number;
-    }
+    type: KlyraIndexerSubtypes.FUNDING;
+    eventProto: FundingEventV1;
+    indexerTendermintEvent: IndexerTendermintEvent;
+    version: number;
+    blockEventIndex: number;
+  }
   | {
-      type: KlyraIndexerSubtypes.ASSET;
-      eventProto: AssetCreateEventV1;
-      indexerTendermintEvent: IndexerTendermintEvent;
-      version: number;
-      blockEventIndex: number;
-    }
+    type: KlyraIndexerSubtypes.ASSET;
+    eventProto: AssetCreateEventV1;
+    indexerTendermintEvent: IndexerTendermintEvent;
+    version: number;
+    blockEventIndex: number;
+  }
   | {
-      type: KlyraIndexerSubtypes.PERPETUAL_MARKET;
-      eventProto: PerpetualMarketCreateEventV1;
-      indexerTendermintEvent: IndexerTendermintEvent;
-      version: number;
-      blockEventIndex: number;
-    }
+    type: KlyraIndexerSubtypes.PERPETUAL_MARKET;
+    eventProto: PerpetualMarketCreateEventV1;
+    indexerTendermintEvent: IndexerTendermintEvent;
+    version: number;
+    blockEventIndex: number;
+  }
   | {
-      type: KlyraIndexerSubtypes.PERPETUAL_MARKET;
-      eventProto: PerpetualMarketCreateEventV2;
-      indexerTendermintEvent: IndexerTendermintEvent;
-      version: number;
-      blockEventIndex: number;
-    }
+    type: KlyraIndexerSubtypes.PERPETUAL_MARKET;
+    eventProto: PerpetualMarketCreateEventV2;
+    indexerTendermintEvent: IndexerTendermintEvent;
+    version: number;
+    blockEventIndex: number;
+  }
   | {
-      type: KlyraIndexerSubtypes.LIQUIDITY_TIER;
-      eventProto: LiquidityTierUpsertEventV1;
-      indexerTendermintEvent: IndexerTendermintEvent;
-      version: number;
-      blockEventIndex: number;
-    }
+    type: KlyraIndexerSubtypes.LIQUIDITY_TIER;
+    eventProto: LiquidityTierUpsertEventV1;
+    indexerTendermintEvent: IndexerTendermintEvent;
+    version: number;
+    blockEventIndex: number;
+  }
   | {
-      type: KlyraIndexerSubtypes.COLLATERAL_POOL;
-      eventProto: CollateralPoolUpsertEvent;
-      indexerTendermintEvent: IndexerTendermintEvent;
-      version: number;
-      blockEventIndex: number;
-    }
+    type: KlyraIndexerSubtypes.COLLATERAL_POOL;
+    eventProto: CollateralPoolUpsertEvent;
+    indexerTendermintEvent: IndexerTendermintEvent;
+    version: number;
+    blockEventIndex: number;
+  }
   | {
-      type: KlyraIndexerSubtypes.LIQUIDITY_TIER;
-      eventProto: LiquidityTierUpsertEventV2;
-      indexerTendermintEvent: IndexerTendermintEvent;
-      version: number;
-      blockEventIndex: number;
-    }
+    type: KlyraIndexerSubtypes.LIQUIDITY_TIER;
+    eventProto: LiquidityTierUpsertEventV2;
+    indexerTendermintEvent: IndexerTendermintEvent;
+    version: number;
+    blockEventIndex: number;
+  }
   | {
-      type: KlyraIndexerSubtypes.UPDATE_PERPETUAL;
-      eventProto: UpdatePerpetualEventV1;
-      indexerTendermintEvent: IndexerTendermintEvent;
-      version: number;
-      blockEventIndex: number;
-    }
+    type: KlyraIndexerSubtypes.UPDATE_PERPETUAL;
+    eventProto: UpdatePerpetualEventV1;
+    indexerTendermintEvent: IndexerTendermintEvent;
+    version: number;
+    blockEventIndex: number;
+  }
   | {
-      type: KlyraIndexerSubtypes.UPDATE_CLOB_PAIR;
-      eventProto: UpdateClobPairEventV1;
-      indexerTendermintEvent: IndexerTendermintEvent;
-      version: number;
-      blockEventIndex: number;
-    }
+    type: KlyraIndexerSubtypes.UPDATE_CLOB_PAIR;
+    eventProto: UpdateClobPairEventV1;
+    indexerTendermintEvent: IndexerTendermintEvent;
+    version: number;
+    blockEventIndex: number;
+  }
   | {
-      type: KlyraIndexerSubtypes.DELEVERAGING;
-      eventProto: DeleveragingEventV1;
-      indexerTendermintEvent: IndexerTendermintEvent;
-      version: number;
-      blockEventIndex: number;
-    }
+    type: KlyraIndexerSubtypes.DELEVERAGING;
+    eventProto: DeleveragingEventV1;
+    indexerTendermintEvent: IndexerTendermintEvent;
+    version: number;
+    blockEventIndex: number;
+  }
   | {
-      type: KlyraIndexerSubtypes.OPEN_INTEREST_UPDATE;
-      eventProto: OpenInterestUpdateEventV1;
-      indexerTendermintEvent: IndexerTendermintEvent;
-      version: number;
-      blockEventIndex: number;
-    }
+    type: KlyraIndexerSubtypes.OPEN_INTEREST_UPDATE;
+    eventProto: OpenInterestUpdateEventV1;
+    indexerTendermintEvent: IndexerTendermintEvent;
+    version: number;
+    blockEventIndex: number;
+  }
   | {
-      type: KlyraIndexerSubtypes.YIELD_PARAMS;
-      eventProto: UpdateYieldParamsEventV1;
-      indexerTendermintEvent: IndexerTendermintEvent;
-      version: number;
-      blockEventIndex: number;
-    }
+    type: KlyraIndexerSubtypes.YIELD_PARAMS;
+    eventProto: UpdateYieldParamsEventV1;
+    indexerTendermintEvent: IndexerTendermintEvent;
+    version: number;
+    blockEventIndex: number;
+  }
 );
 
 // Events grouped into events block events and events for each transactionIndex
@@ -233,8 +233,8 @@ export type OrderFillEventWithLiquidation = {
 
 export type FundingEventMessage = {
   type:
-    | FundingEventV1_Type.TYPE_FUNDING_RATE_AND_INDEX
-    | FundingEventV1_Type.TYPE_PREMIUM_SAMPLE;
+  | FundingEventV1_Type.TYPE_FUNDING_RATE_AND_INDEX
+  | FundingEventV1_Type.TYPE_PREMIUM_SAMPLE;
   updates: FundingUpdateV1[];
 };
 
@@ -274,25 +274,25 @@ export interface VulcanMessage {
 
 export type ConsolidatedKafkaEvent =
   | {
-      topic: KafkaTopics.TO_WEBSOCKETS_SUBACCOUNTS;
-      message: AnnotatedSubaccountMessage;
-    }
+    topic: KafkaTopics.TO_WEBSOCKETS_SUBACCOUNTS;
+    message: AnnotatedSubaccountMessage;
+  }
   | {
-      topic: KafkaTopics.TO_WEBSOCKETS_TRADES;
-      message: SingleTradeMessage;
-    }
+    topic: KafkaTopics.TO_WEBSOCKETS_TRADES;
+    message: SingleTradeMessage;
+  }
   | {
-      topic: KafkaTopics.TO_WEBSOCKETS_MARKETS;
-      message: MarketMessage;
-    }
+    topic: KafkaTopics.TO_WEBSOCKETS_MARKETS;
+    message: MarketMessage;
+  }
   | {
-      topic: KafkaTopics.TO_WEBSOCKETS_CANDLES;
-      message: CandleMessage;
-    }
+    topic: KafkaTopics.TO_WEBSOCKETS_CANDLES;
+    message: CandleMessage;
+  }
   | {
-      topic: KafkaTopics.TO_VULCAN;
-      message: VulcanMessage;
-    };
+    topic: KafkaTopics.TO_VULCAN;
+    message: VulcanMessage;
+  };
 
 export enum TransferEventType {
   DEPOSIT = 'deposit',

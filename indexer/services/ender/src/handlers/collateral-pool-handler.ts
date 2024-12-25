@@ -19,17 +19,16 @@ export class CollateralPoolCreationHandler extends Handler<CollateralPoolUpsertE
 
   // eslint-disable-next-line @typescript-eslint/require-await
   public async internalHandle(
-    resultRow: pg.QueryResultRow
+    resultRow: pg.QueryResultRow,
   ): Promise<ConsolidatedKafkaEvent[]> {
-    const collateralPool: CollateralPoolFromDatabase =
-      CollateralPoolsModel.fromJson(
-        resultRow.collateral_pool
-      ) as CollateralPoolFromDatabase;
+    const collateralPool: CollateralPoolFromDatabase = CollateralPoolsModel.fromJson(
+      resultRow.collateral_pool,
+    ) as CollateralPoolFromDatabase;
 
     collateralPoolRefresher.upsertCollateralPool(collateralPool);
     return [
       this.generateConsolidatedMarketKafkaEvent(
-        JSON.stringify(generateCollateralPoolMessage([collateralPool]))
+        JSON.stringify(generateCollateralPoolMessage([collateralPool])),
       ),
     ];
   }

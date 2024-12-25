@@ -69,7 +69,7 @@ const limitSchemaRecord: Record<string, ParamSchema> = {
           !Number.isInteger(value)
         ) {
           throw new Error(
-            `limit must be a positive integer that is not greater than max: ${config.API_LIMIT_V4}`
+            `limit must be a positive integer that is not greater than max: ${config.API_LIMIT_V4}`,
           );
         }
         return true;

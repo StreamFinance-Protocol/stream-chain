@@ -1,5 +1,4 @@
 import {
-  CollateralPoolsTable,
   dbHelpers,
   testConstants,
   testMocks,
@@ -30,7 +29,7 @@ describe('collateral-pools-controller#V4', () => {
 
       const response: request.Response = await sendRequest({
         type: RequestMethod.GET,
-        path: `/v4/collateralPools`,
+        path: '/v4/collateralPools',
       });
 
       const expectedCollateralPools1: CollateralPoolsResponseObject = {
@@ -69,7 +68,7 @@ describe('collateral-pools-controller#V4', () => {
           expect.objectContaining({
             ...expectedCollateralPools2,
           }),
-        ])
+        ]),
       );
     });
 
@@ -101,7 +100,7 @@ describe('collateral-pools-controller#V4', () => {
           expect.objectContaining({
             ...expectedCollateralPool,
           }),
-        ])
+        ]),
       );
     });
 
@@ -132,7 +131,7 @@ describe('collateral-pools-controller#V4', () => {
               msg: expectedErrorMsg,
             }),
           ]),
-        })
+        }),
       );
     });
   });

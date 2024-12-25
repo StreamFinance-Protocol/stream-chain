@@ -73,17 +73,16 @@ import {
 export function perpetualPositionToResponseObject(
   position: PerpetualPositionWithFunding,
   perpetualMarketsMap: PerpetualMarketsMap,
-  marketsMap: MarketsMap
+  marketsMap: MarketsMap,
 ): PerpetualPositionResponseObject {
   // Realized pnl is calculated from the difference in price between the average entry/exit price
   // (order depending on side of the position) multiplied by amount of the position that was closed
   // in addition to the funding payments.
-  const priceDiff: Big =
-    position.side === PositionSide.LONG
-      ? Big(position.exitPrice ?? 0).minus(position.entryPrice)
-      : Big(position.entryPrice).minus(position.exitPrice ?? 0);
+  const priceDiff: Big = position.side === PositionSide.LONG
+    ? Big(position.exitPrice ?? 0).minus(position.entryPrice)
+    : Big(position.entryPrice).minus(position.exitPrice ?? 0);
   const netFunding: Big = Big(position.settledFunding).plus(
-    position.unsettledFunding
+    position.unsettledFunding,
   );
   const realizedPnl: string = priceDiff
     .mul(position.sumClose)
@@ -102,7 +101,7 @@ export function perpetualPositionToResponseObject(
     unrealizedPnl: helpers.getUnrealizedPnl(
       position,
       perpetualMarketsMap[position.perpetualId],
-      marketsMap
+      marketsMap,
     ),
     createdAt: position.createdAt,
     createdAtHeight: position.createdAtHeight,
@@ -124,7 +123,7 @@ export function perpetualPositionToResponseObject(
 export function assetPositionToResponseObject(
   position: AssetPositionFromDatabase,
   assetMap: AssetById,
-  subaccountNumber: number
+  subaccountNumber: number,
 ): AssetPositionResponseObject {
   return {
     symbol: assetMap[position.assetId].symbol,
@@ -144,7 +143,7 @@ export function assetPositionToResponseObject(
 export function fillToResponseObject(
   fill: FillFromDatabase,
   marketsByClobPairId: MarketByClobPairId,
-  subaccountNumber: number
+  subaccountNumber: number,
 ): FillResponseObject {
   return {
     id: fill.id,
@@ -174,7 +173,7 @@ export function fillToResponseObject(
  */
 export function historicalFundingToResponseObject(
   funding: FundingIndexUpdatesFromDatabase,
-  ticker: string
+  ticker: string,
 ): HistoricalFundingResponseObject {
   return {
     ticker,
@@ -186,7 +185,7 @@ export function historicalFundingToResponseObject(
 }
 
 export function fillToTradeResponseObject(
-  fill: FillFromDatabase
+  fill: FillFromDatabase,
 ): TradeResponseObject {
   return {
     id: fill.eventId.toString('hex'),
@@ -213,7 +212,7 @@ export function transferToResponseObject(
   transfer: TransferFromDatabase,
   assetMap: AssetById,
   subaccountMap: SubaccountById,
-  subaccountId: string
+  subaccountId: string,
 ): TransferResponseObject {
   return {
     id: transfer.id,
@@ -246,19 +245,19 @@ export function transferToParentSubaccountResponseObject(
   transfer: TransferFromDatabase,
   assetMap: AssetById,
   subaccountMap: SubaccountById,
-  parentSubaccountNumber: number
+  parentSubaccountNumber: number,
 ): ParentSubaccountTransferResponseObject {
   const senderParentSubaccountNum = transfer.senderWalletAddress
     ? undefined
     : parentSubaccountHelpers.getParentSubaccountNum(
-        subaccountMap[transfer.senderSubaccountId!].subaccountNumber
-      );
+      subaccountMap[transfer.senderSubaccountId!].subaccountNumber,
+    );
 
   const recipientParentSubaccountNum = transfer.recipientWalletAddress
     ? undefined
     : parentSubaccountHelpers.getParentSubaccountNum(
-        subaccountMap[transfer.recipientSubaccountId!].subaccountNumber
-      );
+      subaccountMap[transfer.recipientSubaccountId!].subaccountNumber,
+    );
 
   // Determine transfer type based on parent subaccount number.
   let transferType: TransferType = TransferType.TRANSFER_IN;
@@ -300,7 +299,7 @@ export function transferToParentSubaccountResponseObject(
 }
 
 export function pnlTicksToResponseObject(
-  pnlTicks: PnlTicksFromDatabase
+  pnlTicks: PnlTicksFromDatabase,
 ): PnlTicksResponseObject {
   return {
     id: pnlTicks.id,
@@ -343,7 +342,7 @@ export function subaccountToResponseObject({
 export function perpetualMarketToResponseObject(
   perpetualMarket: PerpetualMarketFromDatabase,
   liquidityTier: LiquidityTiersFromDatabase,
-  market: MarketFromDatabase
+  market: MarketFromDatabase,
 ): PerpetualMarketResponseObject {
   return {
     clobPairId: perpetualMarket.clobPairId,
@@ -356,13 +355,13 @@ export function perpetualMarketToResponseObject(
     trades24H: perpetualMarket.trades24H,
     nextFundingRate: perpetualMarket.nextFundingRate,
     initialMarginFraction: helpers.ppmToString(
-      Number(liquidityTier.initialMarginPpm)
+      Number(liquidityTier.initialMarginPpm),
     ),
     maintenanceMarginFraction: helpers.ppmToString(
       helpers.getMaintenanceMarginPpm(
         Number(liquidityTier.initialMarginPpm),
-        Number(liquidityTier.maintenanceFractionPpm)
-      )
+        Number(liquidityTier.maintenanceFractionPpm),
+      ),
     ),
     openInterest: perpetualMarket.openInterest,
     atomicResolution: perpetualMarket.atomicResolution,
@@ -382,30 +381,30 @@ export function perpetualMarketToResponseObject(
 
 export function OrderbookLevelsToResponseObject(
   orderbookLevels: OrderbookLevels,
-  perpetualMarket: PerpetualMarketFromDatabase
+  perpetualMarket: PerpetualMarketFromDatabase,
 ): OrderbookResponseObject {
   return {
     bids: OrderbookPriceLevelsToResponsePriceLevels(
       orderbookLevels.bids,
-      perpetualMarket
+      perpetualMarket,
     ),
     asks: OrderbookPriceLevelsToResponsePriceLevels(
       orderbookLevels.asks,
-      perpetualMarket
+      perpetualMarket,
     ),
   };
 }
 
 function OrderbookPriceLevelsToResponsePriceLevels(
   priceLevels: PriceLevel[],
-  perpetualMarket: PerpetualMarketFromDatabase
+  perpetualMarket: PerpetualMarketFromDatabase,
 ): OrderbookResponsePriceLevel[] {
   return priceLevels.map((level: PriceLevel) => {
     return {
       price: level.humanPrice,
       size: protocolTranslations.quantumsToHumanFixedString(
         level.quantums,
-        perpetualMarket.atomicResolution
+        perpetualMarket.atomicResolution,
       ),
     };
   });
@@ -414,17 +413,17 @@ function OrderbookPriceLevelsToResponsePriceLevels(
 export function mergePostgresAndRedisOrdersToResponseObjects(
   postgresOrderMap: PostgresOrderMap,
   redisOrderMap: RedisOrderMap,
-  subaccountIdToNumber: Record<string, number>
+  subaccountIdToNumber: Record<string, number>,
 ): OrderResponseObject[] {
   const orderIds: string[] = _.uniq(
-    Object.keys(redisOrderMap).concat(Object.keys(postgresOrderMap))
+    Object.keys(redisOrderMap).concat(Object.keys(postgresOrderMap)),
   );
 
   return _.map(orderIds, (orderId: string) => {
     return postgresAndRedisOrderToResponseObject(
       postgresOrderMap[orderId],
       subaccountIdToNumber,
-      redisOrderMap[orderId]
+      redisOrderMap[orderId],
     ) as OrderResponseObject;
   });
 }
@@ -443,7 +442,7 @@ export function mergePostgresAndRedisOrdersToResponseObjects(
 export function postgresAndRedisOrderToResponseObject(
   postgresOrder: OrderFromDatabase | undefined,
   subaccountIdToNumber: Record<string, number>,
-  redisOrder?: RedisOrder | null
+  redisOrder?: RedisOrder | null,
 ): OrderResponseObject | undefined {
   if (postgresOrder === undefined) {
     if (redisOrder === null || redisOrder === undefined) {
@@ -455,13 +454,13 @@ export function postgresAndRedisOrderToResponseObject(
 
   const orderResponse: OrderResponseObject = postgresOrderToResponseObject(
     postgresOrder,
-    subaccountIdToNumber[postgresOrder.subaccountId]
+    subaccountIdToNumber[postgresOrder.subaccountId],
   );
   if (redisOrder === null || redisOrder === undefined) {
     return orderResponse;
   }
   const redisOrderTIF: TimeInForce = protocolTranslations.protocolOrderTIFToTIF(
-    redisOrder.order!.timeInForce
+    redisOrder.order!.timeInForce,
   );
 
   return {
@@ -481,7 +480,7 @@ export function postgresAndRedisOrderToResponseObject(
 
 export function postgresOrderToResponseObject(
   order: OrderFromDatabase,
-  subaccountNumber: number
+  subaccountNumber: number,
 ): OrderResponseObject {
   return {
     ...order,
@@ -491,7 +490,7 @@ export function postgresOrderToResponseObject(
     goodTilBlockTime: order.goodTilBlockTime ?? undefined,
     createdAtHeight: order.createdAtHeight ?? undefined,
     ticker: perpetualMarketRefresher.getPerpetualMarketTicker(
-      order.clobPairId
+      order.clobPairId,
     )!,
     triggerPrice: order.triggerPrice ?? undefined,
     routerFeeOwner: order.routerFeeOwner ?? undefined,
@@ -500,21 +499,21 @@ export function postgresOrderToResponseObject(
 }
 
 export function redisOrderToResponseObject(
-  redisOrder: RedisOrder
+  redisOrder: RedisOrder,
 ): OrderResponseObject {
   const clobPairId: string = redisOrder.order!.orderId!.clobPairId.toString();
   const orderTIF: TimeInForce = protocolTranslations.protocolOrderTIFToTIF(
-    redisOrder.order!.timeInForce
+    redisOrder.order!.timeInForce,
   );
   return {
     id: redisOrder.id,
     subaccountId: SubaccountTable.subaccountIdToUuid(
-      redisOrder.order!.orderId!.subaccountId!
+      redisOrder.order!.orderId!.subaccountId!,
     ),
     clientId: redisOrder.order!.orderId!.clientId.toString(),
     clobPairId,
     side: protocolTranslations.protocolOrderSideToOrderSide(
-      redisOrder.order!.side
+      redisOrder.order!.side,
     ),
     size: redisOrder.size,
     totalFilled: '0',
@@ -539,7 +538,7 @@ export function redisOrderToResponseObject(
 }
 
 export function candleToResponseObject(
-  candle: CandleFromDatabase
+  candle: CandleFromDatabase,
 ): CandleResponseObject {
   return _.omit(candle, [CandleColumns.id]);
 }
@@ -547,16 +546,16 @@ export function candleToResponseObject(
 export function candlesToSparklineResponseObject(
   tickers: string[],
   unsortedTickerCandles: CandleFromDatabase[],
-  limit: number
+  limit: number,
 ): SparklineResponseObject {
   const response: SparklineResponseObject = _.fromPairs(
-    _.map(tickers, (ticker: string) => [ticker, []])
+    _.map(tickers, (ticker: string) => [ticker, []]),
   );
   return _.reduce(
     unsortedTickerCandles,
     (
       accumulator: { [ticker: string]: string[] },
-      candle: CandleFromDatabase
+      candle: CandleFromDatabase,
     ) => {
       if (accumulator[candle.ticker].length < limit) {
         accumulator[candle.ticker].push(candle[CandleColumns.close]);
@@ -566,12 +565,12 @@ export function candlesToSparklineResponseObject(
       // will be the most recent candles.
       return accumulator;
     },
-    response
+    response,
   );
 }
 
 export function yieldParamsToResponseObject(
-  yieldParams: YieldParamsFromDatabase
+  yieldParams: YieldParamsFromDatabase,
 ): YieldParamsResponseObject {
   return {
     id: yieldParams.id,
@@ -583,7 +582,7 @@ export function yieldParamsToResponseObject(
 }
 
 export function collateralPoolToResponseObject(
-  collateralPool: CollateralPoolFromDatabase
+  collateralPool: CollateralPoolFromDatabase,
 ): CollateralPoolsResponseObject {
   return {
     id: collateralPool.id.toString(),

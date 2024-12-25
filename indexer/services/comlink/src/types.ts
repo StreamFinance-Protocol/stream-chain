@@ -410,7 +410,7 @@ export interface LimitAndCreatedBeforeAndAfterRequest
 
 export interface PerpetualPositionRequest
   extends SubaccountRequest,
-    LimitAndCreatedBeforeRequest {
+  LimitAndCreatedBeforeRequest {
   status: PerpetualPositionStatus[];
 }
 
@@ -421,21 +421,21 @@ export interface ParentSubaccountAssetPositionRequest
 
 export interface TransferRequest
   extends SubaccountRequest,
-    LimitAndCreatedBeforeRequest {}
+  LimitAndCreatedBeforeRequest {}
 
 export interface ParentSubaccountTransferRequest
   extends ParentSubaccountRequest,
-    LimitAndCreatedBeforeRequest {}
+  LimitAndCreatedBeforeRequest {}
 
 export interface FillRequest
   extends SubaccountRequest,
-    LimitAndCreatedBeforeRequest {
+  LimitAndCreatedBeforeRequest {
   market: string;
 }
 
 export interface ParentSubaccountFillRequest
   extends ParentSubaccountRequest,
-    LimitAndCreatedBeforeRequest {
+  LimitAndCreatedBeforeRequest {
   market: string;
 }
 
@@ -447,11 +447,11 @@ export interface PerpetualMarketRequest extends LimitRequest, TickerRequest {}
 
 export interface PnlTicksRequest
   extends SubaccountRequest,
-    LimitAndCreatedBeforeAndAfterRequest {}
+  LimitAndCreatedBeforeAndAfterRequest {}
 
 export interface ParentSubaccountPnlTicksRequest
   extends ParentSubaccountRequest,
-    LimitAndCreatedBeforeAndAfterRequest {}
+  LimitAndCreatedBeforeAndAfterRequest {}
 
 export interface OrderbookRequest {
   ticker: string;
@@ -463,8 +463,8 @@ export interface GetOrderRequest {
 
 export interface ListOrderRequest
   extends SubaccountRequest,
-    LimitRequest,
-    TickerRequest {
+  LimitRequest,
+  TickerRequest {
   side?: OrderSide;
   type?: OrderType;
   status?: OrderStatus[];
@@ -491,8 +491,8 @@ export interface HistoricalFundingRequest
 
 export interface ParentSubaccountListOrderRequest
   extends ParentSubaccountRequest,
-    LimitRequest,
-    TickerRequest {
+  LimitRequest,
+  TickerRequest {
   side?: OrderSide;
   type?: OrderType;
   status?: OrderStatus[];

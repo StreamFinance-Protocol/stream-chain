@@ -3,6 +3,7 @@ import express from 'express';
 import AddressesController from './v4/addresses-controller';
 import AssetPositionsController from './v4/asset-positions-controller';
 import CandlesController from './v4/candles-controller';
+import CollateralPoolsController from './v4/collateral-pools-controller';
 import ComplianceController from './v4/compliance-controller';
 import FillsController from './v4/fills-controller';
 import HeightController from './v4/height-controller';
@@ -16,7 +17,6 @@ import SparklinesController from './v4/sparklines-controller';
 import TimeController from './v4/time-controller';
 import TradesController from './v4/trades-controller';
 import TransfersController from './v4/transfers-controller';
-import CollateralPoolsController from './v4/collateral-pools-controller';
 import YieldParamsController from './v4/yield-params-controller';
 
 // Keep routers in alphabetical order

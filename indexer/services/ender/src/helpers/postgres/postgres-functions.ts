@@ -20,7 +20,7 @@ export type PostgresFunction = {
  */
 function newScript(name: string, scriptPath: string): PostgresFunction {
   const script: string = readFileSync(
-    path.resolve(__dirname, scriptPath)
+    path.resolve(__dirname, scriptPath),
   ).toString();
   return {
     name,
@@ -104,17 +104,16 @@ const SCRIPTS: string[] = [
 export async function createPostgresFunctions(): Promise<void> {
   await Promise.all([
     dbHelpers.createModelToJsonFunctions(),
-    ...SCRIPTS.map((script: string) =>
-      storeHelpers
-        .rawQuery(newScript(script, `../../scripts/${script}`).script, {})
-        .catch((error: Error) => {
-          logger.error({
-            at: 'postgres-functions#createPostgresFunctions',
-            message: `Failed to create or replace function contained in ${script}`,
-            error,
-          });
-          throw error;
-        })
+    ...SCRIPTS.map((script: string) => storeHelpers
+      .rawQuery(newScript(script, `../../scripts/${script}`).script, {})
+      .catch((error: Error) => {
+        logger.error({
+          at: 'postgres-functions#createPostgresFunctions',
+          message: `Failed to create or replace function contained in ${script}`,
+          error,
+        });
+        throw error;
+      }),
     ),
   ]);
 }

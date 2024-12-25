@@ -31,7 +31,7 @@ const layer1Tables = [
  */
 function getSqlConversionForKlyraModelTypes(
   fieldName: string,
-  type: string
+  type: string,
 ): string {
   switch (type) {
     case 'integer':
@@ -60,10 +60,9 @@ export async function createModelToJsonFunctions(): Promise<void> {
   await Promise.all(
     SQL_TO_JSON_DEFINED_MODELS.map(async (model) => {
       const sqlProperties: string[] = Object.entries(
-        model.sqlToJsonConversions
+        model.sqlToJsonConversions,
       ).map(
-        ([key, value]) =>
-          `'${key}', ${getSqlConversionForKlyraModelTypes(key, value)}`
+        ([key, value]) => `'${key}', ${getSqlConversionForKlyraModelTypes(key, value)}`,
       );
       const sqlFn: string = `CREATE OR REPLACE FUNCTION klyra_to_jsonb(row_t ${
         model.tableName
@@ -82,7 +81,7 @@ $$ LANGUAGE plpgsql IMMUTABLE PARALLEL SAFE;`;
         });
         throw error;
       });
-    })
+    }),
   );
 }
 
@@ -90,7 +89,7 @@ async function dropData() {
   await Promise.all(
     layer2Tables.map(async (table) => {
       return knexPrimary(table).del();
-    })
+    }),
   );
 
   // need to use for... of to ensure tables are removed sequentially
@@ -146,7 +145,7 @@ export async function clearData() {
       if (tableExists) {
         return knexPrimary.raw(`truncate table "${table}" cascade`);
       }
-    })
+    }),
   );
 }
 

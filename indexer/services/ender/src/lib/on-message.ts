@@ -39,8 +39,10 @@ export async function onMessage(message: KafkaMessage): Promise<void> {
   stats.increment(`${config.SERVICE_NAME}.received_kafka_message`, 1);
   const start: number = Date.now();
 
-  const indexerTendermintBlock: IndexerTendermintBlock | undefined =
-    getIndexerTendermintBlock(message, start);
+  const indexerTendermintBlock: IndexerTendermintBlock | undefined = getIndexerTendermintBlock(
+    message,
+    start,
+  );
   if (indexerTendermintBlock === undefined) {
     return;
   }
@@ -49,7 +51,7 @@ export async function onMessage(message: KafkaMessage): Promise<void> {
     DateTime.now()
       .diff(dateToDateTime(indexerTendermintBlock.time!))
       .toMillis(),
-    STATS_NO_SAMPLING
+    STATS_NO_SAMPLING,
   );
 
   const offset = message.offset;
@@ -67,21 +69,20 @@ export async function onMessage(message: KafkaMessage): Promise<void> {
     const blockProcessor: BlockProcessor = new BlockProcessor(
       indexerTendermintBlock,
       txId,
-      message.timestamp
+      message.timestamp,
     );
     const kafkaPublisher: KafkaPublisher = await blockProcessor.process();
 
     const candlesGenerator: CandlesGenerator = new CandlesGenerator(
       kafkaPublisher,
       dateToDateTime(indexerTendermintBlock.time!),
-      txId
+      txId,
     );
-    const candles: CandleFromDatabase[] =
-      await candlesGenerator.updateCandles();
+    const candles: CandleFromDatabase[] = await candlesGenerator.updateCandles();
     await Transaction.commit(txId);
     stats.gauge(
       `${config.SERVICE_NAME}.processing_block_height`,
-      indexerTendermintBlock.height
+      indexerTendermintBlock.height,
     );
     // Update caches after transaction is committed
     updateBlockCache(blockHeight);
@@ -91,7 +92,7 @@ export async function onMessage(message: KafkaMessage): Promise<void> {
       wrapBackgroundTask(
         kafkaPublisher.publish(),
         false,
-        'kafkaPublisher.publish'
+        'kafkaPublisher.publish',
       );
     }
     logger.info({
@@ -129,7 +130,7 @@ export async function onMessage(message: KafkaMessage): Promise<void> {
       `${config.SERVICE_NAME}.processed_block.timing`,
       Date.now() - start,
       STATS_NO_SAMPLING,
-      { success: success.toString() }
+      { success: success.toString() },
     );
   }
 }
@@ -139,7 +140,7 @@ export async function onMessage(message: KafkaMessage): Promise<void> {
  */
 function getIndexerTendermintBlock(
   message: KafkaMessage,
-  start: number
+  start: number,
 ): IndexerTendermintBlock | undefined {
   if (!message || !message.value || !message.timestamp) {
     stats.increment(`${config.SERVICE_NAME}.empty_kafka_message`, 1);
@@ -156,7 +157,7 @@ function getIndexerTendermintBlock(
     STATS_NO_SAMPLING,
     {
       topic: KafkaTopics.TO_ENDER,
-    }
+    },
   );
   try {
     const messageValueBinary: Uint8Array = new Uint8Array(message.value);
@@ -166,8 +167,7 @@ function getIndexerTendermintBlock(
       offset: message.offset,
     });
 
-    const block: IndexerTendermintBlock =
-      IndexerTendermintBlock.decode(messageValueBinary);
+    const block: IndexerTendermintBlock = IndexerTendermintBlock.decode(messageValueBinary);
     logger.info({
       at: 'onMessage#getIndexerTendermintBlock',
       message: 'Parsed message',
@@ -192,7 +192,7 @@ function getIndexerTendermintBlock(
 }
 
 function validateIndexerTendermintBlock(
-  indexerTendermintBlock: IndexerTendermintBlock
+  indexerTendermintBlock: IndexerTendermintBlock,
 ) {
   if (indexerTendermintBlock.time === undefined) {
     logger.error({
@@ -203,7 +203,7 @@ function validateIndexerTendermintBlock(
     });
 
     throw new ParseMessageError(
-      'IndexerTendermintBlock.time cannot be undefined'
+      'IndexerTendermintBlock.time cannot be undefined',
     );
   }
 }

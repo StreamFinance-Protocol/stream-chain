@@ -18,7 +18,7 @@ export async function start(): Promise<void> {
   await startUpdateLoop(
     updateCollateralPools,
     config.COLLATERAL_POOLS_REFRESHER_INTERVAL_MS,
-    'updateCollateralPools'
+    'updateCollateralPools',
   );
 }
 
@@ -27,12 +27,11 @@ export async function start(): Promise<void> {
  */
 export async function updateCollateralPools(options?: Options): Promise<void> {
   const startTime: number = Date.now();
-  const collateralPools: CollateralPoolFromDatabase[] =
-    await CollateralPoolsTable.findAll(
-      {},
-      [],
-      options || { readReplica: true }
-    );
+  const collateralPools: CollateralPoolFromDatabase[] = await CollateralPoolsTable.findAll(
+    {},
+    [],
+    options || { readReplica: true },
+  );
 
   const tmpIdToCollateralPool: Record<string, CollateralPoolFromDatabase> = {};
   collateralPools.forEach((collateralPool: CollateralPoolFromDatabase) => {
@@ -42,7 +41,7 @@ export async function updateCollateralPools(options?: Options): Promise<void> {
   idToCollateralPool = tmpIdToCollateralPool;
   stats.timing(
     `${config.SERVICE_NAME}.loops.update_collateral_pools`,
-    Date.now() - startTime
+    Date.now() - startTime,
   );
 }
 
@@ -54,10 +53,9 @@ export function getCollateralPoolsList(): CollateralPoolFromDatabase[] {
  * Gets the collateral pool for a given id.
  */
 export function getCollateralPoolFromId(
-  id: number
+  id: number,
 ): CollateralPoolFromDatabase {
-  const collateralPool: CollateralPoolFromDatabase | undefined =
-    idToCollateralPool[id];
+  const collateralPool: CollateralPoolFromDatabase | undefined = idToCollateralPool[id];
   if (collateralPool === undefined) {
     const message: string = `Unable to find collateral pool with id: ${id}`;
     logger.error({
@@ -74,7 +72,7 @@ export function getCollateralPoolsMap(): CollateralPoolsMap {
 }
 
 export function upsertCollateralPool(
-  collateralPool: CollateralPoolFromDatabase
+  collateralPool: CollateralPoolFromDatabase,
 ): void {
   idToCollateralPool[collateralPool.id] = collateralPool;
 }

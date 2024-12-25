@@ -36,15 +36,15 @@ describe('collateralPoolRefresher', () => {
           multiCollateralAssets: Array.isArray(result.multiCollateralAssets)
             ? result.multiCollateralAssets
             : JSON.parse(
-                result.multiCollateralAssets.replace('{', '[').replace('}', ']')
-              ),
+              result.multiCollateralAssets.replace('{', '[').replace('}', ']'),
+            ),
         });
-      }
+      },
     );
 
     it('throws error if CollateralPool does not exist', () => {
       expect(() => getCollateralPoolFromId(50)).toThrowError(
-        'Unable to find collateral pool with id: 50'
+        'Unable to find collateral pool with id: 50',
       );
     });
   });

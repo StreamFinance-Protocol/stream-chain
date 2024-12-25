@@ -1,13 +1,13 @@
 import { stats } from '@klyraprotocol-indexer/base';
 import {
-  Ordering,
   CollateralPoolFromDatabase,
   CollateralPoolsTable,
-  CollateralPoolsColumns,
 } from '@klyraprotocol-indexer/postgres';
 import express from 'express';
 import { matchedData } from 'express-validator';
-import { Controller, Get, Query, Route } from 'tsoa';
+import {
+  Controller, Get, Query, Route,
+} from 'tsoa';
 
 import { getReqRateLimiter } from '../../../caches/rate-limiters';
 import config from '../../../config';
@@ -32,11 +32,10 @@ const controllerName: string = 'collateral-pools-controller';
 class CollateralPoolsController extends Controller {
   @Get('/')
   async getCollateralPools(
-    @Query() id?: string
+    @Query() id?: string,
   ): Promise<CollateralPoolsResponse> {
     if (id !== undefined) {
-      const collateralPool: CollateralPoolFromDatabase | undefined =
-        await CollateralPoolsTable.findById(Number(id));
+      const collateralPool = await CollateralPoolsTable.findById(Number(id));
 
       if (collateralPool === undefined) {
         throw new NotFoundError(`No collateral pool found with id: ${id}`);
@@ -45,8 +44,11 @@ class CollateralPoolsController extends Controller {
         collateralPools: [collateralPoolToResponseObject(collateralPool)],
       };
     } else {
-      const allCollateralPools: CollateralPoolFromDatabase[] =
-        await CollateralPoolsTable.findAll({}, [], {});
+      const allCollateralPools: CollateralPoolFromDatabase[] = await CollateralPoolsTable.findAll(
+        {},
+        [],
+        {},
+      );
 
       if (allCollateralPools.length === 0) {
         return { collateralPools: [] };
@@ -56,7 +58,7 @@ class CollateralPoolsController extends Controller {
         collateralPools: allCollateralPools.map(
           (collateralPool: CollateralPoolFromDatabase) => {
             return collateralPoolToResponseObject(collateralPool);
-          }
+          },
         ),
       };
 
@@ -82,10 +84,8 @@ router.get(
     } = matchedData(req) as CollateralPoolsRequest;
 
     try {
-      const controllers: CollateralPoolsController =
-        new CollateralPoolsController();
-      const response: CollateralPoolsResponse =
-        await controllers.getCollateralPools(id);
+      const controllers: CollateralPoolsController = new CollateralPoolsController();
+      const response: CollateralPoolsResponse = await controllers.getCollateralPools(id);
       return res.send(response);
     } catch (error) {
       return handleControllerError(
@@ -93,15 +93,15 @@ router.get(
         'CollateralPools error',
         error,
         req,
-        res
+        res,
       );
     } finally {
       stats.timing(
         `${config.SERVICE_NAME}.${controllerName}.get_collateral_pools.timing`,
-        Date.now() - start
+        Date.now() - start,
       );
     }
-  }
+  },
 );
 
 export default router;

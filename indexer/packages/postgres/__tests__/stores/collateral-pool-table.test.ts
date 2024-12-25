@@ -43,75 +43,73 @@ describe('CollateralPool store', () => {
       CollateralPoolTable.create(defaultCollateralPool2),
     ]);
 
-    const collateralPools: CollateralPoolFromDatabase[] =
-      await CollateralPoolTable.findAll({}, [], { readReplica: true });
+    const collateralPools: CollateralPoolFromDatabase[] = await CollateralPoolTable.findAll(
+      {},
+      [],
+      { readReplica: true },
+    );
 
     expect(collateralPools.length).toEqual(2);
     expect(normalizeCollateralPool(collateralPools[0])).toEqual(
-      normalizeCollateralPool(defaultCollateralPool)
+      normalizeCollateralPool(defaultCollateralPool),
     );
     expect(normalizeCollateralPool(collateralPools[1])).toEqual(
-      normalizeCollateralPool(defaultCollateralPool2)
+      normalizeCollateralPool(defaultCollateralPool2),
     );
   });
 
   it('Successfully finds a collateral pool', async () => {
     await CollateralPoolTable.create(defaultCollateralPool);
 
-    const collateralPool: CollateralPoolFromDatabase | undefined =
-      await CollateralPoolTable.findById(defaultCollateralPool.id);
+    const collateralPool = await CollateralPoolTable.findById(defaultCollateralPool.id);
 
     expect(collateralPool).toEqual(
-      normalizeCollateralPool(defaultCollateralPool)
+      normalizeCollateralPool(defaultCollateralPool),
     );
   });
 
   it('Successfully updates a collateralPool', async () => {
     await CollateralPoolTable.create(defaultCollateralPool);
 
-    const collateralPool: CollateralPoolFromDatabase | undefined =
-      await CollateralPoolTable.update({
-        id: defaultCollateralPool.id,
-        maxCumulativeInsuranceFundDeltaPerBlock: 2000000,
-      });
+    const collateralPool = await CollateralPoolTable.update({
+      id: defaultCollateralPool.id,
+      maxCumulativeInsuranceFundDeltaPerBlock: 2000000,
+    });
 
     expect(collateralPool).toEqual(
       normalizeCollateralPool({
         ...defaultCollateralPool,
         maxCumulativeInsuranceFundDeltaPerBlock: 2000000,
-      })
+      }),
     );
   });
 
   it('Unable to find a collateral pool', async () => {
-    const collateralPool: CollateralPoolFromDatabase | undefined =
-      await CollateralPoolTable.findById(defaultCollateralPool.id);
+    const collateralPool = await CollateralPoolTable.findById(defaultCollateralPool.id);
     expect(collateralPool).toEqual(undefined);
   });
 
   it('Successfully upserts an existing collateralPool', async () => {
     await CollateralPoolTable.create(defaultCollateralPool);
 
-    const collateralPool: CollateralPoolFromDatabase | undefined =
-      await CollateralPoolTable.upsert({
-        ...defaultCollateralPool,
-        maxCumulativeInsuranceFundDeltaPerBlock: 2000000,
-      });
+    const collateralPool = await CollateralPoolTable.upsert({
+      ...defaultCollateralPool,
+      maxCumulativeInsuranceFundDeltaPerBlock: 2000000,
+    });
 
     expect(collateralPool).toEqual(
       normalizeCollateralPool({
         ...defaultCollateralPool,
         maxCumulativeInsuranceFundDeltaPerBlock: 2000000,
-      })
+      }),
     );
   });
 
   it('Successfully upserts a collateral pool', async () => {
-    const collateralPool: CollateralPoolFromDatabase | undefined =
-      await CollateralPoolTable.upsert(defaultCollateralPool);
+    const collateralPool = await CollateralPoolTable.upsert(defaultCollateralPool);
 
     expect(collateralPool).toEqual(
-      normalizeCollateralPool(defaultCollateralPool)
+      normalizeCollateralPool(defaultCollateralPool),
     );
   });
 });
@@ -124,7 +122,7 @@ function normalizeCollateralPool(pool: CollateralPoolFromDatabase) {
     multiCollateralAssets: Array.isArray(pool.multiCollateralAssets)
       ? pool.multiCollateralAssets
       : JSON.parse(
-          pool.multiCollateralAssets.replace('{', '[').replace('}', ']')
-        ),
+        pool.multiCollateralAssets.replace('{', '[').replace('}', ']'),
+      ),
   };
 }

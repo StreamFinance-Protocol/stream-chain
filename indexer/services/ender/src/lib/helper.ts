@@ -39,7 +39,7 @@ import {
 } from './types';
 
 export function indexerTendermintEventToTransactionIndex(
-  event: IndexerTendermintEvent
+  event: IndexerTendermintEvent,
 ): number {
   if (event.transactionIndex !== undefined) {
     return event.transactionIndex;
@@ -51,18 +51,18 @@ export function indexerTendermintEventToTransactionIndex(
         return -1;
       default:
         throw new ParseMessageError(
-          `Received V4 event with invalid block event type: ${event.blockEvent}`
+          `Received V4 event with invalid block event type: ${event.blockEvent}`,
         );
     }
   }
 
   throw new ParseMessageError(
-    'Either transactionIndex or blockEvent must be defined in IndexerTendermintEvent'
+    'Either transactionIndex or blockEvent must be defined in IndexerTendermintEvent',
   );
 }
 
 export function convertToSubaccountMessage(
-  annotatedMessage: AnnotatedSubaccountMessage
+  annotatedMessage: AnnotatedSubaccountMessage,
 ): SubaccountMessage {
   const subaccountMessage: SubaccountMessage = _.omit(annotatedMessage, [
     'orderId',
@@ -85,7 +85,7 @@ export function dateToDateTime(protoTime: Date): DateTime {
  */
 export function indexerTendermintEventToEventProtoWithType(
   blockEventIndex: number,
-  event: IndexerTendermintEvent
+  event: IndexerTendermintEvent,
 ): EventProtoWithTypeAndVersion | undefined {
   const eventDataBinary: Uint8Array = event.dataBytes;
   // set the default version to 1
@@ -270,11 +270,11 @@ export function indexerTendermintEventToEventProtoWithType(
  */
 export function getSize(
   order: IndexerOrder,
-  perpetualMarket: PerpetualMarketFromDatabase
+  perpetualMarket: PerpetualMarketFromDatabase,
 ): string {
   return protocolTranslations.quantumsToHumanFixedString(
     order.quantums.toString(10),
-    perpetualMarket.atomicResolution
+    perpetualMarket.atomicResolution,
   );
 }
 
@@ -286,11 +286,11 @@ export function getSize(
  */
 export function getPrice(
   order: IndexerOrder,
-  perpetualMarket: PerpetualMarketFromDatabase
+  perpetualMarket: PerpetualMarketFromDatabase,
 ): string {
   return protocolTranslations.subticksToPrice(
     order.subticks.toString(10),
-    perpetualMarket
+    perpetualMarket,
   );
 }
 
@@ -303,11 +303,11 @@ export function getPrice(
  */
 export function getTriggerPrice(
   order: IndexerOrder,
-  perpetualMarket: PerpetualMarketFromDatabase
+  perpetualMarket: PerpetualMarketFromDatabase,
 ): string {
   return protocolTranslations.subticksToPrice(
     order.conditionalOrderTriggerSubticks.toString(10),
-    perpetualMarket
+    perpetualMarket,
   );
 }
 
@@ -323,7 +323,7 @@ export function getWeightedAverage(
   firstPrice: string,
   firstWeight: string,
   secondPrice: string,
-  secondWeight: string
+  secondWeight: string,
 ): string {
   return Big(firstPrice)
     .times(firstWeight)
@@ -340,7 +340,7 @@ export function getWeightedAverage(
  */
 export function perpetualPositionAndOrderSideMatching(
   perpetualPositionSide: PositionSide,
-  orderSide: OrderSide
+  orderSide: OrderSide,
 ): boolean {
   return (
     (perpetualPositionSide === PositionSide.LONG &&

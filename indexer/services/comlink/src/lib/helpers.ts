@@ -135,7 +135,7 @@ export async function getClobPairId(
   if (perpetualMarket !== undefined) {
     return perpetualMarket.clobPairId;
   }
-  
+
   // spot markets are not supported in V4 yet
 
   return undefined;

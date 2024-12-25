@@ -12,7 +12,6 @@ import express from 'express';
 import {
   checkSchema,
   matchedData,
-  query,
 } from 'express-validator';
 import _ from 'lodash';
 import {

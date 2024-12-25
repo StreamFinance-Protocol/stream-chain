@@ -51,7 +51,7 @@ export class SyncHandlers {
    */
   public addHandler(
     indexerSubtype: KlyraIndexerSubtypes,
-    handler: Handler<EventMessage>
+    handler: Handler<EventMessage>,
   ): void {
     if (!SYNCHRONOUS_SUBTYPES.includes(indexerSubtype)) {
       logger.error({
@@ -70,7 +70,7 @@ export class SyncHandlers {
    */
   public async process(
     kafkaPublisher: KafkaPublisher,
-    resultRow: pg.QueryResultRow
+    resultRow: pg.QueryResultRow,
   ): Promise<void> {
     const start: number = Date.now();
     const handlerCountMapping: { [key: string]: number } = {};
@@ -82,7 +82,7 @@ export class SyncHandlers {
       }
       handlerCountMapping[handlerName] += 1;
       const events: ConsolidatedKafkaEvent[] = await handler.handle(
-        resultRow[handler.blockEventIndex]
+        resultRow[handler.blockEventIndex],
       );
       consolidatedKafkaEventGroup.push(events);
     }
@@ -91,7 +91,7 @@ export class SyncHandlers {
       consolidatedKafkaEventGroup,
       (events: ConsolidatedKafkaEvent[]) => {
         kafkaPublisher.addEvents(events);
-      }
+      },
     );
     logger.info({
       at: 'SyncHandlers#process',
@@ -101,7 +101,7 @@ export class SyncHandlers {
     });
     stats.timing(
       `${config.SERVICE_NAME}.synchronous_events_process_time`,
-      Date.now() - start
+      Date.now() - start,
     );
   }
 }

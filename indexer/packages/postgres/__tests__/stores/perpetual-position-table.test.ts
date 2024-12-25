@@ -643,7 +643,7 @@ describe('PerpetualPosition store', () => {
         settledFunding: '0',
         status: PerpetualPositionStatus.CLOSED,
         size: position.maxSize,
-        perpYieldIndex: defaultZeroPerpYieldIndex,  
+        perpYieldIndex: defaultZeroPerpYieldIndex,
       };
       const secondUpdateObject: PerpetualPositionSubaccountUpdateObject = {
         ...updateObject,

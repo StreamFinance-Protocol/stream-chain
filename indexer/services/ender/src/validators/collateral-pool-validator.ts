@@ -23,14 +23,14 @@ export class CollateralPoolValidator extends Validator<CollateralPoolUpsertEvent
     if (this.event.multiCollateralAssets.length === 0) {
       return this.logAndThrowParseMessageError(
         'CollateralPoolUpsertEvent multiCollateralAssets is not populated',
-        { event: this.event }
+        { event: this.event },
       );
     }
 
     if (this.event.quoteAssetId === undefined) {
       return this.logAndThrowParseMessageError(
         'CollateralPoolUpsertEvent quoteAssetId is not populated',
-        { event: this.event }
+        { event: this.event },
       );
     }
   }
@@ -38,16 +38,15 @@ export class CollateralPoolValidator extends Validator<CollateralPoolUpsertEvent
   public createHandlers(
     indexerTendermintEvent: IndexerTendermintEvent,
     txId: number,
-    _: string
+    _: string,
   ): Handler<CollateralPoolUpsertEvent>[] {
-    const handler: Handler<CollateralPoolUpsertEvent> =
-      new CollateralPoolCreationHandler(
-        this.block,
-        this.blockEventIndex,
-        indexerTendermintEvent,
-        txId,
-        this.event
-      );
+    const handler: Handler<CollateralPoolUpsertEvent> = new CollateralPoolCreationHandler(
+      this.block,
+      this.blockEventIndex,
+      indexerTendermintEvent,
+      txId,
+      this.event,
+    );
 
     return [handler];
   }

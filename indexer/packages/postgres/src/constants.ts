@@ -6,6 +6,7 @@ import {
 import config from './config';
 import AssetModel from './models/asset-model';
 import AssetPositionModel from './models/asset-position-model';
+import CollateralPoolsModel from './models/collateral-pool-model';
 import FillModel from './models/fill-model';
 import FundingIndexUpdatesModel from './models/funding-index-updates-model';
 import LiquidityTiersModel from './models/liquidity-tiers-model';
@@ -24,7 +25,6 @@ import {
   PerpetualMarketStatus,
   TimeInForce,
 } from './types';
-import CollateralPoolsModel from './models/collateral-pool-model';
 
 export const BUFFER_ENCODING_UTF_8: BufferEncoding = 'utf-8';
 
@@ -123,7 +123,7 @@ export type SpecifiedClobPairStatus = Exclude<
   ClobPairStatus,
   ClobPairStatus.CLOB_PAIR_STATUS_UNSPECIFIED
 > &
-  Exclude<ClobPairStatus, ClobPairStatus.UNRECOGNIZED>;
+Exclude<ClobPairStatus, ClobPairStatus.UNRECOGNIZED>;
 
 export const CLOB_STATUS_TO_MARKET_STATUS: Record<
   SpecifiedClobPairStatus,
@@ -142,8 +142,8 @@ export const CLOB_STATUS_TO_MARKET_STATUS: Record<
 
 export const DEFAULT_POSTGRES_OPTIONS: Options = config.USE_READ_REPLICA
   ? {
-      readReplica: true,
-    }
+    readReplica: true,
+  }
   : {};
 
 export const MAX_PARENT_SUBACCOUNTS: number = 128;

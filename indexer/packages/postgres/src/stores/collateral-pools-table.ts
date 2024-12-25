@@ -15,24 +15,26 @@ import {
   QueryableField,
   QueryConfig,
   CollateralPoolsUpdateObject,
+  CollateralPoolsColumns, CollateralPoolsCreateObject,
 } from '../types';
-import { CollateralPoolsColumns, CollateralPoolsCreateObject } from '../types';
 
 export async function findAll(
   { limit, id }: CollateralPoolsQueryConfig,
   requiredFields: QueryableField[],
-  options: Options = DEFAULT_POSTGRES_OPTIONS
+  options: Options = DEFAULT_POSTGRES_OPTIONS,
 ): Promise<CollateralPoolFromDatabase[]> {
   verifyAllRequiredFields(
     {
       limit,
       id,
     } as QueryConfig,
-    requiredFields
+    requiredFields,
   );
 
-  let baseQuery: QueryBuilder<CollateralPoolsModel> =
-    setupBaseQuery<CollateralPoolsModel>(CollateralPoolsModel, options);
+  let baseQuery: QueryBuilder<CollateralPoolsModel> = setupBaseQuery<CollateralPoolsModel>(
+    CollateralPoolsModel,
+    options,
+  );
 
   if (id !== undefined) {
     baseQuery = baseQuery.whereIn(CollateralPoolsColumns.id, id);
@@ -55,7 +57,7 @@ export async function findAll(
 
 export async function create(
   collateralPoolToCreate: CollateralPoolsCreateObject,
-  options: Options = { txId: undefined }
+  options: Options = { txId: undefined },
 ): Promise<CollateralPoolFromDatabase> {
   const modelObject: Partial<CollateralPoolsModel> = {
     ...collateralPoolToCreate,
@@ -68,19 +70,21 @@ export async function create(
 
 export async function findById(
   id: number,
-  options: Options = DEFAULT_POSTGRES_OPTIONS
+  options: Options = DEFAULT_POSTGRES_OPTIONS,
 ): Promise<CollateralPoolFromDatabase | undefined> {
-  const baseQuery: QueryBuilder<CollateralPoolsModel> =
-    setupBaseQuery<CollateralPoolsModel>(CollateralPoolsModel, options);
+  const baseQuery: QueryBuilder<CollateralPoolsModel> = setupBaseQuery<CollateralPoolsModel>(
+    CollateralPoolsModel,
+    options,
+  );
   return baseQuery.findById(id).returning('*');
 }
 
 export async function update(
   { id, ...fields }: CollateralPoolsUpdateObject,
-  options: Options = { txId: undefined }
+  options: Options = { txId: undefined },
 ): Promise<CollateralPoolFromDatabase | undefined> {
   const collateralPool = await CollateralPoolsModel.query(
-    Transaction.get(options.txId)
+    Transaction.get(options.txId),
     // TODO fix expression typing so we dont have to use any
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ).findById(id);
@@ -96,12 +100,13 @@ export async function update(
 
 export async function upsert(
   collateralPoolToUpsert: CollateralPoolsCreateObject,
-  options: Options = { txId: undefined }
+  options: Options = { txId: undefined },
 ): Promise<CollateralPoolFromDatabase> {
-  const collateralPools: CollateralPoolsModel[] =
-    await CollateralPoolsModel.query(Transaction.get(options.txId))
-      .upsert(collateralPoolToUpsert)
-      .returning('*');
+  const collateralPools: CollateralPoolsModel[] = await CollateralPoolsModel.query(
+    Transaction.get(options.txId),
+  )
+    .upsert(collateralPoolToUpsert)
+    .returning('*');
   // should only ever be one collateral pool
   return collateralPools[0];
 }

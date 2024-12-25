@@ -439,7 +439,6 @@ func TestIsValidMultiCollateralUpdate(t *testing.T) {
 				require.NoError(t, err)
 			}
 			require.Equal(t, tc.expectedResult, result)
-
 		})
 	}
 }
@@ -449,7 +448,6 @@ func createPerpetuals(
 	perpKeeper *perpetualskeeper.Keeper,
 	perpetuals []perptypes.Perpetual,
 ) error {
-
 	for _, perp := range perpetuals {
 		_, err := perpKeeper.CreatePerpetual(
 			ctx,
@@ -543,7 +541,6 @@ func createAssets(
 	assets []asstypes.Asset,
 ) error {
 	for _, asset := range assets {
-
 		_, err := assetsKeeper.CreateAsset(
 			ctx,
 			asset.Id,

@@ -133,7 +133,7 @@ func (k Keeper) UpdateSubaccounts(
 
 		// this assumed the perpetual updates are not applied therefore the yield is not sent twice when we then call
 		// computeAndExecuteCollateralTransfer as if the subaccount is newly opened deposit yield to subaccount will
-		// transfer yield to the dummy pool and then the full asset amount will be transfered to the collateral pool
+		// transfer yield to the dummy pool and then the full asset amount will be transferred to the collateral pool
 		// if a a subaccount is closed, the yield is sent to the collateral pool and then the full amount will be sent
 		// back to the dummy pool in computeAndExecuteCollateralTransfer
 		err := k.DepositYieldToSubaccount(ctx, subaccountId, amountToTransfer)

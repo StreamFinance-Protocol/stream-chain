@@ -108,7 +108,6 @@ func (k Keeper) getNegativeTncSubaccountStoreSuffix(
 	ctx sdk.Context,
 	perpetualId uint32,
 ) (string, error) {
-
 	perpetual, err := k.perpetualsKeeper.GetPerpetual(ctx, perpetualId)
 	if err != nil {
 		return "", err

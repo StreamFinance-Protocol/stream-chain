@@ -64,7 +64,6 @@ func PerpetualsKeepersWithClobHelpers(
 		stateStore storetypes.CommitMultiStore,
 		transientStoreKey storetypes.StoreKey,
 	) []GenesisInitializer {
-
 		// Define necessary keepers here for unit tests
 		pc.PricesKeeper, _, pc.DaemonPriceCache, _, pc.MockTimeProvider = createPricesKeeper(
 			stateStore,

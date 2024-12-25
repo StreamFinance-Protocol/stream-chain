@@ -636,7 +636,6 @@ func (k Keeper) UpdateYieldIndexToNewMint(
 	allPerps := k.GetAllPerpetuals(ctx)
 
 	for _, perp := range allPerps {
-
 		collateralPool, err := k.GetCollateralPool(ctx, perp.Params.CollateralPoolId)
 		if err != nil {
 			return err
@@ -1432,7 +1431,6 @@ func (k Keeper) setPerpetual(
 	ctx sdk.Context,
 	perpetual types.Perpetual,
 ) {
-
 	if perpetual.YieldIndex == "" {
 		perpetual.YieldIndex = "0/1"
 	}
@@ -1447,7 +1445,6 @@ func (k Keeper) ValidateAndSetPerpetual(
 	ctx sdk.Context,
 	perpetual types.Perpetual,
 ) error {
-
 	if perpetual.YieldIndex == "" {
 		perpetual.YieldIndex = "0/1"
 	}

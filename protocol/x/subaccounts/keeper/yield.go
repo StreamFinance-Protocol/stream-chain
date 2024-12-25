@@ -56,7 +56,6 @@ func (k Keeper) DoesSubaccountEarnTDaiYield(
 	earnsTdaiYield bool,
 	err error,
 ) {
-
 	if len(subaccount.PerpetualPositions) == 0 {
 		return subaccount.GetTDaiPosition().Cmp(big.NewInt(0)) != 0, nil
 	}

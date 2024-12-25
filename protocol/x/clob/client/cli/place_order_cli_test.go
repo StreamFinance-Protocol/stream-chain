@@ -207,7 +207,6 @@ func (s *PlaceOrderIntegrationTestSuite) SetupSuite() {
 // The orders placed are expected to match, and after matching, the subaccounts are queried and assertions
 // are performed on their QuoteBalance and PerpetualPositions.
 func (s *PlaceOrderIntegrationTestSuite) TestCLIPlaceOrder() {
-
 	val := s.network.Validators[0]
 	ctx := val.ClientCtx
 
@@ -350,7 +349,6 @@ func (s *PlaceOrderIntegrationTestSuite) TestCLIPlaceOrder() {
 }
 
 func (s *PlaceOrderIntegrationTestSuite) TestCLIPlaceOrderBTCCollat() {
-
 	val := s.network.Validators[0]
 	ctx := val.ClientCtx
 

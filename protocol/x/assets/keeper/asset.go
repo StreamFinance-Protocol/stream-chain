@@ -202,7 +202,6 @@ func (k Keeper) GetNetCollateral(
 	bigNetCollateralQuoteQuantums *big.Int,
 	err error,
 ) {
-
 	// Get asset
 	asset, exists := k.GetAsset(ctx, id)
 	if !exists {
@@ -264,7 +263,6 @@ func (k Keeper) GetMarginRequirements(
 	bigMaintenanceMarginQuoteQuantums *big.Int,
 	err error,
 ) {
-
 	return big.NewInt(0), big.NewInt(0), nil
 }
 

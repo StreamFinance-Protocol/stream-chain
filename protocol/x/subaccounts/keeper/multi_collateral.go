@@ -39,7 +39,6 @@ func (k Keeper) IsValidMultiCollateralUpdate(
 	settledUpdate SettledUpdate,
 	perpIdToParams map[uint32]perptypes.PerpetualParams,
 ) (types.UpdateResult, error) {
-
 	if len(settledUpdate.PerpetualUpdates) == 0 && len(settledUpdate.SettledSubaccount.PerpetualPositions) == 0 {
 		return types.Success, nil
 	}
@@ -57,7 +56,6 @@ func (k Keeper) isValidAssetUpdate(
 	settledUpdate SettledUpdate,
 	collateralPoolId uint32,
 ) (types.UpdateResult, error) {
-
 	collateralPool, err := k.perpetualsKeeper.GetCollateralPool(ctx, collateralPoolId)
 	if err != nil {
 		return types.UpdateCausedError, err

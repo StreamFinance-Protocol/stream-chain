@@ -87,7 +87,6 @@ func (k Keeper) DepositFundsFromAccountToSubaccount(
 	assetId uint32,
 	quantums *big.Int,
 ) error {
-
 	if quantums.Sign() <= 0 {
 		return errorsmod.Wrap(types.ErrAssetTransferQuantumsNotPositive, lib.UintToString(assetId))
 	}
@@ -146,7 +145,6 @@ func (k Keeper) WithdrawFundsFromSubaccountToAccount(
 	assetId uint32,
 	quantums *big.Int,
 ) error {
-
 	if quantums.Sign() <= 0 {
 		return errorsmod.Wrap(types.ErrAssetTransferQuantumsNotPositive, lib.UintToString(assetId))
 	}
@@ -204,7 +202,6 @@ func (k Keeper) TransferFeesToFeeCollectorModule(
 	quantums *big.Int,
 	perpetualId uint32,
 ) error {
-
 	if quantums.Sign() == 0 {
 		return nil
 	}
@@ -419,7 +416,6 @@ func (k Keeper) TransferFundsFromSubaccountToSubaccount(
 	assetId uint32,
 	quantums *big.Int,
 ) error {
-
 	updates := []types.Update{
 		{
 			SubaccountId: senderSubaccountId,

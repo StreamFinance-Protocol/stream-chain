@@ -55,7 +55,6 @@ type CancelOrderIntegrationTestSuite struct {
 }
 
 func GetBalanceAfterYield(clientCtx client.Context, initialBalance *big.Int) (balance int64, err error) {
-
 	args := []string{}
 	data, err := clitestutil.ExecTestCLICmd(clientCtx, ratelimitcli.CmdGetSDAIPriceQuery(), args)
 	if err != nil {
@@ -253,7 +252,6 @@ func (s *CancelOrderIntegrationTestSuite) SetupTest() {
 
 	_, err = s.network.WaitForHeight(1)
 	s.Require().NoError(err)
-
 }
 
 // TestCLICancelPendingOrder places then cancels an order from a subaccount, and then places an order from
@@ -263,7 +261,6 @@ func (s *CancelOrderIntegrationTestSuite) SetupTest() {
 // The subaccounts are then queried and assertions are performed on their QuoteBalance and PerpetualPositions.
 // The account which places the orders is also the validator's AccAddress.
 func (s *CancelOrderIntegrationTestSuite) TestCLICancelPendingOrder() {
-
 	val := s.network.Validators[0]
 	ctx := val.ClientCtx
 
@@ -380,11 +377,9 @@ func (s *CancelOrderIntegrationTestSuite) TestCLICancelPendingOrder() {
 
 	s.Require().NoError(err)
 	s.Require().Equal(int64(0), distrModuleTDaiBalance)
-
 }
 
 func (s *CancelOrderIntegrationTestSuite) TestCLICancelPendingOrderBtcCollat() {
-
 	val := s.network.Validators[0]
 	ctx := val.ClientCtx
 
@@ -501,7 +496,6 @@ func (s *CancelOrderIntegrationTestSuite) TestCLICancelPendingOrderBtcCollat() {
 
 	s.Require().NoError(err)
 	s.Require().Equal(int64(0), distrModuleBtcBalance)
-
 }
 
 // TestCLICancelMatchingOrders places two matching orders from two different subaccounts (with the
@@ -510,7 +504,6 @@ func (s *CancelOrderIntegrationTestSuite) TestCLICancelPendingOrderBtcCollat() {
 // The subaccounts are then queried and assertions are performed on their QuoteBalance and PerpetualPositions.
 // The account which places the orders is also the validator's AccAddress.
 func (s *CancelOrderIntegrationTestSuite) TestCLICancelMatchingOrders() {
-
 	val := s.network.Validators[0]
 	ctx := val.ClientCtx
 
@@ -713,7 +706,6 @@ func (s *CancelOrderIntegrationTestSuite) TestCLICancelMatchingOrders() {
 }
 
 func (s *CancelOrderIntegrationTestSuite) TestCLICancelMatchingOrdersBtcCollat() {
-
 	val := s.network.Validators[0]
 	ctx := val.ClientCtx
 

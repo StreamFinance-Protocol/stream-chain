@@ -7,7 +7,6 @@ import (
 )
 
 func (collateralPool CollateralPool) Validate() error {
-
 	if len(collateralPool.MultiCollateralAssets.MultiCollateralAssets) == 0 {
 		return errorsmod.Wrap(ErrMultiCollateralAssetsEmpty, "")
 	}

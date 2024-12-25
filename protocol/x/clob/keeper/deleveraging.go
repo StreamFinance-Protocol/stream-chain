@@ -77,6 +77,10 @@ func (k Keeper) MaybeDeleverageSubaccount(
 		shouldDeleverageAtOraclePrice,
 	)
 
+	if err != nil {
+		return new(big.Int), err
+	}
+
 	labels := []metrics.Label{
 		metrics.GetLabelForIntValue(metrics.PerpetualId, int(perpetualId)),
 		metrics.GetLabelForBoolValue(metrics.IsLong, deltaQuantums.Sign() == -1),
@@ -143,7 +147,6 @@ func (k Keeper) GetInsuranceFundBalanceInQuoteQuantums(
 ) (
 	balance *big.Int,
 ) {
-
 	collateralPool, err := k.perpetualsKeeper.GetCollateralPoolFromPerpetualId(ctx, perpetualId)
 	if err != nil {
 		return nil

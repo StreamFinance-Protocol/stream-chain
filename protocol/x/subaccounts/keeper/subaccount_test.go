@@ -7392,7 +7392,6 @@ func TestUpdateSubaccounts_WithdrawalsBlocked(t *testing.T) {
 }
 
 func TestUpdateSubaccountWithTwoSeparateUpdates(t *testing.T) {
-
 	tests := map[string]struct {
 		// state
 		perpetuals        []perptypes.Perpetual
@@ -7511,7 +7510,6 @@ func TestUpdateSubaccountWithTwoSeparateUpdates(t *testing.T) {
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-
 			// Initialization
 			ctx, keeper, pricesKeeper, perpetualsKeeper, accountKeeper, bankKeeper, assetsKeeper, rateLimitKeeper, _, _ := testutil.SubaccountsKeepers(
 				t,

@@ -211,7 +211,6 @@ func TestGetValCmtPubKeyFromVote(t *testing.T) {
 	}
 
 	t.Run("Successful public key retrieval", func(t *testing.T) {
-
 		mockValidatorStore.On("GetPubKeyByConsAddr", mock.Anything, testValConsAddr).Return(protoPubKey, nil).Once()
 
 		pubKey, err := veutils.GetValPubKeyFromVote(ctx, mockVote, mockValidatorStore)

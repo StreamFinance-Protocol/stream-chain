@@ -183,7 +183,6 @@ func (k Keeper) UpdateCollateralizationInfoGivenAssets(
 	bigTotalNetCollateral *big.Int,
 	quoteCurrencyAtomicResolution int32,
 ) error {
-
 	if len(settledSubaccount.AssetPositions) == 0 {
 		return nil
 	}

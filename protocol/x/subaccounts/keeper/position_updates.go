@@ -13,7 +13,6 @@ import (
 func getUpdatedAssetPositions(
 	update SettledUpdate,
 ) []*types.AssetPosition {
-
 	assetIdToPosition := createMapFromSliceForPositions(update.SettledSubaccount.AssetPositions)
 	updatedAssetIds := createIdsToEmptyStructMap(update.AssetUpdates)
 
@@ -77,7 +76,6 @@ func UpdateSubaccountPositions(
 	perpIdToYieldIndex map[uint32]string,
 ) {
 	for i, update := range settledUpdates {
-
 		perpetualPositionsMap := createMapFromSliceForPositions(update.SettledSubaccount.PerpetualPositions)
 
 		assetPositionsMap := createMapFromSliceForPositions(update.SettledSubaccount.AssetPositions)
@@ -96,7 +94,6 @@ func createUpdatedPerpetualPositions(
 	perpIdToFundingIndex map[uint32]dtypes.SerializableInt,
 	perpIdToYieldIndex map[uint32]string,
 ) []*types.PerpetualPosition {
-
 	for _, perpetualUpdate := range update.PerpetualUpdates {
 		perpetualPosition, exists := perpetualIdToPerpetualPosition[perpetualUpdate.PerpetualId]
 		if exists {
@@ -126,7 +123,6 @@ func createUpdatedAssetPositions(
 	update SettledUpdate,
 	assetIdToAssetPosition map[uint32]*types.AssetPosition,
 ) []*types.AssetPosition {
-
 	for _, assetUpdate := range update.AssetUpdates {
 		assetPosition, exists := assetIdToAssetPosition[assetUpdate.AssetId]
 		if exists {
@@ -247,7 +243,6 @@ func insertNewPerpetualPosition(
 	perpIdToFundingIndex map[uint32]dtypes.SerializableInt,
 	perpIdToYieldIndex map[uint32]string,
 ) {
-
 	fundingIndex, exists := perpIdToFundingIndex[perpetualUpdate.PerpetualId]
 	if !exists {
 		// Invariant: `perpIdToFundingIndex` contains all existing perpetauls,

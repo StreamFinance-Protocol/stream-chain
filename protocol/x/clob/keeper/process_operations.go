@@ -301,7 +301,6 @@ func (k Keeper) PersistMatchOrdersToState(
 	matchOrders *types.MatchOrders,
 	ordersMap map[types.OrderId]types.Order,
 ) error {
-
 	takerOrder, err := k.fetchAndValidateTakerOrder(ctx, matchOrders, ordersMap)
 	if err != nil {
 		return err
@@ -977,7 +976,6 @@ func (k Keeper) setNegativeTNCSubaccountSeenIfZeroFillDeleverage(
 	position *satypes.PerpetualPosition,
 	shouldDeleverageAtBankruptcyPrice bool,
 ) error {
-
 	if !shouldDeleverageAtBankruptcyPrice {
 		return errorsmod.Wrapf(
 			types.ErrZeroFillDeleveragingForNonNegativeTncSubaccount,

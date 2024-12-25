@@ -34,7 +34,6 @@ func (p *Perpetual) GetYieldIndexAsRat() (*big.Rat, error) {
 
 // Stateless validation on Perpetual params.
 func (p *PerpetualParams) Validate() error {
-
 	// Validate `ticker`.
 	if len(p.Ticker) == 0 {
 		return errors.WithStack(ErrTickerEmptyString)

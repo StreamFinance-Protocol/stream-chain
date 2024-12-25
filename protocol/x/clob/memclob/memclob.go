@@ -1857,7 +1857,6 @@ func (m *MemClobPriceTimePriority) cancelIOCOrderWithRemainingSizeAfterMatch(
 	orderStatus types.OrderStatus,
 	offchainUpdates *types.OffchainUpdates,
 ) {
-
 	m.maybeHandleOffchainOrderRemovalUpdate(
 		ctx,
 		order,
@@ -1875,7 +1874,6 @@ func (m *MemClobPriceTimePriority) cancelIOCOrderWithRemainingSizeAfterMatch(
 		order.OrderId,
 		types.OrderRemoval_REMOVAL_REASON_CONDITIONAL_IOC_WOULD_REST_ON_BOOK,
 	)
-
 }
 
 func (m *MemClobPriceTimePriority) isOrderStatefulAndNoOrderRemovalInOpQueue(
@@ -1932,7 +1930,6 @@ func (m *MemClobPriceTimePriority) handleOrderRemovalAfterFailedMatched(
 		order,
 		types.OrderRemoval_REMOVAL_REASON_UNDERCOLLATERALIZED,
 	)
-
 }
 
 func (m *MemClobPriceTimePriority) isTakerOrderStatefulAndUndercollateralized(
@@ -1981,7 +1978,6 @@ func (m *MemClobPriceTimePriority) generalIsOrderbookCrossed(
 	bestBid *list.Node[types.ClobOrder],
 	hasBid bool,
 ) bool {
-
 	return hasBid && hasAsk && bestBid.Value.Order.Subticks >= bestAsk.Value.Order.Subticks
 }
 
@@ -1996,7 +1992,6 @@ func (m *MemClobPriceTimePriority) handlePlaceOrderAndMaybeReplacementOffchainUp
 
 	m.maybeHandleOffchainUpdatesForReplacementOrder(ctx, order, offchainUpdates)
 	m.addPlaceOrderMsgToOffchainUpdates(ctx, order, offchainUpdates)
-
 }
 
 func (m *MemClobPriceTimePriority) maybeHandleOffchainUpdatesForReplacementOrder(
@@ -3061,7 +3056,6 @@ func (m *MemClobPriceTimePriority) addTakerOrderToOperationsQueueIfNeeded(
 		m.operationsToPropose.MustAddShortTermOrderTxBytes(taker, ctx.TxBytes())
 		m.operationsToPropose.MustAddShortTermOrderPlacementToOperationsQueue(taker)
 	}
-
 }
 
 func (m *MemClobPriceTimePriority) processMakerFills(
@@ -3170,7 +3164,6 @@ func (m *MemClobPriceTimePriority) maybeAddMatchedMakerOrderToOperationsQueue(
 			matchedMakerOrder,
 		)
 	}
-
 }
 
 func (m *MemClobPriceTimePriority) updateMatchedOrders(

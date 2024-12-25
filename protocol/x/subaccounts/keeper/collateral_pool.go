@@ -49,7 +49,6 @@ func IsValidCollateralPoolUpdate(
 	settledUpdate SettledUpdate,
 	perpIdToCollateralPoolId map[uint32]uint32,
 ) (types.UpdateResult, error) {
-
 	if len(settledUpdate.PerpetualUpdates) == 0 {
 		return types.Success, nil
 	}
@@ -100,7 +99,6 @@ func (k *Keeper) computeAndExecuteCollateralTransfer(
 	ctx sdk.Context,
 	settledUpdateWithUpdatedSubaccount SettledUpdate,
 ) error {
-
 	quoteAssetId, err := k.getQuoteAssetId(ctx, settledUpdateWithUpdatedSubaccount.SettledSubaccount)
 	if err != nil {
 		return err
@@ -135,7 +133,6 @@ func GetCollateralPoolStateTransition(
 	settledUpdateWithUpdatedSubaccount SettledUpdate,
 	quoteAssetId uint32,
 ) (*types.CollateralTransferPerpetualPositionStateTransition, error) {
-
 	if len(settledUpdateWithUpdatedSubaccount.PerpetualUpdates) == 0 {
 		return nil, nil
 	}
@@ -197,11 +194,9 @@ func (k *Keeper) transferAssetsToCollateralPool(
 	var fromModuleAddr sdk.AccAddress
 
 	if stateTransition.Transition == types.Opened {
-
 		toModuleAddr = CollateralPoolAddr
 		fromModuleAddr = types.ModuleAddress
 	} else if stateTransition.Transition == types.Closed {
-
 		toModuleAddr = types.ModuleAddress
 		fromModuleAddr = CollateralPoolAddr
 	} else {
@@ -215,8 +210,7 @@ func (k *Keeper) transferAssetsToCollateralPool(
 		)
 	}
 
-	for i, _ := range stateTransition.AssetIds {
-
+	for i := range stateTransition.AssetIds {
 		// If there are zero quantums to transfer, don't transfer collateral.
 		if stateTransition.BigQuantums[i].Sign() == 0 {
 			continue
@@ -254,7 +248,6 @@ func (k *Keeper) transferAssetsToCollateralPool(
 		); err != nil {
 			return err
 		}
-
 	}
 	return nil
 }
@@ -266,7 +259,6 @@ func getCollateralPoolStateTransitionForAllPerpPositionsClosed(
 	updatedSubaccount types.Subaccount,
 	perpetualId uint32,
 ) *types.CollateralTransferPerpetualPositionStateTransition {
-
 	assetIds := make([]uint32, 0, len(updatedSubaccount.AssetPositions))
 	assetSizes := make([]*big.Int, 0, len(updatedSubaccount.AssetPositions))
 
@@ -298,7 +290,6 @@ func getCollateralPoolStateTransitionForAllPerpPositionsOpened(
 	settledUpdateWithUpdatedSubaccount SettledUpdate,
 	quoteAssetId uint32,
 ) *types.CollateralTransferPerpetualPositionStateTransition {
-
 	updatedSubaccount := settledUpdateWithUpdatedSubaccount.SettledSubaccount
 
 	assetIds := make([]uint32, 0, len(updatedSubaccount.AssetPositions))
@@ -331,7 +322,6 @@ func areAllSubaccountPerpPositionsNew(
 	subaccountPerpetualPositions []*types.PerpetualPosition,
 	perpetualUpdates []types.PerpetualUpdate,
 ) bool {
-
 	if len(subaccountPerpetualPositions) != len(perpetualUpdates) {
 		return false
 	}
@@ -351,7 +341,6 @@ func getErrorFromInvalidAssetUpdateForNewPerpPosition(
 	assetUpdates []types.AssetUpdate,
 	quoteAssetId uint32,
 ) error {
-
 	if len(assetUpdates) != 1 {
 		return errorsmod.Wrap(
 			types.ErrFailedToUpdateSubaccounts,

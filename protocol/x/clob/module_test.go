@@ -20,7 +20,6 @@ import (
 
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/mocks"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/constants"
-	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/keeper"
 	keepertest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob"
 	clob_keeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/keeper"
@@ -88,7 +87,7 @@ func createAppModuleWithKeeper(t *testing.T) (
 	).Return(
 		sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int))),
 	)
-	ks := keeper.NewClobKeepersTestContext(t, memClob, mockBankKeeper, mockIndexerEventManager, nil)
+	ks := keepertest.NewClobKeepersTestContext(t, memClob, mockBankKeeper, mockIndexerEventManager, nil)
 
 	keepertest.CreateNonDefaultTestMarkets(t, ks.Ctx, ks.PricesKeeper)
 

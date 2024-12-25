@@ -152,7 +152,6 @@ func CreateBTCMarket(t *testing.T, ctx sdk.Context, k *keeper.Keeper) {
 
 // CreateNMarkets creates N MarketParam, MarketPrice pairs for testing.
 func CreateNMarkets(t *testing.T, ctx sdk.Context, keeper *keeper.Keeper, n int) []types.MarketParamPrice {
-
 	items := make([]types.MarketParamPrice, n)
 	numExistingMarkets := GetNumMarkets(t, ctx, keeper)
 	for i := range items {

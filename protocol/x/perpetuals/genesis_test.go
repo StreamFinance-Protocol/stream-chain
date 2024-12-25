@@ -19,7 +19,6 @@ import (
 )
 
 func TestGenesis(t *testing.T) {
-
 	genesisState := constants.Perpetuals_DefaultGenesisState
 
 	memClob := &mocks.MemClob{}

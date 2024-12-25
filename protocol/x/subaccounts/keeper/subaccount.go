@@ -253,7 +253,6 @@ func (k Keeper) fetchParamsToSettleSubaccount(
 	quoteAssetId uint32,
 	err error,
 ) {
-
 	earnsTdaiYield, err = k.DoesSubaccountEarnTDaiYield(ctx, subaccount)
 	if err != nil {
 		return nil, nil, nil, false, 0, err

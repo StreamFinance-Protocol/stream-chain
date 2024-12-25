@@ -64,7 +64,6 @@ func MedianPrices(
 		ctx sdk.Context,
 		vePricesPerValidator map[string]map[string]AggregatorPricePair,
 	) (map[string]AggregatorPricePair, error) {
-
 		marketToPriceInfoWithVotingPower := getMarketToPriceInfoFromVotes(
 			ctx,
 			logger,
@@ -95,11 +94,9 @@ func getMarketToPriceInfoFromVotes(
 	validatorStore ValidatorStore,
 	vePricesPerValidator map[string]map[string]AggregatorPricePair,
 ) map[string]PriceInfo {
-
 	allMarketsPriceInfo := make(map[string]PriceInfo)
 
 	for validatorAddr, validatorPrices := range vePricesPerValidator {
-
 		validatorPower, err := getValidatorPowerByAddress(ctx, validatorStore, validatorAddr)
 		if err != nil {
 			logger.Error(
@@ -187,7 +184,6 @@ func computeAggregatedPriceForMarket(
 	threshold *big.Rat,
 	totalPower math.Int,
 ) (AggregatorPricePair, bool) {
-
 	// The total voting power % that submitted a price update for the given currency pair
 	// must be greater than the threshold to be included in the final oracle price.
 	percentSubmitted := new(big.Rat).SetFrac(
@@ -246,7 +242,6 @@ func getConverstionRateInfoFromVotes(
 	validatorStore ValidatorStore,
 	veConversionRatesPerValidator map[string]*big.Int,
 ) ConverstionRateInfo {
-
 	conversionRateInfo := ConverstionRateInfo{
 		ConversionRates: make([]PricePerValidator, 0),
 		TotalWeight:     math.ZeroInt(),
@@ -295,7 +290,6 @@ func computeFinalConversionRate(
 	threshold *big.Rat,
 	totalPower math.Int,
 ) (*big.Int, error) {
-
 	// The total voting power % that submitted a conversion rate update
 	// must be greater than the threshold to set a new conversion rate.
 	percentSubmitted := new(big.Rat).SetFrac(

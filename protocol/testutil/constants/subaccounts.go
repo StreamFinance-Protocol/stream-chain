@@ -1000,7 +1000,7 @@ var (
 	Dave_Num0_TinyIso_Long_LargerIso2_Long_1BTC_Short = satypes.Subaccount{
 		Id: &Dave_Num0,
 		AssetPositions: []*satypes.AssetPosition{
-			&satypes.AssetPosition{
+			{
 				AssetId:  1,
 				Quantums: dtypes.NewInt(-100_000_000),
 			},
@@ -1023,7 +1023,7 @@ var (
 	Dave_Num0_TinyIso_Long_SmallBTC_Short = satypes.Subaccount{
 		Id: &Dave_Num0,
 		AssetPositions: []*satypes.AssetPosition{
-			&satypes.AssetPosition{
+			{
 				AssetId:  1,
 				Quantums: dtypes.NewInt(-1_000),
 			},

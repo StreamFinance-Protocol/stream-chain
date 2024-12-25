@@ -665,7 +665,6 @@ func TestMsgWithdrawFromSubaccountWithinDummyPoolAndAccounts(t *testing.T) {
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-
 			// Set up tApp.
 			msgSender := msgsender.NewIndexerMessageSenderInMemoryCollector()
 			appOpts := map[string]interface{}{

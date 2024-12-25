@@ -330,7 +330,6 @@ func (k Keeper) persistMatchedOrders(
 					return takerUpdateResult, makerUpdateResult, err
 				}
 			}
-
 		}
 
 		if matchWithOrders.MakerOrder.MustGetOrder().RouterFeeOwner != "" {

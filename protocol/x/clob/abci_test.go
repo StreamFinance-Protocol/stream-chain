@@ -240,7 +240,6 @@ func TestEndBlocker_Success(t *testing.T) {
 		"Prunes expired and cancelled untriggered conditional orders from UntriggeredConditionalorders": {
 			blockTime: unixTimeFifteen,
 			setupState: func(ctx sdk.Context, ks keepertest.ClobKeepersTestContext, m *mocks.MemClob) {
-
 				// add expired orders to state, cancelled orders already removed in DeliverTx
 				orders := []types.Order{
 					constants.ConditionalOrder_Alice_Num0_Id0_Clob0_Buy5_Price10_GTBT15_StopLoss20,

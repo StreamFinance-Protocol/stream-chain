@@ -98,7 +98,6 @@ func networkWithLiquidityTierAndPerpetualObjects(
 
 	// Generate `n` Perpetuals.
 	for i := 0; i < n; i++ {
-
 		perpetual := types.Perpetual{
 			Params: types.PerpetualParams{
 				Id:               uint32(i),

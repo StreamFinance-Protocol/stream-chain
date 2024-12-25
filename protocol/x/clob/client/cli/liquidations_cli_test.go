@@ -222,7 +222,6 @@ func (s *LiquidationsIntegrationTestSuite) SetupSuite() {
 
 	_, err = s.network.WaitForHeight(1)
 	s.Require().NoError(err)
-
 }
 
 // TestCLILiquidations creates two subaccounts (where one is undercollateralized), and places a
@@ -366,7 +365,6 @@ func (s *LiquidationsIntegrationTestSuite) TestCLILiquidations() {
 }
 
 func (s *LiquidationsIntegrationTestSuite) TestCLILiquidationsBTCCollat() {
-
 	val := s.network.Validators[0]
 	ctx := val.ClientCtx
 

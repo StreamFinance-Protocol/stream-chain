@@ -793,7 +793,6 @@ func TestIsPositionUpdatable(t *testing.T) {
 }
 
 func TestGetNetCollateralWithSlippage(t *testing.T) {
-
 	tests := map[string]struct {
 		asset          types.Asset
 		bigQuantums    *big.Int

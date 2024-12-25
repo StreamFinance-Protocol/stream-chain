@@ -1110,13 +1110,14 @@ func TestPlacePerpetualLiquidation_PreexistingLiquidation(t *testing.T) {
 			keepertest.CreateTestCollateralPools(t, ctx, ks.PerpetualsKeeper)
 
 			if tc.maxInsuranceFundLost != 0 {
-				ks.PerpetualsKeeper.UpsertCollateralPool(
+				_, err := ks.PerpetualsKeeper.UpsertCollateralPool(
 					ctx,
 					constants.CollateralPools[0].CollateralPoolId,
 					tc.maxInsuranceFundLost,
 					constants.CollateralPools[0].MultiCollateralAssets,
 					constants.CollateralPools[0].QuoteAssetId,
 				)
+				require.NoError(t, err)
 			}
 
 			require.NoError(t, ks.FeeTiersKeeper.SetPerpetualFeeParams(ctx, constants.PerpetualFeeParams))
@@ -5728,7 +5729,7 @@ func TestGetBestPerpetualPositionToLiquidateMultiplePositions(t *testing.T) {
 			subaccount: satypes.Subaccount{
 				Id: &constants.Dave_Num0,
 				AssetPositions: []*satypes.AssetPosition{
-					&satypes.AssetPosition{
+					{
 						AssetId:  0,
 						Quantums: dtypes.NewInt(-1_000_000_000),
 					},
@@ -5759,7 +5760,7 @@ func TestGetBestPerpetualPositionToLiquidateMultiplePositions(t *testing.T) {
 			subaccount: satypes.Subaccount{
 				Id: &constants.Dave_Num0,
 				AssetPositions: []*satypes.AssetPosition{
-					&satypes.AssetPosition{
+					{
 						AssetId:  0,
 						Quantums: dtypes.NewInt(-1_000_000_000),
 					},
@@ -5790,7 +5791,7 @@ func TestGetBestPerpetualPositionToLiquidateMultiplePositions(t *testing.T) {
 			subaccount: satypes.Subaccount{
 				Id: &constants.Dave_Num0,
 				AssetPositions: []*satypes.AssetPosition{
-					&satypes.AssetPosition{
+					{
 						AssetId:  0,
 						Quantums: dtypes.NewInt(-1_000_000_000),
 					},
@@ -5826,7 +5827,7 @@ func TestGetBestPerpetualPositionToLiquidateMultiplePositions(t *testing.T) {
 			subaccount: satypes.Subaccount{
 				Id: &constants.Dave_Num0,
 				AssetPositions: []*satypes.AssetPosition{
-					&satypes.AssetPosition{
+					{
 						AssetId:  0,
 						Quantums: dtypes.NewInt(-1_000_000_000),
 					},
@@ -5862,7 +5863,7 @@ func TestGetBestPerpetualPositionToLiquidateMultiplePositions(t *testing.T) {
 			subaccount: satypes.Subaccount{
 				Id: &constants.Dave_Num0,
 				AssetPositions: []*satypes.AssetPosition{
-					&satypes.AssetPosition{
+					{
 						AssetId:  0,
 						Quantums: dtypes.NewInt(-1_000_000_000),
 					},
@@ -5898,7 +5899,7 @@ func TestGetBestPerpetualPositionToLiquidateMultiplePositions(t *testing.T) {
 			subaccount: satypes.Subaccount{
 				Id: &constants.Dave_Num0,
 				AssetPositions: []*satypes.AssetPosition{
-					&satypes.AssetPosition{
+					{
 						AssetId:  0,
 						Quantums: dtypes.NewInt(-1_000_000_000),
 					},
@@ -5934,7 +5935,7 @@ func TestGetBestPerpetualPositionToLiquidateMultiplePositions(t *testing.T) {
 			subaccount: satypes.Subaccount{
 				Id: &constants.Dave_Num0,
 				AssetPositions: []*satypes.AssetPosition{
-					&satypes.AssetPosition{
+					{
 						AssetId:  0,
 						Quantums: dtypes.NewInt(-1_000_000_000),
 					},
@@ -5970,7 +5971,7 @@ func TestGetBestPerpetualPositionToLiquidateMultiplePositions(t *testing.T) {
 			subaccount: satypes.Subaccount{
 				Id: &constants.Dave_Num0,
 				AssetPositions: []*satypes.AssetPosition{
-					&satypes.AssetPosition{
+					{
 						AssetId:  0,
 						Quantums: dtypes.NewInt(-1_000_000_000),
 					},
@@ -6074,7 +6075,7 @@ func TestGetBestPerpetualPositionToLiquidateMultiplePositions(t *testing.T) {
 			subaccount: satypes.Subaccount{
 				Id: &constants.Dave_Num0,
 				AssetPositions: []*satypes.AssetPosition{
-					&satypes.AssetPosition{
+					{
 						AssetId:  1,
 						Quantums: dtypes.NewInt(-1_000_000),
 					},
@@ -6110,7 +6111,7 @@ func TestGetBestPerpetualPositionToLiquidateMultiplePositions(t *testing.T) {
 			subaccount: satypes.Subaccount{
 				Id: &constants.Dave_Num0,
 				AssetPositions: []*satypes.AssetPosition{
-					&satypes.AssetPosition{
+					{
 						AssetId:  1,
 						Quantums: dtypes.NewInt(-1_000_000),
 					},
@@ -6146,7 +6147,7 @@ func TestGetBestPerpetualPositionToLiquidateMultiplePositions(t *testing.T) {
 			subaccount: satypes.Subaccount{
 				Id: &constants.Dave_Num0,
 				AssetPositions: []*satypes.AssetPosition{
-					&satypes.AssetPosition{
+					{
 						AssetId:  1,
 						Quantums: dtypes.NewInt(-1_000_000),
 					},
@@ -6182,7 +6183,7 @@ func TestGetBestPerpetualPositionToLiquidateMultiplePositions(t *testing.T) {
 			subaccount: satypes.Subaccount{
 				Id: &constants.Dave_Num0,
 				AssetPositions: []*satypes.AssetPosition{
-					&satypes.AssetPosition{
+					{
 						AssetId:  1,
 						Quantums: dtypes.NewInt(-1_000_000),
 					},
@@ -6218,7 +6219,7 @@ func TestGetBestPerpetualPositionToLiquidateMultiplePositions(t *testing.T) {
 			subaccount: satypes.Subaccount{
 				Id: &constants.Dave_Num0,
 				AssetPositions: []*satypes.AssetPosition{
-					&satypes.AssetPosition{
+					{
 						AssetId:  1,
 						Quantums: dtypes.NewInt(-1_000_000),
 					},
@@ -6254,7 +6255,7 @@ func TestGetBestPerpetualPositionToLiquidateMultiplePositions(t *testing.T) {
 			subaccount: satypes.Subaccount{
 				Id: &constants.Dave_Num0,
 				AssetPositions: []*satypes.AssetPosition{
-					&satypes.AssetPosition{
+					{
 						AssetId:  1,
 						Quantums: dtypes.NewInt(-1_000_000),
 					},
@@ -6611,13 +6612,14 @@ func TestCheckInsuranceFundLimits(t *testing.T) {
 
 			if tc.maxInsuranceFundLost != 0 {
 				for _, pool := range constants.CollateralPools {
-					ks.PerpetualsKeeper.UpsertCollateralPool(
+					_, err := ks.PerpetualsKeeper.UpsertCollateralPool(
 						ctx,
 						pool.CollateralPoolId,
 						tc.maxInsuranceFundLost,
 						pool.MultiCollateralAssets,
 						pool.QuoteAssetId,
 					)
+					require.NoError(t, err)
 				}
 			}
 
@@ -6950,13 +6952,14 @@ func TestGetInsuranceFundDeltaBlockLimit(t *testing.T) {
 			keepertest.CreateTestLiquidityTiers(t, ctx, ks.PerpetualsKeeper)
 			keepertest.CreateTestCollateralPools(t, ctx, ks.PerpetualsKeeper)
 
-			ks.PerpetualsKeeper.UpsertCollateralPool(
+			_, err := ks.PerpetualsKeeper.UpsertCollateralPool(
 				ctx,
 				constants.CollateralPools[0].CollateralPoolId,
 				500_000,
 				constants.CollateralPools[0].MultiCollateralAssets,
 				constants.CollateralPools[0].QuoteAssetId,
 			)
+			require.NoError(t, err)
 
 			require.NoError(t, ks.FeeTiersKeeper.SetPerpetualFeeParams(ctx, tc.feeParams))
 

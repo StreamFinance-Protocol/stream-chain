@@ -714,7 +714,7 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 		},
 		`Success: Handles one liquidatable subaccount that also has negative TNC`: {
 			subaccounts: []satypes.Subaccount{
-				satypes.Subaccount{
+				{
 					Id: &constants.Carl_Num1,
 					AssetPositions: []*satypes.AssetPosition{
 						{
@@ -747,7 +747,7 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 		},
 		`Success: Handles one liquidatable non-TDAI backed subaccount`: {
 			subaccounts: []satypes.Subaccount{
-				satypes.Subaccount{
+				{
 					Id: &constants.Carl_Num1,
 					AssetPositions: []*satypes.AssetPosition{
 						{
@@ -778,7 +778,7 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 		},
 		`Success: Handles one liquidatable non-TDAI backed subaccount with negative TNC`: {
 			subaccounts: []satypes.Subaccount{
-				satypes.Subaccount{
+				{
 					Id: &constants.Carl_Num1,
 					AssetPositions: []*satypes.AssetPosition{
 						{
@@ -811,7 +811,7 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 		},
 		`Success: Handles multiple liquidatable non-TDAI backed subaccounts`: {
 			subaccounts: []satypes.Subaccount{
-				satypes.Subaccount{
+				{
 					Id: &constants.Carl_Num0,
 					AssetPositions: []*satypes.AssetPosition{
 						{
@@ -828,7 +828,7 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 					},
 					AssetYieldIndex: big.NewRat(1, 1).String(),
 				},
-				satypes.Subaccount{
+				{
 					Id: &constants.Dave_Num1,
 					AssetPositions: []*satypes.AssetPosition{
 						{
@@ -866,7 +866,7 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 		`Success: Handles multiple liquidatable TDAI backed subaccounts`: {
 			subaccounts: []satypes.Subaccount{
 				constants.Carl_Num1_99999TDAI_Long_1BTC_Short,
-				satypes.Subaccount{
+				{
 					Id: &constants.Dave_Num0,
 					AssetPositions: []*satypes.AssetPosition{
 						{
@@ -904,7 +904,7 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 		`Success: Handles a mix of multiple liquidatable TDAI backed and non-TDAI backed subaccounts`: {
 			subaccounts: []satypes.Subaccount{
 				constants.Carl_Num1_99999TDAI_Long_1BTC_Short,
-				satypes.Subaccount{
+				{
 					Id: &constants.Dave_Num0,
 					AssetPositions: []*satypes.AssetPosition{
 						{
@@ -921,7 +921,7 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 					},
 					AssetYieldIndex: big.NewRat(1, 1).String(),
 				},
-				satypes.Subaccount{
+				{
 					Id: &constants.Alice_Num0,
 					AssetPositions: []*satypes.AssetPosition{
 						{
@@ -938,7 +938,7 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 					},
 					AssetYieldIndex: big.NewRat(1, 1).String(),
 				},
-				satypes.Subaccount{
+				{
 					Id: &constants.Bob_Num0,
 					AssetPositions: []*satypes.AssetPosition{
 						{

@@ -15,7 +15,6 @@ func (k *Keeper) getQuoteAssetId(
 	ctx sdk.Context,
 	subaccount types.Subaccount,
 ) (uint32, error) {
-
 	if len(subaccount.PerpetualPositions) == 0 {
 		return math.MaxUint32, nil
 	}
@@ -115,7 +114,6 @@ func getPerpIdToYieldIndex(
 func getValidAssetIdMap(
 	assetIds []uint32,
 ) (assetIdsMap map[uint32]struct{}) {
-
 	assetIdsMap = make(map[uint32]struct{})
 	for _, asset := range assetIds {
 		assetIdsMap[asset] = struct{}{}

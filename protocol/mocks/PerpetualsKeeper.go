@@ -268,6 +268,34 @@ func (_m *PerpetualsKeeper) GetNetNotional(ctx types.Context, id uint32, bigQuan
 	return r0, r1
 }
 
+// GetQuoteAssetIdFromPerpetualId provides a mock function with given fields: ctx, perpetualId
+func (_m *PerpetualsKeeper) GetQuoteAssetIdFromPerpetualId(ctx types.Context, perpetualId uint32) (uint32, error) {
+	ret := _m.Called(ctx, perpetualId)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetQuoteAssetIdFromPerpetualId")
+	}
+
+	var r0 uint32
+	var r1 error
+	if rf, ok := ret.Get(0).(func(types.Context, uint32) (uint32, error)); ok {
+		return rf(ctx, perpetualId)
+	}
+	if rf, ok := ret.Get(0).(func(types.Context, uint32) uint32); ok {
+		r0 = rf(ctx, perpetualId)
+	} else {
+		r0 = ret.Get(0).(uint32)
+	}
+
+	if rf, ok := ret.Get(1).(func(types.Context, uint32) error); ok {
+		r1 = rf(ctx, perpetualId)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetQuoteCurrencyAtomicResolutionFromPerpetualId provides a mock function with given fields: ctx, perpetualId
 func (_m *PerpetualsKeeper) GetQuoteCurrencyAtomicResolutionFromPerpetualId(ctx types.Context, perpetualId uint32) (int32, error) {
 	ret := _m.Called(ctx, perpetualId)

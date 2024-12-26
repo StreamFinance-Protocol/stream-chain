@@ -22,6 +22,10 @@ const (
 	FlagPriceDaemonEnabled     = "price-daemon-enabled"
 	FlagPriceDaemonLoopDelayMs = "price-daemon-loop-delay-ms"
 
+	FlagBridgeDaemonEnabled        = "bridge-daemon-enabled"
+	FlagBridgeDaemonLoopDelayMs    = "bridge-daemon-loop-delay-ms"
+	FlagBridgeDaemonEthRpcEndpoint = "bridge-daemon-eth-rpc-endpoint"
+
 	FlagDeleveragingDaemonEnabled        = "deleveraging-daemon-enabled"
 	FlagDeleveragingDaemonLoopDelayMs    = "deleveraging-daemon-loop-delay-ms"
 	FlagDeleveragingDaemonQueryPageLimit = "deleveraging-daemon-query-page-limit"
@@ -51,6 +55,16 @@ type SDAIFlags struct {
 	EthRpcEndpoint string
 }
 
+// BridgeFlags contains configuration flags for the Bridge Daemon.
+type BridgeFlags struct {
+	// Enabled toggles the bridge daemon on or off.
+	Enabled bool
+	// LoopDelayMs configures the update frequency of the bridge daemon.
+	LoopDelayMs uint32
+	// EthRpcEndpoint is the endpoint for the Ethereum node where bridge data is queried.
+	EthRpcEndpoint string
+}
+
 // DeleveragingFlags contains configuration flags for the Deleveraging Daemon.
 type DeleveragingFlags struct {
 	// Enabled toggles the deleveraging daemon on or off.
@@ -73,6 +87,7 @@ type PriceFlags struct {
 type DaemonFlags struct {
 	Shared       SharedFlags
 	SDAI         SDAIFlags
+	Bridge       BridgeFlags
 	Price        PriceFlags
 	Deleveraging DeleveragingFlags
 }
@@ -99,6 +114,11 @@ func GetDefaultDaemonFlags() DaemonFlags {
 				Enabled:        true,
 				LoopDelayMs:    1_600,
 				QueryPageLimit: 1_000,
+			},
+			Bridge: BridgeFlags{
+				Enabled:        true,
+				LoopDelayMs:    30_000,
+				EthRpcEndpoint: "",
 			},
 			Price: PriceFlags{
 				Enabled:     true,
@@ -179,6 +199,22 @@ func AddDaemonFlagsToCmd(
 		df.Deleveraging.QueryPageLimit,
 		"Limit on the number of items to fetch per query in the Deleveraging Daemon task loop.",
 	)
+	// Bridge Daemon.
+	cmd.Flags().Bool(
+		FlagBridgeDaemonEnabled,
+		df.Bridge.Enabled,
+		"Enable Bridge Daemon. Set to false for non-validator nodes.",
+	)
+	cmd.Flags().Uint32(
+		FlagBridgeDaemonLoopDelayMs,
+		df.Bridge.LoopDelayMs,
+		"Delay in milliseconds between running the Bridge Daemon task loop.",
+	)
+	cmd.Flags().String(
+		FlagBridgeDaemonEthRpcEndpoint,
+		df.Bridge.EthRpcEndpoint,
+		"Ethereum Node Rpc Endpoint",
+	)
 
 	// Price Daemon.
 	cmd.Flags().Bool(
@@ -241,6 +277,22 @@ func GetDaemonFlagValuesFromOptions(
 	if option := appOpts.Get(FlagSDAIDaemonEthRpcEndpoint); option != nil {
 		if v, err := cast.ToStringE(option); err == nil && len(v) > 0 {
 			result.SDAI.EthRpcEndpoint = v
+		}
+	}
+	// Bridge Daemon.
+	if option := appOpts.Get(FlagBridgeDaemonEnabled); option != nil {
+		if v, err := cast.ToBoolE(option); err == nil {
+			result.Bridge.Enabled = v
+		}
+	}
+	if option := appOpts.Get(FlagBridgeDaemonLoopDelayMs); option != nil {
+		if v, err := cast.ToUint32E(option); err == nil {
+			result.Bridge.LoopDelayMs = v
+		}
+	}
+	if option := appOpts.Get(FlagBridgeDaemonEthRpcEndpoint); option != nil {
+		if v, err := cast.ToStringE(option); err == nil && len(v) > 0 {
+			result.Bridge.EthRpcEndpoint = v
 		}
 	}
 

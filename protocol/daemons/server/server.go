@@ -5,7 +5,9 @@ import (
 	"syscall"
 
 	"cosmossdk.io/log"
+	bridgeapi "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/bridge/api"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/constants"
+
 	deleveragingapi "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/deleveraging/api"
 	pricefeedapi "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/pricefeed/api"
 	sdaioracleapi "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/sdaioracle/api"
@@ -25,6 +27,7 @@ type Server struct {
 	fileHandler   daemontypes.FileHandler
 	socketAddress string
 
+	BridgeServer
 	SDAIServer
 	PriceFeedServer
 	DeleveragingServer
@@ -92,6 +95,9 @@ func (server *Server) Start() {
 
 	// Register gRPC services needed by the daemons. This is required before invoking `Serve`.
 	// https://pkg.go.dev/google.golang.org/grpc#Server.RegisterService
+
+	// Register Server to ingest gRPC requests from bridge daemon.
+	bridgeapi.RegisterBridgeServiceServer(server.gsrv, server)
 
 	// Register Server to ingest gRPC requests from price feed daemon and update market prices.
 	pricefeedapi.RegisterPriceFeedServiceServer(server.gsrv, server)

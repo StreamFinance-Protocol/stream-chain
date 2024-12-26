@@ -17,5 +17,6 @@ const (
 	SDAIDaemonServiceName         = "sDAI-daemon"
 	DeleveragingDaemonServiceName = "deleveraging-daemon"
 	PricefeedDaemonServiceName    = "pricefeed-daemon"
+	BridgeDaemonServiceName       = "bridge-daemon"
 	MetricsDaemonServiceName      = "metrics-daemon"
 )

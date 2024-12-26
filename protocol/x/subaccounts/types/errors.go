@@ -9,6 +9,8 @@ import (
 
 // Panic strings
 const (
+	ErrMatchUpdatesMustHaveTwoPerpetualUpdates = "internalCanUpdateSubaccounts: MATCH subaccount updates must consist of " +
+		"exactly 2 perpetual updates, got settledUpdates: %+v"
 	ErrMatchUpdatesMustHaveTwoUpdates = "internalCanUpdateSubaccounts: MATCH subaccount updates must consist of " +
 		"exactly 2 updates, got settledUpdates: %+v"
 	ErrMatchUpdatesMustUpdateOnePerp = "internalCanUpdateSubaccounts: MATCH subaccount updates must each have " +

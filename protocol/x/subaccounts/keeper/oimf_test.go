@@ -19,6 +19,15 @@ var (
 	bobSubaccountId = &types.SubaccountId{
 		Owner: "Bob",
 	}
+	carlSubaccountId = &types.SubaccountId{
+		Owner: "Carl",
+	}
+	daveSubaccountId = &types.SubaccountId{
+		Owner: "Dave",
+	}
+	emilySubaccountId = &types.SubaccountId{
+		Owner: "Emily",
+	}
 )
 
 func TestGetDeltaOpenInterestFromUpdates(t *testing.T) {
@@ -31,39 +40,6 @@ func TestGetDeltaOpenInterestFromUpdates(t *testing.T) {
 		"Invalid: 1 update": {
 			updateType: types.Match,
 			settledUpdates: []keeper.SettledUpdate{
-				{
-					SettledSubaccount: types.Subaccount{},
-					PerpetualUpdates: []types.PerpetualUpdate{
-						{
-							PerpetualId:      0,
-							BigQuantumsDelta: big.NewInt(1_000),
-						},
-					},
-				},
-			},
-			panicErr: types.ErrMatchUpdatesMustHaveTwoUpdates,
-		},
-		"Invalid: 3 updates": {
-			updateType: types.Match,
-			settledUpdates: []keeper.SettledUpdate{
-				{
-					SettledSubaccount: types.Subaccount{},
-					PerpetualUpdates: []types.PerpetualUpdate{
-						{
-							PerpetualId:      0,
-							BigQuantumsDelta: big.NewInt(1_000),
-						},
-					},
-				},
-				{
-					SettledSubaccount: types.Subaccount{},
-					PerpetualUpdates: []types.PerpetualUpdate{
-						{
-							PerpetualId:      0,
-							BigQuantumsDelta: big.NewInt(1_000),
-						},
-					},
-				},
 				{
 					SettledSubaccount: types.Subaccount{},
 					PerpetualUpdates: []types.PerpetualUpdate{
@@ -96,7 +72,7 @@ func TestGetDeltaOpenInterestFromUpdates(t *testing.T) {
 					},
 				},
 			},
-			panicErr: types.ErrMatchUpdatesMustUpdateOnePerp,
+			panicErr: types.ErrMatchUpdatesMustHaveTwoPerpetualUpdates,
 		},
 		"Invalid: updates are on different perpetuals": {
 			updateType: types.Match,
@@ -386,6 +362,150 @@ func TestGetDeltaOpenInterestFromUpdates(t *testing.T) {
 				PerpetualId:  1000,
 				BaseQuantums: big.NewInt(1900),
 			},
+		},
+		"Invalid: 3 updates": {
+			updateType: types.Match,
+			settledUpdates: []keeper.SettledUpdate{
+				{
+					SettledSubaccount: types.Subaccount{},
+					PerpetualUpdates: []types.PerpetualUpdate{
+						{
+							PerpetualId:      0,
+							BigQuantumsDelta: big.NewInt(1_000),
+						},
+					},
+				},
+				{
+					SettledSubaccount: types.Subaccount{},
+					PerpetualUpdates: []types.PerpetualUpdate{
+						{
+							PerpetualId:      0,
+							BigQuantumsDelta: big.NewInt(1_000),
+						},
+					},
+				},
+				{
+					SettledSubaccount: types.Subaccount{},
+					PerpetualUpdates: []types.PerpetualUpdate{
+						{
+							PerpetualId:      0,
+							BigQuantumsDelta: big.NewInt(1_000),
+						},
+					},
+				},
+			},
+			panicErr: types.ErrMatchUpdatesMustHaveTwoUpdates,
+		},
+		"Invalid: four updates": {
+			updateType: types.Match,
+			settledUpdates: []keeper.SettledUpdate{
+				{
+					SettledSubaccount: types.Subaccount{
+						Id: carlSubaccountId,
+					},
+					AssetUpdates: []types.AssetUpdate{
+						{
+							AssetId:          0,
+							BigQuantumsDelta: big.NewInt(100),
+						},
+					},
+				},
+				{
+					SettledSubaccount: types.Subaccount{
+						Id: aliceSubaccountId,
+					},
+					PerpetualUpdates: []types.PerpetualUpdate{
+						{
+							PerpetualId:      1,
+							BigQuantumsDelta: big.NewInt(500),
+						},
+					},
+				},
+				{
+					SettledSubaccount: types.Subaccount{
+						Id: daveSubaccountId,
+					},
+					AssetUpdates: []types.AssetUpdate{
+						{
+							AssetId:          0,
+							BigQuantumsDelta: big.NewInt(100),
+						},
+					},
+				},
+				{
+					SettledSubaccount: types.Subaccount{
+						Id: bobSubaccountId,
+					},
+					PerpetualUpdates: []types.PerpetualUpdate{
+						{
+							PerpetualId:      1,
+							BigQuantumsDelta: big.NewInt(-500),
+						},
+					},
+				},
+			},
+			panicErr: types.ErrMatchUpdatesMustHaveTwoUpdates,
+		},
+		"Invalid: five updates": {
+			updateType: types.Match,
+			settledUpdates: []keeper.SettledUpdate{
+				{
+					SettledSubaccount: types.Subaccount{
+						Id: carlSubaccountId,
+					},
+					AssetUpdates: []types.AssetUpdate{
+						{
+							AssetId:          0,
+							BigQuantumsDelta: big.NewInt(100),
+						},
+					},
+				},
+				{
+					SettledSubaccount: types.Subaccount{
+						Id: aliceSubaccountId,
+					},
+					PerpetualUpdates: []types.PerpetualUpdate{
+						{
+							PerpetualId:      1,
+							BigQuantumsDelta: big.NewInt(500),
+						},
+					},
+				},
+				{
+					SettledSubaccount: types.Subaccount{
+						Id: daveSubaccountId,
+					},
+					AssetUpdates: []types.AssetUpdate{
+						{
+							AssetId:          0,
+							BigQuantumsDelta: big.NewInt(100),
+						},
+					},
+				},
+				{
+					SettledSubaccount: types.Subaccount{
+						Id: bobSubaccountId,
+					},
+					PerpetualUpdates: []types.PerpetualUpdate{
+						{
+							PerpetualId:      1,
+							BigQuantumsDelta: big.NewInt(-500),
+						},
+					},
+				},
+				{
+					SettledSubaccount: types.Subaccount{
+						Id: emilySubaccountId,
+					},
+					AssetUpdates: []types.AssetUpdate{
+						{
+							AssetId:          0,
+							BigQuantumsDelta: big.NewInt(100),
+						},
+					},
+				},
+			},
+			panicErr: types.ErrMatchUpdatesMustHaveTwoUpdates,
 		},
 	}
 

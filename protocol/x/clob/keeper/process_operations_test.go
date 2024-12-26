@@ -2148,6 +2148,802 @@ func TestProcessProposerOperations(t *testing.T) {
 			},
 			expectedError: types.ErrDeleveragingIsFinalSettlementFlagMismatch,
 		},
+		"Succeeds with maker order that has a router fee": {
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcUsd_100PercentMarginRequirement,
+			},
+			perpetualFeeParams: &constants.PerpetualFeeParams,
+			clobPairs: []types.ClobPair{
+				constants.ClobPair_Btc,
+			},
+			subaccounts: []satypes.Subaccount{
+				{
+					Id: &constants.Alice_Num0,
+					AssetPositions: []*satypes.AssetPosition{
+						&constants.TDai_Asset_100_000,
+					},
+					PerpetualPositions: []*satypes.PerpetualPosition{
+						{
+							PerpetualId: 0,
+							Quantums:    dtypes.NewInt(1_000_000_000), // 10 BTC
+						},
+					},
+				},
+				{
+					Id: &constants.Bob_Num0,
+					AssetPositions: []*satypes.AssetPosition{
+						&constants.TDai_Asset_100_000,
+					},
+					PerpetualPositions: []*satypes.PerpetualPosition{
+						{
+							PerpetualId: 0,
+							Quantums:    dtypes.NewInt(1_000_000_000), // 10 BTC
+						},
+					},
+				},
+			},
+			preExistingStatefulOrders: []types.Order{},
+			rawOperations: []types.OperationRaw{
+				clobtest.NewShortTermOrderPlacementOperationRaw(
+					types.Order{
+						OrderId:        types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
+						Side:           types.Order_SIDE_BUY,
+						Quantums:       100_000_000, // 1 BTC
+						Subticks:       50_000_000,
+						GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+						RouterFeeOwner: constants.Carl_Num0.Owner,
+						RouterFeePpm:   1000,
+					},
+				),
+				clobtest.NewShortTermOrderPlacementOperationRaw(
+					types.Order{
+						OrderId:      types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
+						Side:         types.Order_SIDE_SELL,
+						Quantums:     100_000_000, // 1 BTC
+						Subticks:     50_000_000,
+						GoodTilOneof: &types.Order_GoodTilBlock{GoodTilBlock: 25},
+					},
+				),
+				clobtest.NewMatchOperationRaw(
+					&types.Order{
+						OrderId:      types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
+						Side:         types.Order_SIDE_SELL,
+						Quantums:     100_000_000, // 1 BTC
+						Subticks:     50_000_000,
+						GoodTilOneof: &types.Order_GoodTilBlock{GoodTilBlock: 25},
+					},
+					[]types.MakerFill{
+						{
+							FillAmount:   100_000_000,
+							MakerOrderId: types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
+						},
+					},
+				),
+			},
+			expectedMatches: []*MatchWithOrdersForTesting{
+				{
+					MatchWithOrders: types.MatchWithOrders{
+						TakerOrder: &types.Order{
+							OrderId:      types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
+							Side:         types.Order_SIDE_SELL,
+							Quantums:     100_000_000,
+							Subticks:     50_000_000,
+							GoodTilOneof: &types.Order_GoodTilBlock{GoodTilBlock: 25},
+						},
+						MakerOrder: &types.Order{
+							OrderId:        types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
+							Side:           types.Order_SIDE_BUY,
+							Quantums:       100_000_000,
+							Subticks:       50_000_000,
+							GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+							RouterFeeOwner: constants.Carl_Num0.Owner,
+							RouterFeePpm:   1000,
+						},
+						FillAmount: 100_000_000,
+						MakerFee:   60_000,
+						TakerFee:   25_000,
+					},
+					TotalFilledMaker: 100_000_000,
+					TotalFilledTaker: 100_000_000,
+				},
+			},
+			expectedProcessProposerMatchesEvents: types.ProcessProposerMatchesEvents{
+				OrderIdsFilledInLastBlock: []types.OrderId{
+					{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
+					{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
+				},
+				BlockHeight: blockHeight,
+			},
+			// Expected balances are initial balance + balance change due to order - fees
+			expectedQuoteBalances: map[satypes.SubaccountId]int64{
+				constants.Alice_Num0: constants.TDai_Asset_100_000.GetBigQuantums().Int64() - 50_000_000 - 60_000,
+				constants.Bob_Num0:   constants.TDai_Asset_100_000.GetBigQuantums().Int64() + 50_000_000 - 25_000,
+			},
+			expectedPerpetualPositions: map[satypes.SubaccountId][]*satypes.PerpetualPosition{
+				constants.Bob_Num0: {
+					{
+						PerpetualId:  0,
+						Quantums:     dtypes.NewInt(1_000_000_000 - 100_000_000),
+						FundingIndex: dtypes.ZeroInt(),
+						YieldIndex:   big.NewRat(0, 1).String(),
+					},
+				},
+				constants.Alice_Num0: {
+					{
+						PerpetualId:  0,
+						Quantums:     dtypes.NewInt(1_000_000_000 + 100_000_000),
+						FundingIndex: dtypes.ZeroInt(),
+						YieldIndex:   big.NewRat(0, 1).String(),
+					},
+				},
+			},
+		},
+		"Succeeds with taker order that has a router fee": {
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcUsd_100PercentMarginRequirement,
+			},
+			perpetualFeeParams: &constants.PerpetualFeeParams,
+			clobPairs: []types.ClobPair{
+				constants.ClobPair_Btc,
+			},
+			subaccounts: []satypes.Subaccount{
+				{
+					Id: &constants.Alice_Num0,
+					AssetPositions: []*satypes.AssetPosition{
+						&constants.TDai_Asset_100_000,
+					},
+					PerpetualPositions: []*satypes.PerpetualPosition{
+						{
+							PerpetualId: 0,
+							Quantums:    dtypes.NewInt(1_000_000_000), // 10 BTC
+						},
+					},
+				},
+				{
+					Id: &constants.Bob_Num0,
+					AssetPositions: []*satypes.AssetPosition{
+						&constants.TDai_Asset_100_000,
+					},
+					PerpetualPositions: []*satypes.PerpetualPosition{
+						{
+							PerpetualId: 0,
+							Quantums:    dtypes.NewInt(1_000_000_000), // 10 BTC
+						},
+					},
+				},
+			},
+			preExistingStatefulOrders: []types.Order{},
+			rawOperations: []types.OperationRaw{
+				clobtest.NewShortTermOrderPlacementOperationRaw(
+					types.Order{
+						OrderId:      types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
+						Side:         types.Order_SIDE_BUY,
+						Quantums:     100_000_000, // 1 BTC
+						Subticks:     50_000_000,
+						GoodTilOneof: &types.Order_GoodTilBlock{GoodTilBlock: 25},
+					},
+				),
+				clobtest.NewShortTermOrderPlacementOperationRaw(
+					types.Order{
+						OrderId:        types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
+						Side:           types.Order_SIDE_SELL,
+						Quantums:       100_000_000, // 1 BTC
+						Subticks:       50_000_000,
+						GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+						RouterFeeOwner: constants.Carl_Num0.Owner,
+						RouterFeePpm:   1000,
+					},
+				),
+				clobtest.NewMatchOperationRaw(
+					&types.Order{
+						OrderId:      types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
+						Side:         types.Order_SIDE_SELL,
+						Quantums:     100_000_000, // 1 BTC
+						Subticks:     50_000_000,
+						GoodTilOneof: &types.Order_GoodTilBlock{GoodTilBlock: 25},
+					},
+					[]types.MakerFill{
+						{
+							FillAmount:   100_000_000,
+							MakerOrderId: types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
+						},
+					},
+				),
+			},
+			expectedMatches: []*MatchWithOrdersForTesting{
+				{
+					MatchWithOrders: types.MatchWithOrders{
+						TakerOrder: &types.Order{
+							OrderId:        types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
+							Side:           types.Order_SIDE_SELL,
+							Quantums:       100_000_000,
+							Subticks:       50_000_000,
+							GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+							RouterFeeOwner: constants.Carl_Num0.Owner,
+							RouterFeePpm:   1000,
+						},
+						MakerOrder: &types.Order{
+							OrderId:      types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
+							Side:         types.Order_SIDE_BUY,
+							Quantums:     100_000_000,
+							Subticks:     50_000_000,
+							GoodTilOneof: &types.Order_GoodTilBlock{GoodTilBlock: 25},
+						},
+						FillAmount: 100_000_000,
+						MakerFee:   10_000,
+						TakerFee:   75_000,
+					},
+					TotalFilledMaker: 100_000_000,
+					TotalFilledTaker: 100_000_000,
+				},
+			},
+			expectedProcessProposerMatchesEvents: types.ProcessProposerMatchesEvents{
+				OrderIdsFilledInLastBlock: []types.OrderId{
+					{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
+					{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
+				},
+				BlockHeight: blockHeight,
+			},
+			// Expected balances are initial balance + balance change due to order - fees
+			expectedQuoteBalances: map[satypes.SubaccountId]int64{
+				constants.Alice_Num0: constants.TDai_Asset_100_000.GetBigQuantums().Int64() - 50_000_000 - 10_000,
+				constants.Bob_Num0:   constants.TDai_Asset_100_000.GetBigQuantums().Int64() + 50_000_000 - 75_000,
+			},
+			expectedPerpetualPositions: map[satypes.SubaccountId][]*satypes.PerpetualPosition{
+				constants.Bob_Num0: {
+					{
+						PerpetualId:  0,
+						Quantums:     dtypes.NewInt(1_000_000_000 - 100_000_000),
+						FundingIndex: dtypes.ZeroInt(),
+						YieldIndex:   big.NewRat(0, 1).String(),
+					},
+				},
+				constants.Alice_Num0: {
+					{
+						PerpetualId:  0,
+						Quantums:     dtypes.NewInt(1_000_000_000 + 100_000_000),
+						FundingIndex: dtypes.ZeroInt(),
+						YieldIndex:   big.NewRat(0, 1).String(),
+					},
+				},
+			},
+		},
+		"Succeeds with router fees of the same amount for same router for both maker and taker orders": {
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcUsd_100PercentMarginRequirement,
+			},
+			perpetualFeeParams: &constants.PerpetualFeeParams,
+			clobPairs: []types.ClobPair{
+				constants.ClobPair_Btc,
+			},
+			subaccounts: []satypes.Subaccount{
+				{
+					Id: &constants.Alice_Num0,
+					AssetPositions: []*satypes.AssetPosition{
+						&constants.TDai_Asset_100_000,
+					},
+					PerpetualPositions: []*satypes.PerpetualPosition{
+						{
+							PerpetualId: 0,
+							Quantums:    dtypes.NewInt(1_000_000_000), // 10 BTC
+						},
+					},
+				},
+				{
+					Id: &constants.Bob_Num0,
+					AssetPositions: []*satypes.AssetPosition{
+						&constants.TDai_Asset_100_000,
+					},
+					PerpetualPositions: []*satypes.PerpetualPosition{
+						{
+							PerpetualId: 0,
+							Quantums:    dtypes.NewInt(1_000_000_000), // 10 BTC
+						},
+					},
+				},
+			},
+			preExistingStatefulOrders: []types.Order{},
+			rawOperations: []types.OperationRaw{
+				clobtest.NewShortTermOrderPlacementOperationRaw(
+					types.Order{
+						OrderId:        types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
+						Side:           types.Order_SIDE_BUY,
+						Quantums:       100_000_000, // 1 BTC
+						Subticks:       50_000_000,
+						GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+						RouterFeeOwner: constants.Carl_Num0.Owner,
+						RouterFeePpm:   1000,
+					},
+				),
+				clobtest.NewShortTermOrderPlacementOperationRaw(
+					types.Order{
+						OrderId:        types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
+						Side:           types.Order_SIDE_SELL,
+						Quantums:       100_000_000, // 1 BTC
+						Subticks:       50_000_000,
+						GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+						RouterFeeOwner: constants.Carl_Num0.Owner,
+						RouterFeePpm:   1000,
+					},
+				),
+				clobtest.NewMatchOperationRaw(
+					&types.Order{
+						OrderId:      types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
+						Side:         types.Order_SIDE_SELL,
+						Quantums:     100_000_000, // 1 BTC
+						Subticks:     50_000_000,
+						GoodTilOneof: &types.Order_GoodTilBlock{GoodTilBlock: 25},
+					},
+					[]types.MakerFill{
+						{
+							FillAmount:   100_000_000,
+							MakerOrderId: types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
+						},
+					},
+				),
+			},
+			expectedMatches: []*MatchWithOrdersForTesting{
+				{
+					MatchWithOrders: types.MatchWithOrders{
+						TakerOrder: &types.Order{
+							OrderId:        types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
+							Side:           types.Order_SIDE_SELL,
+							Quantums:       100_000_000,
+							Subticks:       50_000_000,
+							GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+							RouterFeeOwner: constants.Carl_Num0.Owner,
+							RouterFeePpm:   1000,
+						},
+						MakerOrder: &types.Order{
+							OrderId:        types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
+							Side:           types.Order_SIDE_BUY,
+							Quantums:       100_000_000,
+							Subticks:       50_000_000,
+							GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+							RouterFeeOwner: constants.Carl_Num0.Owner,
+							RouterFeePpm:   1000,
+						},
+						FillAmount: 100_000_000,
+						MakerFee:   60_000,
+						TakerFee:   75_000,
+					},
+					TotalFilledMaker: 100_000_000,
+					TotalFilledTaker: 100_000_000,
+				},
+			},
+			expectedProcessProposerMatchesEvents: types.ProcessProposerMatchesEvents{
+				OrderIdsFilledInLastBlock: []types.OrderId{
+					{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
+					{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
+				},
+				BlockHeight: blockHeight,
+			},
+			// Expected balances are initial balance + balance change due to order - fees
+			expectedQuoteBalances: map[satypes.SubaccountId]int64{
+				constants.Alice_Num0: constants.TDai_Asset_100_000.GetBigQuantums().Int64() - 50_000_000 - 60_000,
+				constants.Bob_Num0:   constants.TDai_Asset_100_000.GetBigQuantums().Int64() + 50_000_000 - 75_000,
+			},
+			expectedPerpetualPositions: map[satypes.SubaccountId][]*satypes.PerpetualPosition{
+				constants.Bob_Num0: {
+					{
+						PerpetualId:  0,
+						Quantums:     dtypes.NewInt(1_000_000_000 - 100_000_000),
+						FundingIndex: dtypes.ZeroInt(),
+						YieldIndex:   big.NewRat(0, 1).String(),
+					},
+				},
+				constants.Alice_Num0: {
+					{
+						PerpetualId:  0,
+						Quantums:     dtypes.NewInt(1_000_000_000 + 100_000_000),
+						FundingIndex: dtypes.ZeroInt(),
+						YieldIndex:   big.NewRat(0, 1).String(),
+					},
+				},
+			},
+		},
+		"Succeeds with router fees of different amounts for same router for both maker and taker orders": {
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcUsd_100PercentMarginRequirement,
+			},
+			perpetualFeeParams: &constants.PerpetualFeeParams,
+			clobPairs: []types.ClobPair{
+				constants.ClobPair_Btc,
+			},
+			subaccounts: []satypes.Subaccount{
+				{
+					Id: &constants.Alice_Num0,
+					AssetPositions: []*satypes.AssetPosition{
+						&constants.TDai_Asset_100_000,
+					},
+					PerpetualPositions: []*satypes.PerpetualPosition{
+						{
+							PerpetualId: 0,
+							Quantums:    dtypes.NewInt(1_000_000_000), // 10 BTC
+						},
+					},
+				},
+				{
+					Id: &constants.Bob_Num0,
+					AssetPositions: []*satypes.AssetPosition{
+						&constants.TDai_Asset_100_000,
+					},
+					PerpetualPositions: []*satypes.PerpetualPosition{
+						{
+							PerpetualId: 0,
+							Quantums:    dtypes.NewInt(1_000_000_000), // 10 BTC
+						},
+					},
+				},
+			},
+			preExistingStatefulOrders: []types.Order{},
+			rawOperations: []types.OperationRaw{
+				clobtest.NewShortTermOrderPlacementOperationRaw(
+					types.Order{
+						OrderId:        types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
+						Side:           types.Order_SIDE_BUY,
+						Quantums:       100_000_000, // 1 BTC
+						Subticks:       50_000_000,
+						GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+						RouterFeeOwner: constants.Carl_Num0.Owner,
+						RouterFeePpm:   1000,
+					},
+				),
+				clobtest.NewShortTermOrderPlacementOperationRaw(
+					types.Order{
+						OrderId:        types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
+						Side:           types.Order_SIDE_SELL,
+						Quantums:       100_000_000, // 1 BTC
+						Subticks:       50_000_000,
+						GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+						RouterFeeOwner: constants.Carl_Num0.Owner,
+						RouterFeePpm:   2000,
+					},
+				),
+				clobtest.NewMatchOperationRaw(
+					&types.Order{
+						OrderId:      types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
+						Side:         types.Order_SIDE_SELL,
+						Quantums:     100_000_000, // 1 BTC
+						Subticks:     50_000_000,
+						GoodTilOneof: &types.Order_GoodTilBlock{GoodTilBlock: 25},
+					},
+					[]types.MakerFill{
+						{
+							FillAmount:   100_000_000,
+							MakerOrderId: types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
+						},
+					},
+				),
+			},
+			expectedMatches: []*MatchWithOrdersForTesting{
+				{
+					MatchWithOrders: types.MatchWithOrders{
+						TakerOrder: &types.Order{
+							OrderId:        types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
+							Side:           types.Order_SIDE_SELL,
+							Quantums:       100_000_000,
+							Subticks:       50_000_000,
+							GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+							RouterFeeOwner: constants.Carl_Num0.Owner,
+							RouterFeePpm:   2000,
+						},
+						MakerOrder: &types.Order{
+							OrderId:        types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
+							Side:           types.Order_SIDE_BUY,
+							Quantums:       100_000_000,
+							Subticks:       50_000_000,
+							GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+							RouterFeeOwner: constants.Carl_Num0.Owner,
+							RouterFeePpm:   1000,
+						},
+						FillAmount: 100_000_000,
+						MakerFee:   60_000,
+						TakerFee:   125_000,
+					},
+					TotalFilledMaker: 100_000_000,
+					TotalFilledTaker: 100_000_000,
+				},
+			},
+			expectedProcessProposerMatchesEvents: types.ProcessProposerMatchesEvents{
+				OrderIdsFilledInLastBlock: []types.OrderId{
+					{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
+					{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
+				},
+				BlockHeight: blockHeight,
+			},
+			// Expected balances are initial balance + balance change due to order - fees
+			expectedQuoteBalances: map[satypes.SubaccountId]int64{
+				constants.Alice_Num0: constants.TDai_Asset_100_000.GetBigQuantums().Int64() - 50_000_000 - 60_000,
+				constants.Bob_Num0:   constants.TDai_Asset_100_000.GetBigQuantums().Int64() + 50_000_000 - 125_000,
+			},
+			expectedPerpetualPositions: map[satypes.SubaccountId][]*satypes.PerpetualPosition{
+				constants.Bob_Num0: {
+					{
+						PerpetualId:  0,
+						Quantums:     dtypes.NewInt(1_000_000_000 - 100_000_000),
+						FundingIndex: dtypes.ZeroInt(),
+						YieldIndex:   big.NewRat(0, 1).String(),
+					},
+				},
+				constants.Alice_Num0: {
+					{
+						PerpetualId:  0,
+						Quantums:     dtypes.NewInt(1_000_000_000 + 100_000_000),
+						FundingIndex: dtypes.ZeroInt(),
+						YieldIndex:   big.NewRat(0, 1).String(),
+					},
+				},
+			},
+		},
+		"Succeeds with router fees of same amount for different routers for both maker and taker orders": {
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcUsd_100PercentMarginRequirement,
+			},
+			perpetualFeeParams: &constants.PerpetualFeeParams,
+			clobPairs: []types.ClobPair{
+				constants.ClobPair_Btc,
+			},
+			subaccounts: []satypes.Subaccount{
+				{
+					Id: &constants.Alice_Num0,
+					AssetPositions: []*satypes.AssetPosition{
+						&constants.TDai_Asset_100_000,
+					},
+					PerpetualPositions: []*satypes.PerpetualPosition{
+						{
+							PerpetualId: 0,
+							Quantums:    dtypes.NewInt(1_000_000_000), // 10 BTC
+						},
+					},
+				},
+				{
+					Id: &constants.Bob_Num0,
+					AssetPositions: []*satypes.AssetPosition{
+						&constants.TDai_Asset_100_000,
+					},
+					PerpetualPositions: []*satypes.PerpetualPosition{
+						{
+							PerpetualId: 0,
+							Quantums:    dtypes.NewInt(1_000_000_000), // 10 BTC
+						},
+					},
+				},
+			},
+			preExistingStatefulOrders: []types.Order{},
+			rawOperations: []types.OperationRaw{
+				clobtest.NewShortTermOrderPlacementOperationRaw(
+					types.Order{
+						OrderId:        types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
+						Side:           types.Order_SIDE_BUY,
+						Quantums:       100_000_000, // 1 BTC
+						Subticks:       50_000_000,
+						GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+						RouterFeeOwner: constants.Dave_Num0.Owner,
+						RouterFeePpm:   1000,
+					},
+				),
+				clobtest.NewShortTermOrderPlacementOperationRaw(
+					types.Order{
+						OrderId:        types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
+						Side:           types.Order_SIDE_SELL,
+						Quantums:       100_000_000, // 1 BTC
+						Subticks:       50_000_000,
+						GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+						RouterFeeOwner: constants.Carl_Num0.Owner,
+						RouterFeePpm:   1000,
+					},
+				),
+				clobtest.NewMatchOperationRaw(
+					&types.Order{
+						OrderId:      types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
+						Side:         types.Order_SIDE_SELL,
+						Quantums:     100_000_000, // 1 BTC
+						Subticks:     50_000_000,
+						GoodTilOneof: &types.Order_GoodTilBlock{GoodTilBlock: 25},
+					},
+					[]types.MakerFill{
+						{
+							FillAmount:   100_000_000,
+							MakerOrderId: types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
+						},
+					},
+				),
+			},
+			expectedMatches: []*MatchWithOrdersForTesting{
+				{
+					MatchWithOrders: types.MatchWithOrders{
+						TakerOrder: &types.Order{
+							OrderId:        types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
+							Side:           types.Order_SIDE_SELL,
+							Quantums:       100_000_000,
+							Subticks:       50_000_000,
+							GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+							RouterFeeOwner: constants.Carl_Num0.Owner,
+							RouterFeePpm:   1000,
+						},
+						MakerOrder: &types.Order{
+							OrderId:        types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
+							Side:           types.Order_SIDE_BUY,
+							Quantums:       100_000_000,
+							Subticks:       50_000_000,
+							GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+							RouterFeeOwner: constants.Dave_Num0.Owner,
+							RouterFeePpm:   1000,
+						},
+						FillAmount: 100_000_000,
+						MakerFee:   60_000,
+						TakerFee:   75_000,
+					},
+					TotalFilledMaker: 100_000_000,
+					TotalFilledTaker: 100_000_000,
+				},
+			},
+			expectedProcessProposerMatchesEvents: types.ProcessProposerMatchesEvents{
+				OrderIdsFilledInLastBlock: []types.OrderId{
+					{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
+					{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
+				},
+				BlockHeight: blockHeight,
+			},
+			// Expected balances are initial balance + balance change due to order - fees
+			expectedQuoteBalances: map[satypes.SubaccountId]int64{
+				constants.Alice_Num0: constants.TDai_Asset_100_000.GetBigQuantums().Int64() - 50_000_000 - 60_000,
+				constants.Bob_Num0:   constants.TDai_Asset_100_000.GetBigQuantums().Int64() + 50_000_000 - 75_000,
+			},
+			expectedPerpetualPositions: map[satypes.SubaccountId][]*satypes.PerpetualPosition{
+				constants.Bob_Num0: {
+					{
+						PerpetualId:  0,
+						Quantums:     dtypes.NewInt(1_000_000_000 - 100_000_000),
+						FundingIndex: dtypes.ZeroInt(),
+						YieldIndex:   big.NewRat(0, 1).String(),
+					},
+				},
+				constants.Alice_Num0: {
+					{
+						PerpetualId:  0,
+						Quantums:     dtypes.NewInt(1_000_000_000 + 100_000_000),
+						FundingIndex: dtypes.ZeroInt(),
+						YieldIndex:   big.NewRat(0, 1).String(),
+					},
+				},
+			},
+		},
+		"Succeeds with router fees of different amounts for different routers for both maker and taker orders": {
+			perpetuals: []perptypes.Perpetual{
+				constants.BtcUsd_100PercentMarginRequirement,
+			},
+			perpetualFeeParams: &constants.PerpetualFeeParams,
+			clobPairs: []types.ClobPair{
+				constants.ClobPair_Btc,
+			},
+			subaccounts: []satypes.Subaccount{
+				{
+					Id: &constants.Alice_Num0,
+					AssetPositions: []*satypes.AssetPosition{
+						&constants.TDai_Asset_100_000,
+					},
+					PerpetualPositions: []*satypes.PerpetualPosition{
+						{
+							PerpetualId: 0,
+							Quantums:    dtypes.NewInt(1_000_000_000), // 10 BTC
+						},
+					},
+				},
+				{
+					Id: &constants.Bob_Num0,
+					AssetPositions: []*satypes.AssetPosition{
+						&constants.TDai_Asset_100_000,
+					},
+					PerpetualPositions: []*satypes.PerpetualPosition{
+						{
+							PerpetualId: 0,
+							Quantums:    dtypes.NewInt(1_000_000_000), // 10 BTC
+						},
+					},
+				},
+			},
+			preExistingStatefulOrders: []types.Order{},
+			rawOperations: []types.OperationRaw{
+				clobtest.NewShortTermOrderPlacementOperationRaw(
+					types.Order{
+						OrderId:        types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
+						Side:           types.Order_SIDE_BUY,
+						Quantums:       100_000_000, // 1 BTC
+						Subticks:       50_000_000,
+						GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+						RouterFeeOwner: constants.Dave_Num0.Owner,
+						RouterFeePpm:   1000,
+					},
+				),
+				clobtest.NewShortTermOrderPlacementOperationRaw(
+					types.Order{
+						OrderId:        types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
+						Side:           types.Order_SIDE_SELL,
+						Quantums:       100_000_000, // 1 BTC
+						Subticks:       50_000_000,
+						GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+						RouterFeeOwner: constants.Carl_Num0.Owner,
+						RouterFeePpm:   2000,
+					},
+				),
+				clobtest.NewMatchOperationRaw(
+					&types.Order{
+						OrderId:      types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
+						Side:         types.Order_SIDE_SELL,
+						Quantums:     100_000_000, // 1 BTC
+						Subticks:     50_000_000,
+						GoodTilOneof: &types.Order_GoodTilBlock{GoodTilBlock: 25},
+					},
+					[]types.MakerFill{
+						{
+							FillAmount:   100_000_000,
+							MakerOrderId: types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
+						},
+					},
+				),
+			},
+			expectedMatches: []*MatchWithOrdersForTesting{
+				{
+					MatchWithOrders: types.MatchWithOrders{
+						TakerOrder: &types.Order{
+							OrderId:        types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
+							Side:           types.Order_SIDE_SELL,
+							Quantums:       100_000_000,
+							Subticks:       50_000_000,
+							GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+							RouterFeeOwner: constants.Carl_Num0.Owner,
+							RouterFeePpm:   2000,
+						},
+						MakerOrder: &types.Order{
+							OrderId:        types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
+							Side:           types.Order_SIDE_BUY,
+							Quantums:       100_000_000,
+							Subticks:       50_000_000,
+							GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+							RouterFeeOwner: constants.Dave_Num0.Owner,
+							RouterFeePpm:   1000,
+						},
+						FillAmount: 100_000_000,
+						MakerFee:   60_000,
+						TakerFee:   125_000,
+					},
+					TotalFilledMaker: 100_000_000,
+					TotalFilledTaker: 100_000_000,
+				},
+			},
+			expectedProcessProposerMatchesEvents: types.ProcessProposerMatchesEvents{
+				OrderIdsFilledInLastBlock: []types.OrderId{
+					{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
+					{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
+				},
+				BlockHeight: blockHeight,
+			},
+			// Expected balances are initial balance + balance change due to order - fees
+			expectedQuoteBalances: map[satypes.SubaccountId]int64{
+				constants.Alice_Num0: constants.TDai_Asset_100_000.GetBigQuantums().Int64() - 50_000_000 - 60_000,
+				constants.Bob_Num0:   constants.TDai_Asset_100_000.GetBigQuantums().Int64() + 50_000_000 - 125_000,
+			},
+			expectedPerpetualPositions: map[satypes.SubaccountId][]*satypes.PerpetualPosition{
+				constants.Bob_Num0: {
+					{
+						PerpetualId:  0,
+						Quantums:     dtypes.NewInt(1_000_000_000 - 100_000_000),
+						FundingIndex: dtypes.ZeroInt(),
+						YieldIndex:   big.NewRat(0, 1).String(),
+					},
+				},
+				constants.Alice_Num0: {
+					{
+						PerpetualId:  0,
+						Quantums:     dtypes.NewInt(1_000_000_000 + 100_000_000),
+						FundingIndex: dtypes.ZeroInt(),
+						YieldIndex:   big.NewRat(0, 1).String(),
+					},
+				},
+			},
+		},
 	}
 
 	for name, tc := range tests {

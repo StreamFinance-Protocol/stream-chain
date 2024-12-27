@@ -187,7 +187,7 @@ func (k Keeper) UpdateCollateralizationInfoGivenAssets(
 		return nil
 	}
 
-	// Note that we only expect QuoteAsset before multi-collateral support is added.
+	// SANITY CHECK: Note that we only expect QuoteAsset before multi-collateral support is added.
 	if len(settledSubaccount.AssetPositions) > 1 {
 		return types.ErrMultiCollateralNotImplemented
 	}
@@ -202,10 +202,6 @@ func (k Keeper) UpdateCollateralizationInfoGivenAssets(
 
 		if settledSubaccount.AssetPositions[0].AssetId != quoteAssetId {
 			return types.ErrMultiCollateralNotImplemented
-		}
-	} else {
-		if settledSubaccount.AssetPositions[0].AssetId != assettypes.AssetTDai.Id {
-			return assettypes.ErrTDaiMustBeQuoteAssetOfBaseCollateralPool
 		}
 	}
 

@@ -197,7 +197,7 @@ func TestStart_RegistersAllServices(t *testing.T) {
 	require.NotPanics(t, s.Start)
 
 	// Verify that RegisterService was called exactly 3 times (one for each daemon)
-	mockGrpcServer.AssertNumberOfCalls(t, "RegisterService", 3)
+	mockGrpcServer.AssertNumberOfCalls(t, "RegisterService", 4)
 
 	// Verify that RegisterService was called for each daemon
 	mockGrpcServer.AssertCalled(t, "RegisterService", mock.MatchedBy(func(sd *golanggrpc.ServiceDesc) bool {

@@ -180,7 +180,7 @@ func (s *LiquidationsIntegrationTestSuite) SetupSuite() {
 			AssetPositions: []*satypes.AssetPosition{
 				{
 					AssetId:  1,
-					Quantums: dtypes.NewInt(-90_002_000),
+					Quantums: dtypes.NewInt(-4_500_100_000_000),
 				},
 			},
 			PerpetualPositions: []*satypes.PerpetualPosition{
@@ -431,7 +431,7 @@ func (s *LiquidationsIntegrationTestSuite) TestCLILiquidationsBTCCollat() {
 	s.Require().Len(subaccountTwo.PerpetualPositions, 1)
 	s.Require().Equal(liqTestMakerOrderQuantums.ToBigInt(), subaccountTwo.PerpetualPositions[0].GetBigQuantums())
 
-	subaccountThreeInitialQuoteBalance := int64(-90_002_000)
+	subaccountThreeInitialQuoteBalance := int64(-4_500_100_000_000)
 	liquidationFee := fillSizeQuoteQuantums *
 		int64(types.LiquidationsConfig_Default.InsuranceFundFeePpm) /
 		int64(lib.OneMillion)

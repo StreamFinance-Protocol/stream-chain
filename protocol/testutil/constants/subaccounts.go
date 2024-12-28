@@ -238,10 +238,10 @@ var (
 		},
 		AssetYieldIndex: big.NewRat(1, 1).String(),
 	}
-	Carl_Num0_2BTC_Asset_1BTC_Short = satypes.Subaccount{
+	Carl_Num0_100000BTC_Asset_1BTC_Short = satypes.Subaccount{
 		Id: &Carl_Num0,
 		AssetPositions: []*satypes.AssetPosition{
-			&Long_Asset_2BTC,
+			&Long_Asset_100000BTC,
 		},
 		PerpetualPositions: []*satypes.PerpetualPosition{
 			{

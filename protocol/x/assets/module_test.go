@@ -95,7 +95,7 @@ func TestAppModuleBasic_DefaultGenesis(t *testing.T) {
 	expected += `"denom_exponent":-6,"has_market":false,`
 	expected += `"market_id":0,"atomic_resolution":-6,"asset_yield_index":"1/1","max_slippage_ppm":0},`
 	expected += `{"id":1,"symbol":"BTC","denom":"btc-denom",`
-	expected += `"denom_exponent":-8,"has_market":true,`
+	expected += `"denom_exponent":-8,"has_market":false,`
 	expected += `"market_id":0,"atomic_resolution":-8,"asset_yield_index":"","max_slippage_ppm":0}]}`
 	require.Equal(t, expected, string(json))
 }

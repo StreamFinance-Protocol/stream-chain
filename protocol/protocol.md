@@ -13,4 +13,5 @@
 
 ## Asset Invariants
 - The asset ID of tDAI is 0
+- All assets should have has_market set to false (until multicollateral is implemented)
 

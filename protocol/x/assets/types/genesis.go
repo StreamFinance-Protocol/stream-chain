@@ -27,8 +27,7 @@ var (
 		Symbol:           "BTC",
 		Denom:            "btc-denom",
 		DenomExponent:    int32(-8),
-		HasMarket:        true,
-		MarketId:         uint32(0),
+		HasMarket:        false,
 		AtomicResolution: int32(-8),
 		MaxSlippagePpm:   uint32(0),
 	}

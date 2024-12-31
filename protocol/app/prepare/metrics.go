@@ -15,6 +15,7 @@ const (
 type successMetricParams struct {
 	txs                 PrepareProposalTxs
 	pricesTx            PricesTxResponse
+	bridgeTx            BridgeTxResponse
 	fundingTx           FundingTxResponse
 	operationsTx        OperationsTxResponse
 	numTxsToReturn      int

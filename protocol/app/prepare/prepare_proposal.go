@@ -38,6 +38,12 @@ type OperationsTxResponse struct {
 	NumOperations int
 }
 
+// BridgeTxResponse represents a response for creating 'AcknowledgeBridges' tx
+type BridgeTxResponse struct {
+	Tx         []byte
+	NumBridges int
+}
+
 // common params between tx setters
 type TxSetterUtils struct {
 	Ctx      sdk.Context
@@ -55,6 +61,7 @@ type TxSetterUtils struct {
 //   - If there are extra available bytes and there are more txs in "Other" group, add more txs from this group.
 func PrepareProposalHandler(
 	txConfig client.TxConfig,
+	bridgeKeeper PrepareBridgeKeeper,
 	clobKeeper PrepareClobKeeper,
 	perpetualKeeper PreparePerpetualsKeeper,
 	pricesKeeper ve.PreBlockExecPricesKeeper,
@@ -126,6 +133,22 @@ func PrepareProposalHandler(
 			return &EmptyPrepareProposalResponse, nil
 		}
 
+		//------------------------ ACKNOWLEDGE BRIDGES ----------------------
+		bridgeTxResp, err := SetAcknowledgeBridgesTx(
+			txSetterUtils,
+			bridgeKeeper,
+		)
+
+		if err != nil {
+			ctx.Logger().Error(
+				"failed to inject bridge acknowledgements into block",
+				"height", request.Height,
+				"err", err,
+			)
+			recordErrorMetricsWithLabel(metrics.AcknowledgeBridgesTx)
+			return &EmptyPrepareProposalResponse, nil
+		}
+
 		//------------------------ OTHER TXS ------------------------
 		otherTxsRemainder, err := SetOneFourthOtherTxsAndGetRemainder(
 			txSetterUtils,
@@ -170,6 +193,7 @@ func PrepareProposalHandler(
 			successMetricParams{
 				txs:                 txs,
 				fundingTx:           fundingTxResp,
+				bridgeTx:            bridgeTxResp,
 				operationsTx:        operationsTxResp,
 				numTxsToReturn:      len(finalTxs),
 				numTxsInOriginalReq: len(request.Txs),
@@ -276,6 +300,25 @@ func SetProposedOperationsTx(
 	return operationsTxResp, nil
 }
 
+func SetAcknowledgeBridgesTx(
+	txSetterUtils TxSetterUtils,
+	bridgeKeeper PrepareBridgeKeeper,
+) (BridgeTxResponse, error) {
+	bridgeTxResp, err := GetAcknowledgeBridgesTx(
+		txSetterUtils.Ctx,
+		txSetterUtils.TxConfig,
+		bridgeKeeper,
+	)
+	if err != nil {
+		return bridgeTxResp, err
+	}
+	if err := txSetterUtils.Txs.SetAcknowledgeBridgesTx(bridgeTxResp.Tx); err != nil {
+		return bridgeTxResp, err
+	}
+
+	return bridgeTxResp, nil
+}
+
 func SetOneFourthOtherTxsAndGetRemainder(
 	txSetterUtils TxSetterUtils,
 ) ([][]byte, error) {
@@ -319,6 +362,28 @@ func GetAddPremiumVotesTx(
 	return FundingTxResponse{
 		Tx:       tx,
 		NumVotes: len(msgAddPremiumVotes.Votes),
+	}, nil
+}
+
+// GetAcknowledgeBridgeTx returns a tx containing a list of `MsgAcknowledgeBridge`.
+func GetAcknowledgeBridgesTx(
+	ctx sdk.Context,
+	txConfig client.TxConfig,
+	bridgeKeeper PrepareBridgeKeeper,
+) (BridgeTxResponse, error) {
+	msgAcknowledgeBridges := bridgeKeeper.GetAcknowledgeBridges(ctx, ctx.BlockTime())
+
+	tx, err := EncodeMsgsIntoTxBytes(txConfig, msgAcknowledgeBridges)
+	if err != nil {
+		return BridgeTxResponse{}, err
+	}
+	if len(tx) == 0 {
+		return BridgeTxResponse{}, fmt.Errorf("Invalid tx: %v", tx)
+	}
+
+	return BridgeTxResponse{
+		Tx:         tx,
+		NumBridges: len(msgAcknowledgeBridges.Events),
 	}, nil
 }
 

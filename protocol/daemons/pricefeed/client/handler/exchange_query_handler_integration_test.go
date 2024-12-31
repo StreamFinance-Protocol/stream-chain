@@ -30,6 +30,9 @@ func TestQueryingActualExchanges(t *testing.T) {
 		"Kraken": {
 			url: CreateRequestUrl(kraken.KrakenDetails.Url, []string{"XXBTZUSD", "XETHZUSD", "LINKUSD"}),
 		},
+		"Rost": {
+			url: CreateRequestUrl(rost.RostDetails.Url, []string{"AMZN"}),
+		},
 	}
 
 	for name, tc := range tests {

@@ -164,5 +164,5 @@ func TestStaticExchangeQueryConfigCache(t *testing.T) {
 }
 
 func TestStaticExchangeQueryConfigCacheLength(t *testing.T) {
-	require.Len(t, constants.StaticExchangeQueryConfig, 15)
+	require.Len(t, constants.StaticExchangeQueryConfig, 16)
 }

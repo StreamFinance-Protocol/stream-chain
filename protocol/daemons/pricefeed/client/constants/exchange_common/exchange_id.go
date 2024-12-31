@@ -31,6 +31,8 @@ const (
 	EXCHANGE_ID_MEXC types.ExchangeId = "Mexc"
 	// EXCHANGE_ID_COINBASE_PRO is the id for CoinbasePro exchange.
 	EXCHANGE_ID_COINBASE_PRO types.ExchangeId = "CoinbasePro"
+	// EXCHANGE_ID_ROST is the id for Rost exchange.
+	EXCHANGE_ID_ROST types.ExchangeId = "Rost"
 	// EXCHANGE_ID_TEST_EXCHANGE is the id for test exchange.
 	EXCHANGE_ID_TEST_EXCHANGE types.ExchangeId = "TestExchange"
 	// EXCHANGE_ID_TEST_VOLATILE_EXCHANGE is the id for test volatile exchange.

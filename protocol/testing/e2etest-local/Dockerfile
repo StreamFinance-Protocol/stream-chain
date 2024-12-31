@@ -11,4 +11,6 @@ RUN go install cosmossdk.io/tools/cosmovisor/cmd/cosmovisor@v1.5.0
 RUN /klyraprotocol/local.sh
 
 ENV DAEMON_NAME=klyraprotocold
+# Insert appropriate key for the ROST API
+ENV ROST_KEY=abcde
 ENTRYPOINT ["cosmovisor", "run"]

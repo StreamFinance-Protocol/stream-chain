@@ -102,6 +102,11 @@ const (
 	TimeoutMs = 3000
 	MaxQueries = 1
 	[[exchanges]]
+	ExchangeId = "Rost"
+	IntervalMs = 20000
+	TimeoutMs = 30000
+	MaxQueries = 1
+	[[exchanges]]
 	ExchangeId = "TestFixedPriceExchange"
 	IntervalMs = 2000
 	TimeoutMs = 3000

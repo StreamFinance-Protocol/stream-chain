@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"net/http"
+	"fmt"
 	"time"
 
 	"cosmossdk.io/errors"
@@ -380,10 +381,15 @@ func RunMarketParamUpdaterTaskLoop(
 			marketParamErrors,
 		)
 	} else if len(marketParamErrors) > 0 {
+		// Convert errors to strings to ensure full error details are logged
+		errorStrings := make(map[string]string)
+		for marketId, err := range marketParamErrors {
+			errorStrings[fmt.Sprintf("%v", marketId)] = err.Error()
+		}
+
 		logger.Error(
 			"Failed to apply some market updates",
-			"marketParamErrors",
-			marketParamErrors,
+			"marketParamErrors", errorStrings,
 		)
 	}
 }

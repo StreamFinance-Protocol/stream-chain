@@ -12,6 +12,7 @@ import (
 // Validators within the validator set should never use this implementation.
 func FullNodeProcessProposalHandler(
 	txConfig client.TxConfig,
+	bridgeKeeper ProcessBridgeKeeper,
 	clobKeeper ProcessClobKeeper,
 	stakingKeeper ProcessStakingKeeper,
 	perpetualKeeper ProcessPerpetualKeeper,
@@ -21,7 +22,7 @@ func FullNodeProcessProposalHandler(
 		// Always return `abci.ResponseProcessProposal_ACCEPT`
 		response := &abci.ResponseProcessProposal{Status: abci.ResponseProcessProposal_ACCEPT}
 
-		txs, err := DecodeProcessProposalTxs(txConfig.TxDecoder(), req, pricesKeeper)
+		txs, err := DecodeProcessProposalTxs(ctx, txConfig.TxDecoder(), req, bridgeKeeper, pricesKeeper)
 		if err != nil {
 			return response, nil
 		}

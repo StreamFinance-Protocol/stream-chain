@@ -125,6 +125,7 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/mempool"
 
 	// Daemons
+	bridgeclient "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/bridge/client"
 	deleveragingclient "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/deleveraging/client"
 	daemonflags "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/flags"
 	metricsclient "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/metrics/client"
@@ -134,6 +135,7 @@ import (
 	sdaiclient "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/sdaioracle/client"
 	daemonserver "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/server"
 	daemonservertypes "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/server/types"
+	bridgedaemontypes "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/server/types/bridge"
 	deleveragingtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/server/types/deleveraging"
 	pricefeedtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/server/types/pricefeed"
 	sdaidaemontypes "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/server/types/sdaioracle"
@@ -146,6 +148,9 @@ import (
 	blocktimemodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/blocktime"
 	blocktimemodulekeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/blocktime/keeper"
 	blocktimemoduletypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/blocktime/types"
+	bridgemodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge"
+	bridgemodulekeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/keeper"
+	bridgemoduletypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
 	clobmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob"
 	clobflags "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/flags"
 	clobmodulekeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/keeper"
@@ -284,6 +289,8 @@ type App struct {
 
 	BlockTimeKeeper blocktimemodulekeeper.Keeper
 
+	BridgeKeeper bridgemodulekeeper.Keeper
+
 	DelayMsgKeeper delaymsgmodulekeeper.Keeper
 
 	FeeTiersKeeper feetiersmodulekeeper.Keeper
@@ -322,6 +329,8 @@ type App struct {
 	DeleveragingClient *deleveragingclient.Client
 
 	DaemonHealthMonitor *daemonservertypes.HealthMonitor
+
+	BridgeClient *bridgeclient.Client
 
 	pricePreBlocker daemonpreblocker.PreBlockHandler
 }
@@ -393,6 +402,7 @@ func New(
 		pricesmoduletypes.StoreKey,
 		assetsmoduletypes.StoreKey,
 		blocktimemoduletypes.StoreKey,
+		bridgemoduletypes.StoreKey,
 		feetiersmoduletypes.StoreKey,
 		perpetualsmoduletypes.StoreKey,
 		satypes.StoreKey,
@@ -742,6 +752,11 @@ func New(
 	daemonDeleveragingInfo := deleveragingtypes.NewDaemonDeleveragingInfo()
 	app.Server.WithDaemonDeleveragingInfo(daemonDeleveragingInfo)
 
+	// Setup server for bridge messages.
+	// The in-memory data structure is shared by the x/bridge module and bridge daemon.
+	bridgeEventManager := bridgedaemontypes.NewBridgeEventManager(timeProvider)
+	app.Server.WithBridgeEventManager(bridgeEventManager)
+
 	app.DaemonHealthMonitor = daemonservertypes.NewHealthMonitor(
 		daemonservertypes.DaemonStartupGracePeriod,
 		daemonservertypes.HealthCheckPollFrequency,
@@ -797,6 +812,25 @@ func New(
 				)
 				app.RegisterDaemonWithHealthMonitor(app.PriceFeedClient, maxDaemonUnhealthyDuration)
 			}
+		}
+
+		// Start Bridge Daemon.
+		// Non-validating full-nodes have no need to run the bridge daemon.
+		if !appFlags.NonValidatingFullNode && daemonFlags.Bridge.Enabled {
+			app.BridgeClient = bridgeclient.NewClient(logger)
+			go func() {
+				app.RegisterDaemonWithHealthMonitor(app.BridgeClient, maxDaemonUnhealthyDuration)
+				if err := app.BridgeClient.Start(
+					// The client will use `context.Background` so that it can have a different context from
+					// the main application.
+					context.Background(),
+					daemonFlags,
+					appFlags,
+					&daemontypes.GrpcClientImpl{},
+				); err != nil {
+					panic(err)
+				}
+			}()
 		}
 
 		// Start SDAI Daemon.
@@ -878,6 +912,20 @@ func New(
 		},
 	)
 	delayMsgModule := delaymsgmodule.NewAppModule(appCodec, app.DelayMsgKeeper)
+
+	app.BridgeKeeper = *bridgemodulekeeper.NewKeeper(
+		appCodec,
+		keys[bridgemoduletypes.StoreKey],
+		bridgeEventManager,
+		app.BankKeeper,
+		app.DelayMsgKeeper,
+		// gov module and delayMsg module accounts are allowed to send messages to the bridge module.
+		[]string{
+			lib.GovModuleAddress.String(),
+			delaymsgmoduletypes.ModuleAddress.String(),
+		},
+	)
+	bridgeModule := bridgemodule.NewAppModule(appCodec, app.BridgeKeeper)
 
 	app.PerpetualsKeeper = *perpetualsmodulekeeper.NewKeeper(
 		appCodec,
@@ -1115,6 +1163,7 @@ func New(
 		pricesModule,
 		assetsModule,
 		blockTimeModule,
+		bridgeModule,
 		feeTiersModule,
 		perpetualsModule,
 		statsModule,
@@ -1159,6 +1208,7 @@ func New(
 		icatypes.ModuleName,
 		pricesmoduletypes.ModuleName,
 		assetsmoduletypes.ModuleName,
+		bridgemoduletypes.ModuleName,
 		feetiersmoduletypes.ModuleName,
 		perpetualsmoduletypes.ModuleName,
 		statsmoduletypes.ModuleName,
@@ -1194,6 +1244,7 @@ func New(
 		icatypes.ModuleName,
 		pricesmoduletypes.ModuleName,
 		assetsmoduletypes.ModuleName,
+		bridgemoduletypes.ModuleName,
 		feetiersmoduletypes.ModuleName,
 		perpetualsmoduletypes.ModuleName,
 		statsmoduletypes.ModuleName,
@@ -1235,6 +1286,7 @@ func New(
 		pricesmoduletypes.ModuleName,
 		assetsmoduletypes.ModuleName,
 		blocktimemoduletypes.ModuleName,
+		bridgemoduletypes.ModuleName,
 		feetiersmoduletypes.ModuleName,
 		perpetualsmoduletypes.ModuleName,
 		statsmoduletypes.ModuleName,
@@ -1271,6 +1323,7 @@ func New(
 		pricesmoduletypes.ModuleName,
 		assetsmoduletypes.ModuleName,
 		blocktimemoduletypes.ModuleName,
+		bridgemoduletypes.ModuleName,
 		feetiersmoduletypes.ModuleName,
 		perpetualsmoduletypes.ModuleName,
 		statsmoduletypes.ModuleName,
@@ -1330,6 +1383,7 @@ func New(
 		app.SetPrepareProposal(
 			prepare.PrepareProposalHandler(
 				txConfig,
+				app.BridgeKeeper,
 				&app.ClobKeeper,
 				app.PerpetualsKeeper,
 				app.PricesKeeper,

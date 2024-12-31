@@ -19,7 +19,17 @@ type RostResponse map[string]struct {
         UtcDate  string  `json:"utcDate"`
         Volume   int64   `json:"volume"`
         AvgPrice float64 `json:"avgPrice"`
-        BtcPrice float64 `json:"btcPrice"`
+        BtcPrice struct {
+            Time     int64   `json:"time"`
+            UtcDate  string  `json:"utcDate"`
+            Open     float64 `json:"open"`
+            Close    float64 `json:"close"`
+            High     float64 `json:"high"`
+            Low      float64 `json:"low"`
+            AvgPrice float64 `json:"avgPrice"`
+            Volume   float64 `json:"volume"`
+        } `json:"btcPrice"`
+        PriceType string `json:"priceType"`
     } `json:"latest"`
 }
 // Keep RostTicker as is with string types and validations
@@ -63,6 +73,7 @@ func RostPriceFunction(
     if err != nil {
         return nil, nil, err
     }
+
     tickerData, exists := rostResponse[ticker]
     if !exists {
         return nil, map[string]error{

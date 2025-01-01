@@ -1403,6 +1403,7 @@ func New(
 		app.SetProcessProposal(
 			process.FullNodeProcessProposalHandler(
 				txConfig,
+				app.BridgeKeeper,
 				&app.ClobKeeper,
 				app.StakingKeeper,
 				app.PerpetualsKeeper,
@@ -1413,6 +1414,7 @@ func New(
 		app.SetProcessProposal(
 			process.ProcessProposalHandler(
 				txConfig,
+				app.BridgeKeeper,
 				&app.ClobKeeper,
 				app.StakingKeeper,
 				app.PerpetualsKeeper,

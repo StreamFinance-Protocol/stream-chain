@@ -13,6 +13,7 @@ import (
 
 func init() {
 	txIndicesAndOffsets := []int{
+		constants.AcknowledgeBridgesTxLenOffset,
 		constants.ProposedOperationsTxIndex,
 		constants.AddPremiumVotesTxLenOffset,
 	}
@@ -30,6 +31,7 @@ func init() {
 	}
 	txIndicesForMinTxsCount := []int{
 		constants.ProposedOperationsTxIndex,
+		constants.AcknowledgeBridgesTxLenOffset + constants.MinTxsCount,
 		constants.AddPremiumVotesTxLenOffset + constants.MinTxsCount,
 	}
 	if constants.MinTxsCount != len(txIndicesForMinTxsCount) {

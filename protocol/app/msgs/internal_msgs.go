@@ -4,11 +4,13 @@ import (
 	upgrade "cosmossdk.io/x/upgrade/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib"
 	blocktime "github.com/StreamFinance-Protocol/stream-chain/protocol/x/blocktime/types"
+	bridge "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
 	clob "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	delaymsg "github.com/StreamFinance-Protocol/stream-chain/protocol/x/delaymsg/types"
 	feetiers "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers/types"
 	govplus "github.com/StreamFinance-Protocol/stream-chain/protocol/x/govplus/types"
 	perpetuals "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
+
 	prices "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
 	ratelimit "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
 	sending "github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending/types"
@@ -120,6 +122,16 @@ var (
 		// delaymsg
 		"/klyraprotocol.delaymsg.MsgDelayMessage":         &delaymsg.MsgDelayMessage{},
 		"/klyraprotocol.delaymsg.MsgDelayMessageResponse": nil,
+
+		// bridge
+		"/dydxprotocol.bridge.MsgCompleteBridge":              &bridge.MsgCompleteBridge{},
+		"/dydxprotocol.bridge.MsgCompleteBridgeResponse":      nil,
+		"/dydxprotocol.bridge.MsgUpdateEventParams":           &bridge.MsgUpdateEventParams{},
+		"/dydxprotocol.bridge.MsgUpdateEventParamsResponse":   nil,
+		"/dydxprotocol.bridge.MsgUpdateProposeParams":         &bridge.MsgUpdateProposeParams{},
+		"/dydxprotocol.bridge.MsgUpdateProposeParamsResponse": nil,
+		"/dydxprotocol.bridge.MsgUpdateSafetyParams":          &bridge.MsgUpdateSafetyParams{},
+		"/dydxprotocol.bridge.MsgUpdateSafetyParamsResponse":  nil,
 
 		// feetiers
 		"/klyraprotocol.feetiers.MsgUpdatePerpetualFeeParams":         &feetiers.MsgUpdatePerpetualFeeParams{},

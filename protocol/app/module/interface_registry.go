@@ -94,6 +94,7 @@ func NewInterfaceRegistry(addrPrefix string, valAddrPrefix string) (types.Interf
 				),
 
 				// App injected messages have no signers.
+				"dydxprotocol.bridge.MsgAcknowledgeBridges":   noSigners,
 				"klyraprotocol.clob.MsgProposedOperations":    noSigners,
 				"klyraprotocol.perpetuals.MsgAddPremiumVotes": noSigners,
 			},

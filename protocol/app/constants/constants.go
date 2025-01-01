@@ -23,6 +23,6 @@ const (
 	ProposedOperationsTxIndexWithVE = ProposedOperationsTxIndex + 1
 	AddPremiumVotesTxLenOffset      = -1
 	AcknowledgeBridgesTxLenOffset   = -2
-	LastOtherTxLenOffset            = AddPremiumVotesTxLenOffset
+	LastOtherTxLenOffset            = AcknowledgeBridgesTxLenOffset
 	FirstOtherTxIndex               = ProposedOperationsTxIndex + 1
 )

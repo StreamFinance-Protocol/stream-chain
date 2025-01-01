@@ -152,6 +152,18 @@ var (
 		"/klyraprotocol.blocktime.MsgUpdateDowntimeParams":         {},
 		"/klyraprotocol.blocktime.MsgUpdateDowntimeParamsResponse": {},
 
+		// bridge
+		"/dydxprotocol.bridge.MsgAcknowledgeBridges":          {},
+		"/dydxprotocol.bridge.MsgAcknowledgeBridgesResponse":  {},
+		"/dydxprotocol.bridge.MsgCompleteBridge":              {},
+		"/dydxprotocol.bridge.MsgCompleteBridgeResponse":      {},
+		"/dydxprotocol.bridge.MsgUpdateEventParams":           {},
+		"/dydxprotocol.bridge.MsgUpdateEventParamsResponse":   {},
+		"/dydxprotocol.bridge.MsgUpdateProposeParams":         {},
+		"/dydxprotocol.bridge.MsgUpdateProposeParamsResponse": {},
+		"/dydxprotocol.bridge.MsgUpdateSafetyParams":          {},
+		"/dydxprotocol.bridge.MsgUpdateSafetyParamsResponse":  {},
+
 		// clob
 		"/klyraprotocol.clob.MsgBatchCancel":                                {},
 		"/klyraprotocol.clob.MsgBatchCancelResponse":                        {},

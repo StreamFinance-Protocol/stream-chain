@@ -43,6 +43,7 @@ func TestVEInjectionHandling(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// Setup.
 			ctx, pricesKeeper, _, daemonPriceCache, _, mockTimeProvider := keepertest.PricesKeepers(t)
+			_, bridgeKeeper, _, _, _, _, _ := keepertest.BridgeKeepers(t)
 
 			ctx = vetesting.GetVeEnabledCtx(ctx, 3)
 			ctx = ctx.WithCometInfo(
@@ -71,6 +72,7 @@ func TestVEInjectionHandling(t *testing.T) {
 
 			handler := process.ProcessProposalHandler(
 				constants.TestEncodingCfg.TxConfig,
+				bridgeKeeper,
 				mockClobKeeper,
 				&mocks.ProcessStakingKeeper{},
 				&mocks.ProcessPerpetualKeeper{},

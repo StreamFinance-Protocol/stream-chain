@@ -159,6 +159,8 @@ func (t *PrepareProposalTxs) GetTxsInOrder(veEnabled bool) ([][]byte, error) {
 		txsToReturn = append(txsToReturn, t.OtherTxs...)
 	}
 
+	txsToReturn = append(txsToReturn, t.AcknowledgeBridgesTx)
+
 	// 4. Funding samples.
 	// The validation for `AddPremiumVotesTx` is done at the beginning.
 	txsToReturn = append(txsToReturn, t.AddPremiumVotesTx)

@@ -18,11 +18,12 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/encoding"
 	keepertest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/keeper"
 	vetesting "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/ve"
+	bridgetypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
 	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	perpetualtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
-
 	cometabci "github.com/cometbft/cometbft/abci/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -57,6 +58,9 @@ type PerpareProposalHandlerTC struct {
 
 	pricesParamsResp              []pricestypes.MarketParam
 	pricesMarketPriceFromByesResp *pricestypes.MarketPriceUpdate
+
+	bridgeResp    *bridgetypes.MsgAcknowledgeBridges
+	bridgeEncoder sdk.TxEncoder
 
 	seenConsAddresses map[string]struct{}
 	veCacheHeight     int64
@@ -131,7 +135,7 @@ func TestPrepareProposalHandler(t *testing.T) {
 					cometabci.ExtendedCommitInfo{},
 					[][]byte{},
 					1,
-					1,
+					2,
 				)
 			},
 		},
@@ -148,7 +152,7 @@ func TestPrepareProposalHandler(t *testing.T) {
 					cometabci.ExtendedCommitInfo{},
 					[][]byte{},
 					1,
-					1,
+					2,
 				)
 			},
 		},
@@ -169,6 +173,66 @@ func TestPrepareProposalHandler(t *testing.T) {
 				)
 			},
 		},
+
+		// // "bridge" related.
+		"Error: GetAcknowledgeBridgesTx returns err": {
+			veEnabled:      false,
+			height:         1,
+			fundingResp:    &perpetualtypes.MsgAddPremiumVotes{},
+			fundingEncoder: passingTxEncoderOne,
+
+			bridgeResp:    &bridgetypes.MsgAcknowledgeBridges{},
+			bridgeEncoder: failingTxEncoder, // encoder fails and returns err.
+
+			expectedTxs: [][]byte{}, // error returns empty result.
+			request: func() *cometabci.RequestPrepareProposal {
+				return createRequestPrepareProposal(
+					cometabci.ExtendedCommitInfo{},
+					[][]byte{},
+					1,
+					2,
+				)
+			},
+		},
+
+		"Error: GetAcknowledgeBridgesTx returns empty": {
+			veEnabled:      false,
+			height:         1,
+			fundingResp:    &perpetualtypes.MsgAddPremiumVotes{},
+			fundingEncoder: passingTxEncoderOne,
+
+			bridgeResp:    &bridgetypes.MsgAcknowledgeBridges{},
+			bridgeEncoder: emptyTxEncoder, // encoder returns empty.
+
+			expectedTxs: [][]byte{}, // error returns empty result.
+			request: func() *cometabci.RequestPrepareProposal {
+				return createRequestPrepareProposal(
+					cometabci.ExtendedCommitInfo{},
+					[][]byte{},
+					1,
+					2,
+				)
+			},
+		},
+		"Error: SetAcknowledgeBridgesTx returns err": {
+			veEnabled:      false,
+			height:         1,
+			fundingResp:    &perpetualtypes.MsgAddPremiumVotes{},
+			fundingEncoder: passingTxEncoderOne, // takes up 1 byte
+
+			bridgeResp:    constants.MsgAcknowledgeBridges_Id0_Height0,
+			bridgeEncoder: passingTxEncoderOne, // takes up another 1 byte, so exceeds max.
+
+			expectedTxs: [][]byte{}, // error returns empty result.
+			request: func() *cometabci.RequestPrepareProposal {
+				return createRequestPrepareProposal(
+					cometabci.ExtendedCommitInfo{},
+					[][]byte{},
+					1,
+					2,
+				)
+			},
+		},
 		// "Others" related.
 		"Error: AddOtherTxs return error": {
 
@@ -177,6 +241,9 @@ func TestPrepareProposalHandler(t *testing.T) {
 
 			clobResp:    &clobtypes.MsgProposedOperations{},
 			clobEncoder: passingTxEncoderFour,
+
+			bridgeResp:    &bridgetypes.MsgAcknowledgeBridges{},
+			bridgeEncoder: passingTxEncoderFour,
 
 			veEnabled: false,
 
@@ -188,7 +255,7 @@ func TestPrepareProposalHandler(t *testing.T) {
 					cometabci.ExtendedCommitInfo{},
 					[][]byte{{}},
 					3,
-					13,
+					17,
 				)
 			},
 		},
@@ -199,6 +266,9 @@ func TestPrepareProposalHandler(t *testing.T) {
 
 			clobResp:    &clobtypes.MsgProposedOperations{},
 			clobEncoder: passingTxEncoderFour,
+
+			bridgeResp:    &bridgetypes.MsgAcknowledgeBridges{},
+			bridgeEncoder: passingTxEncoderFour,
 
 			veEnabled: false,
 
@@ -222,6 +292,9 @@ func TestPrepareProposalHandler(t *testing.T) {
 			clobResp:    &clobtypes.MsgProposedOperations{},
 			clobEncoder: passingTxEncoderFour,
 
+			bridgeResp:    &bridgetypes.MsgAcknowledgeBridges{},
+			bridgeEncoder: passingTxEncoderFour,
+
 			veEnabled: true,
 
 			pricesParamsResp:              constants.TestMarketParams,
@@ -232,6 +305,7 @@ func TestPrepareProposalHandler(t *testing.T) {
 			expectedTxs: [][]byte{
 				{1, 2, 3, 4},               // order.
 				constants.Msg_Send_TxBytes, // others.
+				{1, 2, 3, 4},               // bridges.
 				{1, 2, 3, 4},               // funding.
 			},
 
@@ -259,7 +333,7 @@ func TestPrepareProposalHandler(t *testing.T) {
 						constants.Msg_Send_TxBytes, // not included due to maxBytes.
 					},
 					3,
-					int64(8)+msgSendTxBytesLen+1+int64(len(bz)),
+					int64(12)+msgSendTxBytesLen+1+int64(len(bz)),
 				)
 			},
 		},
@@ -272,6 +346,9 @@ func TestPrepareProposalHandler(t *testing.T) {
 			pricesParamsResp:              constants.TestMarketParams,
 			pricesMarketPriceFromByesResp: constants.ValidMarketPriceUpdates[0],
 
+			bridgeResp:    &bridgetypes.MsgAcknowledgeBridges{},
+			bridgeEncoder: passingTxEncoderFour,
+
 			expectedPrices: constants.ValidVEPrices,
 
 			clobResp:    &clobtypes.MsgProposedOperations{},
@@ -280,6 +357,7 @@ func TestPrepareProposalHandler(t *testing.T) {
 				{1, 2, 3, 4},                          // order.
 				constants.Msg_Send_TxBytes,            // others.
 				constants.Msg_SendAndTransfer_TxBytes, // additional others.
+				{1, 2, 3, 4},                          // bridges.
 				{1, 2, 3, 4},                          // funding.
 			},
 			height:        3,
@@ -305,7 +383,7 @@ func TestPrepareProposalHandler(t *testing.T) {
 						constants.Msg_Send_TxBytes, // not included due t.
 					},
 					3,
-					int64(8)+msgSendTxBytesLen+msgSendAndTransferTxBytesLen+int64(len(bz)),
+					int64(12)+msgSendTxBytesLen+msgSendAndTransferTxBytesLen+int64(len(bz)),
 				)
 			},
 		},
@@ -317,6 +395,9 @@ func TestPrepareProposalHandler(t *testing.T) {
 			clobResp:    &clobtypes.MsgProposedOperations{},
 			clobEncoder: passingTxEncoderFour,
 
+			bridgeResp:    &bridgetypes.MsgAcknowledgeBridges{},
+			bridgeEncoder: passingTxEncoderFour,
+
 			pricesParamsResp:              constants.TestMarketParams,
 			pricesMarketPriceFromByesResp: constants.ValidMarketPriceUpdates[0],
 
@@ -325,6 +406,7 @@ func TestPrepareProposalHandler(t *testing.T) {
 
 			expectedTxs: [][]byte{
 				{1, 2, 3, 4}, // order.
+				{1, 2, 3, 4}, // bridges.
 				{1, 2, 3, 4}, // funding.
 			},
 
@@ -333,7 +415,7 @@ func TestPrepareProposalHandler(t *testing.T) {
 					cometabci.ExtendedCommitInfo{},
 					[][]byte{},
 					3,
-					int64(8),
+					int64(12),
 				)
 			},
 		},
@@ -343,6 +425,9 @@ func TestPrepareProposalHandler(t *testing.T) {
 
 			clobResp:    &clobtypes.MsgProposedOperations{},
 			clobEncoder: passingTxEncoderFour,
+
+			bridgeResp:    &bridgetypes.MsgAcknowledgeBridges{},
+			bridgeEncoder: passingTxEncoderFour,
 
 			pricesParamsResp:              constants.TestMarketParams,
 			pricesMarketPriceFromByesResp: constants.ValidMarketPriceUpdates[0],
@@ -369,7 +454,7 @@ func TestPrepareProposalHandler(t *testing.T) {
 					commitInfo,
 					[][]byte{},
 					3,
-					int64(8)+int64(len(bz)),
+					int64(12)+int64(len(bz)),
 				)
 
 				return prop
@@ -377,6 +462,7 @@ func TestPrepareProposalHandler(t *testing.T) {
 
 			expectedTxs: [][]byte{
 				{1, 2, 3, 4}, // order.
+				{1, 2, 3, 4}, // bridges.
 				{1, 2, 3, 4}, // funding.
 			},
 		},
@@ -386,6 +472,9 @@ func TestPrepareProposalHandler(t *testing.T) {
 
 			clobResp:    &clobtypes.MsgProposedOperations{},
 			clobEncoder: passingTxEncoderFour,
+
+			bridgeResp:    &bridgetypes.MsgAcknowledgeBridges{},
+			bridgeEncoder: passingTxEncoderFour,
 
 			pricesParamsResp:              constants.TestMarketParams,
 			pricesMarketPriceFromByesResp: constants.ValidMarketPriceUpdates[0],
@@ -417,7 +506,7 @@ func TestPrepareProposalHandler(t *testing.T) {
 					commitInfo,
 					proposal,
 					3,
-					int64(8)+msgSendTxBytesLen+msgSendAndTransferTxBytesLen+int64(len(bz)),
+					int64(12)+msgSendTxBytesLen+msgSendAndTransferTxBytesLen+int64(len(bz)),
 				)
 
 				return prop
@@ -427,6 +516,7 @@ func TestPrepareProposalHandler(t *testing.T) {
 				{1, 2, 3, 4},                          // order.
 				constants.Msg_SendAndTransfer_TxBytes, // others.
 				constants.Msg_Send_TxBytes,            // others.
+				{1, 2, 3, 4},                          // bridges.
 				{1, 2, 3, 4},                          // funding.
 			},
 		},
@@ -436,6 +526,9 @@ func TestPrepareProposalHandler(t *testing.T) {
 
 			clobResp:    &clobtypes.MsgProposedOperations{},
 			clobEncoder: passingTxEncoderFour,
+
+			bridgeResp:    &bridgetypes.MsgAcknowledgeBridges{},
+			bridgeEncoder: passingTxEncoderFour,
 
 			pricesParamsResp:              constants.TestMarketParams,
 			pricesMarketPriceFromByesResp: constants.ValidMarketPriceUpdates[0],
@@ -470,7 +563,7 @@ func TestPrepareProposalHandler(t *testing.T) {
 					commitInfo,
 					proposal,
 					3,
-					int64(8)+msgSendTxBytesLen+msgSendAndTransferTxBytesLen+int64(len(bz)),
+					int64(12)+msgSendTxBytesLen+msgSendAndTransferTxBytesLen+int64(len(bz)),
 				)
 
 				return prop
@@ -480,6 +573,7 @@ func TestPrepareProposalHandler(t *testing.T) {
 				{1, 2, 3, 4},                          // order.
 				constants.Msg_SendAndTransfer_TxBytes, // others.
 				constants.Msg_Send_TxBytes,            // others.
+				{1, 2, 3, 4},                          // bridges.
 				{1, 2, 3, 4},                          // funding.
 			},
 		},
@@ -489,6 +583,9 @@ func TestPrepareProposalHandler(t *testing.T) {
 
 			clobResp:    &clobtypes.MsgProposedOperations{},
 			clobEncoder: passingTxEncoderFour,
+
+			bridgeResp:    &bridgetypes.MsgAcknowledgeBridges{},
+			bridgeEncoder: passingTxEncoderFour,
 
 			pricesParamsResp:              constants.TestMarketParams,
 			pricesMarketPriceFromByesResp: constants.ValidMarketPriceUpdates[0],
@@ -522,7 +619,7 @@ func TestPrepareProposalHandler(t *testing.T) {
 					commitInfo,
 					proposal,
 					3,
-					int64(8)+msgSendTxBytesLen+msgSendAndTransferTxBytesLen+int64(len(bz)),
+					int64(12)+msgSendTxBytesLen+msgSendAndTransferTxBytesLen+int64(len(bz)),
 				)
 
 				return prop
@@ -532,6 +629,7 @@ func TestPrepareProposalHandler(t *testing.T) {
 				{1, 2, 3, 4},                          // order.
 				constants.Msg_SendAndTransfer_TxBytes, // others.
 				constants.Msg_Send_TxBytes,            // others.
+				{1, 2, 3, 4},                          // bridges.
 				{1, 2, 3, 4},                          // funding.
 			},
 		},
@@ -541,6 +639,9 @@ func TestPrepareProposalHandler(t *testing.T) {
 
 			clobResp:    &clobtypes.MsgProposedOperations{},
 			clobEncoder: passingTxEncoderFour,
+
+			bridgeResp:    &bridgetypes.MsgAcknowledgeBridges{},
+			bridgeEncoder: passingTxEncoderFour,
 
 			pricesParamsResp:              constants.TestMarketParams,
 			pricesMarketPriceFromByesResp: constants.ValidMarketPriceUpdates[0],
@@ -575,7 +676,7 @@ func TestPrepareProposalHandler(t *testing.T) {
 					commitInfo,
 					proposal,
 					3,
-					int64(8)+int64(len(bz)),
+					int64(12)+int64(len(bz)),
 				)
 
 				return prop
@@ -583,6 +684,7 @@ func TestPrepareProposalHandler(t *testing.T) {
 
 			expectedTxs: [][]byte{
 				{1, 2, 3, 4}, // order.
+				{1, 2, 3, 4}, // bridges.
 				{1, 2, 3, 4}, // funding.
 			},
 		},
@@ -595,6 +697,9 @@ func TestPrepareProposalHandler(t *testing.T) {
 
 			pricesParamsResp:              constants.TestMarketParams,
 			pricesMarketPriceFromByesResp: constants.ValidMarketPriceUpdates[0],
+
+			bridgeResp:    &bridgetypes.MsgAcknowledgeBridges{},
+			bridgeEncoder: passingTxEncoderFour,
 
 			veEnabled: true,
 			height:    3,
@@ -625,7 +730,7 @@ func TestPrepareProposalHandler(t *testing.T) {
 					commitInfo,
 					proposal,
 					3,
-					int64(8)+msgSendTxBytesLen+msgSendAndTransferTxBytesLen+int64(len(bz)),
+					int64(12)+msgSendTxBytesLen+msgSendAndTransferTxBytesLen+int64(len(bz)),
 				)
 
 				return prop
@@ -635,6 +740,7 @@ func TestPrepareProposalHandler(t *testing.T) {
 				{1, 2, 3, 4},                          // order.
 				constants.Msg_SendAndTransfer_TxBytes, // others.
 				constants.Msg_Send_TxBytes,            // others.
+				{1, 2, 3, 4},                          // bridges.
 				{1, 2, 3, 4},                          // funding.
 			},
 		},
@@ -644,6 +750,9 @@ func TestPrepareProposalHandler(t *testing.T) {
 
 			clobResp:    &clobtypes.MsgProposedOperations{},
 			clobEncoder: passingTxEncoderFour,
+
+			bridgeResp:    &bridgetypes.MsgAcknowledgeBridges{},
+			bridgeEncoder: passingTxEncoderFour,
 
 			pricesParamsResp:              constants.TestMarketParams,
 			pricesMarketPriceFromByesResp: constants.ValidMarketPriceUpdates[0],
@@ -677,7 +786,7 @@ func TestPrepareProposalHandler(t *testing.T) {
 					commitInfo,
 					proposal,
 					3,
-					int64(8)+msgSendTxBytesLen+msgSendAndTransferTxBytesLen+int64(len(bz)),
+					int64(12)+msgSendTxBytesLen+msgSendAndTransferTxBytesLen+int64(len(bz)),
 				)
 
 				return prop
@@ -687,7 +796,9 @@ func TestPrepareProposalHandler(t *testing.T) {
 				{1, 2, 3, 4},                          // order.
 				constants.Msg_SendAndTransfer_TxBytes, // others.
 				constants.Msg_Send_TxBytes,            // others.
-				{1, 2, 3, 4},                          // funding.
+				{1, 2, 3, 4},                          // bridges.
+
+				{1, 2, 3, 4}, // funding.
 			},
 		},
 		"Valid: Multiple VE's with other tx, cache is empty - accepts all": {
@@ -696,6 +807,9 @@ func TestPrepareProposalHandler(t *testing.T) {
 
 			clobResp:    &clobtypes.MsgProposedOperations{},
 			clobEncoder: passingTxEncoderFour,
+
+			bridgeResp:    &bridgetypes.MsgAcknowledgeBridges{},
+			bridgeEncoder: passingTxEncoderFour,
 
 			pricesParamsResp:              constants.TestMarketParams,
 			pricesMarketPriceFromByesResp: constants.ValidMarketPriceUpdates[0],
@@ -727,7 +841,7 @@ func TestPrepareProposalHandler(t *testing.T) {
 					commitInfo,
 					proposal,
 					3,
-					int64(8)+msgSendTxBytesLen+msgSendAndTransferTxBytesLen+int64(len(bz)),
+					int64(12)+msgSendTxBytesLen+msgSendAndTransferTxBytesLen+int64(len(bz)),
 				)
 
 				return prop
@@ -737,6 +851,7 @@ func TestPrepareProposalHandler(t *testing.T) {
 				{1, 2, 3, 4},                          // order.
 				constants.Msg_SendAndTransfer_TxBytes, // others.
 				constants.Msg_Send_TxBytes,            // others.
+				{1, 2, 3, 4},                          // bridges.
 				{1, 2, 3, 4},                          // funding.
 			},
 		},
@@ -747,14 +862,15 @@ func TestPrepareProposalHandler(t *testing.T) {
 				nil,
 				[]sdktypes.TxEncoder{
 					tc.fundingEncoder,
+					tc.bridgeEncoder,
 					tc.clobEncoder,
 				},
 			)
 
 			// necessary mock keepers
-			mPricesKeeper, mClobKeeper, mPerpKeeper, mRatelimitKeeper := buildMockKeepers()
+			mPricesKeeper, mClobKeeper, mPerpKeeper, mRatelimitKeeper, mBridgeKeeper := buildMockKeepers()
 
-			setMockResponses(mPricesKeeper, mRatelimitKeeper, mClobKeeper, mPerpKeeper, tc)
+			setMockResponses(mBridgeKeeper, mPricesKeeper, mRatelimitKeeper, mClobKeeper, mPerpKeeper, tc)
 
 			ctx, _, _, _, _, _ := keepertest.PricesKeepers(t)
 
@@ -770,6 +886,7 @@ func TestPrepareProposalHandler(t *testing.T) {
 
 			handler := prepare.PrepareProposalHandler(
 				mockTxConfig,
+				mBridgeKeeper,
 				mClobKeeper,
 				mPerpKeeper,
 				mPricesKeeper,
@@ -819,7 +936,10 @@ func TestPrepareProposalHandler_OtherTxs(t *testing.T) {
 				multiMsgsTxHasDisallowMixedTxBytes, // filtered out.
 			},
 			expectedTxs: [][]byte{
-				constants.ValidEmptyMsgProposedOperationsTxBytes, // order.
+
+				constants.ValidEmptyMsgProposedOperationsTxBytes,       // order.
+				constants.MsgAcknowledgeBridges_Ids0_1_Height0_TxBytes, // bridge.
+
 				// no other txs.
 				constants.ValidMsgAddPremiumVotesTxBytes, // funding.
 
@@ -836,10 +956,12 @@ func TestPrepareProposalHandler_OtherTxs(t *testing.T) {
 				constants.ValidMsgAddPremiumVotesTxBytes, // filtered out.
 			},
 			expectedTxs: [][]byte{
-				constants.ValidEmptyMsgProposedOperationsTxBytes, // order.
-				constants.Msg_SendAndTransfer_TxBytes,            // others.
-				constants.Msg_Send_TxBytes,                       // others.
-				constants.ValidMsgAddPremiumVotesTxBytes,         // funding.
+				constants.ValidEmptyMsgProposedOperationsTxBytes,       // order.
+				constants.Msg_SendAndTransfer_TxBytes,                  // others.
+				constants.Msg_Send_TxBytes,                             // others.
+				constants.MsgAcknowledgeBridges_Ids0_1_Height0_TxBytes, // bridge.
+
+				constants.ValidMsgAddPremiumVotesTxBytes, // funding.
 
 			},
 			veEnabled: false,
@@ -851,6 +973,10 @@ func TestPrepareProposalHandler_OtherTxs(t *testing.T) {
 			mockPricesKeeper := mocks.PreBlockExecPricesKeeper{}
 			mockPricesKeeper.On("GetAllMarketParams", mock.Anything).
 				Return(constants.ValidEmptyMarketParams)
+
+			mockBridgeKeeper := mocks.PrepareBridgeKeeper{}
+			mockBridgeKeeper.On("GetAcknowledgeBridges", mock.Anything, mock.Anything).
+				Return(constants.MsgAcknowledgeBridges_Ids0_1_Height0)
 
 			mockRatelimitKeeper := mocks.VoteExtensionRateLimitKeeper{}
 			mockRatelimitKeeper.On("GetSDAILastBlockUpdated", mock.Anything).
@@ -876,6 +1002,7 @@ func TestPrepareProposalHandler_OtherTxs(t *testing.T) {
 
 			handler := prepare.PrepareProposalHandler(
 				encodingCfg.TxConfig,
+				&mockBridgeKeeper,
 				&mockClobKeeper,
 				&mockPerpKeeper,
 				&mockPricesKeeper,
@@ -1098,16 +1225,18 @@ func createRequestPrepareProposal(
 	}
 }
 
-func buildMockKeepers() (*mocks.PreBlockExecPricesKeeper, *mocks.PrepareClobKeeper, *mocks.PreparePerpetualsKeeper, *mocks.VoteExtensionRateLimitKeeper) {
+func buildMockKeepers() (*mocks.PreBlockExecPricesKeeper, *mocks.PrepareClobKeeper, *mocks.PreparePerpetualsKeeper, *mocks.VoteExtensionRateLimitKeeper, *mocks.PrepareBridgeKeeper) {
 	mPricesk := &mocks.PreBlockExecPricesKeeper{}
 	mClobk := &mocks.PrepareClobKeeper{}
 	mPerpk2 := &mocks.PreparePerpetualsKeeper{}
 	mRatelimitk := &mocks.VoteExtensionRateLimitKeeper{}
+	mBridgek := &mocks.PrepareBridgeKeeper{}
 
-	return mPricesk, mClobk, mPerpk2, mRatelimitk
+	return mPricesk, mClobk, mPerpk2, mRatelimitk, mBridgek
 }
 
 func setMockResponses(
+	mBridgeKeeper *mocks.PrepareBridgeKeeper,
 	mPricesKeeper *mocks.PreBlockExecPricesKeeper,
 	mRatelimitKeeper *mocks.VoteExtensionRateLimitKeeper,
 	mClobKeeper *mocks.PrepareClobKeeper,
@@ -1126,6 +1255,8 @@ func setMockResponses(
 		Return(new(big.Int), false)
 	mRatelimitKeeper.On("GetSDAIPrice", mock.Anything).
 		Return(new(big.Int), false)
+	mBridgeKeeper.On("GetAcknowledgeBridges", mock.Anything, mock.Anything).
+		Return(tc.bridgeResp)
 }
 
 func getResponseTransactionsWithoutExtInfo(txs [][]byte) [][]byte {

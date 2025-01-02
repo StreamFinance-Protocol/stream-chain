@@ -13,6 +13,7 @@ type TestFunction int
 
 const (
 	testAddPremiumVotes TestFunction = iota
+	testAcknowledgeBridges
 	testProposedOperations
 )
 
@@ -28,6 +29,7 @@ func Test_NewPrepareProposalTransactions_Success(t *testing.T) {
 
 	require.Nil(t, ppt.ExtInfoBz)
 	require.Nil(t, ppt.AddPremiumVotesTx)
+	require.Nil(t, ppt.AcknowledgeBridgesTx)
 	require.Nil(t, ppt.ProposedOperationsTx)
 	require.Nil(t, ppt.OtherTxs)
 }
@@ -40,6 +42,10 @@ func Test_NewPrepareProposalTransactions_Fail(t *testing.T) {
 
 	require.ErrorContains(t, err, "MaxTxBytes must be positive")
 	require.Equal(t, prepare.PrepareProposalTxs{}, ppt)
+}
+
+func Test_SetAcknowledgeBridgesTx(t *testing.T) {
+	setterTestCases(t, testAcknowledgeBridges)
 }
 
 func Test_SetAddPremiumVotesTx(t *testing.T) {
@@ -110,6 +116,8 @@ func setterTestHelper(tFunc TestFunction, target *prepare.PrepareProposalTxs, va
 	switch tFunc {
 	case testAddPremiumVotes:
 		return target.SetAddPremiumVotesTx(value)
+	case testAcknowledgeBridges:
+		return target.SetAcknowledgeBridgesTx(value)
 	case testProposedOperations:
 		return target.SetProposedOperationsTx(value)
 	default:
@@ -121,6 +129,8 @@ func getterTestHelper(tFunc TestFunction, target *prepare.PrepareProposalTxs) []
 	switch tFunc {
 	case testAddPremiumVotes:
 		return target.AddPremiumVotesTx
+	case testAcknowledgeBridges:
+		return target.AcknowledgeBridgesTx
 	case testProposedOperations:
 		return target.ProposedOperationsTx
 	default:
@@ -359,6 +369,7 @@ func Test_GetTxsInOrder(t *testing.T) {
 		operationsTx       []byte
 		otherTxs           [][]byte
 		otherAdditionalTxs [][]byte
+		bridgeTx           []byte
 		fundingTx          []byte
 		extInfoBz          []byte
 
@@ -370,6 +381,7 @@ func Test_GetTxsInOrder(t *testing.T) {
 			operationsTx:       []byte{},
 			otherTxs:           [][]byte{},
 			otherAdditionalTxs: [][]byte{},
+			bridgeTx:           []byte{},
 			fundingTx:          []byte{},
 			extInfoBz:          []byte{},
 
@@ -380,6 +392,7 @@ func Test_GetTxsInOrder(t *testing.T) {
 		"extInfo is not set": {
 			operationsTx:       []byte{},
 			otherTxs:           [][]byte{},
+			bridgeTx:           []byte{4, 5},
 			otherAdditionalTxs: [][]byte{},
 			fundingTx:          []byte{2, 3},
 			extInfoBz:          nil,
@@ -388,36 +401,39 @@ func Test_GetTxsInOrder(t *testing.T) {
 			expectedErr: errors.New("ExtInfoBz must be set"),
 			veEnabled:   true,
 		},
-		"funding and extInfo only": {
+		"funding, bridge, and extInfo only": {
 			operationsTx:       []byte{},
 			otherTxs:           [][]byte{},
+			bridgeTx:           []byte{6, 7},
 			otherAdditionalTxs: [][]byte{},
 			fundingTx:          []byte{2, 3},
 			extInfoBz:          []byte{4, 5},
 
-			expectedTxs: [][]byte{{4, 5}, {2, 3}},
+			expectedTxs: [][]byte{{4, 5}, {6, 7}, {2, 3}},
 			expectedErr: nil,
 			veEnabled:   true,
 		},
-		"funding + matched orders + extInfo": {
+		"funding + matched orders + extInfo + bridge": {
 			operationsTx:       []byte{4, 5, 6},
 			otherTxs:           [][]byte{},
 			otherAdditionalTxs: [][]byte{},
+			bridgeTx:           []byte{7},
 			fundingTx:          []byte{2},
 			extInfoBz:          []byte{1},
 
-			expectedTxs: [][]byte{{1}, {4, 5, 6}, {2}},
+			expectedTxs: [][]byte{{1}, {4, 5, 6}, {7}, {2}},
 			expectedErr: nil,
 			veEnabled:   true,
 		},
-		"funding + others": {
+		"funding + others + bridge": {
 			operationsTx:       []byte{},
 			otherTxs:           [][]byte{{4}, {5, 6}},
 			otherAdditionalTxs: [][]byte{},
+			bridgeTx:           []byte{7},
 			fundingTx:          []byte{2},
 			extInfoBz:          []byte{1},
 
-			expectedTxs: [][]byte{{1}, {4}, {5, 6}, {2}},
+			expectedTxs: [][]byte{{1}, {4}, {5, 6}, {7}, {2}},
 			expectedErr: nil,
 			veEnabled:   true,
 		},
@@ -425,10 +441,11 @@ func Test_GetTxsInOrder(t *testing.T) {
 			operationsTx:       []byte{4, 5, 6},
 			otherTxs:           [][]byte{{7, 8}, {9, 10}},
 			otherAdditionalTxs: [][]byte{},
+			bridgeTx:           []byte{15},
 			fundingTx:          []byte{2, 3},
 			extInfoBz:          []byte{11, 12},
 
-			expectedTxs: [][]byte{{11, 12}, {4, 5, 6}, {7, 8}, {9, 10}, {2, 3}},
+			expectedTxs: [][]byte{{11, 12}, {4, 5, 6}, {7, 8}, {9, 10}, {15}, {2, 3}},
 			expectedErr: nil,
 			veEnabled:   true,
 		},
@@ -436,10 +453,11 @@ func Test_GetTxsInOrder(t *testing.T) {
 			operationsTx:       []byte{4, 5},
 			otherTxs:           [][]byte{{6}, {7, 8}},
 			otherAdditionalTxs: [][]byte{{9}, {10}},
+			bridgeTx:           []byte{13, 14},
 			fundingTx:          []byte{2, 3},
 			extInfoBz:          []byte{11, 12},
 
-			expectedTxs: [][]byte{{11, 12}, {4, 5}, {6}, {7, 8}, {9}, {10}, {2, 3}},
+			expectedTxs: [][]byte{{11, 12}, {4, 5}, {6}, {7, 8}, {9}, {10}, {13, 14}, {2, 3}},
 			expectedErr: nil,
 			veEnabled:   true,
 		},
@@ -447,10 +465,11 @@ func Test_GetTxsInOrder(t *testing.T) {
 			operationsTx:       []byte{4, 5},
 			otherTxs:           [][]byte{{6}, {7, 8}},
 			otherAdditionalTxs: [][]byte{{9}, {10}},
+			bridgeTx:           []byte{12},
 			fundingTx:          []byte{2, 3},
 			extInfoBz:          []byte{11, 12},
 
-			expectedTxs: [][]byte{{4, 5}, {6}, {7, 8}, {9}, {10}, {2, 3}},
+			expectedTxs: [][]byte{{4, 5}, {6}, {7, 8}, {9}, {10}, {12}, {2, 3}},
 			expectedErr: nil,
 			veEnabled:   false,
 		},
@@ -458,6 +477,7 @@ func Test_GetTxsInOrder(t *testing.T) {
 			operationsTx:       []byte{4, 5},
 			otherTxs:           [][]byte{{6}, {7, 8}},
 			otherAdditionalTxs: [][]byte{{9}, {10}},
+			bridgeTx:           []byte{12},
 			fundingTx:          []byte{2, 3},
 			extInfoBz:          nil,
 
@@ -471,11 +491,11 @@ func Test_GetTxsInOrder(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			ppt, err := prepare.NewPrepareProposalTxs(
 				&abci.RequestPrepareProposal{
-					MaxTxBytes: 11,
+					MaxTxBytes: 13,
 				},
 			)
 			require.NoError(t, err)
-			require.Equal(t, uint64(11), ppt.MaxBytes)
+			require.Equal(t, uint64(13), ppt.MaxBytes)
 			require.Equal(t, uint64(0), ppt.UsedBytes)
 
 			if tc.extInfoBz != nil {
@@ -484,6 +504,9 @@ func Test_GetTxsInOrder(t *testing.T) {
 			}
 
 			err = ppt.SetAddPremiumVotesTx(tc.fundingTx)
+			require.NoError(t, err)
+
+			err = ppt.SetAcknowledgeBridgesTx(tc.bridgeTx)
 			require.NoError(t, err)
 
 			err = ppt.SetProposedOperationsTx(tc.operationsTx)

@@ -9,6 +9,7 @@ import (
 	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/app/config"
+	bridgemoduletypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
 	perpetualsmoduletypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	ratelimittypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
@@ -32,6 +33,8 @@ var (
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner}, // Note: TDaiPoolAccount is another name for ibctransfertypes.ModuleName
 		icatypes.ModuleName:            nil,
 		// -------- klyra custom module accounts --------
+		// bridge module account mints tokens for bridged funds.
+		bridgemoduletypes.ModuleName: {authtypes.Minter},
 		// subaccounts module account holds tokens for all subaccounts.
 		satypes.ModuleName: nil,
 		// insurance fund account manages insurance fund for liquidations.

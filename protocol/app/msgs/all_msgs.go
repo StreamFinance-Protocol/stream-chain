@@ -153,16 +153,16 @@ var (
 		"/klyraprotocol.blocktime.MsgUpdateDowntimeParamsResponse": {},
 
 		// bridge
-		"/dydxprotocol.bridge.MsgAcknowledgeBridges":          {},
-		"/dydxprotocol.bridge.MsgAcknowledgeBridgesResponse":  {},
-		"/dydxprotocol.bridge.MsgCompleteBridge":              {},
-		"/dydxprotocol.bridge.MsgCompleteBridgeResponse":      {},
-		"/dydxprotocol.bridge.MsgUpdateEventParams":           {},
-		"/dydxprotocol.bridge.MsgUpdateEventParamsResponse":   {},
-		"/dydxprotocol.bridge.MsgUpdateProposeParams":         {},
-		"/dydxprotocol.bridge.MsgUpdateProposeParamsResponse": {},
-		"/dydxprotocol.bridge.MsgUpdateSafetyParams":          {},
-		"/dydxprotocol.bridge.MsgUpdateSafetyParamsResponse":  {},
+		"/klyraprotocol.bridge.MsgAcknowledgeBridges":          {},
+		"/klyraprotocol.bridge.MsgAcknowledgeBridgesResponse":  {},
+		"/klyraprotocol.bridge.MsgCompleteBridge":              {},
+		"/klyraprotocol.bridge.MsgCompleteBridgeResponse":      {},
+		"/klyraprotocol.bridge.MsgUpdateEventParams":           {},
+		"/klyraprotocol.bridge.MsgUpdateEventParamsResponse":   {},
+		"/klyraprotocol.bridge.MsgUpdateProposeParams":         {},
+		"/klyraprotocol.bridge.MsgUpdateProposeParamsResponse": {},
+		"/klyraprotocol.bridge.MsgUpdateSafetyParams":          {},
+		"/klyraprotocol.bridge.MsgUpdateSafetyParamsResponse":  {},
 
 		// clob
 		"/klyraprotocol.clob.MsgBatchCancel":                                {},

@@ -14,7 +14,7 @@ var (
 	// AppInjectedMsgSamples are msgs that are injected into the block by the proposing validator.
 	// These messages are reserved for proposing validator's use only.
 	AppInjectedMsgSamples = map[string]sdk.Msg{
-		"/dydxprotocol.bridge.MsgAcknowledgeBridges": &bridgetypes.MsgAcknowledgeBridges{
+		"/klyraprotocol.bridge.MsgAcknowledgeBridges": &bridgetypes.MsgAcknowledgeBridges{
 			Events: []bridgetypes.BridgeEvent{
 				{
 					Id: 0,
@@ -26,7 +26,7 @@ var (
 				},
 			},
 		},
-		"/dydxprotocol.bridge.MsgAcknowledgeBridgesResponse": nil,
+		"/klyraprotocol.bridge.MsgAcknowledgeBridgesResponse": nil,
 		// clob
 		"/klyraprotocol.clob.MsgProposedOperations": &clobtypes.MsgProposedOperations{
 			OperationsQueue: make([]clobtypes.OperationRaw, 0),

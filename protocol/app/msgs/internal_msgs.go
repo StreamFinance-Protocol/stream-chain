@@ -124,14 +124,14 @@ var (
 		"/klyraprotocol.delaymsg.MsgDelayMessageResponse": nil,
 
 		// bridge
-		"/dydxprotocol.bridge.MsgCompleteBridge":              &bridge.MsgCompleteBridge{},
-		"/dydxprotocol.bridge.MsgCompleteBridgeResponse":      nil,
-		"/dydxprotocol.bridge.MsgUpdateEventParams":           &bridge.MsgUpdateEventParams{},
-		"/dydxprotocol.bridge.MsgUpdateEventParamsResponse":   nil,
-		"/dydxprotocol.bridge.MsgUpdateProposeParams":         &bridge.MsgUpdateProposeParams{},
-		"/dydxprotocol.bridge.MsgUpdateProposeParamsResponse": nil,
-		"/dydxprotocol.bridge.MsgUpdateSafetyParams":          &bridge.MsgUpdateSafetyParams{},
-		"/dydxprotocol.bridge.MsgUpdateSafetyParamsResponse":  nil,
+		"/klyraprotocol.bridge.MsgCompleteBridge":              &bridge.MsgCompleteBridge{},
+		"/klyraprotocol.bridge.MsgCompleteBridgeResponse":      nil,
+		"/klyraprotocol.bridge.MsgUpdateEventParams":           &bridge.MsgUpdateEventParams{},
+		"/klyraprotocol.bridge.MsgUpdateEventParamsResponse":   nil,
+		"/klyraprotocol.bridge.MsgUpdateProposeParams":         &bridge.MsgUpdateProposeParams{},
+		"/klyraprotocol.bridge.MsgUpdateProposeParamsResponse": nil,
+		"/klyraprotocol.bridge.MsgUpdateSafetyParams":          &bridge.MsgUpdateSafetyParams{},
+		"/klyraprotocol.bridge.MsgUpdateSafetyParamsResponse":  nil,
 
 		// feetiers
 		"/klyraprotocol.feetiers.MsgUpdatePerpetualFeeParams":         &feetiers.MsgUpdatePerpetualFeeParams{},

@@ -53,6 +53,9 @@ func GetDefaultTestAppOptions(homePath string, customFlags map[string]interface{
 	// Disable the Liquidation Daemon for all end-to-end and integration tests by default.
 	fao.Set(daemonflags.FlagDeleveragingDaemonEnabled, false)
 
+	// Disable the Bridge Daemon for all end-to-end and integration tests by default.
+	fao.Set(daemonflags.FlagBridgeDaemonEnabled, false)
+
 	// Populate the default value for gRPC.
 	fao.Set(appflags.GrpcAddress, config.DefaultGRPCAddress)
 

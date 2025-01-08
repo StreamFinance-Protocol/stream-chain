@@ -8,6 +8,7 @@ import (
 	feegrantmodule "cosmossdk.io/x/feegrant/module"
 	"cosmossdk.io/x/upgrade"
 	custommodule "github.com/StreamFinance-Protocol/stream-chain/protocol/app/module"
+	bridgemodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge"
 	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers"
 	perpetualtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
@@ -16,6 +17,7 @@ import (
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module/testutil"
+
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/consensus"
@@ -52,6 +54,7 @@ func GetTestEncodingCfg() testutil.TestEncodingConfig {
 		consensus.AppModuleBasic{},
 
 		// Custom modules
+		bridgemodule.AppModuleBasic{},
 		subaccountsmodule.AppModuleBasic{})
 
 	msgInterfacesToRegister := []sdk.Msg{

@@ -3,6 +3,7 @@ package process_test
 import (
 	"testing"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/app/process"
 	vecodec "github.com/StreamFinance-Protocol/stream-chain/protocol/app/ve/codec"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/mocks"
@@ -12,6 +13,7 @@ import (
 	testmsgs "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/msgs"
 	vetesting "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/ve"
 	bridgetypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/stretchr/testify/mock"
@@ -27,10 +29,10 @@ func TestProcessProposalHandler_Error(t *testing.T) {
 		Status: abci.ResponseProcessProposal_REJECT,
 	}
 
-	// // Invalid acknowledge bridges txs.
-	// acknowledgeBridgesTx_IdsNotConsecutive := constants.MsgAcknowledgeBridges_Ids0_55_Height0_TxBytes
-	// acknowledgeBridgesTx_NotRecognized := constants.MsgAcknowledgeBridges_Id55_Height15_TxBytes
-	// acknowledgeBridgesTx_NotNextToAcknowledge := constants.MsgAcknowledgeBridges_Id1_Height0_TxBytes
+	// Invalid acknowledge bridges txs.
+	acknowledgeBridgesTx_IdsNotConsecutive := constants.MsgAcknowledgeBridges_Ids0_55_Height0_TxBytes
+	acknowledgeBridgesTx_NotRecognized := constants.MsgAcknowledgeBridges_Id55_Height15_TxBytes
+	acknowledgeBridgesTx_NotNextToAcknowledge := constants.MsgAcknowledgeBridges_Id1_Height0_TxBytes
 
 	// Valid operations tx.
 	validOperationsTx := constants.ValidEmptyMsgProposedOperationsTxBytes
@@ -47,7 +49,7 @@ func TestProcessProposalHandler_Error(t *testing.T) {
 	// // Valid acknowledge bridges tx.
 	validAcknowledgeBridgesTx := constants.MsgAcknowledgeBridges_Ids0_1_Height0_TxBytes
 	validAcknowledgeBridgesMsg := constants.MsgAcknowledgeBridges_Ids0_1_Height0
-	// validAcknowledgeBridgesTx_NoEvents := constants.MsgAcknowledgeBridges_NoEvents_TxBytes
+	validAcknowledgeBridgesTx_NoEvents := constants.MsgAcknowledgeBridges_NoEvents_TxBytes
 
 	tests := map[string]struct {
 		bridgeEventsInServer []bridgetypes.BridgeEvent
@@ -62,12 +64,23 @@ func TestProcessProposalHandler_Error(t *testing.T) {
 		},
 		"Error: place order type is not allowed": {
 			txsBytes: [][]byte{
-				{}, // empty for ve.
 				validOperationsTx,
 				constants.Msg_PlaceOrder_TxBtyes, // invalid other txs.
+				validAcknowledgeBridgesTx,
 				validAddFundingTx,
 			},
-			expectedResponse: rejectResponse,
+			bridgeEventsInServer: validAcknowledgeBridgesMsg.Events,
+			expectedResponse:     rejectResponse,
+		},
+		"Error: cancel order type is not allowed": {
+			txsBytes: [][]byte{
+				validOperationsTx,
+				constants.Msg_CancelOrder_TxBtyes, // invalid other txs.
+				validAcknowledgeBridgesTx,
+				validAddFundingTx,
+			},
+			bridgeEventsInServer: validAcknowledgeBridgesMsg.Events,
+			expectedResponse:     rejectResponse,
 		},
 		"Reject: bridge events are non-empty and bridging is disabled": {
 			txsBytes: [][]byte{
@@ -80,20 +93,59 @@ func TestProcessProposalHandler_Error(t *testing.T) {
 			bridgingDisabled:     true,
 			expectedResponse:     rejectResponse,
 		},
+		"Reject: bridge event IDs not consecutive": {
+			txsBytes: [][]byte{
+				validOperationsTx,
+				acknowledgeBridgesTx_IdsNotConsecutive,
+				validAddFundingTx,
+			},
+			bridgeEventsInServer: validAcknowledgeBridgesMsg.Events,
+			expectedResponse:     rejectResponse,
+		},
+		"Reject: bridge event ID not yet recognized": {
+			txsBytes: [][]byte{
+				validOperationsTx,
+				acknowledgeBridgesTx_NotRecognized,
+				validAddFundingTx,
+			},
+			bridgeEventsInServer: validAcknowledgeBridgesMsg.Events,
+			expectedResponse:     rejectResponse,
+		},
+		"Reject: bridge event ID not next to acknowledge": {
+			txsBytes: [][]byte{
+				validOperationsTx,
+				acknowledgeBridgesTx_NotNextToAcknowledge,
+				validAddFundingTx,
+			},
+			bridgeEventsInServer: validAcknowledgeBridgesMsg.Events,
+			expectedResponse:     rejectResponse,
+		},
+		"Reject: bridge event content mismatch": {
+			txsBytes: [][]byte{
+				validOperationsTx,
+				validAcknowledgeBridgesTx,
+				validAddFundingTx,
+			},
+			bridgeEventsInServer: []bridgetypes.BridgeEvent{
+				validAcknowledgeBridgesMsg.Events[0],
+				func(event bridgetypes.BridgeEvent) bridgetypes.BridgeEvent {
+					return bridgetypes.BridgeEvent{
+						Id: event.Id,
+						Coin: sdk.NewCoin(
+							event.Coin.Denom,
+							event.Coin.Amount.Add(sdkmath.NewInt(10_000)), // second event has different amount.
+						),
+						Address:        event.Address,
+						EthBlockHeight: event.EthBlockHeight,
+					}
+				}(validAcknowledgeBridgesMsg.Events[1]),
+			},
+			expectedResponse: rejectResponse,
+		},
 		"Error: VE injected data is not at top of block": {
 			txsBytes: [][]byte{
 				validOperationsTx,
 				{}, // empty for ve.
-				validAcknowledgeBridgesTx,
-				validAddFundingTx,
-			},
-			expectedResponse: rejectResponse,
-		},
-		"Error: cancel order type is not allowed": {
-			txsBytes: [][]byte{
-				{}, // empty for ve.
-				validOperationsTx,
-				constants.Msg_CancelOrder_TxBtyes, // invalid other txs.
 				validAcknowledgeBridgesTx,
 				validAddFundingTx,
 			},
@@ -116,6 +168,27 @@ func TestProcessProposalHandler_Error(t *testing.T) {
 				validAddFundingTx,
 			},
 			expectedResponse: rejectResponse,
+		},
+		"Accept: bridge tx with no events": {
+			txsBytes: [][]byte{
+				{}, // empty for ve.
+				validOperationsTx,
+				validSingleMsgOtherTx,
+				validAcknowledgeBridgesTx_NoEvents,
+				validAddFundingTx,
+			},
+			expectedResponse: acceptResponse,
+		},
+		"Accept: bridge tx with no events and bridging is disabled": {
+			txsBytes: [][]byte{
+				{}, // empty for ve.
+				validOperationsTx,
+				validSingleMsgOtherTx,
+				validAcknowledgeBridgesTx_NoEvents,
+				validAddFundingTx,
+			},
+			bridgingDisabled: true,
+			expectedResponse: acceptResponse,
 		},
 		"Error: internal msg type is not allowed": {
 			txsBytes: [][]byte{

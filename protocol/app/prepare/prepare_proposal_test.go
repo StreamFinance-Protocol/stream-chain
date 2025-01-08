@@ -41,6 +41,9 @@ var (
 	passingTxEncoderOne = func(tx sdktypes.Tx) ([]byte, error) {
 		return []byte{1}, nil
 	}
+	passingTxEncoderTwo = func(tx sdk.Tx) ([]byte, error) {
+		return []byte{1, 2}, nil
+	}
 	passingTxEncoderFour = func(tx sdktypes.Tx) ([]byte, error) {
 		return []byte{1, 2, 3, 4}, nil
 	}
@@ -1190,6 +1193,68 @@ func TestEncodeMsgsIntoTxBytes(t *testing.T) {
 				require.NoError(t, err)
 			}
 			require.Equal(t, tc.expectedTx, tx)
+		})
+	}
+}
+
+func TestGetAcknowledgeBridgesTx(t *testing.T) {
+	tests := map[string]struct {
+		keeperResp *bridgetypes.MsgAcknowledgeBridges
+		txEncoder  sdk.TxEncoder
+
+		expectedTx         []byte
+		expectedNumBridges int
+		expectedErr        error
+	}{
+		"empty list of msgs": {
+			keeperResp: &bridgetypes.MsgAcknowledgeBridges{},
+			txEncoder:  passingTxEncoderOne,
+
+			expectedTx:         []byte{1},
+			expectedNumBridges: 0,
+		},
+		"empty tx": {
+			keeperResp: &bridgetypes.MsgAcknowledgeBridges{},
+			txEncoder:  emptyTxEncoder, // returns empty tx.
+
+			expectedErr: fmt.Errorf("Invalid tx: []"),
+		},
+		"valid messages, but encoding fails": {
+			keeperResp: &bridgetypes.MsgAcknowledgeBridges{},
+			txEncoder:  failingTxEncoder,
+
+			expectedErr: fmt.Errorf("encoder failed"),
+		},
+		"1 bridge event": {
+			keeperResp: constants.MsgAcknowledgeBridges_Id0_Height0,
+			txEncoder:  passingTxEncoderTwo,
+
+			expectedTx:         []byte{1, 2},
+			expectedNumBridges: 1,
+		},
+		"2 bridge events": {
+			keeperResp: constants.MsgAcknowledgeBridges_Ids0_1_Height0,
+			txEncoder:  passingTxEncoderFour,
+
+			expectedTx:         []byte{1, 2, 3, 4},
+			expectedNumBridges: 2,
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			mockTxConfig := createMockTxConfig(nil, []sdk.TxEncoder{tc.txEncoder})
+			mockBridgeKeeper := mocks.PrepareBridgeKeeper{}
+			mockBridgeKeeper.On("GetAcknowledgeBridges", mock.Anything, mock.Anything).
+				Return(tc.keeperResp)
+
+			resp, err := prepare.GetAcknowledgeBridgesTx(ctx, mockTxConfig, &mockBridgeKeeper)
+			if tc.expectedErr != nil {
+				require.Equal(t, err, tc.expectedErr)
+			} else {
+				require.NoError(t, err)
+			}
+			require.Equal(t, tc.expectedTx, resp.Tx)
+			require.Equal(t, tc.expectedNumBridges, resp.NumBridges)
 		})
 	}
 }

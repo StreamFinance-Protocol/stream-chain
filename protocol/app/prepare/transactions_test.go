@@ -473,6 +473,18 @@ func Test_GetTxsInOrder(t *testing.T) {
 			expectedErr: nil,
 			veEnabled:   false,
 		},
+		"acknowledge bridges is not set": {
+			operationsTx:       []byte{},
+			otherTxs:           [][]byte{},
+			otherAdditionalTxs: [][]byte{},
+			bridgeTx:           []byte{},
+			fundingTx:          []byte{2},
+			extInfoBz:          []byte{1},
+
+			expectedTxs: nil,
+			expectedErr: errors.New("AcknowledgeBridgesTx must be set"),
+			veEnabled:   false,
+		},
 		"ve enabled with no extInfo": {
 			operationsTx:       []byte{4, 5},
 			otherTxs:           [][]byte{{6}, {7, 8}},

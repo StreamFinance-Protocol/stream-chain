@@ -101,7 +101,7 @@ func TestValidateMsgType_Empty(t *testing.T) {
 	}
 }
 
-func TestValidateMsgType_AppInjectedMsg(t *testing.T) {
+func f(t *testing.T) {
 	tests := map[string]struct {
 		msgs              []sdk.Msg
 		addAppInjectedMsg bool

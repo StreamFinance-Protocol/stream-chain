@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/app"
+	bridgemoduletypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
 	perpetualsmoduletypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	ratelimittypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
@@ -19,6 +20,7 @@ import (
 func TestModuleAccountsToAddresses(t *testing.T) {
 	expectedModuleAccToAddresses := map[string]string{
 		authtypes.FeeCollectorName:              "klyra17xpfvakm2amg962yls6f84z3kell8c5lx3ctrp",
+		bridgemoduletypes.ModuleName:            "klyra1zlefkpe3g0vvm9a4h0jf9000lmqutlh9dl8uc8",
 		distrtypes.ModuleName:                   "klyra1jv65s3grqf6v6jl3dp4t6c9t9rk99cd83hlhpr",
 		stakingtypes.BondedPoolName:             "klyra1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3rnjy3t",
 		stakingtypes.NotBondedPoolName:          "klyra1tygms3xhhs3yv487phx3dw4a95jn7t7lhnw48l",
@@ -54,6 +56,7 @@ func TestMaccPerms(t *testing.T) {
 	maccPerms := app.GetMaccPerms()
 	expectedMaccPerms := map[string][]string{
 		"bonded_tokens_pool":     {"burner", "staking"},
+		"bridge":                 {"minter"},
 		"distribution":           nil,
 		"fee_collector":          nil,
 		"gov":                    {"burner"},
@@ -71,6 +74,7 @@ func TestMaccPerms(t *testing.T) {
 func TestModuleAccountAddrs(t *testing.T) {
 	expectedModuleAccAddresses := map[string]bool{
 		"klyra17xpfvakm2amg962yls6f84z3kell8c5lx3ctrp": true, // x/auth.FeeCollector
+		"klyra1zlefkpe3g0vvm9a4h0jf9000lmqutlh9dl8uc8": true, // x/bridge
 		"klyra1jv65s3grqf6v6jl3dp4t6c9t9rk99cd83hlhpr": true, // x/distribution
 		"klyra1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3rnjy3t": true, // x/staking.bondedPool
 		"klyra1tygms3xhhs3yv487phx3dw4a95jn7t7lhnw48l": true, // x/staking.notBondedPool

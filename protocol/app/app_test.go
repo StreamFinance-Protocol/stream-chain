@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	bridgemodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge"
+
 	evidencemodule "cosmossdk.io/x/evidence"
 	feegrantmodule "cosmossdk.io/x/feegrant/module"
 	"cosmossdk.io/x/upgrade"
@@ -99,6 +101,7 @@ func TestAppIsFullyInitialized(t *testing.T) {
 				"PriceFeedClient",
 				"SDAIClient",
 				"DeleveragingClient",
+				"BridgeClient",
 
 				// Any default constructed type can be considered initialized if the default is what is
 				// expected. getUninitializedStructFields relies on fields being the non-default and
@@ -192,6 +195,7 @@ func TestModuleBasics(t *testing.T) {
 		pricesmodule.AppModuleBasic{},
 		assetsmodule.AppModuleBasic{},
 		blocktimemodule.AppModuleBasic{},
+		bridgemodule.AppModuleBasic{},
 		feetiersmodule.AppModuleBasic{},
 		perpetualsmodule.AppModuleBasic{},
 		statsmodule.AppModuleBasic{},

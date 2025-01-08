@@ -413,10 +413,8 @@ func GetProposedOperationsTx(
 }
 
 func GetFinalTxs(ctx sdk.Context, txs PrepareProposalTxs) ([][]byte, error) {
-	if veutils.AreVEEnabled(ctx) {
-		return txs.GetTxsInOrder(true)
-	}
-	return txs.GetTxsInOrder(false)
+	areVeEnabled := veutils.AreVEEnabled(ctx)
+	return txs.GetTxsInOrder(areVeEnabled)
 }
 
 // EncodeMsgsIntoTxBytes encodes the given msgs into a single transaction.

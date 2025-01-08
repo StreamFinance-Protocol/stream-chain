@@ -1,7 +1,9 @@
 package ante
 
 import (
+	bridgetypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
 	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
+
 	perpetualstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -18,7 +20,8 @@ func IsAppInjectedMsg(msg sdk.Msg) bool {
 	switch msg.(type) {
 	case
 		// ------- Custom modules
-
+		// bridge
+		*bridgetypes.MsgAcknowledgeBridges,
 		// clob
 		*clobtypes.MsgProposedOperations,
 

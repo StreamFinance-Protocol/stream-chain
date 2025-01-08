@@ -3,6 +3,7 @@ package ante
 import (
 	upgrade "cosmossdk.io/x/upgrade/types"
 	blocktime "github.com/StreamFinance-Protocol/stream-chain/protocol/x/blocktime/types"
+	bridge "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
 	clob "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	delaymsg "github.com/StreamFinance-Protocol/stream-chain/protocol/x/delaymsg/types"
 	feetiers "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers/types"
@@ -14,6 +15,7 @@ import (
 	stats "github.com/StreamFinance-Protocol/stream-chain/protocol/x/stats/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	auth "github.com/cosmos/cosmos-sdk/x/auth/types"
+
 	bank "github.com/cosmos/cosmos-sdk/x/bank/types"
 	consensus "github.com/cosmos/cosmos-sdk/x/consensus/types"
 	crisis "github.com/cosmos/cosmos-sdk/x/crisis/types"
@@ -66,6 +68,12 @@ func IsInternalMsg(msg sdk.Msg) bool {
 		// ------- Custom modules
 		// blocktime
 		*blocktime.MsgUpdateDowntimeParams,
+
+		// bridge
+		*bridge.MsgCompleteBridge,
+		*bridge.MsgUpdateEventParams,
+		*bridge.MsgUpdateProposeParams,
+		*bridge.MsgUpdateSafetyParams,
 
 		// clob
 		*clob.MsgCreateClobPair,

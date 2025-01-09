@@ -68,10 +68,10 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
       - working-directory: ./indexer
         run: |
-          npm install -g pnpm@6.34.0
+          npm install -g pnpm@9.15.1
           pnpm install --loglevel warn --frozen-lockfile
           cd packages/v4-protos && npm run build:verify-proto
   v4-proto-py-gen:

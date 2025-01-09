@@ -47,6 +47,7 @@ mock-gen:
 	@go run github.com/vektra/mockery/v2 --name=VEApplierInterface --dir=./app/ve --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=VoteExtensionRateLimitKeeper --dir=./app/ve --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=MemClob --dir=./x/clob/types --recursive --output=./mocks
+	@go run github.com/vektra/mockery/v2 --name=BridgeKeeper --dir=./x/bridge/types --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=DelayMsgKeeper --dir=./x/delaymsg/types --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=ClobKeeper --dir=./x/clob/types --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=MemClobKeeper --dir=./x/clob/types --recursive --output=./mocks

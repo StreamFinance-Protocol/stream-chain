@@ -28,6 +28,7 @@ service Query {
     option (google.api.http).get = "/klyraprotocol/perpetuals/liquidity_tiers";
   }
 
+  // Queries a list of CollateralPools.
   rpc AllCollateralPools(QueryAllCollateralPoolsRequest)
       returns (QueryAllCollateralPoolsResponse) {
     option (google.api.http).get = "/klyraprotocol/perpetuals/collateral_pools";

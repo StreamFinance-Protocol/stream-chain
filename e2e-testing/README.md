@@ -8,9 +8,6 @@ issues in the E2E testing notion.
 Go to the indexer directory and run `pnpm install` to install the dependencies.
 Then, run `pnpm build:all` to build the indexer.
 
-Similar, go to the v4-client-js directory and run `pnpm install` to install the dependencies.
-Then, run `pnpm build` to build the v4-client-js.
-
 Spin up a containerized environment running both the network and Indexer services:
 
 In one terminal, run
@@ -19,8 +16,9 @@ In one terminal, run
 ./run-containerized-env.sh
 ```
 
-Wait until the chain that was launched has reached height at least 50. 
+Wait until the chain that was launched has reached height at least 50.
 Then, in another terminal, from the e2e-testing directory, run:
+
 ```
 pnpm build && pnpm test
 ```

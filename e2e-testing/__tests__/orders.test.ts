@@ -1,14 +1,12 @@
 import {
   BECH32_PREFIX,
-  HeightResponse,
-  IndexerClient,
-  IPlaceOrder,
+  Klyra,
   LocalWallet,
-  Network,
-  SocketClient,
   SubaccountInfo,
-  ValidatorClient,
-} from "@klyraprotocol/v4-client-js/src";
+  WalletSubaccountInfo,
+  IChainPlaceOrder,
+  MessageChannel,
+} from '@klyra/core';
 import {
   KLYRA_LOCAL_ADDRESS,
   KLYRA_LOCAL_ADDRESS_2,
@@ -16,13 +14,13 @@ import {
   KLYRA_LOCAL_MNEMONIC_2,
   orderDetails,
   PERPETUAL_PAIR_BTC_USD,
-} from "./helpers/constants";
-import { DateTime } from "luxon";
-import * as utils from "./helpers/utils";
+} from './helpers/constants';
+import { DateTime } from 'luxon';
+import * as utils from './helpers/utils';
 import {
   connectAndValidateSocketClient,
   createModifiedOrder,
-} from "./helpers/utils";
+} from './helpers/utils';
 import {
   CandleResolution,
   FillTable,
@@ -32,15 +30,18 @@ import {
   OrderSide,
   OrderTable,
   SubaccountTable,
-} from "@klyraprotocol-indexer/postgres";
-import { AnyMxRecord } from "dns";
+} from '@klyraprotocol-indexer/postgres';
+import { getKlyra } from './helpers/init';
 
-async function placeOrder(mnemonic: string, order: IPlaceOrder): Promise<void> {
+async function placeOrder(
+  mnemonic: string,
+  order: IChainPlaceOrder,
+  klyra: Klyra,
+): Promise<void> {
   const wallet = await LocalWallet.fromMnemonic(mnemonic, BECH32_PREFIX);
-  const client = await ValidatorClient.connect(Network.local().validatorConfig);
 
-  const subaccount = new SubaccountInfo(wallet, 0);
-  const modifiedOrder: IPlaceOrder = order;
+  const subaccount = new WalletSubaccountInfo(wallet, 0);
+  const modifiedOrder: IChainPlaceOrder = order;
   if (order.orderFlags !== 0) {
     // cancel the order 30 seconds from now
     modifiedOrder.goodTilBlock = 0;
@@ -53,27 +54,35 @@ async function placeOrder(mnemonic: string, order: IPlaceOrder): Promise<void> {
     modifiedOrder.goodTilBlockTime = 0;
   }
 
-  await client.post.placeOrderObject(subaccount, modifiedOrder);
+  const routerSubaccount = new SubaccountInfo('klyra0xxxx', 1);
+
+  await klyra.chainClient.nodeClient.post.placeOrderObject(
+    subaccount,
+    routerSubaccount,
+    modifiedOrder,
+  );
 }
 
-describe("orders", () => {
-  it("test orders", async () => {
-    const indexerClient = new IndexerClient(Network.local().indexerConfig);
-    const heightResp: HeightResponse = await indexerClient.utility.getHeight();
-    const height: number = heightResp.height;
-    connectAndValidateSocketClient(validateOrders);
+describe('orders', () => {
+  it('test orders', async () => {
+    const klyra = await getKlyra();
+
+    const indexerClient = klyra.chainClient.indexerClient;
+
+    const { height } = await indexerClient.utils.getHeight();
+    connectAndValidateSocketClient(validateOrders, klyra);
 
     // place all orders
     for (const order of orderDetails) {
-      const modifiedOrder: IPlaceOrder = createModifiedOrder(order);
+      const modifiedOrder: IChainPlaceOrder = createModifiedOrder(order);
 
-      await placeOrder(order.mnemonic, modifiedOrder);
+      await placeOrder(order.mnemonic, modifiedOrder, klyra);
     }
 
     const candleStart: string | null = helpers
       .calculateNormalizedCandleStartTime(
         DateTime.utc() as any,
-        CandleResolution.ONE_MINUTE
+        CandleResolution.ONE_MINUTE,
       )
       .toISO() ?? '';
 
@@ -83,18 +92,18 @@ describe("orders", () => {
       LocalWallet.fromMnemonic(KLYRA_LOCAL_MNEMONIC_2, BECH32_PREFIX),
     ]);
 
-    const subaccountId = SubaccountTable.uuid(wallet.address!, 0);
-    const subaccountId2 = SubaccountTable.uuid(wallet2.address!, 0);
+    const subaccountId = SubaccountTable.uuid(wallet.getAddress(), 0);
+    const subaccountId2 = SubaccountTable.uuid(wallet2.getAddress(), 0);
     const [makerOrders, takerOrders] = await Promise.all([
       OrderTable.findBySubaccountIdAndClobPairAfterHeight(
         subaccountId,
         PERPETUAL_PAIR_BTC_USD.toString(),
-        height
+        Number(height),
       ),
       OrderTable.findBySubaccountIdAndClobPairAfterHeight(
         subaccountId2,
         PERPETUAL_PAIR_BTC_USD.toString(),
-        height
+        Number(height),
       ),
     ]);
     expect(makerOrders).toHaveLength(1);
@@ -107,7 +116,7 @@ describe("orders", () => {
           createdOnOrAfterHeight: height.toString(),
         },
         [],
-        {}
+        {},
       ),
       FillTable.findAll(
         {
@@ -115,7 +124,7 @@ describe("orders", () => {
           createdOnOrAfterHeight: height.toString(),
         },
         [],
-        {}
+        {},
       ),
     ]);
 
@@ -126,14 +135,14 @@ describe("orders", () => {
         side: OrderSide.BUY,
         liquidity: Liquidity.MAKER,
         type: FillType.LIMIT,
-        clobPairId: "0",
+        clobPairId: '0',
         orderId: makerOrders[0].id,
-        size: "0.0005",
-        price: "50000",
-        quoteAmount: "25",
-        clientMetadata: "0",
-        fee: "-0.00275",
-      })
+        size: '0.0005',
+        price: '50000',
+        quoteAmount: '25',
+        clientMetadata: '0',
+        fee: '-0.00275',
+      }),
     );
 
     expect(takerFills.length).toEqual(1);
@@ -143,191 +152,173 @@ describe("orders", () => {
         side: OrderSide.SELL,
         liquidity: Liquidity.TAKER,
         type: FillType.LIMIT,
-        clobPairId: "0",
+        clobPairId: '0',
         orderId: takerOrders[0].id,
-        size: "0.0005",
-        price: "50000",
-        quoteAmount: "25",
-        clientMetadata: "0",
-        fee: "0.0125",
-      })
+        size: '0.0005',
+        price: '50000',
+        quoteAmount: '25',
+        clientMetadata: '0',
+        fee: '0.0125',
+      }),
     );
 
     // Check API /v4/orders endpoint
     const [ordersResponse, ordersResponse2] = await Promise.all([
-      indexerClient.account.getSubaccountOrders(
-        KLYRA_LOCAL_ADDRESS,
-        0,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        10,
-        undefined,
-        undefined,
-        true
-      ),
-      indexerClient.account.getSubaccountOrders(
-        KLYRA_LOCAL_ADDRESS_2,
-        0,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        10,
-        undefined,
-        undefined,
-        true
-      ),
+      indexerClient.account.getSubaccountOrders({
+        address: KLYRA_LOCAL_ADDRESS,
+        subaccountNumber: 0,
+        returnLatestOrders: true,
+        limit: 10,
+      }),
+      indexerClient.account.getSubaccountOrders({
+        address: KLYRA_LOCAL_ADDRESS_2,
+        subaccountNumber: 0,
+        returnLatestOrders: true,
+        limit: 10,
+      }),
     ]);
-    expect(ordersResponse[0]).toEqual(
+    expect(ordersResponse.orders[0]).toEqual(
       expect.objectContaining({
         subaccountId: SubaccountTable.uuid(KLYRA_LOCAL_ADDRESS, 0),
-        clobPairId: "0",
-        side: "BUY",
-        size: "0.001",
-        totalFilled: "0.0005",
-        price: "50000",
-        type: "LIMIT",
-        timeInForce: "GTT",
+        clobPairId: '0',
+        side: 'BUY',
+        size: '0.001',
+        totalFilled: '0.0005',
+        price: '50000',
+        type: 'LIMIT',
+        timeInForce: 'GTT',
         reduceOnly: false,
-        orderFlags: "64",
+        orderFlags: '64',
         postOnly: false,
-        ticker: "BTC-USD",
-      })
+        ticker: 'BTC-USD',
+      }),
     );
-    expect(ordersResponse2[0]).toEqual(
+    expect(ordersResponse2.orders[0]).toEqual(
       expect.objectContaining({
         subaccountId: SubaccountTable.uuid(KLYRA_LOCAL_ADDRESS_2, 0),
-        clobPairId: "0",
-        side: "SELL",
-        size: "0.0005",
-        totalFilled: "0.0005",
-        price: "50000",
-        type: "LIMIT",
-        status: "FILLED",
-        timeInForce: "GTT",
+        clobPairId: '0',
+        side: 'SELL',
+        size: '0.0005',
+        totalFilled: '0.0005',
+        price: '50000',
+        type: 'LIMIT',
+        status: 'FILLED',
+        timeInForce: 'GTT',
         reduceOnly: false,
-        orderFlags: "64",
+        orderFlags: '64',
         postOnly: false,
-        ticker: "BTC-USD",
-      })
+        ticker: 'BTC-USD',
+      }),
     );
 
     // Check API /v4/perpetualPositions endpoint
     const [response, response2] = await Promise.all([
-      indexerClient.account.getSubaccountPerpetualPositions(
-        KLYRA_LOCAL_ADDRESS,
-        0
-      ),
-      indexerClient.account.getSubaccountPerpetualPositions(
-        KLYRA_LOCAL_ADDRESS_2,
-        0
-      ),
+      indexerClient.account.getSubaccountPerpetualPositions({
+        address: KLYRA_LOCAL_ADDRESS,
+        subaccountNumber: 0,
+      }),
+      indexerClient.account.getSubaccountPerpetualPositions({
+        address: KLYRA_LOCAL_ADDRESS_2,
+        subaccountNumber: 0,
+      }),
     ]);
     expect(response.positions.length).toEqual(1);
     expect(response.positions[0]).toEqual(
       expect.objectContaining({
-        market: "BTC-USD",
-        status: "OPEN",
-        side: "LONG",
-        entryPrice: "50000",
-      })
+        market: 'BTC-USD',
+        status: 'OPEN',
+        side: 'LONG',
+        entryPrice: '50000',
+      }),
     );
     expect(response2.positions.length).toEqual(1);
     expect(response2.positions[0]).toEqual(
       expect.objectContaining({
-        market: "BTC-USD",
-        status: "OPEN",
-        side: "SHORT",
-        entryPrice: "50000",
-      })
+        market: 'BTC-USD',
+        status: 'OPEN',
+        side: 'SHORT',
+        entryPrice: '50000',
+      }),
     );
 
     // Check API /v4/orderbooks endpoint
-    const orderbooksResponse =
-      await indexerClient.markets.getPerpetualMarketOrderbook("BTC-USD");
+    const orderbooksResponse = await indexerClient.markets.getPerpetualMarketOrderbook('BTC-USD');
     expect(orderbooksResponse).toEqual(
       expect.objectContaining({
         bids: [
           {
-            price: "50000",
-            size: "0.0005",
+            price: '50000',
+            size: '0.0005',
           },
         ],
         asks: [],
-      })
+      }),
     );
 
     // Check API /v4/candles endpoint
-    const candlesResponse =
-      await indexerClient.markets.getPerpetualMarketCandles(
-        "BTC-USD",
-        CandleResolution.ONE_MINUTE,
-        undefined,
-        undefined,
-        1
-      );
+    const candlesResponse = await indexerClient.markets.getPerpetualMarketCandles({
+      ticker: 'BTC-USD',
+      resolution: CandleResolution.ONE_MINUTE,
+    });
     expect(candlesResponse.candles[0]).toEqual(
       expect.objectContaining({
         startedAt: candleStart,
-        ticker: "BTC-USD",
-        resolution: "1MIN",
-        low: "50000",
-        high: "50000",
-        open: "50000",
-        close: "50000",
-        baseTokenVolume: "0.0005",
-        usdVolume: "25",
+        ticker: 'BTC-USD',
+        resolution: '1MIN',
+        low: '50000',
+        high: '50000',
+        open: '50000',
+        close: '50000',
+        baseTokenVolume: '0.0005',
+        usdVolume: '25',
         trades: 1,
-      })
+      }),
     );
   });
 
-  function validateOrders(data: any, socketClient: SocketClient): void {
-    if (data.type === "connected") {
-      socketClient.subscribeToSubaccount(KLYRA_LOCAL_ADDRESS, 0);
-    } else if (data.type === "subscribed") {
-      expect(data.channel).toEqual("v4_subaccounts");
+  function validateOrders(data: any, klyra: Klyra): void {
+    klyra.enableWebsocket();
+    if (data.type === 'connected') {
+      klyra.subscribeToWebSocketChannel(MessageChannel.PARENT_SUBACCOUNTS, `${KLYRA_LOCAL_ADDRESS}/0`);
+    } else if (data.type === 'subscribed') {
+      expect(data.channel).toEqual('v4_parent_subaccounts');
       expect(data.id).toEqual(`${KLYRA_LOCAL_ADDRESS}/0`);
       expect(data.contents.subaccount).toEqual(
         expect.objectContaining({
           address: KLYRA_LOCAL_ADDRESS,
           subaccountNumber: 0,
-        })
+        }),
       );
     } else if (
-      data.type === "channel_data" &&
+      data.type === 'channel_data' &&
       data.contents.perpetualPositions
     ) {
       expect(data.contents.perpetualPositions[0]).toEqual(
         expect.objectContaining({
           address: KLYRA_LOCAL_ADDRESS,
           subaccountNumber: 0,
-          market: "BTC-USD",
-          side: "LONG",
-          status: "OPEN",
-          netFunding: "0",
+          market: 'BTC-USD',
+          side: 'LONG',
+          status: 'OPEN',
+          netFunding: '0',
           exitPrice: null,
-        })
+        }),
       );
-    } else if (data.type === "channel_data" && data.contents.fills) {
+    } else if (data.type === 'channel_data' && data.contents.fills) {
       expect(data.contents.fills[0]).toEqual(
         expect.objectContaining({
-          fee: "-0.00275",
-          side: "BUY",
-          size: "0.0005",
-          type: "LIMIT",
-          price: "50000",
-          liquidity: "MAKER",
-          clobPairId: "0",
-          quoteAmount: "25",
+          fee: '-0.00275',
+          side: 'BUY',
+          size: '0.0005',
+          type: 'LIMIT',
+          price: '50000',
+          liquidity: 'MAKER',
+          clobPairId: '0',
+          quoteAmount: '25',
           subaccountId: SubaccountTable.uuid(KLYRA_LOCAL_ADDRESS, 0),
-          clientMetadata: "0",
-          ticker: "BTC-USD",
-        })
+          clientMetadata: '0',
+          ticker: 'BTC-USD',
+        }),
       );
     }
   }

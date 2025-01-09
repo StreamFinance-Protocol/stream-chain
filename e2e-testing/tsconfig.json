@@ -24,6 +24,7 @@
     },
     "baseUrl": ".",
     "outDir": "build",
+    "skipLibCheck": true,  // This will skip type checking of declaration files
   },
   "include": [
     "src/**/*",

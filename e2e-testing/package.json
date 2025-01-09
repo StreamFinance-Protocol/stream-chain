@@ -20,12 +20,12 @@
   "author": "",
   "license": "AGPL-3.0",
   "dependencies": {
+    "@klyra/core": "file:../../custom-sdk",
     "@klyraprotocol-indexer/base": "file:../indexer/packages/base",
     "@klyraprotocol-indexer/kafka": "file:../indexer/packages/kafka",
     "@klyraprotocol-indexer/postgres": "file:../indexer/packages/postgres",
     "@klyraprotocol-indexer/v4-proto-parser": "file:../indexer/packages/v4-proto-parser",
     "@klyraprotocol-indexer/v4-protos": "file:../indexer/packages/v4-protos",
-    "@klyraprotocol/v4-client-js": "file:../v4-client-js",
     "big.js": "^6.0.2",
     "dotenv-flow": "^3.2.0",
     "kafkajs": "^2.1.0",

@@ -46,9 +46,19 @@ export interface PerpetualSDKType {
 
   yield_index: string;
 }
+/**
+ * MultiCollateralAssetsArray is an array of assets represented by their
+ * asset ids.
+ */
+
 export interface MultiCollateralAssetsArray {
   multiCollateralAssets: number[];
 }
+/**
+ * MultiCollateralAssetsArray is an array of assets represented by their
+ * asset ids.
+ */
+
 export interface MultiCollateralAssetsArraySDKType {
   multi_collateral_assets: number[];
 }

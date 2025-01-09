@@ -13,6 +13,8 @@ export interface Query {
   /** Queries a list of LiquidityTiers. */
 
   allLiquidityTiers(request?: QueryAllLiquidityTiersRequest): Promise<QueryAllLiquidityTiersResponse>;
+  /** Queries a list of CollateralPools. */
+
   allCollateralPools(request?: QueryAllCollateralPoolsRequest): Promise<QueryAllCollateralPoolsResponse>;
   /** Queries a list of premium votes. */
 

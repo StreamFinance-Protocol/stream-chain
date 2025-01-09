@@ -1756,6 +1756,8 @@ func (m *PerpetualMarketCreateEventV1) GetLiquidityTier() uint32 {
 	return 0
 }
 
+// CollateralPoolUpsertEvent indicates any contains information about
+// a new collateral pool or updates to an existing collateral pool.
 type CollateralPoolUpsertEvent struct {
 	// The id of the collateral pool.
 	Id uint32 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`

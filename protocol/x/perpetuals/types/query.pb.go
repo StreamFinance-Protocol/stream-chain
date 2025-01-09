@@ -760,6 +760,7 @@ type QueryClient interface {
 	AllPerpetuals(ctx context.Context, in *QueryAllPerpetualsRequest, opts ...grpc.CallOption) (*QueryAllPerpetualsResponse, error)
 	// Queries a list of LiquidityTiers.
 	AllLiquidityTiers(ctx context.Context, in *QueryAllLiquidityTiersRequest, opts ...grpc.CallOption) (*QueryAllLiquidityTiersResponse, error)
+	// Queries a list of CollateralPools.
 	AllCollateralPools(ctx context.Context, in *QueryAllCollateralPoolsRequest, opts ...grpc.CallOption) (*QueryAllCollateralPoolsResponse, error)
 	// Queries a list of premium votes.
 	PremiumVotes(ctx context.Context, in *QueryPremiumVotesRequest, opts ...grpc.CallOption) (*QueryPremiumVotesResponse, error)
@@ -848,6 +849,7 @@ type QueryServer interface {
 	AllPerpetuals(context.Context, *QueryAllPerpetualsRequest) (*QueryAllPerpetualsResponse, error)
 	// Queries a list of LiquidityTiers.
 	AllLiquidityTiers(context.Context, *QueryAllLiquidityTiersRequest) (*QueryAllLiquidityTiersResponse, error)
+	// Queries a list of CollateralPools.
 	AllCollateralPools(context.Context, *QueryAllCollateralPoolsRequest) (*QueryAllCollateralPoolsResponse, error)
 	// Queries a list of premium votes.
 	PremiumVotes(context.Context, *QueryPremiumVotesRequest) (*QueryPremiumVotesResponse, error)

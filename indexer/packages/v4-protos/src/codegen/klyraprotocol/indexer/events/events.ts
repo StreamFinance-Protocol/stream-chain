@@ -936,6 +936,11 @@ export interface PerpetualMarketCreateEventV1SDKType {
 
   liquidity_tier: number;
 }
+/**
+ * CollateralPoolUpsertEvent indicates any contains information about
+ * a new collateral pool or updates to an existing collateral pool.
+ */
+
 export interface CollateralPoolUpsertEvent {
   /** The id of the collateral pool. */
   id: number;
@@ -949,6 +954,11 @@ export interface CollateralPoolUpsertEvent {
 
   quoteAssetId: number;
 }
+/**
+ * CollateralPoolUpsertEvent indicates any contains information about
+ * a new collateral pool or updates to an existing collateral pool.
+ */
+
 export interface CollateralPoolUpsertEventSDKType {
   /** The id of the collateral pool. */
   id: number;

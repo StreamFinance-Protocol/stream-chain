@@ -47,11 +47,23 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 18.14.0
 
       - name: Install pnpm
         run:
           npm install -g pnpm@9.15.1
+      
+      - name: Install specific npm version
+        run: npm install -g npm@9.3.1
+      
+      - name: Print versions
+        run: |
+          echo "Node.js version:"
+          node -v
+          echo "npm version:"
+          npm -v
+          echo "pnpm version:"
+          pnpm -v
 
       - name: Build and install
         run: |

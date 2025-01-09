@@ -27,122 +27,123 @@ import * as _37 from "./clob/order";
 import * as _38 from "./clob/process_proposer_matches_events";
 import * as _39 from "./clob/query";
 import * as _40 from "./clob/tx";
-import * as _41 from "./daemons/deleveraging/deleveraging";
-import * as _42 from "./daemons/pricefeed/price_feed";
-import * as _43 from "./daemons/sdaioracle/sdai";
-import * as _44 from "./delaymsg/block_message_ids";
-import * as _45 from "./delaymsg/delayed_message";
-import * as _46 from "./delaymsg/genesis";
-import * as _47 from "./delaymsg/query";
-import * as _48 from "./delaymsg/tx";
-import * as _49 from "./epochs/epoch_info";
-import * as _50 from "./epochs/genesis";
-import * as _51 from "./epochs/query";
-import * as _52 from "./feetiers/genesis";
-import * as _53 from "./feetiers/params";
-import * as _54 from "./feetiers/query";
-import * as _55 from "./feetiers/tx";
-import * as _56 from "./govplus/genesis";
-import * as _57 from "./govplus/query";
-import * as _58 from "./govplus/tx";
-import * as _59 from "./indexer/events/events";
-import * as _60 from "./indexer/indexer_manager/event";
-import * as _61 from "./indexer/off_chain_updates/off_chain_updates";
-import * as _62 from "./indexer/protocol/v1/clob";
-import * as _63 from "./indexer/protocol/v1/subaccount";
-import * as _64 from "./indexer/redis/redis_order";
-import * as _65 from "./indexer/shared/removal_reason";
-import * as _66 from "./indexer/socks/messages";
-import * as _67 from "./perpetuals/collateral";
-import * as _68 from "./perpetuals/genesis";
-import * as _69 from "./perpetuals/params";
-import * as _70 from "./perpetuals/perpetual";
-import * as _71 from "./perpetuals/query";
-import * as _72 from "./perpetuals/tx";
-import * as _73 from "./prices/genesis";
-import * as _74 from "./prices/market_param";
-import * as _75 from "./prices/market_price";
-import * as _76 from "./prices/query";
-import * as _77 from "./prices/tx";
-import * as _78 from "./ratelimit/capacity";
-import * as _79 from "./ratelimit/genesis";
-import * as _80 from "./ratelimit/limit_params";
-import * as _81 from "./ratelimit/pending_send_packet";
-import * as _82 from "./ratelimit/query";
-import * as _83 from "./ratelimit/tx";
-import * as _84 from "./sending/genesis";
-import * as _85 from "./sending/query";
-import * as _86 from "./sending/transfer";
-import * as _87 from "./sending/tx";
-import * as _88 from "./stats/genesis";
-import * as _89 from "./stats/params";
-import * as _90 from "./stats/query";
-import * as _91 from "./stats/stats";
-import * as _92 from "./stats/tx";
-import * as _93 from "./subaccounts/asset_position";
-import * as _94 from "./subaccounts/genesis";
-import * as _95 from "./subaccounts/perpetual_position";
-import * as _96 from "./subaccounts/query";
-import * as _97 from "./subaccounts/subaccount";
-import * as _98 from "./subaccounts/tx";
-import * as _99 from "./ve/ve";
-import * as _100 from "./assets/query.lcd";
-import * as _101 from "./blocktime/query.lcd";
-import * as _102 from "./bridge/query.lcd";
-import * as _103 from "./clob/query.lcd";
-import * as _104 from "./delaymsg/query.lcd";
-import * as _105 from "./epochs/query.lcd";
-import * as _106 from "./feetiers/query.lcd";
-import * as _107 from "./perpetuals/query.lcd";
-import * as _108 from "./prices/query.lcd";
-import * as _109 from "./ratelimit/query.lcd";
-import * as _110 from "./stats/query.lcd";
-import * as _111 from "./subaccounts/query.lcd";
-import * as _112 from "./assets/query.rpc.Query";
-import * as _113 from "./blocktime/query.rpc.Query";
-import * as _114 from "./bridge/query.rpc.Query";
-import * as _115 from "./clob/query.rpc.Query";
-import * as _116 from "./delaymsg/query.rpc.Query";
-import * as _117 from "./epochs/query.rpc.Query";
-import * as _118 from "./feetiers/query.rpc.Query";
-import * as _119 from "./govplus/query.rpc.Query";
-import * as _120 from "./perpetuals/query.rpc.Query";
-import * as _121 from "./prices/query.rpc.Query";
-import * as _122 from "./ratelimit/query.rpc.Query";
-import * as _123 from "./sending/query.rpc.Query";
-import * as _124 from "./stats/query.rpc.Query";
-import * as _125 from "./subaccounts/query.rpc.Query";
-import * as _126 from "./blocktime/tx.rpc.msg";
-import * as _127 from "./bridge/tx.rpc.msg";
-import * as _128 from "./clob/tx.rpc.msg";
-import * as _129 from "./delaymsg/tx.rpc.msg";
-import * as _130 from "./feetiers/tx.rpc.msg";
-import * as _131 from "./govplus/tx.rpc.msg";
-import * as _132 from "./perpetuals/tx.rpc.msg";
-import * as _133 from "./prices/tx.rpc.msg";
-import * as _134 from "./ratelimit/tx.rpc.msg";
-import * as _135 from "./sending/tx.rpc.msg";
-import * as _136 from "./stats/tx.rpc.msg";
-import * as _137 from "./subaccounts/tx.rpc.msg";
-import * as _138 from "./lcd";
-import * as _139 from "./rpc.query";
-import * as _140 from "./rpc.tx";
+import * as _41 from "./daemons/bridge/bridge";
+import * as _42 from "./daemons/deleveraging/deleveraging";
+import * as _43 from "./daemons/pricefeed/price_feed";
+import * as _44 from "./daemons/sdaioracle/sdai";
+import * as _45 from "./delaymsg/block_message_ids";
+import * as _46 from "./delaymsg/delayed_message";
+import * as _47 from "./delaymsg/genesis";
+import * as _48 from "./delaymsg/query";
+import * as _49 from "./delaymsg/tx";
+import * as _50 from "./epochs/epoch_info";
+import * as _51 from "./epochs/genesis";
+import * as _52 from "./epochs/query";
+import * as _53 from "./feetiers/genesis";
+import * as _54 from "./feetiers/params";
+import * as _55 from "./feetiers/query";
+import * as _56 from "./feetiers/tx";
+import * as _57 from "./govplus/genesis";
+import * as _58 from "./govplus/query";
+import * as _59 from "./govplus/tx";
+import * as _60 from "./indexer/events/events";
+import * as _61 from "./indexer/indexer_manager/event";
+import * as _62 from "./indexer/off_chain_updates/off_chain_updates";
+import * as _63 from "./indexer/protocol/v1/clob";
+import * as _64 from "./indexer/protocol/v1/subaccount";
+import * as _65 from "./indexer/redis/redis_order";
+import * as _66 from "./indexer/shared/removal_reason";
+import * as _67 from "./indexer/socks/messages";
+import * as _68 from "./perpetuals/collateral";
+import * as _69 from "./perpetuals/genesis";
+import * as _70 from "./perpetuals/params";
+import * as _71 from "./perpetuals/perpetual";
+import * as _72 from "./perpetuals/query";
+import * as _73 from "./perpetuals/tx";
+import * as _74 from "./prices/genesis";
+import * as _75 from "./prices/market_param";
+import * as _76 from "./prices/market_price";
+import * as _77 from "./prices/query";
+import * as _78 from "./prices/tx";
+import * as _79 from "./ratelimit/capacity";
+import * as _80 from "./ratelimit/genesis";
+import * as _81 from "./ratelimit/limit_params";
+import * as _82 from "./ratelimit/pending_send_packet";
+import * as _83 from "./ratelimit/query";
+import * as _84 from "./ratelimit/tx";
+import * as _85 from "./sending/genesis";
+import * as _86 from "./sending/query";
+import * as _87 from "./sending/transfer";
+import * as _88 from "./sending/tx";
+import * as _89 from "./stats/genesis";
+import * as _90 from "./stats/params";
+import * as _91 from "./stats/query";
+import * as _92 from "./stats/stats";
+import * as _93 from "./stats/tx";
+import * as _94 from "./subaccounts/asset_position";
+import * as _95 from "./subaccounts/genesis";
+import * as _96 from "./subaccounts/perpetual_position";
+import * as _97 from "./subaccounts/query";
+import * as _98 from "./subaccounts/subaccount";
+import * as _99 from "./subaccounts/tx";
+import * as _100 from "./ve/ve";
+import * as _101 from "./assets/query.lcd";
+import * as _102 from "./blocktime/query.lcd";
+import * as _103 from "./bridge/query.lcd";
+import * as _104 from "./clob/query.lcd";
+import * as _105 from "./delaymsg/query.lcd";
+import * as _106 from "./epochs/query.lcd";
+import * as _107 from "./feetiers/query.lcd";
+import * as _108 from "./perpetuals/query.lcd";
+import * as _109 from "./prices/query.lcd";
+import * as _110 from "./ratelimit/query.lcd";
+import * as _111 from "./stats/query.lcd";
+import * as _112 from "./subaccounts/query.lcd";
+import * as _113 from "./assets/query.rpc.Query";
+import * as _114 from "./blocktime/query.rpc.Query";
+import * as _115 from "./bridge/query.rpc.Query";
+import * as _116 from "./clob/query.rpc.Query";
+import * as _117 from "./delaymsg/query.rpc.Query";
+import * as _118 from "./epochs/query.rpc.Query";
+import * as _119 from "./feetiers/query.rpc.Query";
+import * as _120 from "./govplus/query.rpc.Query";
+import * as _121 from "./perpetuals/query.rpc.Query";
+import * as _122 from "./prices/query.rpc.Query";
+import * as _123 from "./ratelimit/query.rpc.Query";
+import * as _124 from "./sending/query.rpc.Query";
+import * as _125 from "./stats/query.rpc.Query";
+import * as _126 from "./subaccounts/query.rpc.Query";
+import * as _127 from "./blocktime/tx.rpc.msg";
+import * as _128 from "./bridge/tx.rpc.msg";
+import * as _129 from "./clob/tx.rpc.msg";
+import * as _130 from "./delaymsg/tx.rpc.msg";
+import * as _131 from "./feetiers/tx.rpc.msg";
+import * as _132 from "./govplus/tx.rpc.msg";
+import * as _133 from "./perpetuals/tx.rpc.msg";
+import * as _134 from "./prices/tx.rpc.msg";
+import * as _135 from "./ratelimit/tx.rpc.msg";
+import * as _136 from "./sending/tx.rpc.msg";
+import * as _137 from "./stats/tx.rpc.msg";
+import * as _138 from "./subaccounts/tx.rpc.msg";
+import * as _139 from "./lcd";
+import * as _140 from "./rpc.query";
+import * as _141 from "./rpc.tx";
 export namespace klyraprotocol {
   export const assets = { ..._12,
     ..._13,
     ..._14,
     ..._15,
-    ..._100,
-    ..._112
+    ..._101,
+    ..._113
   };
   export const blocktime = { ..._16,
     ..._17,
     ..._18,
     ..._19,
     ..._20,
-    ..._101,
-    ..._113,
-    ..._126
+    ..._102,
+    ..._114,
+    ..._127
   };
   export const bridge = { ..._21,
     ..._22,
@@ -150,9 +151,9 @@ export namespace klyraprotocol {
     ..._24,
     ..._25,
     ..._26,
-    ..._102,
-    ..._114,
-    ..._127
+    ..._103,
+    ..._115,
+    ..._128
   };
   export const clob = { ..._27,
     ..._28,
@@ -168,125 +169,127 @@ export namespace klyraprotocol {
     ..._38,
     ..._39,
     ..._40,
-    ..._103,
-    ..._115,
-    ..._128
-  };
-  export namespace daemons {
-    export const deleveraging = { ..._41
-    };
-    export const pricefeed = { ..._42
-    };
-    export const sdaioracle = { ..._43
-    };
-  }
-  export const delaymsg = { ..._44,
-    ..._45,
-    ..._46,
-    ..._47,
-    ..._48,
     ..._104,
     ..._116,
     ..._129
   };
-  export const epochs = { ..._49,
-    ..._50,
-    ..._51,
+  export namespace daemons {
+    export const bridge = { ..._41
+    };
+    export const deleveraging = { ..._42
+    };
+    export const pricefeed = { ..._43
+    };
+    export const sdaioracle = { ..._44
+    };
+  }
+  export const delaymsg = { ..._45,
+    ..._46,
+    ..._47,
+    ..._48,
+    ..._49,
     ..._105,
-    ..._117
-  };
-  export const feetiers = { ..._52,
-    ..._53,
-    ..._54,
-    ..._55,
-    ..._106,
-    ..._118,
+    ..._117,
     ..._130
   };
-  export const govplus = { ..._56,
-    ..._57,
-    ..._58,
+  export const epochs = { ..._50,
+    ..._51,
+    ..._52,
+    ..._106,
+    ..._118
+  };
+  export const feetiers = { ..._53,
+    ..._54,
+    ..._55,
+    ..._56,
+    ..._107,
     ..._119,
     ..._131
   };
+  export const govplus = { ..._57,
+    ..._58,
+    ..._59,
+    ..._120,
+    ..._132
+  };
   export namespace indexer {
-    export const events = { ..._59
+    export const events = { ..._60
     };
-    export const indexer_manager = { ..._60
+    export const indexer_manager = { ..._61
     };
-    export const off_chain_updates = { ..._61
+    export const off_chain_updates = { ..._62
     };
     export namespace protocol {
-      export const v1 = { ..._62,
-        ..._63
+      export const v1 = { ..._63,
+        ..._64
       };
     }
-    export const redis = { ..._64
+    export const redis = { ..._65
     };
-    export const shared = { ..._65
+    export const shared = { ..._66
     };
-    export const socks = { ..._66
+    export const socks = { ..._67
     };
   }
-  export const perpetuals = { ..._67,
-    ..._68,
+  export const perpetuals = { ..._68,
     ..._69,
     ..._70,
     ..._71,
     ..._72,
-    ..._107,
-    ..._120,
-    ..._132
-  };
-  export const prices = { ..._73,
-    ..._74,
-    ..._75,
-    ..._76,
-    ..._77,
+    ..._73,
     ..._108,
     ..._121,
     ..._133
   };
-  export const ratelimit = { ..._78,
-    ..._79,
-    ..._80,
-    ..._81,
-    ..._82,
-    ..._83,
+  export const prices = { ..._74,
+    ..._75,
+    ..._76,
+    ..._77,
+    ..._78,
     ..._109,
     ..._122,
     ..._134
   };
-  export const sending = { ..._84,
-    ..._85,
-    ..._86,
-    ..._87,
+  export const ratelimit = { ..._79,
+    ..._80,
+    ..._81,
+    ..._82,
+    ..._83,
+    ..._84,
+    ..._110,
     ..._123,
     ..._135
   };
-  export const stats = { ..._88,
-    ..._89,
-    ..._90,
-    ..._91,
-    ..._92,
-    ..._110,
+  export const sending = { ..._85,
+    ..._86,
+    ..._87,
+    ..._88,
     ..._124,
     ..._136
   };
-  export const subaccounts = { ..._93,
-    ..._94,
-    ..._95,
-    ..._96,
-    ..._97,
-    ..._98,
+  export const stats = { ..._89,
+    ..._90,
+    ..._91,
+    ..._92,
+    ..._93,
     ..._111,
     ..._125,
     ..._137
   };
-  export const ve = { ..._99
+  export const subaccounts = { ..._94,
+    ..._95,
+    ..._96,
+    ..._97,
+    ..._98,
+    ..._99,
+    ..._112,
+    ..._126,
+    ..._138
   };
-  export const ClientFactory = { ..._138,
-    ..._139,
-    ..._140
+  export const ve = { ..._100
+  };
+  export const ClientFactory = { ..._139,
+    ..._140,
+    ..._141
   };
 }

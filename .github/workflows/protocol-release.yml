@@ -1,19 +1,20 @@
 name: Release
 # This workflow helps with creating releases.
 # This job will only be triggered when a protocol release tag is pushed
-on:  # yamllint disable-line rule:truthy
+on: # yamllint disable-line rule:truthy
   push:
     # Sequence of patterns matched against refs/tags
     tags:
-      - "protocol/v[0-9]+.[0-9]+.[0-9]+"  # e.g.: protocol/v1.0.1
-      - "protocol/v[0-9]+.[0-9]+.[0-9]+-rc[0-9]+"  # e.g.: protocol/v1.0.1-rc1
-      - "protocol/v[0-9]+.[0-9]+.[0-9]+-dev[0-9]+"  # e.g.: protocol/v1.0.1-dev1
+      - 'protocol/v[0-9]+.[0-9]+.[0-9]+' # e.g.: protocol/v1.0.1
+      - 'protocol/v[0-9]+.[0-9]+.[0-9]+-rc[0-9]+' # e.g.: protocol/v1.0.1-rc1
+      - 'protocol/v[0-9]+.[0-9]+.[0-9]+-dev[0-9]+' # e.g.: protocol/v1.0.1-dev1
 
 jobs:
   protocol-release:
     name: Create Release
     permissions:
       contents: write
+
     defaults:
       run:
         working-directory: ./protocol
@@ -136,7 +137,7 @@ jobs:
         with:
           node-version: 18
           registry-url: https://registry.npmjs.org
-          cache: "npm"
+          cache: 'npm'
           cache-dependency-path: '**/package-lock.json'
 
       - name: Install buf

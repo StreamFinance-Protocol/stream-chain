@@ -105,9 +105,8 @@ func (k Keeper) CreatePerpetualClobPair(
 				subticksPerTick,
 				stepSizeBaseQuantums.ToUint64(),
 				perpetual.Params.LiquidityTier,
-				perpetual.Params.MarketType,
 				perpetual.Params.DangerIndexPpm,
-				fmt.Sprintf("%d", perpetual.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock),
+				perpetual.Params.CollateralPoolId,
 			),
 		),
 	)

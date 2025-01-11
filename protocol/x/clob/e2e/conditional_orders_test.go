@@ -9,13 +9,13 @@ import (
 	sdaiservertypes "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/server/types/sdaioracle"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/dtypes"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib"
+	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/daemons/pricefeed/exchange_config"
 	vetesting "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/ve"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/cometbft/cometbft/types"
 
 	testapp "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/app"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/constants"
-	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/daemons/pricefeed/exchange_config"
 	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	feetiertypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
@@ -723,6 +723,71 @@ func TestConditionalOrder(t *testing.T) {
 				},
 			},
 		},
+		"BTC Collat: StopLoss/Buy IOC conditional order can place, trigger, fully match, and be removed from state": {
+			subaccounts: []satypes.Subaccount{
+				constants.Carl_Num11_5BTC,
+				constants.Dave_Num11_5Btc,
+			},
+			orders: []clobtypes.Order{
+				constants.LongTermOrder_Dave_Num11_Id0_Clob10_Sell1Link_Price7_GTBT10,
+				constants.ConditionalOrder_Carl_Num11_Id0_Clob10_Buy05Link_Price7_GTBT10_SL_7_003_IOC,
+			},
+			priceUpdateForFirstBlock: map[uint32]ve.VEPricePair{
+				0: {
+					SpotPrice: 0,
+					PnlPrice:  0,
+				},
+				1: {
+					SpotPrice: 0,
+					PnlPrice:  0,
+				},
+				2: {
+					SpotPrice: 0,
+					PnlPrice:  0,
+				},
+				3: {
+					SpotPrice: 0,
+					PnlPrice:  0,
+				},
+				4: {
+					SpotPrice: 0,
+					PnlPrice:  0,
+				},
+				5: {
+					SpotPrice: 703_000_000,
+					PnlPrice:  703_000_000,
+				},
+			},
+			priceUpdateForSecondBlock: map[uint32]ve.VEPricePair{},
+			expectedInTriggeredStateAfterBlock: map[uint32]map[clobtypes.OrderId]bool{
+				2: {constants.ConditionalOrder_Carl_Num11_Id0_Clob10_Buy05Link_Price7_GTBT10_SL_7_003_IOC.OrderId: true},
+				3: {constants.ConditionalOrder_Carl_Num11_Id0_Clob10_Buy05Link_Price7_GTBT10_SL_7_003_IOC.OrderId: false},
+				4: {constants.ConditionalOrder_Carl_Num11_Id0_Clob10_Buy05Link_Price7_GTBT10_SL_7_003_IOC.OrderId: false},
+			},
+			expectedExistInState: map[clobtypes.OrderId]bool{
+				constants.ConditionalOrder_Carl_Num11_Id0_Clob10_Buy05Link_Price7_GTBT10_SL_7_003_IOC.OrderId: false,
+			},
+			expectedSubaccounts: []satypes.Subaccount{
+				{
+					Id: &constants.Carl_Num11,
+					AssetPositions: []*satypes.AssetPosition{
+						{
+							AssetId:  1,
+							Quantums: dtypes.NewInt(500_000_000 - 350_000_000),
+						},
+					},
+					PerpetualPositions: []*satypes.PerpetualPosition{
+						{
+							PerpetualId:  11,
+							Quantums:     dtypes.NewInt(50_000_000),
+							FundingIndex: dtypes.NewInt(0),
+							YieldIndex:   big.NewRat(0, 1).String(),
+						},
+					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
+				},
+			},
+		},
 		"TakeProfit/Buy post-only conditional order can place, trigger, not cross, and stay in state": {
 			subaccounts: []satypes.Subaccount{
 				constants.Carl_Num0_10000USD,
@@ -752,6 +817,60 @@ func TestConditionalOrder(t *testing.T) {
 					Id: &constants.Carl_Num0,
 					AssetPositions: []*satypes.AssetPosition{
 						&constants.TDai_Asset_10_000,
+					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
+				},
+			},
+		},
+		"BTC Collat: TakeProfit/Buy post-only conditional order can place, trigger, not cross, and stay in state": {
+			subaccounts: []satypes.Subaccount{
+				constants.Carl_Num11_5BTC,
+				constants.Dave_Num11_5Btc,
+			},
+			orders: []clobtypes.Order{
+				constants.LongTermOrder_Dave_Num11_Id1_Clob10_Sell0_25Link_Price7_001_GTBT10,
+				constants.ConditionalOrder_Carl_Num11_Id0_Clob10_Buy05Link_Price7_GTBT10_TP_6_999_PO,
+			},
+			priceUpdateForFirstBlock: map[uint32]ve.VEPricePair{
+				0: {
+					SpotPrice: 0,
+					PnlPrice:  0,
+				},
+				1: {
+					SpotPrice: 0,
+					PnlPrice:  0,
+				},
+				2: {
+					SpotPrice: 0,
+					PnlPrice:  0,
+				},
+				3: {
+					SpotPrice: 0,
+					PnlPrice:  0,
+				},
+				4: {
+					SpotPrice: 0,
+					PnlPrice:  0,
+				},
+				5: {
+					SpotPrice: 699_700_000,
+					PnlPrice:  699_700_000,
+				},
+			},
+			priceUpdateForSecondBlock: map[uint32]ve.VEPricePair{},
+			expectedInTriggeredStateAfterBlock: map[uint32]map[clobtypes.OrderId]bool{
+				2: {constants.ConditionalOrder_Carl_Num11_Id0_Clob10_Buy05Link_Price7_GTBT10_TP_6_999_PO.OrderId: true},
+				3: {constants.ConditionalOrder_Carl_Num11_Id0_Clob10_Buy05Link_Price7_GTBT10_TP_6_999_PO.OrderId: true},
+				4: {constants.ConditionalOrder_Carl_Num11_Id0_Clob10_Buy05Link_Price7_GTBT10_TP_6_999_PO.OrderId: true},
+			},
+			expectedExistInState: map[clobtypes.OrderId]bool{
+				constants.ConditionalOrder_Carl_Num11_Id0_Clob10_Buy05Link_Price7_GTBT10_TP_6_999_PO.OrderId: true,
+			},
+			expectedSubaccounts: []satypes.Subaccount{
+				{
+					Id: &constants.Carl_Num11,
+					AssetPositions: []*satypes.AssetPosition{
+						&constants.Btc_Asset_5,
 					},
 					AssetYieldIndex: big.NewRat(1, 1).String(),
 				},
@@ -981,7 +1100,9 @@ func TestConditionalOrder(t *testing.T) {
 						genesisState.Perpetuals = []perptypes.Perpetual{
 							constants.BtcUsd_20PercentInitial_10PercentMaintenance,
 							constants.IsoUsd_IsolatedMarket,
+							constants.LinkBtc_10_20MarginRequirement_CollatPool1_Id11_OpenInterest20,
 						}
+						genesisState.CollateralPools = constants.CollateralPools
 					},
 				)
 				testapp.UpdateGenesisDocWithAppStateForModule(
@@ -989,6 +1110,7 @@ func TestConditionalOrder(t *testing.T) {
 					func(genesisState *clobtypes.GenesisState) {
 						genesisState.ClobPairs = []clobtypes.ClobPair{
 							constants.ClobPair_Btc,
+							constants.ClobPair_LinkBtc,
 						}
 						genesisState.LiquidationsConfig = clobtypes.LiquidationsConfig_Default
 					},
@@ -2068,6 +2190,30 @@ func TestConditionalOrder_TriggeringUsingMatchedPrice(t *testing.T) {
 				},
 			},
 		},
+		"BTC Collat: TakeProfit/Buy conditional order is placed and triggered in later blocks": {
+			subaccounts: []satypes.Subaccount{
+				constants.Alice_Num11_500BTC,
+				constants.Carl_Num11_500BTC,
+				constants.Dave_Num11_500BTC,
+			},
+			ordersForFirstBlock: []clobtypes.Order{
+				constants.ConditionalOrder_Alice_Num11_Id0_Clob10_Buy1Link_Price7_GTBT10_TP_6_999,
+			},
+			ordersForSecondBlock: []clobtypes.Order{
+				// Create a match with price $6_997.
+				constants.Order_Dave_Num11_Id0_Clob10_Sell1Link_Price6_997_GTB10,
+				constants.Order_Carl_Num11_Id0_Clob10_Buy1Link_Price7_003_GTB10,
+			},
+
+			expectedExistInState: map[clobtypes.OrderId]bool{
+				constants.ConditionalOrder_Alice_Num11_Id0_Clob10_Buy1Link_Price7_GTBT10_TP_6_999.OrderId: true,
+			},
+			expectedInTriggeredStateAfterBlock: map[uint32]map[clobtypes.OrderId]bool{
+				2: {constants.ConditionalOrder_Alice_Num11_Id0_Clob10_Buy1Link_Price7_GTBT10_TP_6_999.OrderId: false},
+				3: {constants.ConditionalOrder_Alice_Num11_Id0_Clob10_Buy1Link_Price7_GTBT10_TP_6_999.OrderId: true},
+				4: {constants.ConditionalOrder_Alice_Num11_Id0_Clob10_Buy1Link_Price7_GTBT10_TP_6_999.OrderId: true},
+			},
+		},
 		"TakeProfit/Buy post-only conditional order can place, trigger, not cross, and partially fill in a later block": {
 			subaccounts: []satypes.Subaccount{
 				constants.Carl_Num0_10000USD,
@@ -2176,6 +2322,14 @@ func TestConditionalOrder_TriggeringUsingMatchedPrice(t *testing.T) {
 									MinPriceChangePpm:  1_000,
 									ExchangeConfigJson: constants.TestMarketExchangeConfigs[exchange_config.MARKET_BTC_USD],
 								},
+								{
+									Id:                 5,
+									Pair:               constants.IsoBtcPair,
+									Exponent:           constants.IsoBtcExponent,
+									MinExchanges:       1,
+									MinPriceChangePpm:  50,
+									ExchangeConfigJson: constants.TestMarketExchangeConfigs[exchange_config.MARKET_ISO_BTC],
+								},
 							},
 
 							MarketPrices: []prices.MarketPrice{
@@ -2184,6 +2338,12 @@ func TestConditionalOrder_TriggeringUsingMatchedPrice(t *testing.T) {
 									Exponent:  constants.BtcUsdExponent,
 									SpotPrice: constants.FiveBillion, // $50,000 == 1 BTC
 									PnlPrice:  constants.FiveBillion, // $50,000 == 1 BTC
+								},
+								{
+									Id:        5,
+									Exponent:  -8,
+									SpotPrice: 700_000_000,
+									PnlPrice:  700_000_000,
 								},
 							},
 						}
@@ -2196,7 +2356,9 @@ func TestConditionalOrder_TriggeringUsingMatchedPrice(t *testing.T) {
 						genesisState.LiquidityTiers = constants.LiquidityTiers
 						genesisState.Perpetuals = []perptypes.Perpetual{
 							constants.BtcUsd_20PercentInitial_10PercentMaintenance,
+							constants.LinkBtc_10_20MarginRequirement_CollatPool1_Id11_OpenInterest20,
 						}
+						genesisState.CollateralPools = constants.CollateralPools
 					},
 				)
 				testapp.UpdateGenesisDocWithAppStateForModule(
@@ -2215,6 +2377,7 @@ func TestConditionalOrder_TriggeringUsingMatchedPrice(t *testing.T) {
 								QuantumConversionExponent: -8,
 								Status:                    clobtypes.ClobPair_STATUS_ACTIVE,
 							},
+							constants.ClobPair_LinkBtc,
 						}
 						genesisState.LiquidationsConfig = clobtypes.LiquidationsConfig_Default
 					},
@@ -2349,6 +2512,42 @@ func TestConditionalOrderCancellation(t *testing.T) {
 			},
 			expectedConditionalOrderTriggered: false,
 		},
+		"BTC Collat: untriggered conditional order is cancelled": {
+			subaccounts: []satypes.Subaccount{
+				constants.Alice_Num11_1BTC,
+			},
+			orders: []clobtypes.Order{
+				constants.ConditionalOrder_Alice_Num11_Id0_Clob10_Buy1Link_Price7_GTBT10_SL_7_01,
+			},
+
+			priceUpdate: map[uint32]ve.VEPricePair{
+				0: {
+					SpotPrice: 0,
+					PnlPrice:  0,
+				},
+				1: {
+					SpotPrice: 0,
+					PnlPrice:  0,
+				},
+				2: {
+					SpotPrice: 0,
+					PnlPrice:  0,
+				},
+				3: {
+					SpotPrice: 0,
+					PnlPrice:  0,
+				},
+				4: {
+					SpotPrice: 0,
+					PnlPrice:  0,
+				},
+				5: {
+					SpotPrice: 700_500_000,
+					PnlPrice:  700_500_000,
+				},
+			},
+			expectedConditionalOrderTriggered: false,
+		},
 		"triggered conditional order is cancelled": {
 			subaccounts: []satypes.Subaccount{
 				constants.Alice_Num0_100_000USD,
@@ -2408,7 +2607,9 @@ func TestConditionalOrderCancellation(t *testing.T) {
 						genesisState.LiquidityTiers = constants.LiquidityTiers
 						genesisState.Perpetuals = []perptypes.Perpetual{
 							constants.BtcUsd_20PercentInitial_10PercentMaintenance,
+							constants.LinkBtc_10_20MarginRequirement_CollatPool1_Id11_OpenInterest20,
 						}
+						genesisState.CollateralPools = constants.CollateralPools
 					},
 				)
 				testapp.UpdateGenesisDocWithAppStateForModule(
@@ -2416,6 +2617,7 @@ func TestConditionalOrderCancellation(t *testing.T) {
 					func(genesisState *clobtypes.GenesisState) {
 						genesisState.ClobPairs = []clobtypes.ClobPair{
 							constants.ClobPair_Btc,
+							constants.ClobPair_LinkBtc,
 						}
 						genesisState.LiquidationsConfig = clobtypes.LiquidationsConfig_Default
 					},
@@ -2580,6 +2782,58 @@ func TestConditionalOrderExpiration(t *testing.T) {
 				constants.ConditionalOrder_Bob_Num0_Id0_Clob0_Sell1BTC_Price50000_GTBT10_SL_49995.OrderId: false,
 			},
 		},
+		"BTC Collat: untriggered conditional order that doesn't expire": {
+			subaccounts: []satypes.Subaccount{
+				constants.Bob_Num11_1BTC,
+			},
+			// Expires at unix time 10.
+			orders: []clobtypes.Order{
+				constants.ConditionalOrder_Bob_Num11_Id0_Clob10_Sell1Link_Price7_GTBT10_SL_6_99,
+			},
+			firstBlockTime: time.Unix(5, 0).UTC(),
+			// Does not trigger above conditional order.
+			firstPriceUpdate: map[uint32]ve.VEPricePair{
+				0: {
+					SpotPrice: 0,
+					PnlPrice:  0,
+				},
+				1: {
+					SpotPrice: 0,
+					PnlPrice:  0,
+				},
+				2: {
+					SpotPrice: 0,
+					PnlPrice:  0,
+				},
+				3: {
+					SpotPrice: 0,
+					PnlPrice:  0,
+				},
+				4: {
+					SpotPrice: 0,
+					PnlPrice:  0,
+				},
+				5: {
+					SpotPrice: 699_500_000,
+					PnlPrice:  699_500_000,
+				},
+			},
+			firstExistInStateExpectations: map[clobtypes.OrderId]bool{
+				constants.ConditionalOrder_Bob_Num11_Id0_Clob10_Sell1Link_Price7_GTBT10_SL_6_99.OrderId: true,
+			},
+			firstExpectedTriggered: map[clobtypes.OrderId]bool{
+				constants.ConditionalOrder_Bob_Num11_Id0_Clob10_Sell1Link_Price7_GTBT10_SL_6_99.OrderId: false,
+			},
+
+			// Does not expire above conditional order.
+			secondBlockTime: time.Unix(9, 0).UTC(),
+			secondExistInStateExpectations: map[clobtypes.OrderId]bool{
+				constants.ConditionalOrder_Bob_Num11_Id0_Clob10_Sell1Link_Price7_GTBT10_SL_6_99.OrderId: true,
+			},
+			secondExpectedTriggered: map[clobtypes.OrderId]bool{
+				constants.ConditionalOrder_Bob_Num11_Id0_Clob10_Sell1Link_Price7_GTBT10_SL_6_99.OrderId: false,
+			},
+		},
 		"untriggered conditional order that expires": {
 			subaccounts: []satypes.Subaccount{
 				constants.Bob_Num0_100_000USD,
@@ -2676,6 +2930,58 @@ func TestConditionalOrderExpiration(t *testing.T) {
 				constants.ConditionalOrder_Alice_Num0_Id0_Clob0_Buy1BTC_Price50000_GTBT10_TP_49999.OrderId: false,
 			},
 		},
+		"BTC Collat: triggered conditional order that expires": {
+			subaccounts: []satypes.Subaccount{
+				constants.Alice_Num11_1BTC,
+			},
+			// Expires at unix time 10.
+			orders: []clobtypes.Order{
+				constants.ConditionalOrder_Alice_Num11_Id0_Clob10_Buy1Link_Price7_GTBT10_TP_6_99,
+			},
+			firstBlockTime: time.Unix(5, 0).UTC(),
+			// Triggers above conditional order.
+			firstPriceUpdate: map[uint32]ve.VEPricePair{
+				0: {
+					SpotPrice: 0,
+					PnlPrice:  0,
+				},
+				1: {
+					SpotPrice: 0,
+					PnlPrice:  0,
+				},
+				2: {
+					SpotPrice: 0,
+					PnlPrice:  0,
+				},
+				3: {
+					SpotPrice: 0,
+					PnlPrice:  0,
+				},
+				4: {
+					SpotPrice: 0,
+					PnlPrice:  0,
+				},
+				5: {
+					SpotPrice: 698_500_000,
+					PnlPrice:  698_500_000,
+				},
+			},
+			firstExistInStateExpectations: map[clobtypes.OrderId]bool{
+				constants.ConditionalOrder_Alice_Num11_Id0_Clob10_Buy1Link_Price7_GTBT10_TP_6_99.OrderId: true,
+			},
+			firstExpectedTriggered: map[clobtypes.OrderId]bool{
+				constants.ConditionalOrder_Alice_Num11_Id0_Clob10_Buy1Link_Price7_GTBT10_TP_6_99.OrderId: true,
+			},
+
+			// Expires above conditional order.
+			secondBlockTime: time.Unix(11, 0).UTC(),
+			secondExistInStateExpectations: map[clobtypes.OrderId]bool{
+				constants.ConditionalOrder_Alice_Num11_Id0_Clob10_Buy1Link_Price7_GTBT10_TP_6_99.OrderId: false,
+			},
+			secondExpectedTriggered: map[clobtypes.OrderId]bool{
+				constants.ConditionalOrder_Alice_Num11_Id0_Clob10_Buy1Link_Price7_GTBT10_TP_6_99.OrderId: false,
+			},
+		},
 		"triggered conditional order partially matches, then expires": {
 			subaccounts: []satypes.Subaccount{
 				constants.Bob_Num0_100_000USD,
@@ -2739,7 +3045,9 @@ func TestConditionalOrderExpiration(t *testing.T) {
 						genesisState.LiquidityTiers = constants.LiquidityTiers
 						genesisState.Perpetuals = []perptypes.Perpetual{
 							constants.BtcUsd_20PercentInitial_10PercentMaintenance,
+							constants.LinkBtc_10_20MarginRequirement_CollatPool1_Id11_OpenInterest20,
 						}
+						genesisState.CollateralPools = constants.CollateralPools
 					},
 				)
 				testapp.UpdateGenesisDocWithAppStateForModule(
@@ -2747,6 +3055,7 @@ func TestConditionalOrderExpiration(t *testing.T) {
 					func(genesisState *clobtypes.GenesisState) {
 						genesisState.ClobPairs = []clobtypes.ClobPair{
 							constants.ClobPair_Btc,
+							constants.ClobPair_LinkBtc,
 						}
 						genesisState.LiquidationsConfig = clobtypes.LiquidationsConfig_Default
 					},

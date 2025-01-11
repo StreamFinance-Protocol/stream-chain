@@ -6,7 +6,7 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib"
 	clob "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	sending "github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending/types"
-	subaccounts "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
+	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	bank "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -254,7 +254,7 @@ var (
 		"/klyraprotocol.sending.MsgWithdrawFromSubaccountResponse": nil,
 
 		// subaccounts
-		"/klyraprotocol.subaccounts.MsgClaimYieldForSubaccount":         &subaccounts.MsgClaimYieldForSubaccount{},
+		"/klyraprotocol.subaccounts.MsgClaimYieldForSubaccount":         &satypes.MsgClaimYieldForSubaccount{},
 		"/klyraprotocol.subaccounts.MsgClaimYieldForSubaccountResponse": nil,
 	}
 )

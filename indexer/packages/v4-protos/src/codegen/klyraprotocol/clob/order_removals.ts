@@ -61,10 +61,11 @@ export enum OrderRemoval_RemovalReason {
   REMOVAL_REASON_FULLY_FILLED = 7,
 
   /**
-   * REMOVAL_REASON_VIOLATES_ISOLATED_SUBACCOUNT_CONSTRAINTS - REMOVAL_REASON_FULLY_FILLED represents a removal of an order that
-   *  would lead to the subaccount violating isolated subaccount constraints.
+   * REMOVAL_REASON_VIOLATES_COLLATERAL_POOL_CONSTRAINTS - REMOVAL_REASON_FULLY_FILLED represents a removal of an order that
+   *  would lead to the subaccount violating collateral pool constraints.
    */
-  REMOVAL_REASON_VIOLATES_ISOLATED_SUBACCOUNT_CONSTRAINTS = 8,
+  REMOVAL_REASON_VIOLATES_COLLATERAL_POOL_CONSTRAINTS = 8,
+  REMOVAL_REASON_VIOLATES_MULTI_COLLATERAL_CONSTRAINTS = 9,
   UNRECOGNIZED = -1,
 }
 export enum OrderRemoval_RemovalReasonSDKType {
@@ -127,10 +128,11 @@ export enum OrderRemoval_RemovalReasonSDKType {
   REMOVAL_REASON_FULLY_FILLED = 7,
 
   /**
-   * REMOVAL_REASON_VIOLATES_ISOLATED_SUBACCOUNT_CONSTRAINTS - REMOVAL_REASON_FULLY_FILLED represents a removal of an order that
-   *  would lead to the subaccount violating isolated subaccount constraints.
+   * REMOVAL_REASON_VIOLATES_COLLATERAL_POOL_CONSTRAINTS - REMOVAL_REASON_FULLY_FILLED represents a removal of an order that
+   *  would lead to the subaccount violating collateral pool constraints.
    */
-  REMOVAL_REASON_VIOLATES_ISOLATED_SUBACCOUNT_CONSTRAINTS = 8,
+  REMOVAL_REASON_VIOLATES_COLLATERAL_POOL_CONSTRAINTS = 8,
+  REMOVAL_REASON_VIOLATES_MULTI_COLLATERAL_CONSTRAINTS = 9,
   UNRECOGNIZED = -1,
 }
 export function orderRemoval_RemovalReasonFromJSON(object: any): OrderRemoval_RemovalReason {
@@ -168,8 +170,12 @@ export function orderRemoval_RemovalReasonFromJSON(object: any): OrderRemoval_Re
       return OrderRemoval_RemovalReason.REMOVAL_REASON_FULLY_FILLED;
 
     case 8:
-    case "REMOVAL_REASON_VIOLATES_ISOLATED_SUBACCOUNT_CONSTRAINTS":
-      return OrderRemoval_RemovalReason.REMOVAL_REASON_VIOLATES_ISOLATED_SUBACCOUNT_CONSTRAINTS;
+    case "REMOVAL_REASON_VIOLATES_COLLATERAL_POOL_CONSTRAINTS":
+      return OrderRemoval_RemovalReason.REMOVAL_REASON_VIOLATES_COLLATERAL_POOL_CONSTRAINTS;
+
+    case 9:
+    case "REMOVAL_REASON_VIOLATES_MULTI_COLLATERAL_CONSTRAINTS":
+      return OrderRemoval_RemovalReason.REMOVAL_REASON_VIOLATES_MULTI_COLLATERAL_CONSTRAINTS;
 
     case -1:
     case "UNRECOGNIZED":
@@ -203,8 +209,11 @@ export function orderRemoval_RemovalReasonToJSON(object: OrderRemoval_RemovalRea
     case OrderRemoval_RemovalReason.REMOVAL_REASON_FULLY_FILLED:
       return "REMOVAL_REASON_FULLY_FILLED";
 
-    case OrderRemoval_RemovalReason.REMOVAL_REASON_VIOLATES_ISOLATED_SUBACCOUNT_CONSTRAINTS:
-      return "REMOVAL_REASON_VIOLATES_ISOLATED_SUBACCOUNT_CONSTRAINTS";
+    case OrderRemoval_RemovalReason.REMOVAL_REASON_VIOLATES_COLLATERAL_POOL_CONSTRAINTS:
+      return "REMOVAL_REASON_VIOLATES_COLLATERAL_POOL_CONSTRAINTS";
+
+    case OrderRemoval_RemovalReason.REMOVAL_REASON_VIOLATES_MULTI_COLLATERAL_CONSTRAINTS:
+      return "REMOVAL_REASON_VIOLATES_MULTI_COLLATERAL_CONSTRAINTS";
 
     case OrderRemoval_RemovalReason.UNRECOGNIZED:
     default:

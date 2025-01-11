@@ -108,15 +108,12 @@ func (k Keeper) getNegativeTncSubaccountStoreSuffix(
 	ctx sdk.Context,
 	perpetualId uint32,
 ) (string, error) {
-	isIsolated, err := k.perpetualsKeeper.IsIsolatedPerpetual(ctx, perpetualId)
+	perpetual, err := k.perpetualsKeeper.GetPerpetual(ctx, perpetualId)
 	if err != nil {
 		return "", err
 	}
-	if isIsolated {
-		return lib.UintToString(perpetualId), nil
-	} else {
-		return types.CrossCollateralSuffix, nil
-	}
+
+	return types.NegativeTncSuffix + ":" + lib.UintToString(perpetual.Params.CollateralPoolId), nil
 }
 
 // getNegativeTncSubaccountStoresuffixes gets a slice of negative tnc subaccount store suffixes for
@@ -134,7 +131,7 @@ func (k Keeper) getNegativeTncSubaccountStoresuffixes(
 	for _, u := range settledUpdates {
 		var suffix string
 		if len(u.SettledSubaccount.PerpetualPositions) == 0 {
-			suffix = types.CrossCollateralSuffix
+			suffix = types.NegativeTncSuffix
 		} else {
 			suffix, err = k.getNegativeTncSubaccountStoreSuffix(ctx, u.SettledSubaccount.PerpetualPositions[0].PerpetualId)
 			if err != nil {

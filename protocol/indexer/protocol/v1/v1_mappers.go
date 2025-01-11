@@ -7,7 +7,6 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/dtypes"
 	v1types "github.com/StreamFinance-Protocol/stream-chain/protocol/indexer/protocol/v1/types"
 	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
-	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
@@ -139,17 +138,10 @@ func OrderToIndexerOrder(
 }
 
 func HandleEmptyRouterSubaccountIdForOwner(order clobtypes.Order) string {
-	if order.RouterSubaccountId == nil {
+	if order.RouterFeeOwner == "" {
 		return authtypes.NewModuleAddress("NULL_ROUTER_ADDRESS").String()
 	}
-	return order.RouterSubaccountId.Owner
-}
-
-func HandleEmptyRouterSubaccountIdForNumber(order clobtypes.Order) uint32 {
-	if order.RouterSubaccountId == nil {
-		return 0
-	}
-	return order.RouterSubaccountId.Number
+	return order.RouterFeeOwner
 }
 
 func orderToIndexerOrder_GoodTilBlock(
@@ -168,8 +160,7 @@ func orderToIndexerOrder_GoodTilBlock(
 		ConditionType:                   OrderConditionTypeToIndexerOrderConditionType(order.ConditionType),
 		ConditionalOrderTriggerSubticks: order.ConditionalOrderTriggerSubticks,
 		RouterFeePpm:                    order.RouterFeePpm,
-		RouterFeeSubaccountOwner:        HandleEmptyRouterSubaccountIdForOwner(order),
-		RouterFeeSubaccountNumber:       HandleEmptyRouterSubaccountIdForNumber(order),
+		RouterFeeOwner:                  HandleEmptyRouterSubaccountIdForOwner(order),
 	}
 }
 
@@ -189,8 +180,7 @@ func orderToIndexerOrder_GoodTilBlockTime(
 		ConditionType:                   OrderConditionTypeToIndexerOrderConditionType(order.ConditionType),
 		ConditionalOrderTriggerSubticks: order.ConditionalOrderTriggerSubticks,
 		RouterFeePpm:                    order.RouterFeePpm,
-		RouterFeeSubaccountOwner:        HandleEmptyRouterSubaccountIdForOwner(order),
-		RouterFeeSubaccountNumber:       HandleEmptyRouterSubaccountIdForNumber(order),
+		RouterFeeOwner:                  HandleEmptyRouterSubaccountIdForOwner(order),
 	}
 }
 
@@ -213,22 +203,6 @@ func ConvertToClobPairStatus(status clobtypes.ClobPair_Status) v1types.ClobPairS
 			fmt.Sprintf(
 				"ConvertToClobPairStatus: invalid clob pair status: %+v",
 				status,
-			),
-		)
-	}
-}
-
-func ConvertToPerpetualMarketType(marketType perptypes.PerpetualMarketType) v1types.PerpetualMarketType {
-	switch marketType {
-	case perptypes.PerpetualMarketType_PERPETUAL_MARKET_TYPE_CROSS:
-		return v1types.PerpetualMarketType_PERPETUAL_MARKET_TYPE_CROSS
-	case perptypes.PerpetualMarketType_PERPETUAL_MARKET_TYPE_ISOLATED:
-		return v1types.PerpetualMarketType_PERPETUAL_MARKET_TYPE_ISOLATED
-	default:
-		panic(
-			fmt.Sprintf(
-				"ConvertToPerpetualMarketType: invalid perpetual market type: %+v",
-				marketType,
 			),
 		)
 	}

@@ -14,6 +14,7 @@ import (
 type perpetualFill struct {
 	subaccountId         satypes.SubaccountId
 	perpetualId          uint32
+	quoteAssetId         uint32
 	isBuy                bool
 	bigFillBaseQuantums  *big.Int
 	bigFillQuoteQuantums *big.Int
@@ -298,6 +299,7 @@ func TestPendingUpdates(t *testing.T) {
 					pendingUpdates.AddPerpetualFill(
 						perpetualFill.subaccountId,
 						perpetualFill.perpetualId,
+						perpetualFill.quoteAssetId,
 						perpetualFill.isBuy,
 						perpetualFill.feePpm,
 						perpetualFill.bigFillBaseQuantums,

@@ -12,7 +12,6 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib/log"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib/metrics"
-	assettypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -123,7 +122,12 @@ func (k Keeper) ProcessSingleMatch(
 
 	// Update subaccount total quantums liquidated and total insurance fund lost for liquidation orders.
 	if matchWithOrders.TakerOrder.IsLiquidation() {
-		if err := k.updateLiquidationMetricsAndCummalativeInsuranceFundDelta(ctx, matchWithOrders, perpetualId, fillAmount, takerInsuranceFundDelta); err != nil {
+		quoteCurrencyAtomicResolution, err := k.perpetualsKeeper.GetQuoteCurrencyAtomicResolutionFromPerpetualId(ctx, perpetualId)
+		if err != nil {
+			return false, takerUpdateResult, makerUpdateResult, nil, err
+		}
+
+		if err := k.updateLiquidationMetricsAndCummalativeInsuranceFundDelta(ctx, matchWithOrders, perpetualId, fillAmount, takerInsuranceFundDelta, quoteCurrencyAtomicResolution); err != nil {
 			return false, takerUpdateResult, makerUpdateResult, nil, err
 		}
 	}
@@ -230,13 +234,18 @@ func (k Keeper) persistMatchedOrders(
 		bigTakerQuoteBalanceDelta.Sub(bigTakerQuoteBalanceDelta, liquidityFeeQuoteQuantums)
 	}
 
+	collateralPool, err := k.perpetualsKeeper.GetCollateralPoolFromPerpetualId(ctx, perpetualId)
+	if err != nil {
+		panic(fmt.Sprintf("persistMatchedOrders: failed to get collateral pool %v", err))
+	}
+
 	// Create the subaccount update.
 	updates := []satypes.Update{
 		// Taker update
 		{
 			AssetUpdates: []satypes.AssetUpdate{
 				{
-					AssetId:          assettypes.AssetTDai.Id,
+					AssetId:          collateralPool.QuoteAssetId,
 					BigQuantumsDelta: bigTakerQuoteBalanceDelta,
 				},
 			},
@@ -252,7 +261,7 @@ func (k Keeper) persistMatchedOrders(
 		{
 			AssetUpdates: []satypes.AssetUpdate{
 				{
-					AssetId:          assettypes.AssetTDai.Id,
+					AssetId:          collateralPool.QuoteAssetId,
 					BigQuantumsDelta: bigMakerQuoteBalanceDelta,
 				},
 			},
@@ -264,61 +273,6 @@ func (k Keeper) persistMatchedOrders(
 			},
 			SubaccountId: matchWithOrders.MakerOrder.GetSubaccountId(),
 		},
-	}
-
-	if !isTakerLiquidation {
-		takerRouter := matchWithOrders.TakerOrder.MustGetOrder().RouterSubaccountId
-		makerRouter := matchWithOrders.MakerOrder.MustGetOrder().RouterSubaccountId
-
-		hasTakerRouter := takerRouter != nil
-		hasMakerRouter := makerRouter != nil
-		hasSameRouter := hasTakerRouter && hasMakerRouter && *takerRouter == *makerRouter
-
-		if hasTakerRouter && bigRouterTakerFeeQuoteQuantums.Sign() == -1 {
-			panic(fmt.Sprintf("Taker router fee is negative: %v", bigRouterTakerFeeQuoteQuantums))
-		}
-
-		if hasMakerRouter && bigRouterMakerFeeQuoteQuantums.Sign() == -1 {
-			panic(fmt.Sprintf("Maker router fee is negative: %v", bigRouterMakerFeeQuoteQuantums))
-		}
-
-		if hasSameRouter {
-			totalRouterFee := new(big.Int).Add(bigRouterTakerFeeQuoteQuantums, bigRouterMakerFeeQuoteQuantums)
-			if totalRouterFee.Sign() != 0 {
-				updates = append(updates, satypes.Update{
-					AssetUpdates: []satypes.AssetUpdate{
-						{
-							AssetId:          assettypes.AssetTDai.Id,
-							BigQuantumsDelta: totalRouterFee,
-						},
-					},
-					SubaccountId: *takerRouter,
-				})
-			}
-		} else {
-			if hasTakerRouter && bigRouterTakerFeeQuoteQuantums.Sign() != 0 {
-				updates = append(updates, satypes.Update{
-					AssetUpdates: []satypes.AssetUpdate{
-						{
-							AssetId:          assettypes.AssetTDai.Id,
-							BigQuantumsDelta: bigRouterTakerFeeQuoteQuantums,
-						},
-					},
-					SubaccountId: *takerRouter,
-				})
-			}
-			if hasMakerRouter && bigRouterMakerFeeQuoteQuantums.Sign() != 0 {
-				updates = append(updates, satypes.Update{
-					AssetUpdates: []satypes.AssetUpdate{
-						{
-							AssetId:          assettypes.AssetTDai.Id,
-							BigQuantumsDelta: bigRouterMakerFeeQuoteQuantums,
-						},
-					},
-					SubaccountId: *makerRouter,
-				})
-			}
-		}
 	}
 
 	// Apply the update.
@@ -355,17 +309,63 @@ func (k Keeper) persistMatchedOrders(
 		)
 	}
 
-	if err := k.subaccountsKeeper.TransferInsuranceFundPayments(ctx, insuranceFundDelta, perpetualId); err != nil {
+	if !isTakerLiquidation {
+		if matchWithOrders.TakerOrder.MustGetOrder().RouterFeeOwner != "" {
+			bigRouterTakeFeeQuoteQuantumsSign := bigRouterTakerFeeQuoteQuantums.Sign()
+
+			if bigRouterTakeFeeQuoteQuantumsSign == -1 {
+				panic("Router taker fee is negative")
+			}
+
+			if bigRouterTakeFeeQuoteQuantumsSign == 1 {
+				err := k.subaccountsKeeper.TransferRouterFee(
+					ctx,
+					bigRouterTakerFeeQuoteQuantums,
+					matchWithOrders.TakerOrder.MustGetOrder().RouterFeeOwner,
+					perpetualId,
+					collateralPool.QuoteAssetId,
+				)
+
+				if err != nil {
+					return takerUpdateResult, makerUpdateResult, err
+				}
+			}
+		}
+
+		if matchWithOrders.MakerOrder.MustGetOrder().RouterFeeOwner != "" {
+			bigRouterMakerFeeQuoteQuantumsSign := bigRouterMakerFeeQuoteQuantums.Sign()
+
+			if bigRouterMakerFeeQuoteQuantumsSign == -1 {
+				panic("Router maker fee is negative")
+			}
+
+			if bigRouterMakerFeeQuoteQuantumsSign == 1 {
+				err := k.subaccountsKeeper.TransferRouterFee(
+					ctx,
+					bigRouterMakerFeeQuoteQuantums,
+					matchWithOrders.MakerOrder.MustGetOrder().RouterFeeOwner,
+					perpetualId,
+					collateralPool.QuoteAssetId,
+				)
+
+				if err != nil {
+					return takerUpdateResult, makerUpdateResult, err
+				}
+			}
+		}
+	}
+
+	if err := k.subaccountsKeeper.TransferInsuranceFundPayments(ctx, insuranceFundDelta, perpetualId, collateralPool.QuoteAssetId); err != nil {
 		return takerUpdateResult, makerUpdateResult, err
 	}
 
 	// Transfer the liquidity and validator fees
-	err = k.subaccountsKeeper.TransferLiquidityFee(ctx, liquidityFeeQuoteQuantums, perpetualId)
+	err = k.subaccountsKeeper.TransferLiquidityFee(ctx, liquidityFeeQuoteQuantums, perpetualId, collateralPool.QuoteAssetId)
 	if err != nil {
 		return satypes.UpdateCausedError, satypes.UpdateCausedError, err
 	}
 
-	err = k.subaccountsKeeper.TransferValidatorFee(ctx, validatorFeeQuoteQuantums, perpetualId)
+	err = k.subaccountsKeeper.TransferValidatorFee(ctx, validatorFeeQuoteQuantums, perpetualId, collateralPool.QuoteAssetId)
 	if err != nil {
 		return satypes.UpdateCausedError, satypes.UpdateCausedError, err
 	}
@@ -374,7 +374,7 @@ func (k Keeper) persistMatchedOrders(
 	bigTotalFeeQuoteQuantums := new(big.Int).Add(bigTakerFeeQuoteQuantums, bigMakerFeeQuoteQuantums)
 	if err := k.subaccountsKeeper.TransferFeesToFeeCollectorModule(
 		ctx,
-		assettypes.AssetTDai.Id,
+		collateralPool.QuoteAssetId,
 		bigTotalFeeQuoteQuantums,
 		perpetualId,
 	); err != nil {
@@ -609,10 +609,10 @@ func (k Keeper) calculateFees(ctx sdk.Context, matchWithOrders *types.MatchWithO
 			return 0, 0, 0, 0, nil, nil, nil, err
 		}
 	} else {
-		if matchWithOrders.TakerOrder.MustGetOrder().RouterSubaccountId != nil {
+		if matchWithOrders.TakerOrder.MustGetOrder().RouterFeeOwner != "" {
 			routerTakerFeePpm = matchWithOrders.TakerOrder.MustGetOrder().RouterFeePpm
 		}
-		if matchWithOrders.MakerOrder.MustGetOrder().RouterSubaccountId != nil {
+		if matchWithOrders.MakerOrder.MustGetOrder().RouterFeeOwner != "" {
 			routerMakerFeePpm = matchWithOrders.MakerOrder.MustGetOrder().RouterFeePpm
 		}
 	}
@@ -636,8 +636,8 @@ func (k Keeper) calculateMakerFillAmounts(ctx sdk.Context, matchWithOrders *type
 	return newMakerTotalFillAmount, curMakerPruneableBlockHeight, nil
 }
 
-func (k Keeper) updateLiquidationMetricsAndCummalativeInsuranceFundDelta(ctx sdk.Context, matchWithOrders *types.MatchWithOrders, perpetualId uint32, fillAmount satypes.BaseQuantums, takerInsuranceFundDelta *big.Int) error {
-	notionalLiquidatedQuoteQuantums, err := k.perpetualsKeeper.GetNetNotional(ctx, perpetualId, fillAmount.ToBigInt())
+func (k Keeper) updateLiquidationMetricsAndCummalativeInsuranceFundDelta(ctx sdk.Context, matchWithOrders *types.MatchWithOrders, perpetualId uint32, fillAmount satypes.BaseQuantums, takerInsuranceFundDelta *big.Int, quoteCurrencyAtomicResolution int32) error {
+	notionalLiquidatedQuoteQuantums, err := k.perpetualsKeeper.GetNetNotional(ctx, perpetualId, fillAmount.ToBigInt(), quoteCurrencyAtomicResolution)
 	if err != nil {
 		return err
 	}

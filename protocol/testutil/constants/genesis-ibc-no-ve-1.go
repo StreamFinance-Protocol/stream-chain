@@ -43,7 +43,19 @@ const GenesisStateNoVeIBC1 = `{
           "id": 0,
           "market_id": 0,
           "symbol": "TDAI",
-          "asset_yield_index": "1/1"
+          "asset_yield_index": "0/1",
+          "max_slippage_ppm": 0
+        },
+        {
+          "atomic_resolution": -8,
+          "denom": "btc-denom",
+          "denom_exponent": "-8",
+          "has_market": false,
+          "id": 1,
+          "market_id": 0,
+          "symbol": "BTC",
+          "asset_yield_index": "1/1",
+          "max_slippage_ppm": 0
         }
       ]
     },
@@ -135,6 +147,33 @@ const GenesisStateNoVeIBC1 = `{
           ]
         },
         {
+          "address": "klyra1qt3f40penefk5eyemv8s2zznpzpmklkffr4czn",
+          "coins": [
+            {
+              "denom": "utdai",
+              "amount": "1300000000000000000"
+            }
+          ]
+        },
+        {
+          "address": "klyra1xs5088vrxmawlyuesrn73vye988ltm6mcxecpd",
+          "coins": [
+            {
+              "denom": "utdai",
+              "amount": "1300000000000000000"
+            }
+          ]
+        },
+        {
+          "address": "klyra1daqtvgfdcsgne505p4cltcwq5cfum94a7par8n",
+          "coins": [
+            {
+              "denom": "btc-denom",
+              "amount": "100000000000000000"
+            }
+          ]
+        },
+        {
           "address": "klyra1wau5mja7j7zdavtfq9lu7ejef05hm6ffxz2hcc",
           "coins": [
             {
@@ -187,7 +226,7 @@ const GenesisStateNoVeIBC1 = `{
           "coins": [
             {
               "denom": "ibc/DEEFE2DEFDC8EA8879923C4CCA42BB888C3CD03FF7ECFEFB1C2FEC27A732ACC8",
-              "amount": "2600000000000000000000000000000"
+              "amount": "5200000000000000000000000000000"
             }
           ]
         }
@@ -310,8 +349,7 @@ const GenesisStateNoVeIBC1 = `{
         },
         "insurance_fund_fee_ppm": 5000,
         "validator_fee_ppm": 200000,
-        "liquidity_fee_ppm": 800000,
-        "max_cumulative_insurance_fund_delta": "1000000000000"
+        "liquidity_fee_ppm": 800000
       }
     },
     "crisis": {
@@ -864,6 +902,32 @@ const GenesisStateNoVeIBC1 = `{
       }
     },
     "perpetuals": {
+      "collateral_pools": [
+        {
+          "collateral_pool_id": 0,
+          "max_cumulative_insurance_fund_delta_per_block": 1000000000000,
+          "multi_collateral_assets": {
+            "multi_collateral_assets": [0]
+          },
+          "quote_asset_id": 0
+        },
+        {
+          "collateral_pool_id": 1,
+          "max_cumulative_insurance_fund_delta_per_block": 1000000000000,
+          "multi_collateral_assets": {
+            "multi_collateral_assets": [1]
+          },
+          "quote_asset_id": 1
+        },
+        {
+          "collateral_pool_id": 2,
+          "max_cumulative_insurance_fund_delta_per_block": 1000000000000,
+          "multi_collateral_assets": {
+            "multi_collateral_assets": [0]
+          },
+          "quote_asset_id": 0
+        }
+      ],
       "liquidity_tiers": [
         {
           "base_position_notional": 1000000000000,
@@ -872,6 +936,46 @@ const GenesisStateNoVeIBC1 = `{
           "initial_margin_ppm": 50000,
           "maintenance_fraction_ppm": 600000,
           "name": "Large-Cap"
+        },
+        {
+          "base_position_notional": 250000000000,
+          "id": 1,
+          "impact_notional": 5000000000,
+          "initial_margin_ppm": 100000,
+          "maintenance_fraction_ppm": 500000,
+          "name": "Mid-Cap"
+        },
+        {
+          "base_position_notional": 100000000000,
+          "id": 2,
+          "impact_notional": 2500000000,
+          "initial_margin_ppm": 200000,
+          "maintenance_fraction_ppm": 500000,
+          "name": "Long-Tail"
+        },
+        {
+          "base_position_notional": 1000000000,
+          "id": 3,
+          "impact_notional": 2500000000,
+          "initial_margin_ppm": 1000000,
+          "maintenance_fraction_ppm": 200000,
+          "name": "Safety"
+        },
+        {
+          "base_position_notional": 1000000000039,
+          "id": 4,
+          "impact_notional": 50000000000,
+          "initial_margin_ppm": 10007,
+          "maintenance_fraction_ppm": 500009,
+          "name": "test-usd-100x-liq-tier-linear"
+        },
+        {
+          "base_position_notional": 100000007,
+          "id": 5,
+          "impact_notional": 50000000000,
+          "initial_margin_ppm": 10007,
+          "maintenance_fraction_ppm": 500009,
+          "name": "test-usd-100x-liq-tier-nonlinear"
         }
       ],
       "params": {
@@ -882,27 +986,335 @@ const GenesisStateNoVeIBC1 = `{
       "perpetuals": [
         {
           "params": {
-            "atomic_resolution": -10,
-            "default_funding_ppm": 0,
-            "id": 0,
-            "liquidity_tier": 0,
-            "market_id": 0,
-            "ticker": "BTC-USD",
-            "market_type": 0
+            "atomic_resolution": "-10",
+            "default_funding_ppm": "0",
+            "id": "0",
+            "liquidity_tier": "0",
+            "market_id": "0",
+            "ticker": "BTC-USD"
           },
           "yield_index": "0/1"
         },
         {
           "params": {
-            "atomic_resolution": -9,
-            "default_funding_ppm": 0,
-            "id": 1,
-            "liquidity_tier": 0,
-            "market_id": 1,
-            "ticker": "ETH-USD",
-            "market_type": 0
+            "atomic_resolution": "-9",
+            "default_funding_ppm": "0",
+            "id": "1",
+            "liquidity_tier": "0",
+            "market_id": "1",
+            "ticker": "ETH-USD"
           },
           "yield_index": "0/1"
+        },
+        {
+          "params": {
+            "atomic_resolution": "-6",
+            "default_funding_ppm": "0",
+            "id": "2",
+            "liquidity_tier": "1",
+            "market_id": "2",
+            "ticker": "LINK-USD"
+          }
+        },
+        {
+          "params": {
+            "atomic_resolution": "-5",
+            "default_funding_ppm": "0",
+            "id": "3",
+            "liquidity_tier": "1",
+            "market_id": "3",
+            "ticker": "MATIC-USD"
+          }
+        },
+        {
+          "params": {
+            "atomic_resolution": "-5",
+            "default_funding_ppm": "0",
+            "id": "4",
+            "liquidity_tier": "1",
+            "market_id": "4",
+            "ticker": "CRV-USD"
+          }
+        },
+        {
+          "params": {
+            "atomic_resolution": "-7",
+            "default_funding_ppm": "0",
+            "id": "5",
+            "liquidity_tier": "1",
+            "market_id": "5",
+            "ticker": "SOL-USD"
+          }
+        },
+        {
+          "params": {
+            "atomic_resolution": "-5",
+            "default_funding_ppm": "0",
+            "id": "6",
+            "liquidity_tier": "1",
+            "market_id": "6",
+            "ticker": "ADA-USD"
+          }
+        },
+        {
+          "params": {
+            "atomic_resolution": "-7",
+            "default_funding_ppm": "0",
+            "id": "7",
+            "liquidity_tier": "1",
+            "market_id": "7",
+            "ticker": "AVAX-USD"
+          }
+        },
+        {
+          "params": {
+            "atomic_resolution": "-6",
+            "default_funding_ppm": "0",
+            "id": "8",
+            "liquidity_tier": "1",
+            "market_id": "8",
+            "ticker": "FIL-USD"
+          }
+        },
+        {
+          "params": {
+            "atomic_resolution": "-7",
+            "default_funding_ppm": "0",
+            "id": "9",
+            "liquidity_tier": "1",
+            "market_id": "9",
+            "ticker": "LTC-USD"
+          }
+        },
+        {
+          "params": {
+            "atomic_resolution": "-4",
+            "default_funding_ppm": "0",
+            "id": "10",
+            "liquidity_tier": "1",
+            "market_id": "10",
+            "ticker": "DOGE-USD"
+          }
+        },
+        {
+          "params": {
+            "atomic_resolution": "-6",
+            "default_funding_ppm": "0",
+            "id": "11",
+            "liquidity_tier": "1",
+            "market_id": "11",
+            "ticker": "ATOM-USD"
+          }
+        },
+        {
+          "params": {
+            "atomic_resolution": "-6",
+            "default_funding_ppm": "0",
+            "id": "12",
+            "liquidity_tier": "1",
+            "market_id": "12",
+            "ticker": "DOT-USD"
+          }
+        },
+        {
+          "params": {
+            "atomic_resolution": "-6",
+            "default_funding_ppm": "0",
+            "id": "13",
+            "liquidity_tier": "1",
+            "market_id": "13",
+            "ticker": "UNI-USD"
+          }
+        },
+        {
+          "params": {
+            "atomic_resolution": "-8",
+            "default_funding_ppm": "0",
+            "id": "14",
+            "liquidity_tier": "1",
+            "market_id": "14",
+            "ticker": "BCH-USD"
+          }
+        },
+        {
+          "params": {
+            "atomic_resolution": "-4",
+            "default_funding_ppm": "0",
+            "id": "15",
+            "liquidity_tier": "1",
+            "market_id": "15",
+            "ticker": "TRX-USD"
+          }
+        },
+        {
+          "params": {
+            "atomic_resolution": "-6",
+            "default_funding_ppm": "0",
+            "id": "16",
+            "liquidity_tier": "1",
+            "market_id": "16",
+            "ticker": "NEAR-USD"
+          }
+        },
+        {
+          "params": {
+            "atomic_resolution": "-9",
+            "default_funding_ppm": "0",
+            "id": "17",
+            "liquidity_tier": "2",
+            "market_id": "17",
+            "ticker": "MKR-USD"
+          }
+        },
+        {
+          "params": {
+            "atomic_resolution": "-5",
+            "default_funding_ppm": "0",
+            "id": "18",
+            "liquidity_tier": "1",
+            "market_id": "18",
+            "ticker": "XLM-USD"
+          }
+        },
+        {
+          "params": {
+            "atomic_resolution": "-7",
+            "default_funding_ppm": "0",
+            "id": "19",
+            "liquidity_tier": "1",
+            "market_id": "19",
+            "ticker": "ETC-USD"
+          }
+        },
+        {
+          "params": {
+            "atomic_resolution": "-7",
+            "default_funding_ppm": "0",
+            "id": "20",
+            "liquidity_tier": "2",
+            "market_id": "20",
+            "ticker": "COMP-USD"
+          }
+        },
+        {
+          "params": {
+            "atomic_resolution": "-6",
+            "default_funding_ppm": "0",
+            "id": "21",
+            "liquidity_tier": "1",
+            "market_id": "21",
+            "ticker": "WLD-USD"
+          }
+        },
+        {
+          "params": {
+            "atomic_resolution": "-6",
+            "default_funding_ppm": "0",
+            "id": "22",
+            "liquidity_tier": "2",
+            "market_id": "22",
+            "ticker": "APE-USD"
+          }
+        },
+        {
+          "params": {
+            "atomic_resolution": "-6",
+            "default_funding_ppm": "0",
+            "id": "23",
+            "liquidity_tier": "1",
+            "market_id": "23",
+            "ticker": "APT-USD"
+          }
+        },
+        {
+          "params": {
+            "atomic_resolution": "-6",
+            "default_funding_ppm": "0",
+            "id": "24",
+            "liquidity_tier": "1",
+            "market_id": "24",
+            "ticker": "ARB-USD"
+          }
+        },
+        {
+          "params": {
+            "atomic_resolution": "-5",
+            "default_funding_ppm": "0",
+            "id": "25",
+            "liquidity_tier": "2",
+            "market_id": "25",
+            "ticker": "BLUR-USD"
+          }
+        },
+        {
+          "params": {
+            "atomic_resolution": "-6",
+            "default_funding_ppm": "0",
+            "id": "26",
+            "liquidity_tier": "2",
+            "market_id": "26",
+            "ticker": "LDO-USD"
+          }
+        },
+        {
+          "params": {
+            "atomic_resolution": "-6",
+            "default_funding_ppm": "0",
+            "id": "27",
+            "liquidity_tier": "1",
+            "market_id": "27",
+            "ticker": "OP-USD"
+          }
+        },
+        {
+          "params": {
+            "atomic_resolution": "1",
+            "default_funding_ppm": "0",
+            "id": "28",
+            "liquidity_tier": "1",
+            "market_id": "28",
+            "ticker": "PEPE-USD"
+          }
+        },
+        {
+          "params": {
+            "atomic_resolution": "-5",
+            "default_funding_ppm": "0",
+            "id": "29",
+            "liquidity_tier": "2",
+            "market_id": "29",
+            "ticker": "SEI-USD"
+          }
+        },
+        {
+          "params": {
+            "atomic_resolution": "0",
+            "default_funding_ppm": "0",
+            "id": "30",
+            "liquidity_tier": "1",
+            "market_id": "30",
+            "ticker": "SHIB-USD"
+          }
+        },
+        {
+          "params": {
+            "atomic_resolution": "-5",
+            "default_funding_ppm": "0",
+            "id": "31",
+            "liquidity_tier": "1",
+            "market_id": "31",
+            "ticker": "SUI-USD"
+          }
+        },
+        {
+          "params": {
+            "atomic_resolution": "-5",
+            "default_funding_ppm": "0",
+            "id": "32",
+            "liquidity_tier": "1",
+            "market_id": "32",
+            "ticker": "XRP-USD"
+          }
         }
       ]
     },

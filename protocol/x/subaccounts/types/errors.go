@@ -11,8 +11,8 @@ import (
 const (
 	ErrMatchUpdatesMustHaveTwoPerpetualUpdates = "internalCanUpdateSubaccounts: MATCH subaccount updates must consist of " +
 		"exactly 2 perpetual updates, got settledUpdates: %+v"
-	ErrMatchUpdatesMustHaveTwoToFourUpdates = "internalCanUpdateSubaccounts: MATCH subaccount updates must consist of " +
-		"exactly 2 to 4 updates, got settledUpdates: %+v"
+	ErrMatchUpdatesMustHaveTwoUpdates = "internalCanUpdateSubaccounts: MATCH subaccount updates must consist of " +
+		"exactly 2 updates, got settledUpdates: %+v"
 	ErrMatchUpdatesMustUpdateOnePerp = "internalCanUpdateSubaccounts: MATCH subaccount updates must each have " +
 		"exactly 1 PerpetualUpdate, got settledUpdates: %+v"
 	ErrMatchUpdatesMustBeSamePerpId = "internalCanUpdateSubaccounts: MATCH subaccount updates must consists of two " +
@@ -55,11 +55,7 @@ var (
 	ErrDuplicateSubaccountIds   = errorsmod.Register(ModuleName, 202, "duplicate subaccount id found in genesis")
 
 	// 300 - 399: asset position related.
-	ErrAssetPositionsOutOfOrder       = errorsmod.Register(ModuleName, 300, "asset positions are out of order")
-	ErrAssetPositionZeroQuantum       = errorsmod.Register(ModuleName, 301, "asset position's quantum cannot be zero")
-	ErrAssetPositionNotSupported      = errorsmod.Register(ModuleName, 302, "asset position is not supported")
-	ErrMultAssetPositionsNotSupported = errorsmod.Register(
-		ModuleName, 303, "having multiple asset positions is not supported")
+	ErrAssetPositionZeroQuantum            = errorsmod.Register(ModuleName, 301, "asset position's quantum cannot be zero")
 	ErrNegativeAssetYieldIndexNotSupported = errorsmod.Register(ModuleName, 304, "negative asset yield index not supported")
 
 	// 400 - 499: perpetual position related.
@@ -88,8 +84,6 @@ var (
 	// 500 - 599: transfer related.
 	ErrAssetTransferQuantumsNotPositive = errorsmod.Register(
 		ModuleName, 500, "asset transfer quantums is not positive")
-	ErrAssetTransferThroughBankNotImplemented = errorsmod.Register(
-		ModuleName, 501, "asset transfer (other than TDAI) through the bank module is not implemented")
 	ErrYieldClaim = errorsmod.Register(
 		ModuleName, 502, "error when claiming yield for subaccount")
 )

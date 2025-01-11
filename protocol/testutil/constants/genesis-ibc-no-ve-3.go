@@ -44,6 +44,17 @@ const GenesisStateNoVeIBC3 = `{
           "market_id": 0,
           "symbol": "TDAI",
           "asset_yield_index": "1/1"
+        },
+        {
+          "atomic_resolution": -8,
+          "denom": "btc-denom",
+          "denom_exponent": "-8",
+          "has_market": false,
+          "id": 1,
+          "market_id": 0,
+          "symbol": "BTC",
+          "asset_yield_index": "1/1",
+          "max_slippage_ppm": 0
         }
       ]
     },
@@ -135,6 +146,33 @@ const GenesisStateNoVeIBC3 = `{
           ]
         },
         {
+          "address": "klyra1qt3f40penefk5eyemv8s2zznpzpmklkffr4czn",
+          "coins": [
+            {
+              "denom": "utdai",
+              "amount": "1300000000000000000"
+            }
+          ]
+        },
+        {
+          "address": "klyra1xs5088vrxmawlyuesrn73vye988ltm6mcxecpd",
+          "coins": [
+            {
+              "denom": "utdai",
+              "amount": "1300000000000000000"
+            }
+          ]
+        },
+        {
+          "address": "klyra1daqtvgfdcsgne505p4cltcwq5cfum94a7par8n",
+          "coins": [
+            {
+              "denom": "btc-denom",
+              "amount": "100000000000000000"
+            }
+          ]
+        },
+        {
           "address": "klyra1wau5mja7j7zdavtfq9lu7ejef05hm6ffxz2hcc",
           "coins": [
             {
@@ -187,7 +225,7 @@ const GenesisStateNoVeIBC3 = `{
           "coins": [
             {
               "denom": "ibc/DEEFE2DEFDC8EA8879923C4CCA42BB888C3CD03FF7ECFEFB1C2FEC27A732ACC8",
-              "amount": "2600000000000000000000000000000"
+              "amount": "5200000000000000000000000000000"
             }
           ]
         }
@@ -310,8 +348,7 @@ const GenesisStateNoVeIBC3 = `{
         },
         "insurance_fund_fee_ppm": 5000,
         "validator_fee_ppm": 200000,
-        "liquidity_fee_ppm": 800000,
-        "max_cumulative_insurance_fund_delta": "1000000000000"
+        "liquidity_fee_ppm": 800000
       }
     },
     "crisis": {
@@ -864,6 +901,32 @@ const GenesisStateNoVeIBC3 = `{
       }
     },
     "perpetuals": {
+      "collateral_pools": [
+        {
+          "collateral_pool_id": 0,
+          "max_cumulative_insurance_fund_delta_per_block": 1000000000000,
+          "multi_collateral_assets": {
+            "multi_collateral_assets": [0]
+          },
+          "quote_asset_id": 0
+        },
+        {
+          "collateral_pool_id": 1,
+          "max_cumulative_insurance_fund_delta_per_block": 1000000000000,
+          "multi_collateral_assets": {
+            "multi_collateral_assets": [1]
+          },
+          "quote_asset_id": 1
+        },
+        {
+          "collateral_pool_id": 2,
+          "max_cumulative_insurance_fund_delta_per_block": 1000000000000,
+          "multi_collateral_assets": {
+            "multi_collateral_assets": [0]
+          },
+          "quote_asset_id": 0
+        }
+      ],
       "liquidity_tiers": [
         {
           "base_position_notional": 1000000000000,
@@ -872,6 +935,46 @@ const GenesisStateNoVeIBC3 = `{
           "initial_margin_ppm": 50000,
           "maintenance_fraction_ppm": 600000,
           "name": "Large-Cap"
+        },
+        {
+          "base_position_notional": 250000000000,
+          "id": 1,
+          "impact_notional": 5000000000,
+          "initial_margin_ppm": 100000,
+          "maintenance_fraction_ppm": 500000,
+          "name": "Mid-Cap"
+        },
+        {
+          "base_position_notional": 100000000000,
+          "id": 2,
+          "impact_notional": 2500000000,
+          "initial_margin_ppm": 200000,
+          "maintenance_fraction_ppm": 500000,
+          "name": "Long-Tail"
+        },
+        {
+          "base_position_notional": 1000000000,
+          "id": 3,
+          "impact_notional": 2500000000,
+          "initial_margin_ppm": 1000000,
+          "maintenance_fraction_ppm": 200000,
+          "name": "Safety"
+        },
+        {
+          "base_position_notional": 1000000000039,
+          "id": 4,
+          "impact_notional": 50000000000,
+          "initial_margin_ppm": 10007,
+          "maintenance_fraction_ppm": 500009,
+          "name": "test-usd-100x-liq-tier-linear"
+        },
+        {
+          "base_position_notional": 100000007,
+          "id": 5,
+          "impact_notional": 50000000000,
+          "initial_margin_ppm": 10007,
+          "maintenance_fraction_ppm": 500009,
+          "name": "test-usd-100x-liq-tier-nonlinear"
         }
       ],
       "params": {
@@ -887,8 +990,7 @@ const GenesisStateNoVeIBC3 = `{
             "id": 0,
             "liquidity_tier": 0,
             "market_id": 0,
-            "ticker": "BTC-USD",
-            "market_type": 0
+            "ticker": "BTC-USD"
           },
           "yield_index": "0/1"
         },
@@ -899,8 +1001,7 @@ const GenesisStateNoVeIBC3 = `{
             "id": 1,
             "liquidity_tier": 0,
             "market_id": 1,
-            "ticker": "ETH-USD",
-            "market_type": 0
+            "ticker": "ETH-USD"
           },
           "yield_index": "0/1"
         }

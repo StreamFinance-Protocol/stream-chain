@@ -1,14 +1,15 @@
 package types
 
 import (
-	errorsmod "cosmossdk.io/errors"
 	"fmt"
+
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 var _ sdk.Msg = &MsgSendFromModuleToAccount{}
 
-// NewMsgWithdrawFromSubaccount constructs a `MsgWithdrawFromSubaccount` from an
+// NewMsgSendFromModuleToAccount constructs a `MsgSendFromModuleToAccount` from an
 // `x/subaccounts` subaccount sender, an `x/bank` account recipient, an asset ID,
 // and a number of quantums.
 func NewMsgSendFromModuleToAccount(

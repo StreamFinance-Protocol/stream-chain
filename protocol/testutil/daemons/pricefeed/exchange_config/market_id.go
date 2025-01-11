@@ -78,7 +78,8 @@ const (
 	// Arbitrary isolated market
 	MARKET_ISO_USD  types.MarketId = 999_999
 	MARKET_ISO2_USD types.MarketId = 999_998
-
+	MARKET_ISO_BTC  types.MarketId = 999_997
+	MARKET_ISO2_BTC types.MarketId = 999_996
 	// Non-trading markets.
 	// MARKET_USDT_USD is the id for the USDT-USD market pair.
 	MARKET_USDT_USD types.MarketId = 1_000_000

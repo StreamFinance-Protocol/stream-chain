@@ -1,5 +1,6 @@
 import { PageRequest, PageRequestSDKType, PageResponse, PageResponseSDKType } from "../../cosmos/base/query/v1beta1/pagination";
 import { Perpetual, PerpetualSDKType, LiquidityTier, LiquidityTierSDKType, PremiumStore, PremiumStoreSDKType } from "./perpetual";
+import { CollateralPool, CollateralPoolSDKType } from "./collateral";
 import { Params, ParamsSDKType } from "./params";
 import * as _m0 from "protobufjs/minimal";
 import { DeepPartial } from "../../helpers";
@@ -73,6 +74,34 @@ export interface QueryAllLiquidityTiersResponse {
 
 export interface QueryAllLiquidityTiersResponseSDKType {
   liquidity_tiers: LiquidityTierSDKType[];
+  pagination?: PageResponseSDKType;
+}
+/** Queries a list of CollateralPool items. */
+
+export interface QueryAllCollateralPoolsRequest {
+  pagination?: PageRequest;
+}
+/** Queries a list of CollateralPool items. */
+
+export interface QueryAllCollateralPoolsRequestSDKType {
+  pagination?: PageRequestSDKType;
+}
+/**
+ * QueryAllCollateralPoolsResponse is response type for the AllCollateralPools RPC
+ * method.
+ */
+
+export interface QueryAllCollateralPoolsResponse {
+  collateralPools: CollateralPool[];
+  pagination?: PageResponse;
+}
+/**
+ * QueryAllCollateralPoolsResponse is response type for the AllCollateralPools RPC
+ * method.
+ */
+
+export interface QueryAllCollateralPoolsResponseSDKType {
+  collateral_pools: CollateralPoolSDKType[];
   pagination?: PageResponseSDKType;
 }
 /** QueryPremiumVotesRequest is the request type for the PremiumVotes RPC method. */
@@ -426,6 +455,106 @@ export const QueryAllLiquidityTiersResponse = {
   fromPartial(object: DeepPartial<QueryAllLiquidityTiersResponse>): QueryAllLiquidityTiersResponse {
     const message = createBaseQueryAllLiquidityTiersResponse();
     message.liquidityTiers = object.liquidityTiers?.map(e => LiquidityTier.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  }
+
+};
+
+function createBaseQueryAllCollateralPoolsRequest(): QueryAllCollateralPoolsRequest {
+  return {
+    pagination: undefined
+  };
+}
+
+export const QueryAllCollateralPoolsRequest = {
+  encode(message: QueryAllCollateralPoolsRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryAllCollateralPoolsRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAllCollateralPoolsRequest();
+
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+
+      switch (tag >>> 3) {
+        case 1:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+
+    return message;
+  },
+
+  fromPartial(object: DeepPartial<QueryAllCollateralPoolsRequest>): QueryAllCollateralPoolsRequest {
+    const message = createBaseQueryAllCollateralPoolsRequest();
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  }
+
+};
+
+function createBaseQueryAllCollateralPoolsResponse(): QueryAllCollateralPoolsResponse {
+  return {
+    collateralPools: [],
+    pagination: undefined
+  };
+}
+
+export const QueryAllCollateralPoolsResponse = {
+  encode(message: QueryAllCollateralPoolsResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.collateralPools) {
+      CollateralPool.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryAllCollateralPoolsResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAllCollateralPoolsResponse();
+
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+
+      switch (tag >>> 3) {
+        case 1:
+          message.collateralPools.push(CollateralPool.decode(reader, reader.uint32()));
+          break;
+
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+
+    return message;
+  },
+
+  fromPartial(object: DeepPartial<QueryAllCollateralPoolsResponse>): QueryAllCollateralPoolsResponse {
+    const message = createBaseQueryAllCollateralPoolsResponse();
+    message.collateralPools = object.collateralPools?.map(e => CollateralPool.fromPartial(e)) || [];
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
     return message;
   }

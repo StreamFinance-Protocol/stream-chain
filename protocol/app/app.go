@@ -294,7 +294,7 @@ type App struct {
 
 	SubaccountsKeeper subaccountsmodulekeeper.Keeper
 
-	ClobKeeper *clobmodulekeeper.Keeper
+	ClobKeeper clobmodulekeeper.Keeper
 
 	SendingKeeper sendingmodulekeeper.Keeper
 
@@ -884,6 +884,7 @@ func New(
 		keys[perpetualsmoduletypes.StoreKey],
 		app.PricesKeeper,
 		app.EpochsKeeper,
+		app.AssetsKeeper,
 		app.IndexerEventManager,
 		// gov module and delayMsg module accounts are allowed to send messages to the bridge module.
 		[]string{
@@ -983,7 +984,7 @@ func New(
 	memClob := clobmodulememclob.NewMemClobPriceTimePriority(app.IndexerEventManager.Enabled())
 	memClob.SetGenerateOrderbookUpdates(app.GrpcStreamingManager.Enabled())
 
-	app.ClobKeeper = clobmodulekeeper.NewKeeper(
+	app.ClobKeeper = *clobmodulekeeper.NewKeeper(
 		appCodec,
 		keys[clobmoduletypes.StoreKey],
 		memKeys[clobmoduletypes.MemStoreKey],
@@ -1012,12 +1013,12 @@ func New(
 	)
 	clobModule := clobmodule.NewAppModule(
 		appCodec,
-		app.ClobKeeper,
+		&app.ClobKeeper,
 		app.AccountKeeper,
 		app.BankKeeper,
 		app.SubaccountsKeeper,
 	)
-	app.PerpetualsKeeper.SetClobKeeper(app.ClobKeeper)
+	app.PerpetualsKeeper.SetClobKeeper(&app.ClobKeeper)
 
 	app.SendingKeeper = *sendingmodulekeeper.NewKeeper(
 		appCodec,
@@ -1057,7 +1058,7 @@ func New(
 	)
 
 	if !appFlags.NonValidatingFullNode {
-		app.InitVoteExtensions(logger, app.voteCodec, app.PricesKeeper, &app.PerpetualsKeeper, app.ClobKeeper, &app.RatelimitKeeper, sDAIEventManager, veApplier)
+		app.InitVoteExtensions(logger, app.voteCodec, app.PricesKeeper, &app.PerpetualsKeeper, &app.ClobKeeper, &app.RatelimitKeeper, sDAIEventManager, veApplier)
 	}
 
 	/****  Module Options ****/
@@ -1329,7 +1330,7 @@ func New(
 		app.SetPrepareProposal(
 			prepare.PrepareProposalHandler(
 				txConfig,
-				app.ClobKeeper,
+				&app.ClobKeeper,
 				app.PerpetualsKeeper,
 				app.PricesKeeper,
 				app.RatelimitKeeper,
@@ -1348,7 +1349,7 @@ func New(
 		app.SetProcessProposal(
 			process.FullNodeProcessProposalHandler(
 				txConfig,
-				app.ClobKeeper,
+				&app.ClobKeeper,
 				app.StakingKeeper,
 				app.PerpetualsKeeper,
 				app.PricesKeeper,
@@ -1358,7 +1359,7 @@ func New(
 		app.SetProcessProposal(
 			process.ProcessProposalHandler(
 				txConfig,
-				app.ClobKeeper,
+				&app.ClobKeeper,
 				app.StakingKeeper,
 				app.PerpetualsKeeper,
 				app.PricesKeeper,
@@ -1675,7 +1676,7 @@ func (app *App) buildAnteHandler(txConfig client.TxConfig) sdk.AnteHandler {
 				FeegrantKeeper:  app.FeeGrantKeeper,
 				SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
 			},
-			ClobKeeper:   app.ClobKeeper,
+			ClobKeeper:   &app.ClobKeeper,
 			Codec:        app.appCodec,
 			AuthStoreKey: app.keys[authtypes.StoreKey],
 		},

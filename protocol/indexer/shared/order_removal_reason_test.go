@@ -35,9 +35,9 @@ func TestGetOrderRemovalReason_Success(t *testing.T) {
 			expectedReason: sharedtypes.OrderRemovalReason_ORDER_REMOVAL_REASON_IMMEDIATE_OR_CANCEL_WOULD_REST_ON_BOOK,
 			expectedErr:    nil,
 		},
-		"Gets order removal reason for order status ViolatesIsolatedSubaccountConstraints": {
-			orderStatus:    clobtypes.ViolatesIsolatedSubaccountConstraints,
-			expectedReason: sharedtypes.OrderRemovalReason_ORDER_REMOVAL_REASON_VIOLATES_ISOLATED_SUBACCOUNT_CONSTRAINTS,
+		"Gets order removal reason for order status ViolatesCollateralPoolConstraints": {
+			orderStatus:    clobtypes.ViolatesCollateralPoolConstraints,
+			expectedReason: sharedtypes.OrderRemovalReason_ORDER_REMOVAL_REASON_VIOLATES_COLLATERAL_POOL_CONSTRAINTS,
 			expectedErr:    nil,
 		},
 		"Gets order removal reason for order error ErrFokOrderCouldNotBeFullyFilled": {

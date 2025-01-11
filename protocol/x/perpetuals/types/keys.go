@@ -29,6 +29,9 @@ const (
 	// LiquidityTierKeyPrefix is the prefix to retrieve all `LiquidityTier`s.
 	LiquidityTierKeyPrefix = "LiqTier:"
 
+	// CollateralPoolKeyPrefix is the prefix to retrieve all `CollateralPool`s.
+	CollateralPoolKeyPrefix = "ColPool:"
+
 	// ParamsKey is the key to retrieve all params for the module.
 	ParamsKey = "Params"
 

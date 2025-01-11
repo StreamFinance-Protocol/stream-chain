@@ -9,11 +9,10 @@ import (
 
 	errorsmod "cosmossdk.io/errors"
 
-	"github.com/StreamFinance-Protocol/stream-chain/protocol/dtypes"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib/log"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib/metrics"
-	assetstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets/types"
+	assettypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/heap"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	perpkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/keeper"
@@ -82,6 +81,8 @@ func (k Keeper) LiquidateSubaccountsAgainstOrderbookInternal(
 	subaccountsToDeleverage []heap.SubaccountToDeleverage,
 	err error,
 ) {
+
+	fmt.Println("LiquidateSubaccountsAgainstOrderbookInternal subaccountIds", subaccountIds)
 	numIsolatedLiquidations := 0
 	for i := 0; i < int(k.Flags.MaxLiquidationAttemptsPerBlock); i++ {
 		subaccount, subaccountId := k.GetNextSubaccountToLiquidate(ctx, subaccountIds, isolatedPositionsPriorityHeap, &numIsolatedLiquidations)
@@ -90,11 +91,12 @@ func (k Keeper) LiquidateSubaccountsAgainstOrderbookInternal(
 		}
 
 		// will always have at least one perpetual position
-		isIsolated, err := k.perpetualsKeeper.IsIsolatedPerpetual(ctx, subaccount.PerpetualPositions[0].PerpetualId)
+		// TODO: generalize this to have configurable limits for different collateral pools
+		isMainCollateralPool, err := k.perpetualsKeeper.IsMainCollateralPool(ctx, subaccount.PerpetualPositions[0].PerpetualId)
 		if err != nil {
 			return nil, err
 		}
-		if isIsolated {
+		if !isMainCollateralPool {
 			if numIsolatedLiquidations < int(k.Flags.MaxIsolatedLiquidationAttemptsPerBlock) {
 				numIsolatedLiquidations++
 			} else {
@@ -106,6 +108,7 @@ func (k Keeper) LiquidateSubaccountsAgainstOrderbookInternal(
 
 		// Generate a new liquidation order with the appropriate order size from the sorted subaccount ids.
 		liquidationOrder, err := k.MaybeGetLiquidationOrder(ctx, subaccountId.SubaccountId)
+		fmt.Println("liquidationOrder", liquidationOrder)
 		if errors.Is(err, types.ErrNoPerpetualPositionsToLiquidate) {
 			i--
 			continue
@@ -114,6 +117,8 @@ func (k Keeper) LiquidateSubaccountsAgainstOrderbookInternal(
 		}
 
 		optimisticallyFilledQuantums, _, err := k.PlacePerpetualLiquidation(ctx, *liquidationOrder)
+		fmt.Println("optimisticallyFilledQuantums", optimisticallyFilledQuantums)
+		fmt.Println("err", err)
 		// Exception for liquidation which conflicts with clob pair status. This is expected for liquidations generated
 		// for subaccounts with open positions in final settlement markets.
 		if err != nil {
@@ -126,6 +131,8 @@ func (k Keeper) LiquidateSubaccountsAgainstOrderbookInternal(
 		}
 
 		err = k.handleLiquidationOrderPlacementResult(ctx, liquidationOrder, optimisticallyFilledQuantums, &subaccountsToDeleverage, subaccountIds)
+		fmt.Println("err", err)
+		fmt.Println("subaccountsToDeleverage", subaccountsToDeleverage)
 		if err != nil {
 			return nil, err
 		}
@@ -145,73 +152,18 @@ func (k Keeper) GetNextSubaccountToLiquidate(
 ) {
 	// If we have exceeded the max numIsolatedLiquidations and there are no more non-isolated subaccounts to liquidate
 	if subaccountIds.Len() == 0 {
-		if isolatedPositionsPriorityHeap.Len() > 0 {
-			*subaccountIds = *isolatedPositionsPriorityHeap
-			*isolatedPositionsPriorityHeap = *heap.NewLiquidationPriorityHeap()
-			*numIsolatedLiquidations = -1000000
-		} else {
+		if isolatedPositionsPriorityHeap.Len() == 0 {
 			return satypes.Subaccount{}, nil
 		}
+		*subaccountIds = *isolatedPositionsPriorityHeap
+		*isolatedPositionsPriorityHeap = *heap.NewLiquidationPriorityHeap()
+		*numIsolatedLiquidations = math.MinInt
 	}
 
 	subaccountId = subaccountIds.PopLowestPriority()
 	subaccount = k.subaccountsKeeper.GetSubaccount(ctx, subaccountId.SubaccountId)
 
 	return subaccount, subaccountId
-}
-
-func (k Keeper) handleLiquidationOrderPlacementResult(
-	ctx sdk.Context,
-	liquidationOrder *types.LiquidationOrder,
-	optimisticallyFilledQuantums satypes.BaseQuantums,
-	subaccountsToDeleverage *[]heap.SubaccountToDeleverage,
-	subaccountIds *heap.LiquidationPriorityHeap,
-) error {
-	if optimisticallyFilledQuantums == 0 {
-		*subaccountsToDeleverage = append(*subaccountsToDeleverage, heap.SubaccountToDeleverage{
-			SubaccountId: liquidationOrder.GetSubaccountId(),
-			PerpetualId:  liquidationOrder.MustGetLiquidatedPerpetualId(),
-		})
-		return nil
-	}
-
-	return k.insertIntoLiquidationHeapIfUnhealthy(ctx, liquidationOrder.GetSubaccountId(), subaccountIds)
-}
-
-func (k Keeper) insertIntoLiquidationHeapIfUnhealthy(
-	ctx sdk.Context,
-	subaccountId satypes.SubaccountId,
-	subaccountIds *heap.LiquidationPriorityHeap,
-) error {
-	subaccount := k.subaccountsKeeper.GetSubaccount(ctx, subaccountId)
-	isLiquidatable, priority, err := k.GetSubaccountPriority(ctx, subaccount)
-	if err != nil {
-		return err
-	}
-
-	fmt.Printf("insertIntoLiquidationHeapIfUnhealthy subaccountId: %v, priority: %v\n",
-		subaccountId, priority)
-
-	if isLiquidatable {
-		subaccountIds.AddSubaccount(subaccountId, priority)
-	}
-
-	return nil
-}
-
-func (k Keeper) GetSubaccountPriority(
-	ctx sdk.Context,
-	subaccount satypes.Subaccount,
-) (
-	isLiquidatable bool,
-	priority *big.Float,
-	err error,
-) {
-	_, marketPricesMap, perpetualsMap, liquidityTiersMap := k.FetchInformationForLiquidations(ctx)
-
-	isLiquidatable, _, priority, err = k.GetSubaccountCollateralizationInfo(ctx, subaccount, marketPricesMap, perpetualsMap, liquidityTiersMap)
-
-	return isLiquidatable, priority, err
 }
 
 // MaybeGetLiquidationOrder takes a subaccount ID and returns a liquidation order that can be used to
@@ -230,43 +182,12 @@ func (k Keeper) MaybeGetLiquidationOrder(
 		metrics.ConstructLiquidationOrder,
 	)
 
-	// The subaccount is liquidatable. Get the perpetual position and position size to liquidate.
 	perpetualId, err := k.GetBestPerpetualPositionToLiquidate(ctx, subaccountId)
 	if err != nil {
 		return nil, err
 	}
 
 	return k.GetLiquidationOrderForPerpetual(ctx, subaccountId, perpetualId)
-}
-
-func (k Keeper) GetLiquidationOrderForPerpetual(
-	ctx sdk.Context,
-	subaccountId satypes.SubaccountId,
-	perpetualId uint32,
-) (
-	liquidationOrder *types.LiquidationOrder,
-	err error,
-) {
-	clobPair := k.mustGetClobPairForPerpetualId(ctx, perpetualId)
-	orderQuantums, err := k.GetNegativePositionSize(ctx, subaccountId, perpetualId)
-	if err != nil {
-		return nil, err
-	}
-	isPositionLong := orderQuantums.Sign() == -1
-
-	liquidationPrice, err := k.getLiquidationPrice(ctx, subaccountId, perpetualId, orderQuantums, isPositionLong, clobPair)
-	if err != nil {
-		return nil, err
-	}
-
-	liquidationOrder = types.NewLiquidationOrder(
-		subaccountId,
-		clobPair,
-		!isPositionLong,
-		satypes.BaseQuantums(orderQuantums.Abs(orderQuantums).Uint64()),
-		liquidationPrice,
-	)
-	return liquidationOrder, nil
 }
 
 // PlacePerpetualLiquidation places an IOC liquidation order onto the book that results in fills of type
@@ -303,6 +224,91 @@ func (k Keeper) PlacePerpetualLiquidation(
 	k.handleLiquidationMetrics(ctx, liquidationOrder, orderSizeOptimisticallyFilledFromMatchingQuantums, perpetualId)
 	k.SendOffchainMessages(offchainUpdates, nil, metrics.SendPlacePerpetualLiquidationOffchainUpdates)
 	return orderSizeOptimisticallyFilledFromMatchingQuantums, orderStatus, err
+}
+
+func (k Keeper) handleLiquidationOrderPlacementResult(
+	ctx sdk.Context,
+	liquidationOrder *types.LiquidationOrder,
+	optimisticallyFilledQuantums satypes.BaseQuantums,
+	subaccountsToDeleverage *[]heap.SubaccountToDeleverage,
+	subaccountIds *heap.LiquidationPriorityHeap,
+) error {
+	if optimisticallyFilledQuantums == 0 {
+		*subaccountsToDeleverage = append(*subaccountsToDeleverage, heap.SubaccountToDeleverage{
+			SubaccountId: liquidationOrder.GetSubaccountId(),
+			PerpetualId:  liquidationOrder.MustGetLiquidatedPerpetualId(),
+		})
+		return nil
+	}
+
+	return k.insertIntoLiquidationHeapIfUnhealthy(ctx, liquidationOrder.GetSubaccountId(), subaccountIds)
+}
+
+func (k Keeper) GetBestPerpetualPositionToLiquidate(
+	ctx sdk.Context,
+	subaccountId satypes.SubaccountId,
+) (
+	perpetualId uint32,
+	err error,
+) {
+	subaccount := k.subaccountsKeeper.GetSubaccount(ctx, subaccountId)
+	subaccountLiquidationInfo := k.GetSubaccountLiquidationInfo(ctx, subaccountId)
+
+	//bestPriority := new(big.Float)
+	bestPriority := new(big.Float)
+	bestPerpetualId := uint32(0)
+	foundPerpetual := false
+
+	if len(subaccount.PerpetualPositions) == 1 {
+		if subaccountLiquidationInfo.HasPerpetualBeenLiquidatedForSubaccount(subaccount.PerpetualPositions[0].PerpetualId) {
+			return 0, types.ErrNoPerpetualPositionsToLiquidate
+		} else {
+			return subaccount.PerpetualPositions[0].PerpetualId, nil
+		}
+	}
+
+	for _, position := range subaccount.PerpetualPositions {
+		err := k.SimulatePriorityWithClosedPosition(ctx, subaccount, subaccountLiquidationInfo, position, bestPriority, &bestPerpetualId, &foundPerpetual)
+		if err != nil {
+			return 0, err
+		}
+	}
+
+	if !foundPerpetual {
+		return 0, types.ErrNoPerpetualPositionsToLiquidate
+	}
+
+	return bestPerpetualId, nil
+}
+
+func (k Keeper) GetLiquidationOrderForPerpetual(
+	ctx sdk.Context,
+	subaccountId satypes.SubaccountId,
+	perpetualId uint32,
+) (
+	liquidationOrder *types.LiquidationOrder,
+	err error,
+) {
+	clobPair := k.mustGetClobPairForPerpetualId(ctx, perpetualId)
+	orderQuantums, err := k.GetNegativePositionSize(ctx, subaccountId, perpetualId)
+	if err != nil {
+		return nil, err
+	}
+	isPositionLong := orderQuantums.Sign() == -1
+
+	liquidationPrice, err := k.getLiquidationPrice(ctx, subaccountId, perpetualId, orderQuantums, isPositionLong, clobPair)
+	if err != nil {
+		return nil, err
+	}
+
+	liquidationOrder = types.NewLiquidationOrder(
+		subaccountId,
+		clobPair,
+		!isPositionLong,
+		satypes.BaseQuantums(orderQuantums.Abs(orderQuantums).Uint64()),
+		liquidationPrice,
+	)
+	return liquidationOrder, nil
 }
 
 func (k Keeper) handleLiquidationMetrics(
@@ -346,11 +352,17 @@ func (k Keeper) handleLiquidationMetrics(
 		labels,
 	)
 
+	quoteCurrencyAtomicResolution, err := k.perpetualsKeeper.GetQuoteCurrencyAtomicResolutionFromPerpetualId(ctx, perpetualId)
+	if err != nil {
+		return
+	}
+
 	// Stat the volume of liquidation orders placed.
 	if totalQuoteQuantums, err := k.perpetualsKeeper.GetNetNotional(
 		ctx,
 		perpetualId,
 		liquidationOrder.GetBaseQuantums().ToBigInt(),
+		quoteCurrencyAtomicResolution,
 	); err == nil {
 		metrics.IncrCounterWithLabels(
 			metrics.LiquidationsPlacePerpetualLiquidationQuoteQuantums,
@@ -364,6 +376,118 @@ func (k Keeper) handleLiquidationMetrics(
 			labels...,
 		)
 	}
+}
+
+func (k Keeper) insertIntoLiquidationHeapIfUnhealthy(
+	ctx sdk.Context,
+	subaccountId satypes.SubaccountId,
+	subaccountIds *heap.LiquidationPriorityHeap,
+) error {
+	subaccount := k.subaccountsKeeper.GetSubaccount(ctx, subaccountId)
+	isLiquidatable, priority, err := k.GetSubaccountPriority(ctx, subaccount)
+	if err != nil {
+		return err
+	}
+
+	if isLiquidatable {
+		subaccountIds.AddSubaccount(subaccountId, priority)
+	}
+
+	return nil
+}
+
+func (k Keeper) SimulatePriorityWithClosedPosition(
+	ctx sdk.Context,
+	subaccount satypes.Subaccount,
+	subaccountLiquidationInfo types.SubaccountLiquidationInfo,
+	position *satypes.PerpetualPosition,
+	bestPriority *big.Float,
+	bestPerpetualId *uint32,
+	foundPerpetual *bool,
+) error {
+	perpetual, err := k.perpetualsKeeper.GetPerpetual(ctx, position.PerpetualId)
+	if err != nil {
+		return err
+	}
+
+	price, err := k.pricesKeeper.GetMarketPrice(ctx, perpetual.Params.MarketId)
+	if err != nil {
+		return err
+	}
+
+	if !subaccountLiquidationInfo.HasPerpetualBeenLiquidatedForSubaccount(position.PerpetualId) {
+		err := k.simulatePriorityWithClosedPosition(ctx, subaccount, position, price, bestPriority, bestPerpetualId, foundPerpetual)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// GetNegativePositionSize returns the number of base quantums needed to liquidate
+func (k Keeper) GetNegativePositionSize(
+	ctx sdk.Context,
+	subaccountId satypes.SubaccountId,
+	perpetualId uint32,
+) (
+	deltaQuantums *big.Int,
+	err error,
+) {
+	subaccount := k.subaccountsKeeper.GetSubaccount(ctx, subaccountId)
+	perpetualPosition, exists := subaccount.GetPerpetualPositionForId(perpetualId)
+	if !exists {
+		return nil,
+			errorsmod.Wrapf(
+				types.ErrNoPerpetualPositionsToLiquidate,
+				"SubaccountId: %v, perpetualId: %d",
+				subaccount.Id,
+				perpetualId,
+			)
+	}
+
+	return new(big.Int).Neg(perpetualPosition.GetBigQuantums()), nil
+}
+
+// getLiquidationPrice returns the liquidation price for a given subaccount and perpetual.
+// It calculates the most aggressive price between the bankruptcy price and the fillable price.
+func (k Keeper) getLiquidationPrice(
+	ctx sdk.Context,
+	subaccountId satypes.SubaccountId,
+	perpetualId uint32,
+	orderQuantums *big.Int,
+	isPositionLong bool,
+	clobPair types.ClobPair,
+) (
+	liquidationPrice types.Subticks,
+	err error,
+) {
+	bankruptcyPriceRat, err := k.GetBankruptcyPrice(ctx, subaccountId, perpetualId, orderQuantums)
+	if err != nil {
+		return 0, err
+	}
+
+	fillablePriceRat, err := k.GetFillablePrice(ctx, subaccountId, perpetualId)
+	if err != nil {
+		return 0, err
+	}
+
+	liquidationPriceRat := GetMostAggressivePrice(bankruptcyPriceRat, fillablePriceRat, isPositionLong)
+	return k.ConvertLiquidationPriceToSubticks(ctx, liquidationPriceRat, isPositionLong, clobPair), nil
+}
+
+func (k Keeper) GetSubaccountPriority(
+	ctx sdk.Context,
+	subaccount satypes.Subaccount,
+) (
+	isLiquidatable bool,
+	priority *big.Float,
+	err error,
+) {
+	_, marketPricesMap, perpetualsMap, liquidityTiersMap := k.FetchInformationForLiquidations(ctx)
+
+	isLiquidatable, _, priority, err = k.GetSubaccountCollateralizationInfo(ctx, subaccount, marketPricesMap, perpetualsMap, liquidityTiersMap)
+
+	return isLiquidatable, priority, err
 }
 
 // IsLiquidatable returns true if the subaccount is able to be liquidated; that is,
@@ -407,39 +531,40 @@ func CanLiquidateSubaccount(
 	return bigMaintenanceMargin.Sign() > 0 && bigMaintenanceMargin.Cmp(bigNetCollateral) == 1
 }
 
+func CalculateLiquidationPriority(
+	bigTotalNetCollateral *big.Int,
+	bigTotalMaintenanceMargin *big.Int,
+	bigWeightedPositionSizeQuoteQuantums *big.Int,
+) (
+	liquidationPriority *big.Float,
+) {
+	if bigWeightedPositionSizeQuoteQuantums.Sign() <= 0 {
+		return big.NewFloat(math.MaxFloat64)
+	}
+
+	health := GetHealth(bigTotalNetCollateral, bigTotalMaintenanceMargin)
+
+	if bigTotalNetCollateral.Sign() < 0 {
+		return new(big.Float).Mul(health, new(big.Float).SetInt(bigWeightedPositionSizeQuoteQuantums))
+	}
+
+	return new(big.Float).Quo(health, new(big.Float).SetInt(bigWeightedPositionSizeQuoteQuantums))
+}
+
 func GetHealth(
 	bigNetCollateral *big.Int,
 	bigMaintenanceMargin *big.Int,
 ) *big.Float {
-	// If net collateral is less than 0, return 0
-	if bigNetCollateral.Sign() < 0 {
-		return big.NewFloat(0)
-	}
-
 	// If maintenance margin is less than or equal to 0, return a large number
 	if bigMaintenanceMargin.Sign() <= 0 {
 		return big.NewFloat(math.MaxFloat64)
 	}
 
-	// Calculate the collateral/maintenance margin ratio
-	health := new(big.Float).Quo(new(big.Float).SetInt(bigNetCollateral), new(big.Float).SetInt(bigMaintenanceMargin))
-
-	return health
-}
-
-func CalculateLiquidationPriority(
-	bigTotalNetCollateral *big.Int,
-	bigTotalMaintenanceMargin *big.Int,
-	bigWeightedMaintenanceMargin *big.Int,
-) (
-	liquidationPriority *big.Float,
-) {
-	if bigWeightedMaintenanceMargin.Sign() <= 0 {
-		return big.NewFloat(math.MaxFloat64)
+	if bigNetCollateral.Sign() < 0 {
+		return new(big.Float).Mul(new(big.Float).SetInt(bigNetCollateral), new(big.Float).SetInt(bigMaintenanceMargin))
 	}
 
-	health := GetHealth(bigTotalNetCollateral, bigTotalMaintenanceMargin)
-	return new(big.Float).Quo(health, new(big.Float).SetInt(bigWeightedMaintenanceMargin))
+	return new(big.Float).Quo(new(big.Float).SetInt(bigNetCollateral), new(big.Float).SetInt(bigMaintenanceMargin))
 }
 
 // EnsureIsLiquidatable returns an error if the subaccount is not liquidatable.
@@ -461,33 +586,6 @@ func (k Keeper) EnsureIsLiquidatable(
 		)
 	}
 	return nil
-}
-
-// getLiquidationPrice returns the liquidation price for a given subaccount and perpetual.
-// It calculates the most aggressive price between the bankruptcy price and the fillable price.
-func (k Keeper) getLiquidationPrice(
-	ctx sdk.Context,
-	subaccountId satypes.SubaccountId,
-	perpetualId uint32,
-	orderQuantums *big.Int,
-	isPositionLong bool,
-	clobPair types.ClobPair,
-) (
-	liquidationPrice types.Subticks,
-	err error,
-) {
-	bankruptcyPriceRat, err := k.GetBankruptcyPrice(ctx, subaccountId, perpetualId, orderQuantums)
-	if err != nil {
-		return 0, err
-	}
-
-	fillablePriceRat, err := k.GetFillablePrice(ctx, subaccountId, perpetualId)
-	if err != nil {
-		return 0, err
-	}
-
-	liquidationPriceRat := GetMostAggressivePrice(bankruptcyPriceRat, fillablePriceRat, isPositionLong)
-	return k.ConvertLiquidationPriceToSubticks(ctx, liquidationPriceRat, isPositionLong, clobPair), nil
 }
 
 // For a long position (isLong == true), it returns the lower price.
@@ -615,12 +713,17 @@ func (k Keeper) getFillablePriceCalculationInputs(
 		return nil, nil, nil, nil, 0, 0, nil, types.ErrInvalidPerpetualPositionSizeDelta
 	}
 
-	pnnvBig, err = k.perpetualsKeeper.GetNetCollateral(ctx, perpetualId, bigPositionSizeQuantums)
+	quoteCurrencyAtomicResolution, err := k.perpetualsKeeper.GetQuoteCurrencyAtomicResolutionFromPerpetualId(ctx, perpetualId)
 	if err != nil {
 		return nil, nil, nil, nil, 0, 0, nil, err
 	}
 
-	_, pmmrBig, err = k.perpetualsKeeper.GetMarginRequirements(ctx, perpetualId, bigPositionSizeQuantums)
+	pnnvBig, err = k.perpetualsKeeper.GetNetCollateral(ctx, perpetualId, bigPositionSizeQuantums, quoteCurrencyAtomicResolution)
+	if err != nil {
+		return nil, nil, nil, nil, 0, 0, nil, err
+	}
+
+	_, pmmrBig, err = k.perpetualsKeeper.GetMarginRequirements(ctx, perpetualId, bigPositionSizeQuantums, quoteCurrencyAtomicResolution)
 	if err != nil {
 		return nil, nil, nil, nil, 0, 0, nil, err
 	}
@@ -739,6 +842,7 @@ func (k Keeper) GetBankruptcyPriceInQuoteQuantums(
 	err error,
 ) {
 	tncBig, tmmrBig, pnnvBig, pnnvadBig, pmmrBig, pmmradBig, err := k.getBankruptcyPriceCalculationInputs(ctx, subaccountId, perpetualId, deltaQuantums)
+
 	if err != nil {
 		return nil, err
 	}
@@ -802,6 +906,11 @@ func (k Keeper) getBankruptcyPriceCalculationInputs(
 	pmmradBig *big.Int,
 	err error,
 ) {
+	quoteCurrencyAtomicResolution, err := k.perpetualsKeeper.GetQuoteCurrencyAtomicResolutionFromPerpetualId(ctx, perpetualId)
+	if err != nil {
+		return nil, nil, nil, nil, nil, nil, err
+	}
+
 	tncBig, _, tmmrBig, err = k.subaccountsKeeper.GetNetCollateralAndMarginRequirements(ctx, satypes.Update{SubaccountId: subaccountId})
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
@@ -816,6 +925,7 @@ func (k Keeper) getBankruptcyPriceCalculationInputs(
 		ctx,
 		perpetualId,
 		bigPositionSizeQuantums,
+		quoteCurrencyAtomicResolution,
 	)
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
@@ -825,12 +935,13 @@ func (k Keeper) getBankruptcyPriceCalculationInputs(
 		ctx,
 		perpetualId,
 		new(big.Int).Add(bigPositionSizeQuantums, deltaQuantums),
+		quoteCurrencyAtomicResolution,
 	)
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
 	}
 
-	_, pmmrBig, err = k.perpetualsKeeper.GetMarginRequirements(ctx, perpetualId, bigPositionSizeQuantums)
+	_, pmmrBig, err = k.perpetualsKeeper.GetMarginRequirements(ctx, perpetualId, bigPositionSizeQuantums, quoteCurrencyAtomicResolution)
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
 	}
@@ -842,6 +953,7 @@ func (k Keeper) getBankruptcyPriceCalculationInputs(
 			bigPositionSizeQuantums,
 			deltaQuantums,
 		),
+		quoteCurrencyAtomicResolution,
 	)
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
@@ -1032,66 +1144,6 @@ func (k Keeper) validateValidatorAndLiquidityFee(
 	return nil
 }
 
-func (k Keeper) GetBestPerpetualPositionToLiquidate(
-	ctx sdk.Context,
-	subaccountId satypes.SubaccountId,
-) (
-	perpetualId uint32,
-	err error,
-) {
-	subaccount := k.subaccountsKeeper.GetSubaccount(ctx, subaccountId)
-	subaccountLiquidationInfo := k.GetSubaccountLiquidationInfo(ctx, subaccountId)
-
-	bestPriority := big.NewFloat(-1)
-	bestPerpetualId := uint32(0)
-
-	if len(subaccount.PerpetualPositions) == 1 {
-		if subaccountLiquidationInfo.HasPerpetualBeenLiquidatedForSubaccount(subaccount.PerpetualPositions[0].PerpetualId) {
-			return 0, types.ErrNoPerpetualPositionsToLiquidate
-		} else {
-			return subaccount.PerpetualPositions[0].PerpetualId, nil
-		}
-	}
-
-	for _, position := range subaccount.PerpetualPositions {
-		err := k.SimulatePriorityWithClosedPosition(ctx, subaccount, subaccountLiquidationInfo, position, bestPriority, &bestPerpetualId)
-		if err != nil {
-			return 0, err
-		}
-	}
-
-	if bestPriority.Sign() >= 0 {
-		return bestPerpetualId, nil
-	}
-	return 0, types.ErrNoPerpetualPositionsToLiquidate
-}
-
-func (k Keeper) SimulatePriorityWithClosedPosition(
-	ctx sdk.Context,
-	subaccount satypes.Subaccount,
-	subaccountLiquidationInfo types.SubaccountLiquidationInfo,
-	position *satypes.PerpetualPosition,
-	bestPriority *big.Float,
-	bestPerpetualId *uint32,
-) error {
-	perpetual, err := k.perpetualsKeeper.GetPerpetual(ctx, position.PerpetualId)
-	if err != nil {
-		return err
-	}
-	price, err := k.pricesKeeper.GetMarketPrice(ctx, perpetual.Params.MarketId)
-	if err != nil {
-		return err
-	}
-
-	if !subaccountLiquidationInfo.HasPerpetualBeenLiquidatedForSubaccount(position.PerpetualId) {
-		err := k.simulatePriorityWithClosedPosition(ctx, subaccount, position, price, bestPriority, bestPerpetualId)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 func deepCopySubaccount(subaccount satypes.Subaccount) satypes.Subaccount {
 	copySubaccount := satypes.Subaccount{
 		Id:              subaccount.Id,
@@ -1127,6 +1179,7 @@ func (k Keeper) simulatePriorityWithClosedPosition(
 	price pricestypes.MarketPrice,
 	bestPriority *big.Float,
 	bestPerpetualId *uint32,
+	foundPerpetual *bool,
 ) error {
 	closedSubaccount := deepCopySubaccount(subaccount)
 
@@ -1140,10 +1193,12 @@ func (k Keeper) simulatePriorityWithClosedPosition(
 		return err
 	}
 
-	if priority.Cmp(bestPriority) > 0 {
+	if !*foundPerpetual || priority.Cmp(bestPriority) > 0 {
 		*bestPriority = *priority
 		*bestPerpetualId = position.PerpetualId
+		*foundPerpetual = true
 	}
+
 	return nil
 }
 
@@ -1162,29 +1217,28 @@ func (k Keeper) SimulateClosePerpetualPosition(
 	if err != nil {
 		return satypes.Subaccount{}, err
 	}
-	bigNetCollateralQuoteQuantums := perpkeeper.GetNetNotionalInQuoteQuantums(perpetual, price, position.GetBigQuantums())
 
-	err = UpdateTDaiPosition(&subaccount, bigNetCollateralQuoteQuantums)
+	collateralPool, err := k.perpetualsKeeper.GetCollateralPool(ctx, perpetual.Params.CollateralPoolId)
 	if err != nil {
 		return satypes.Subaccount{}, err
 	}
+
+	quoteAsset, exists := k.assetsKeeper.GetAsset(ctx, collateralPool.QuoteAssetId)
+	if !exists {
+		return satypes.Subaccount{}, errorsmod.Wrapf(assettypes.ErrAssetDoesNotExist, "Quote asset not found for collateral pool %+v", collateralPool)
+	}
+	quoteCurrencyAtomicResolution := quoteAsset.AtomicResolution
+
+	bigNetCollateralQuoteQuantums := perpkeeper.GetNetNotionalInQuoteQuantums(perpetual, price, position.GetBigQuantums(), quoteCurrencyAtomicResolution)
+
+	UpdateQuoteAssetPosition(&subaccount, bigNetCollateralQuoteQuantums, collateralPool.QuoteAssetId)
 	return subaccount, nil
 }
 
-func UpdateTDaiPosition(subaccount *satypes.Subaccount, quantumsDelta *big.Int) (err error) {
-	assetPosition := subaccount.AssetPositions[0]
-	if assetPosition.AssetId != assetstypes.AssetTDai.Id {
-		return errors.New("first asset position must be TDai")
-	}
-
-	assetPosition.Quantums = dtypes.NewIntFromBigInt(new(big.Int).Add(assetPosition.Quantums.BigInt(), quantumsDelta))
-
-	if assetPosition.Quantums.BigInt().Sign() == 0 {
-		subaccount.AssetPositions = []*satypes.AssetPosition{}
-	} else {
-		subaccount.AssetPositions = []*satypes.AssetPosition{assetPosition}
-	}
-	return nil
+func UpdateQuoteAssetPosition(subaccount *satypes.Subaccount, quantumsDelta *big.Int, quoteAssetId uint32) {
+	quoteAmount := subaccount.GetAssetPosition(quoteAssetId)
+	newAmount := new(big.Int).Add(quoteAmount, quantumsDelta)
+	subaccount.SetAssetPosition(newAmount, quoteAssetId)
 }
 
 func RemovePerpetualPosition(subaccount *satypes.Subaccount, perpetualId uint32) {
@@ -1200,30 +1254,6 @@ func RemovePerpetualPosition(subaccount *satypes.Subaccount, perpetualId uint32)
 	}
 }
 
-// GetNegativePositionSize returns the number of base quantums needed to liquidate
-func (k Keeper) GetNegativePositionSize(
-	ctx sdk.Context,
-	subaccountId satypes.SubaccountId,
-	perpetualId uint32,
-) (
-	deltaQuantums *big.Int,
-	err error,
-) {
-	subaccount := k.subaccountsKeeper.GetSubaccount(ctx, subaccountId)
-	perpetualPosition, exists := subaccount.GetPerpetualPositionForId(perpetualId)
-	if !exists {
-		return nil,
-			errorsmod.Wrapf(
-				types.ErrNoPerpetualPositionsToLiquidate,
-				"SubaccountId: %v, perpetualId: %d",
-				subaccount.Id,
-				perpetualId,
-			)
-	}
-
-	return new(big.Int).Neg(perpetualPosition.GetBigQuantums()), nil
-}
-
 func (k Keeper) GetMaxQuantumsInsuranceDelta(
 	ctx sdk.Context,
 	perpetualId uint32,
@@ -1235,6 +1265,7 @@ func (k Keeper) GetMaxQuantumsInsuranceDelta(
 	if err != nil {
 		return nil, err
 	}
+
 	bigCurrentInsuranceFundLost, err := k.GetCumulativeInsuranceFundDelta(ctx, perpetualId)
 	if err != nil {
 		return nil, err
@@ -1253,17 +1284,12 @@ func (k Keeper) GetMaxQuantumsInsuranceDelta(
 }
 
 func (k Keeper) GetInsuranceFundDeltaBlockLimit(ctx sdk.Context, perpetualId uint32) (*big.Int, error) {
-	isIsolated, err := k.perpetualsKeeper.IsIsolatedPerpetual(ctx, perpetualId)
+	collateralPool, err := k.perpetualsKeeper.GetCollateralPoolFromPerpetualId(ctx, perpetualId)
 	if err != nil {
 		return big.NewInt(0), err
 	}
 
-	if isIsolated {
-		perpetual, _ := k.perpetualsKeeper.GetPerpetual(ctx, perpetualId)
-		return new(big.Int).SetUint64(perpetual.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock), nil
-	}
-
-	return new(big.Int).SetUint64(k.GetLiquidationsConfig(ctx).MaxCumulativeInsuranceFundDelta), nil
+	return new(big.Int).SetUint64(collateralPool.MaxCumulativeInsuranceFundDeltaPerBlock), nil
 }
 
 // ConvertLiquidationPriceToSubticks converts the liquidation price of a liquidation order to subticks.
@@ -1418,20 +1444,24 @@ func (k Keeper) CheckInsuranceFundLimits(
 	perpetualId uint32,
 	insuranceFundDelta *big.Int,
 ) error {
-	if insuranceFundDelta.Sign() == -1 {
-		bigMaxQuantumsInsuranceLost, err := k.GetMaxQuantumsInsuranceDelta(ctx, perpetualId)
-		if err != nil {
-			return err
-		}
-		if insuranceFundDelta.CmpAbs(bigMaxQuantumsInsuranceLost) > 0 {
-			return errorsmod.Wrapf(
-				types.ErrLiquidationExceedsMaxInsuranceLost,
-				"Max Insurance Lost: %v, Insurance Lost: %v",
-				bigMaxQuantumsInsuranceLost,
-				insuranceFundDelta,
-			)
-		}
+	if insuranceFundDelta.Sign() != -1 {
+		return nil
 	}
+
+	bigMaxQuantumsInsuranceLost, err := k.GetMaxQuantumsInsuranceDelta(ctx, perpetualId)
+	if err != nil {
+		return err
+	}
+
+	if insuranceFundDelta.CmpAbs(bigMaxQuantumsInsuranceLost) > 0 {
+		return errorsmod.Wrapf(
+			types.ErrLiquidationExceedsMaxInsuranceLost,
+			"Max Insurance Lost: %v, Insurance Lost: %v",
+			bigMaxQuantumsInsuranceLost,
+			insuranceFundDelta,
+		)
+	}
+
 	return nil
 }
 

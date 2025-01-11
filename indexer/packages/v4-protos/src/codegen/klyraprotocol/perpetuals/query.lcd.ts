@@ -1,6 +1,6 @@
 import { setPaginationParams } from "../../helpers";
 import { LCDClient } from "@osmonauts/lcd";
-import { QueryPerpetualRequest, QueryPerpetualResponseSDKType, QueryAllPerpetualsRequest, QueryAllPerpetualsResponseSDKType, QueryAllLiquidityTiersRequest, QueryAllLiquidityTiersResponseSDKType, QueryPremiumVotesRequest, QueryPremiumVotesResponseSDKType, QueryPremiumSamplesRequest, QueryPremiumSamplesResponseSDKType, QueryParamsRequest, QueryParamsResponseSDKType } from "./query";
+import { QueryPerpetualRequest, QueryPerpetualResponseSDKType, QueryAllPerpetualsRequest, QueryAllPerpetualsResponseSDKType, QueryAllLiquidityTiersRequest, QueryAllLiquidityTiersResponseSDKType, QueryAllCollateralPoolsRequest, QueryAllCollateralPoolsResponseSDKType, QueryPremiumVotesRequest, QueryPremiumVotesResponseSDKType, QueryPremiumSamplesRequest, QueryPremiumSamplesResponseSDKType, QueryParamsRequest, QueryParamsResponseSDKType } from "./query";
 export class LCDQueryClient {
   req: LCDClient;
 
@@ -13,6 +13,7 @@ export class LCDQueryClient {
     this.perpetual = this.perpetual.bind(this);
     this.allPerpetuals = this.allPerpetuals.bind(this);
     this.allLiquidityTiers = this.allLiquidityTiers.bind(this);
+    this.allCollateralPools = this.allCollateralPools.bind(this);
     this.premiumVotes = this.premiumVotes.bind(this);
     this.premiumSamples = this.premiumSamples.bind(this);
     this.params = this.params.bind(this);
@@ -57,6 +58,23 @@ export class LCDQueryClient {
 
     const endpoint = `klyraprotocol/perpetuals/liquidity_tiers`;
     return await this.req.get<QueryAllLiquidityTiersResponseSDKType>(endpoint, options);
+  }
+  /* Queries a list of CollateralPools. */
+
+
+  async allCollateralPools(params: QueryAllCollateralPoolsRequest = {
+    pagination: undefined
+  }): Promise<QueryAllCollateralPoolsResponseSDKType> {
+    const options: any = {
+      params: {}
+    };
+
+    if (typeof params?.pagination !== "undefined") {
+      setPaginationParams(options, params.pagination);
+    }
+
+    const endpoint = `klyraprotocol/perpetuals/collateral_pools`;
+    return await this.req.get<QueryAllCollateralPoolsResponseSDKType>(endpoint, options);
   }
   /* Queries a list of premium votes. */
 

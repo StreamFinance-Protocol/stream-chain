@@ -5,6 +5,8 @@ import (
 
 	keepertest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/tracer"
+	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets"
+	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -21,9 +23,10 @@ func TestGetSetNegativeTncSubaccountSeenAtBlock(t *testing.T) {
 		constants.BtcUsd_NoMarginRequirement.Params.Id,
 	}
 	testsuffixes := []string{
-		lib.UintToString(constants.IsoUsd_IsolatedMarket.Params.Id),
-		lib.UintToString(constants.Iso2Usd_IsolatedMarket.Params.Id),
-		types.CrossCollateralSuffix,
+		lib.UintToString(constants.IsoUsd_IsolatedMarket.Params.CollateralPoolId),
+		lib.UintToString(constants.Iso2Usd_IsolatedMarket.Params.CollateralPoolId),
+		lib.UintToString(constants.BtcUsd_NoMarginRequirement.Params.CollateralPoolId),
+		types.NegativeTncSuffix,
 	}
 	tests := map[string]struct {
 		// Setup.
@@ -69,9 +72,9 @@ func TestGetSetNegativeTncSubaccountSeenAtBlock(t *testing.T) {
 			},
 
 			expectedMultiStoreWrites: []string{
-				types.NegativeTncSubaccountForCollateralPoolSeenAtBlockKeyPrefix + testsuffixes[0],
-				types.NegativeTncSubaccountForCollateralPoolSeenAtBlockKeyPrefix + testsuffixes[1],
-				types.NegativeTncSubaccountForCollateralPoolSeenAtBlockKeyPrefix + testsuffixes[2],
+				types.NegativeTncSubaccountForCollateralPoolSeenAtBlockKeyPrefix + testsuffixes[3] + ":" + testsuffixes[0],
+				types.NegativeTncSubaccountForCollateralPoolSeenAtBlockKeyPrefix + testsuffixes[3] + ":" + testsuffixes[1],
+				types.NegativeTncSubaccountForCollateralPoolSeenAtBlockKeyPrefix + testsuffixes[3] + ":" + testsuffixes[2],
 			},
 		},
 		"Block height can be updated more than once": {
@@ -225,9 +228,12 @@ func TestGetSetNegativeTncSubaccountSeenAtBlock(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// Setup keeper state and test parameters.
-			ctx, subaccountsKeeper, pricesKeeper, perpetualsKeeper, _, _, _, _, _, _ := keepertest.SubaccountsKeepers(t, true)
-			keepertest.CreateTestMarkets(t, ctx, pricesKeeper)
+			ctx, subaccountsKeeper, pricesKeeper, perpetualsKeeper, _, _, assetsKeeper, _, _, _ := keepertest.SubaccountsKeepers(t, true)
+			prices.InitGenesis(ctx, *pricesKeeper, constants.Prices_DefaultGenesisState)
+			assets.InitGenesis(ctx, *assetsKeeper, constants.Assets_DefaultGenesisState)
+
 			keepertest.CreateTestLiquidityTiers(t, ctx, perpetualsKeeper)
+			keepertest.CreateTestCollateralPools(t, ctx, perpetualsKeeper)
 			keepertest.CreateTestPerpetuals(t, ctx, perpetualsKeeper)
 
 			// Set the tracer on the multistore to verify the performed writes are correct.
@@ -248,9 +254,12 @@ func TestGetSetNegativeTncSubaccountSeenAtBlock(t *testing.T) {
 
 func TestGetSetNegativeTncSubaccountSeenAtBlock_PanicsOnDecreasingBlock(t *testing.T) {
 	// Setup keeper state and test parameters.
-	ctx, subaccountsKeeper, pricesKeeper, perpetualsKeeper, _, _, _, _, _, _ := keepertest.SubaccountsKeepers(t, true)
-	keepertest.CreateTestMarkets(t, ctx, pricesKeeper)
+	ctx, subaccountsKeeper, pricesKeeper, perpetualsKeeper, _, _, assetsKeeper, _, _, _ := keepertest.SubaccountsKeepers(t, true)
+	prices.InitGenesis(ctx, *pricesKeeper, constants.Prices_DefaultGenesisState)
+	assets.InitGenesis(ctx, *assetsKeeper, constants.Assets_DefaultGenesisState)
+
 	keepertest.CreateTestLiquidityTiers(t, ctx, perpetualsKeeper)
+	keepertest.CreateTestCollateralPools(t, ctx, perpetualsKeeper)
 	keepertest.CreateTestPerpetuals(t, ctx, perpetualsKeeper)
 	err := subaccountsKeeper.SetNegativeTncSubaccountSeenAtBlock(ctx, uint32(0), 2)
 	require.NoError(t, err)
@@ -264,7 +273,7 @@ func TestGetSetNegativeTncSubaccountSeenAtBlock_PanicsOnDecreasingBlock(t *testi
 func getWriteKeys(suffix string, times int) []string {
 	writeKeys := make([]string, times)
 	for i := 0; i < times; i++ {
-		writeKeys[i] = types.NegativeTncSubaccountForCollateralPoolSeenAtBlockKeyPrefix + suffix
+		writeKeys[i] = types.NegativeTncSubaccountForCollateralPoolSeenAtBlockKeyPrefix + types.NegativeTncSuffix + ":" + suffix
 	}
 	return writeKeys
 }

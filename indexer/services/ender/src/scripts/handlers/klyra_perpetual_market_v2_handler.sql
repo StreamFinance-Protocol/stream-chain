@@ -24,11 +24,10 @@ BEGIN
     perpetual_market_record."quantumConversionExponent" = (event_data->'quantumConversionExponent')::integer;
     perpetual_market_record."atomicResolution" = (event_data->'atomicResolution')::integer;
     perpetual_market_record."dangerIndexPpm" = (event_data->'dangerIndexPpm')::integer;
-    perpetual_market_record."isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock" = (event_data->>'isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock')::bigint;
+    perpetual_market_record."collateralPoolId" = (event_data->'collateralPoolId')::integer;
     perpetual_market_record."subticksPerTick" = (event_data->'subticksPerTick')::integer;
     perpetual_market_record."stepBaseQuantums" = klyra_from_jsonlib_long(event_data->'stepBaseQuantums');
     perpetual_market_record."liquidityTierId" = (event_data->'liquidityTier')::integer;
-    perpetual_market_record."marketType" = klyra_protocol_market_type_to_perpetual_market_type(event_data->'marketType');
     perpetual_market_record."baseOpenInterest" = 0;
     perpetual_market_record."perpYieldIndex" = '0/1';
 

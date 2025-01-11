@@ -1,8 +1,6 @@
 /* eslint-disable max-len */
 import { logger, stats, STATS_NO_SAMPLING } from '@klyraprotocol-indexer/base';
-import {
-  storeHelpers,
-} from '@klyraprotocol-indexer/postgres';
+import { storeHelpers } from '@klyraprotocol-indexer/postgres';
 import {
   IndexerTendermintBlock,
   IndexerTendermintEvent,
@@ -13,17 +11,27 @@ import { DatabaseError } from 'pg';
 
 import config from '../config';
 import { BatchedHandlers } from './batched-handlers';
-import { indexerTendermintEventToEventProtoWithType, indexerTendermintEventToTransactionIndex } from './helper';
+import {
+  indexerTendermintEventToEventProtoWithType,
+  indexerTendermintEventToTransactionIndex,
+} from './helper';
 import { KafkaPublisher } from './kafka-publisher';
 import { SyncHandlers, SYNCHRONOUS_SUBTYPES } from './sync-handlers';
 import {
-  KlyraIndexerSubtypes, EventMessage, EventProtoWithTypeAndVersion, GroupedEvents,
+  KlyraIndexerSubtypes,
+  EventMessage,
+  EventProtoWithTypeAndVersion,
+  GroupedEvents,
 } from './types';
 import { Handler } from '../handlers/handler';
 import { AssetValidator } from '../validators/asset-validator';
+import { CollateralPoolValidator } from '../validators/collateral-pool-validator';
 import { DeleveragingValidator } from '../validators/deleveraging-validator';
 import { FundingValidator } from '../validators/funding-validator';
-import { LiquidityTierValidatorV2, LiquidityTierValidator } from '../validators/liquidity-tier-validator';
+import {
+  LiquidityTierValidatorV2,
+  LiquidityTierValidator,
+} from '../validators/liquidity-tier-validator';
 import { MarketValidator } from '../validators/market-validator';
 import { OpenInterestUpdateValidator } from '../validators/open-interest-update-validator';
 import { OrderFillValidator } from '../validators/order-fill-validator';
@@ -36,33 +44,77 @@ import { UpdatePerpetualValidator } from '../validators/update-perpetual-validat
 import { Validator, ValidatorInitializer } from '../validators/validator';
 import { YieldParamsValidator } from '../validators/yield-params-validator';
 
-const TXN_EVENT_SUBTYPE_VERSION_TO_VALIDATOR_MAPPING: Record<string, ValidatorInitializer> = {
-  [serializeSubtypeAndVersion(KlyraIndexerSubtypes.ORDER_FILL.toString(), 1)]: OrderFillValidator,
-  [serializeSubtypeAndVersion(KlyraIndexerSubtypes.SUBACCOUNT_UPDATE.toString(), 1)]: SubaccountUpdateValidator,
-  [serializeSubtypeAndVersion(KlyraIndexerSubtypes.TRANSFER.toString(), 1)]: TransferValidator,
-  [serializeSubtypeAndVersion(KlyraIndexerSubtypes.MARKET.toString(), 1)]: MarketValidator,
-  [serializeSubtypeAndVersion(KlyraIndexerSubtypes.STATEFUL_ORDER.toString(), 1)]: StatefulOrderValidator,
-  [serializeSubtypeAndVersion(KlyraIndexerSubtypes.ASSET.toString(), 1)]: AssetValidator,
-  [serializeSubtypeAndVersion(KlyraIndexerSubtypes.PERPETUAL_MARKET.toString(), 1)]: PerpetualMarketValidator,
-  [serializeSubtypeAndVersion(KlyraIndexerSubtypes.PERPETUAL_MARKET.toString(), 2)]: PerpetualMarketValidator,
-  [serializeSubtypeAndVersion(KlyraIndexerSubtypes.LIQUIDITY_TIER.toString(), 1)]: LiquidityTierValidator,
-  [serializeSubtypeAndVersion(KlyraIndexerSubtypes.UPDATE_PERPETUAL.toString(), 1)]: UpdatePerpetualValidator,
-  [serializeSubtypeAndVersion(KlyraIndexerSubtypes.UPDATE_CLOB_PAIR.toString(), 1)]: UpdateClobPairValidator,
-  [serializeSubtypeAndVersion(KlyraIndexerSubtypes.DELEVERAGING.toString(), 1)]: DeleveragingValidator,
-  [serializeSubtypeAndVersion(KlyraIndexerSubtypes.LIQUIDITY_TIER.toString(), 2)]: LiquidityTierValidatorV2,
-  [serializeSubtypeAndVersion(KlyraIndexerSubtypes.YIELD_PARAMS.toString(), 1)]: YieldParamsValidator,
+const TXN_EVENT_SUBTYPE_VERSION_TO_VALIDATOR_MAPPING: Record<
+  string,
+  ValidatorInitializer
+> = {
+  [serializeSubtypeAndVersion(KlyraIndexerSubtypes.ORDER_FILL.toString(), 1)]:
+    OrderFillValidator,
+  [serializeSubtypeAndVersion(
+    KlyraIndexerSubtypes.SUBACCOUNT_UPDATE.toString(),
+    1,
+  )]: SubaccountUpdateValidator,
+  [serializeSubtypeAndVersion(KlyraIndexerSubtypes.TRANSFER.toString(), 1)]:
+    TransferValidator,
+  [serializeSubtypeAndVersion(KlyraIndexerSubtypes.MARKET.toString(), 1)]:
+    MarketValidator,
+  [serializeSubtypeAndVersion(
+    KlyraIndexerSubtypes.STATEFUL_ORDER.toString(),
+    1,
+  )]: StatefulOrderValidator,
+  [serializeSubtypeAndVersion(KlyraIndexerSubtypes.ASSET.toString(), 1)]:
+    AssetValidator,
+  [serializeSubtypeAndVersion(
+    KlyraIndexerSubtypes.PERPETUAL_MARKET.toString(),
+    1,
+  )]: PerpetualMarketValidator,
+  [serializeSubtypeAndVersion(
+    KlyraIndexerSubtypes.PERPETUAL_MARKET.toString(),
+    2,
+  )]: PerpetualMarketValidator,
+  [serializeSubtypeAndVersion(
+    KlyraIndexerSubtypes.LIQUIDITY_TIER.toString(),
+    1,
+  )]: LiquidityTierValidator,
+  [serializeSubtypeAndVersion(
+    KlyraIndexerSubtypes.COLLATERAL_POOL.toString(),
+    1,
+  )]: CollateralPoolValidator,
+  [serializeSubtypeAndVersion(
+    KlyraIndexerSubtypes.UPDATE_PERPETUAL.toString(),
+    1,
+  )]: UpdatePerpetualValidator,
+  [serializeSubtypeAndVersion(
+    KlyraIndexerSubtypes.UPDATE_CLOB_PAIR.toString(),
+    1,
+  )]: UpdateClobPairValidator,
+  [serializeSubtypeAndVersion(KlyraIndexerSubtypes.DELEVERAGING.toString(), 1)]:
+    DeleveragingValidator,
+  [serializeSubtypeAndVersion(
+    KlyraIndexerSubtypes.LIQUIDITY_TIER.toString(),
+    2,
+  )]: LiquidityTierValidatorV2,
+  [serializeSubtypeAndVersion(KlyraIndexerSubtypes.YIELD_PARAMS.toString(), 1)]:
+    YieldParamsValidator,
 };
 
-const BLOCK_EVENT_SUBTYPE_VERSION_TO_VALIDATOR_MAPPING: Record<string, ValidatorInitializer> = {
-  [serializeSubtypeAndVersion(KlyraIndexerSubtypes.FUNDING.toString(), 1)]: FundingValidator,
-  [serializeSubtypeAndVersion(KlyraIndexerSubtypes.STATEFUL_ORDER.toString(), 1)]: StatefulOrderValidator,
-  [serializeSubtypeAndVersion(KlyraIndexerSubtypes.OPEN_INTEREST_UPDATE.toString(), 1)]: OpenInterestUpdateValidator,
+const BLOCK_EVENT_SUBTYPE_VERSION_TO_VALIDATOR_MAPPING: Record<
+  string,
+  ValidatorInitializer
+> = {
+  [serializeSubtypeAndVersion(KlyraIndexerSubtypes.FUNDING.toString(), 1)]:
+    FundingValidator,
+  [serializeSubtypeAndVersion(
+    KlyraIndexerSubtypes.STATEFUL_ORDER.toString(),
+    1,
+  )]: StatefulOrderValidator,
+  [serializeSubtypeAndVersion(
+    KlyraIndexerSubtypes.OPEN_INTEREST_UPDATE.toString(),
+    1,
+  )]: OpenInterestUpdateValidator,
 };
 
-function serializeSubtypeAndVersion(
-  subtype: string,
-  version: number,
-): string {
+function serializeSubtypeAndVersion(subtype: string, version: number): string {
   return `${subtype}-${version}`;
 }
 
@@ -70,7 +122,10 @@ type DecodedIndexerTendermintBlock = Omit<IndexerTendermintBlock, 'events'> & {
   events: DecodedIndexerTendermintEvent[];
 };
 
-type DecodedIndexerTendermintEvent = Omit<IndexerTendermintEvent, 'dataBytes'> & {
+type DecodedIndexerTendermintEvent = Omit<
+  IndexerTendermintEvent,
+  'dataBytes'
+> & {
   /** Decoded tendermint event. */
   dataBytes: object;
 };
@@ -139,11 +194,7 @@ export class BlockProcessor {
     for (let i: number = 0; i < this.block.events.length; i++) {
       const event: IndexerTendermintEvent = this.block.events[i];
       const transactionIndex: number = indexerTendermintEventToTransactionIndex(event);
-      const eventProtoWithType:
-      EventProtoWithTypeAndVersion | undefined = indexerTendermintEventToEventProtoWithType(
-        i,
-        event,
-      );
+      const eventProtoWithType: EventProtoWithTypeAndVersion | undefined = indexerTendermintEventToEventProtoWithType(i, event);
       if (eventProtoWithType === undefined) {
         continue;
       }
@@ -152,7 +203,9 @@ export class BlockProcessor {
         continue;
       }
 
-      groupedEvents.transactionEvents[transactionIndex].push(eventProtoWithType);
+      groupedEvents.transactionEvents[transactionIndex].push(
+        eventProtoWithType,
+      );
     }
     return groupedEvents;
   }
@@ -185,12 +238,8 @@ export class BlockProcessor {
     eventProto: EventProtoWithTypeAndVersion,
     validatorMap: Record<string, ValidatorInitializer>,
   ): void {
-    const Initializer:
-    ValidatorInitializer | undefined = validatorMap[
-      serializeSubtypeAndVersion(
-        eventProto.type,
-        eventProto.version,
-      )
+    const Initializer: ValidatorInitializer | undefined = validatorMap[
+      serializeSubtypeAndVersion(eventProto.type, eventProto.version)
     ];
     if (Initializer === undefined) {
       const message: string = `cannot process subtype ${eventProto.type} and version ${eventProto.version}`;
@@ -217,7 +266,9 @@ export class BlockProcessor {
     );
 
     _.map(handlers, (handler: Handler<EventMessage>) => {
-      if (SYNCHRONOUS_SUBTYPES.includes(eventProto.type as KlyraIndexerSubtypes)) {
+      if (
+        SYNCHRONOUS_SUBTYPES.includes(eventProto.type as KlyraIndexerSubtypes)
+      ) {
         this.syncHandlers.addHandler(eventProto.type, handler);
       } else {
         this.batchedHandlers.addHandler(handler);
@@ -245,21 +296,20 @@ export class BlockProcessor {
     let success = false;
     let resultRow: pg.QueryResultRow;
     try {
-      const result: pg.QueryResult = await storeHelpers.rawQuery(
-        'SELECT klyra_block_processor(?) AS result;',
-        {
+      const result: pg.QueryResult = await storeHelpers
+        .rawQuery('SELECT klyra_block_processor(?) AS result;', {
           txId: this.txId,
           bindings: [JSON.stringify(this.sqlBlock)],
           sqlOptions: { name: 'klyra_block_processor' },
-        },
-      ).catch((error: DatabaseError) => {
-        logger.crit({
-          at: `BlockProcessor#processEvents\n${error.where}`,
-          message: error.message,
-          error,
+        })
+        .catch((error: DatabaseError) => {
+          logger.crit({
+            at: `BlockProcessor#processEvents\n${error.where}`,
+            message: error.message,
+            error,
+          });
+          throw error;
         });
-        throw error;
-      });
       resultRow = result.rows[0].result;
       success = true;
     } finally {

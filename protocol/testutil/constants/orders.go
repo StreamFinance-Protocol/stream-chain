@@ -4,7 +4,6 @@ import (
 	"math"
 
 	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
-	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
@@ -17,6 +16,15 @@ var (
 		Subticks:     10,
 		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 15},
 	}
+
+	Order_Alice_Num0_Id0_Clob7_Buy5_Price10_GTB15 = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num0, ClientId: 0, ClobPairId: 7},
+		Side:         clobtypes.Order_SIDE_BUY,
+		Quantums:     5,
+		Subticks:     10,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 15},
+	}
+
 	Order_Alice_Num0_Id0_Clob0_Buy10_Price10_GTB16 = clobtypes.Order{
 		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num0, ClientId: 0, ClobPairId: 0},
 		Side:         clobtypes.Order_SIDE_BUY,
@@ -82,6 +90,13 @@ var (
 	}
 	Order_Alice_Num0_Id1_Clob0_Sell10_Price15_GTB15 = clobtypes.Order{
 		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num0, ClientId: 1, ClobPairId: 0},
+		Side:         clobtypes.Order_SIDE_SELL,
+		Quantums:     10,
+		Subticks:     15,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 15},
+	}
+	Order_Alice_Num0_Id1_Clob7_Sell10_Price15_GTB15 = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num0, ClientId: 1, ClobPairId: 7},
 		Side:         clobtypes.Order_SIDE_SELL,
 		Quantums:     10,
 		Subticks:     15,
@@ -192,8 +207,22 @@ var (
 		Subticks:     10,
 		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
 	}
+	Order_Alice_Num11_Id0_Clob2_Sell10_Price10_GTB20 = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num11, ClientId: 0, ClobPairId: 2},
+		Side:         clobtypes.Order_SIDE_SELL,
+		Quantums:     10,
+		Subticks:     10,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
+	}
 	Order_Alice_Num1_Id0_Clob0_Sell10_Price10_GTB30 = clobtypes.Order{
 		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num1, ClientId: 0, ClobPairId: 0},
+		Side:         clobtypes.Order_SIDE_SELL,
+		Quantums:     10,
+		Subticks:     10,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 30},
+	}
+	Order_Alice_Num11_Id0_Clob2_Sell10_Price10_GTB30 = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num11, ClientId: 0, ClobPairId: 2},
 		Side:         clobtypes.Order_SIDE_SELL,
 		Quantums:     10,
 		Subticks:     10,
@@ -213,6 +242,13 @@ var (
 		Subticks:     10,
 		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
 	}
+	Order_Alice_Num11_Id2_Clob2_Buy10_Price10_GTB20 = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num11, ClientId: 2, ClobPairId: 2},
+		Side:         clobtypes.Order_SIDE_BUY,
+		Quantums:     10,
+		Subticks:     10,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
+	}
 	Order_Alice_Num1_Id2_Clob1_Buy10_Price10_GTB26 = clobtypes.Order{
 		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num1, ClientId: 2, ClobPairId: 1},
 		Side:         clobtypes.Order_SIDE_BUY,
@@ -220,8 +256,22 @@ var (
 		Subticks:     10,
 		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 26},
 	}
+	Order_Alice_Num11_Id2_Clob2_Buy10_Price10_GTB26 = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num11, ClientId: 2, ClobPairId: 2},
+		Side:         clobtypes.Order_SIDE_BUY,
+		Quantums:     10,
+		Subticks:     10,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 26},
+	}
 	Order_Alice_Num1_Id1_Clob1_Sell10_Price15_GTB20 = clobtypes.Order{
 		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num1, ClientId: 1, ClobPairId: 1},
+		Side:         clobtypes.Order_SIDE_SELL,
+		Quantums:     10,
+		Subticks:     15,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
+	}
+	Order_Alice_Num11_Id1_Clob2_Sell10_Price15_GTB20 = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num11, ClientId: 1, ClobPairId: 2},
 		Side:         clobtypes.Order_SIDE_SELL,
 		Quantums:     10,
 		Subticks:     15,
@@ -395,8 +445,22 @@ var (
 		Subticks:     1_000_000_000_000,
 		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
 	}
+	Order_Alice_Num11_Id3_Clob2_Sell100_Price100000_GTB20 = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num11, ClientId: 3, ClobPairId: 2},
+		Side:         clobtypes.Order_SIDE_SELL,
+		Quantums:     100,
+		Subticks:     1_000_000_000_000,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
+	}
 	Order_Alice_Num1_Id5_Clob1_Buy10_Price15_GTB23 = clobtypes.Order{
 		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num1, ClientId: 5, ClobPairId: 1},
+		Side:         clobtypes.Order_SIDE_BUY,
+		Quantums:     10,
+		Subticks:     15,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 23},
+	}
+	Order_Alice_Num11_Id5_Clob2_Buy10_Price15_GTB23 = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num11, ClientId: 5, ClobPairId: 2},
 		Side:         clobtypes.Order_SIDE_BUY,
 		Quantums:     10,
 		Subticks:     15,
@@ -458,17 +522,21 @@ var (
 		Subticks:     35,
 		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 22},
 	}
-	Order_Bob_Num0_Id4_Clob1_Buy20_Price35_GTB22_RouterFee = clobtypes.Order{
-		OrderId:      clobtypes.OrderId{SubaccountId: Bob_Num0, ClientId: 4, ClobPairId: 1},
+	Order_Bob_Num11_Id4_Clob2_Buy20_Price35_GTB22 = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Bob_Num11, ClientId: 4, ClobPairId: 2},
 		Side:         clobtypes.Order_SIDE_BUY,
 		Quantums:     20,
 		Subticks:     35,
 		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 22},
-		RouterFeePpm: 1_000,
-		RouterSubaccountId: &satypes.SubaccountId{
-			Owner:  authtypes.NewModuleAddress("NULL_ROUTER_ADDRESS").String(),
-			Number: 0,
-		},
+	}
+	Order_Bob_Num0_Id4_Clob1_Buy20_Price35_GTB22_RouterFee = clobtypes.Order{
+		OrderId:        clobtypes.OrderId{SubaccountId: Bob_Num0, ClientId: 4, ClobPairId: 1},
+		Side:           clobtypes.Order_SIDE_BUY,
+		Quantums:       20,
+		Subticks:       35,
+		GoodTilOneof:   &clobtypes.Order_GoodTilBlock{GoodTilBlock: 22},
+		RouterFeePpm:   1_000,
+		RouterFeeOwner: authtypes.NewModuleAddress("NULL_ROUTER_ADDRESS").String(),
 	}
 	Order_Bob_Num0_Id5_Clob0_Buy20_Price10_GTB22 = clobtypes.Order{
 		OrderId:      clobtypes.OrderId{SubaccountId: Bob_Num0, ClientId: 5, ClobPairId: 0},
@@ -498,8 +566,22 @@ var (
 		Subticks:     10,
 		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 22},
 	}
+	Order_Bob_Num11_Id8_Clob2_Sell5_Price10_GTB22 = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Bob_Num11, ClientId: 8, ClobPairId: 2},
+		Side:         clobtypes.Order_SIDE_SELL,
+		Quantums:     5,
+		Subticks:     10,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 22},
+	}
 	Order_Bob_Num0_Id8_Clob1_Sell20_Price10_GTB22 = clobtypes.Order{
 		OrderId:      clobtypes.OrderId{SubaccountId: Bob_Num0, ClientId: 8, ClobPairId: 1},
+		Side:         clobtypes.Order_SIDE_SELL,
+		Quantums:     20,
+		Subticks:     10,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 22},
+	}
+	Order_Bob_Num11_Id8_Clob2_Sell20_Price10_GTB22 = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Bob_Num11, ClientId: 8, ClobPairId: 2},
 		Side:         clobtypes.Order_SIDE_SELL,
 		Quantums:     20,
 		Subticks:     10,
@@ -533,8 +615,22 @@ var (
 		Subticks:     15,
 		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
 	}
+	Order_Bob_Num11_Id11_Clob2_Sell5_Price15_GTB20 = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Bob_Num11, ClientId: 11, ClobPairId: 2},
+		Side:         clobtypes.Order_SIDE_SELL,
+		Quantums:     5,
+		Subticks:     15,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
+	}
 	Order_Bob_Num0_Id11_Clob1_Buy5_Price40_GTB20 = clobtypes.Order{
 		OrderId:      clobtypes.OrderId{SubaccountId: Bob_Num0, ClientId: 11, ClobPairId: 1},
+		Side:         clobtypes.Order_SIDE_BUY,
+		Quantums:     5,
+		Subticks:     40,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
+	}
+	Order_Bob_Num11_Id11_Clob2_Buy5_Price40_GTB20 = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Bob_Num11, ClientId: 11, ClobPairId: 2},
 		Side:         clobtypes.Order_SIDE_BUY,
 		Quantums:     5,
 		Subticks:     40,
@@ -547,8 +643,22 @@ var (
 		Subticks:     5,
 		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
 	}
+	Order_Bob_Num11_Id12_Clob2_Buy5_Price5_GTB20 = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Bob_Num11, ClientId: 12, ClobPairId: 2},
+		Side:         clobtypes.Order_SIDE_BUY,
+		Quantums:     5,
+		Subticks:     5,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
+	}
 	Order_Bob_Num0_Id12_Clob0_Buy5_Price40_GTB20 = clobtypes.Order{
 		OrderId:      clobtypes.OrderId{SubaccountId: Bob_Num0, ClientId: 12, ClobPairId: 0},
+		Side:         clobtypes.Order_SIDE_BUY,
+		Quantums:     5,
+		Subticks:     40,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
+	}
+	Order_Bob_Num11_Id12_Clob2_Buy5_Price40_GTB20 = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Bob_Num11, ClientId: 12, ClobPairId: 2},
 		Side:         clobtypes.Order_SIDE_BUY,
 		Quantums:     5,
 		Subticks:     40,
@@ -575,8 +685,22 @@ var (
 		Subticks:     5,
 		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
 	}
+	Order_Bob_Num11_Id12_Clob2_Sell20_Price5_GTB20 = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Bob_Num11, ClientId: 12, ClobPairId: 2},
+		Side:         clobtypes.Order_SIDE_SELL,
+		Quantums:     20,
+		Subticks:     5,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
+	}
 	Order_Bob_Num0_Id12_Clob0_Sell20_Price15_GTB20 = clobtypes.Order{
 		OrderId:      clobtypes.OrderId{SubaccountId: Bob_Num0, ClientId: 12, ClobPairId: 0},
+		Side:         clobtypes.Order_SIDE_SELL,
+		Quantums:     20,
+		Subticks:     15,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
+	}
+	Order_Bob_Num11_Id12_Clob2_Sell20_Price15_GTB20 = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Bob_Num11, ClientId: 12, ClobPairId: 2},
 		Side:         clobtypes.Order_SIDE_SELL,
 		Quantums:     20,
 		Subticks:     15,
@@ -967,6 +1091,13 @@ var (
 		Subticks:     50_003_000_000,
 		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 10},
 	}
+	Order_Carl_Num11_Id0_Clob10_Buy1Link_Price7_003_GTB10 = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Carl_Num11, ClientId: 0, ClobPairId: 10},
+		Side:         clobtypes.Order_SIDE_BUY,
+		Quantums:     100_000_000,
+		Subticks:     700_300_000,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 10},
+	}
 	Order_Carl_Num1_Id0_Clob0_Buy1BTC_Price50500_GTB10 = clobtypes.Order{
 		OrderId:      clobtypes.OrderId{SubaccountId: Carl_Num1, ClientId: 0, ClobPairId: 0},
 		Side:         clobtypes.Order_SIDE_BUY,
@@ -986,6 +1117,13 @@ var (
 		Side:         clobtypes.Order_SIDE_SELL,
 		Quantums:     100_000_000,
 		Subticks:     49_500_000_000,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 10},
+	}
+	Order_Dave_Num11_Id2_Clob10_Sell20Link_Price0_0495_GTB10 = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Dave_Num11, ClientId: 2, ClobPairId: 10},
+		Side:         clobtypes.Order_SIDE_SELL,
+		Quantums:     2_000_000_000,
+		Subticks:     4_950_000,
 		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 10},
 	}
 	Order_Dave_Num0_Id0_Clob0_Sell1BTC_Price49999_GTB10 = clobtypes.Order{
@@ -1016,11 +1154,25 @@ var (
 		Subticks:     50_500_000_000,
 		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 10},
 	}
+	Order_Dave_Num11_Id1_Clob10_Sell2Link_Price0_0505_GTB10 = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Dave_Num11, ClientId: 1, ClobPairId: 10},
+		Side:         clobtypes.Order_SIDE_SELL,
+		Quantums:     200_000_000,
+		Subticks:     5_050_000,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 10},
+	}
 	Order_Dave_Num0_Id0_Clob0_Sell1BTC_Price50500_GTB10 = clobtypes.Order{
 		OrderId:      clobtypes.OrderId{SubaccountId: Dave_Num0, ClientId: 0, ClobPairId: 0},
 		Side:         clobtypes.Order_SIDE_SELL,
 		Quantums:     100_000_000,
 		Subticks:     50_500_000_000,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 10},
+	}
+	Order_Dave_Num11_Id0_Clob10_Sell20Link_Price0_505_GTB10 = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Dave_Num11, ClientId: 0, ClobPairId: 10},
+		Side:         clobtypes.Order_SIDE_SELL,
+		Quantums:     2_000_000_000,
+		Subticks:     5_050_000,
 		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 10},
 	}
 	Order_Dave_Num0_Id0_Clob0_Sell1BTC_Price60000_GTB10 = clobtypes.Order{
@@ -1042,6 +1194,13 @@ var (
 		Side:         clobtypes.Order_SIDE_SELL,
 		Quantums:     25_000_000,
 		Subticks:     50_001_000_000,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 11},
+	}
+	Order_Dave_Num11_Id1_Clob10_Sell5Link_Price0_0501_GTB11 = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Dave_Num11, ClientId: 1, ClobPairId: 10},
+		Side:         clobtypes.Order_SIDE_SELL,
+		Quantums:     500_000_000,
+		Subticks:     5_010_000,
 		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 11},
 	}
 	Order_Dave_Num0_Id1_Clob0_Sell025BTC_Price50498_GTB11 = clobtypes.Order{
@@ -1150,6 +1309,13 @@ var (
 		Subticks:     50_500_000_000,
 		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 11},
 	}
+	Order_Dave_Num11_Id1_Clob10_Sell5Link_Price0_0505_GTB11 = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Dave_Num11, ClientId: 1, ClobPairId: 10},
+		Side:         clobtypes.Order_SIDE_SELL,
+		Quantums:     500_000_000,
+		Subticks:     5_050_000,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 11},
+	}
 	Order_Dave_Num1_Id0_Clob0_Sell1BTC_Price49500_GTB10 = clobtypes.Order{
 		OrderId:      clobtypes.OrderId{SubaccountId: Dave_Num1, ClientId: 0, ClobPairId: 0},
 		Side:         clobtypes.Order_SIDE_SELL,
@@ -1162,6 +1328,13 @@ var (
 		Side:         clobtypes.Order_SIDE_SELL,
 		Quantums:     100_000_000,
 		Subticks:     49_997_000_000,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 10},
+	}
+	Order_Dave_Num11_Id0_Clob10_Sell1Link_Price6_997_GTB10 = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Dave_Num11, ClientId: 0, ClobPairId: 10},
+		Side:         clobtypes.Order_SIDE_SELL,
+		Quantums:     100_000_000,
+		Subticks:     699_700_000,
 		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 10},
 	}
 	Order_Dave_Num1_Id0_Clob0_Sell025BTC_Price49999_GTB10 = clobtypes.Order{
@@ -1217,8 +1390,24 @@ var (
 		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
 		TimeInForce:  clobtypes.Order_TIME_IN_FORCE_IOC,
 	}
+	Order_Alice_Num11_Id1_Clob2_Buy5_Price15_GTB20_IOC = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num11, ClientId: 1, ClobPairId: 2},
+		Side:         clobtypes.Order_SIDE_BUY,
+		Quantums:     5,
+		Subticks:     15,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
+		TimeInForce:  clobtypes.Order_TIME_IN_FORCE_IOC,
+	}
 	Order_Alice_Num0_Id1_Clob1_Sell5_Price15_GTB20_IOC = clobtypes.Order{
 		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num0, ClientId: 1, ClobPairId: 1},
+		Side:         clobtypes.Order_SIDE_SELL,
+		Quantums:     5,
+		Subticks:     15,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
+		TimeInForce:  clobtypes.Order_TIME_IN_FORCE_IOC,
+	}
+	Order_Alice_Num11_Id1_Clob2_Sell5_Price15_GTB20_IOC = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num11, ClientId: 1, ClobPairId: 2},
 		Side:         clobtypes.Order_SIDE_SELL,
 		Quantums:     5,
 		Subticks:     15,
@@ -1233,8 +1422,24 @@ var (
 		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
 		TimeInForce:  clobtypes.Order_TIME_IN_FORCE_IOC,
 	}
+	Order_Alice_Num11_Id1_Clob2_Buy10_Price15_GTB20_IOC = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num11, ClientId: 1, ClobPairId: 2},
+		Side:         clobtypes.Order_SIDE_BUY,
+		Quantums:     10,
+		Subticks:     15,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
+		TimeInForce:  clobtypes.Order_TIME_IN_FORCE_IOC,
+	}
 	Order_Alice_Num0_Id1_Clob1_Sell10_Price15_GTB20_IOC = clobtypes.Order{
 		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num0, ClientId: 1, ClobPairId: 1},
+		Side:         clobtypes.Order_SIDE_SELL,
+		Quantums:     10,
+		Subticks:     15,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
+		TimeInForce:  clobtypes.Order_TIME_IN_FORCE_IOC,
+	}
+	Order_Alice_Num11_Id1_Clob2_Sell10_Price15_GTB20_IOC = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num11, ClientId: 1, ClobPairId: 2},
 		Side:         clobtypes.Order_SIDE_SELL,
 		Quantums:     10,
 		Subticks:     15,
@@ -1267,6 +1472,14 @@ var (
 		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
 		TimeInForce:  clobtypes.Order_TIME_IN_FORCE_FILL_OR_KILL,
 	}
+	Order_Alice_Num11_Id0_Clob2_Sell10_Price15_GTB20_FOK = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num11, ClientId: 0, ClobPairId: 2},
+		Side:         clobtypes.Order_SIDE_SELL,
+		Quantums:     10,
+		Subticks:     15,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
+		TimeInForce:  clobtypes.Order_TIME_IN_FORCE_FILL_OR_KILL,
+	}
 	Order_Alice_Num0_Id0_Clob1_Buy10_Price15_GTB20_FOK = clobtypes.Order{
 		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num0, ClientId: 0, ClobPairId: 1},
 		Side:         clobtypes.Order_SIDE_BUY,
@@ -1275,8 +1488,24 @@ var (
 		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
 		TimeInForce:  clobtypes.Order_TIME_IN_FORCE_FILL_OR_KILL,
 	}
+	Order_Alice_Num11_Id0_Clob2_Buy10_Price15_GTB20_FOK = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num11, ClientId: 0, ClobPairId: 2},
+		Side:         clobtypes.Order_SIDE_BUY,
+		Quantums:     10,
+		Subticks:     15,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
+		TimeInForce:  clobtypes.Order_TIME_IN_FORCE_FILL_OR_KILL,
+	}
 	Order_Alice_Num0_Id0_Clob1_Buy20_Price15_GTB20_FOK = clobtypes.Order{
 		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num0, ClientId: 0, ClobPairId: 1},
+		Side:         clobtypes.Order_SIDE_BUY,
+		Quantums:     20,
+		Subticks:     15,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
+		TimeInForce:  clobtypes.Order_TIME_IN_FORCE_FILL_OR_KILL,
+	}
+	Order_Alice_Num11_Id0_Clob2_Buy20_Price15_GTB20_FOK = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num11, ClientId: 0, ClobPairId: 2},
 		Side:         clobtypes.Order_SIDE_BUY,
 		Quantums:     20,
 		Subticks:     15,
@@ -1591,11 +1820,35 @@ var (
 		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 18},
 		TimeInForce:  clobtypes.Order_TIME_IN_FORCE_POST_ONLY,
 	}
+	Order_Alice_Num11_Id1_Clob2_Sell15_Price10_GTB18_PO = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num11, ClientId: 1, ClobPairId: 2},
+		Side:         clobtypes.Order_SIDE_SELL,
+		Quantums:     15,
+		Subticks:     10,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 18},
+		TimeInForce:  clobtypes.Order_TIME_IN_FORCE_POST_ONLY,
+	}
 	Order_Alice_Num0_Id1_Clob0_Buy15_Price10_GTB18_PO = clobtypes.Order{
 		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num0, ClientId: 1, ClobPairId: 0},
 		Side:         clobtypes.Order_SIDE_BUY,
 		Quantums:     15,
 		Subticks:     10,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 18},
+		TimeInForce:  clobtypes.Order_TIME_IN_FORCE_POST_ONLY,
+	}
+	Order_Alice_Num11_Id1_Clob2_Buy15_Price10_GTB18_PO = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num11, ClientId: 1, ClobPairId: 2},
+		Side:         clobtypes.Order_SIDE_BUY,
+		Quantums:     15,
+		Subticks:     10,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 18},
+		TimeInForce:  clobtypes.Order_TIME_IN_FORCE_POST_ONLY,
+	}
+	Order_Alice_Num11_Id1_Clob2_Buy15_Price20_GTB18_PO = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num11, ClientId: 1, ClobPairId: 2},
+		Side:         clobtypes.Order_SIDE_BUY,
+		Quantums:     15,
+		Subticks:     20,
 		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 18},
 		TimeInForce:  clobtypes.Order_TIME_IN_FORCE_POST_ONLY,
 	}
@@ -1609,6 +1862,14 @@ var (
 	}
 	Order_Alice_Num1_Id4_Clob1_Sell10_Price15_GTB20_PO = clobtypes.Order{
 		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num1, ClientId: 4, ClobPairId: 1},
+		Side:         clobtypes.Order_SIDE_SELL,
+		Quantums:     10,
+		Subticks:     15,
+		GoodTilOneof: &clobtypes.Order_GoodTilBlock{GoodTilBlock: 20},
+		TimeInForce:  clobtypes.Order_TIME_IN_FORCE_POST_ONLY,
+	}
+	Order_Alice_Num11_Id4_Clob2_Sell10_Price15_GTB20_PO = clobtypes.Order{
+		OrderId:      clobtypes.OrderId{SubaccountId: Alice_Num11, ClientId: 4, ClobPairId: 2},
 		Side:         clobtypes.Order_SIDE_SELL,
 		Quantums:     10,
 		Subticks:     15,

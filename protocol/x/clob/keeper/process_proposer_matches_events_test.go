@@ -159,7 +159,7 @@ func TestSetProcessProposerMatchesEvents(t *testing.T) {
 			traceDecoder := &tracer.TraceDecoder{}
 			ks.Ctx.MultiStore().SetTracer(traceDecoder)
 
-			tc.setup(ks.Ctx, *ks.ClobKeeper)
+			tc.setup(ks.Ctx, ks.ClobKeeper)
 
 			processProposerMatchesEvents := ks.ClobKeeper.GetProcessProposerMatchesEvents(ks.Ctx)
 

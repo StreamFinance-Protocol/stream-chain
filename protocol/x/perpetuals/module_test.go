@@ -10,12 +10,10 @@ import (
 
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/app/module"
 
-	pricetypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
-
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/mocks"
-	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/constants"
 	testutil_json "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/json"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/keeper"
+	assets_keeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets/keeper"
 	epochs_keeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/epochs/keeper"
 	epoch_types "github.com/StreamFinance-Protocol/stream-chain/protocol/x/epochs/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals"
@@ -31,7 +29,7 @@ import (
 )
 
 func createAppModule(t *testing.T) perpetuals.AppModule {
-	am, _, _, _, _ := createAppModuleWithKeeper(t)
+	am, _, _, _, _, _ := createAppModuleWithKeeper(t)
 	return am
 }
 
@@ -43,16 +41,16 @@ func createAppModuleWithKeeper(t *testing.T) (
 	*perpetuals_keeper.Keeper,
 	*prices_keeper.Keeper,
 	*epochs_keeper.Keeper,
+	*assets_keeper.Keeper,
 	sdk.Context,
 ) {
 	appCodec := codec.NewProtoCodec(module.InterfaceRegistry)
-
 	pc := keeper.PerpetualsKeepers(t)
 
 	return perpetuals.NewAppModule(
 		appCodec,
 		pc.PerpetualsKeeper,
-	), pc.PerpetualsKeeper, pc.PricesKeeper, pc.EpochsKeeper, pc.Ctx
+	), pc.PerpetualsKeeper, pc.PricesKeeper, pc.EpochsKeeper, pc.AssetsKeeper, pc.Ctx
 }
 
 func createAppModuleBasic(t *testing.T) perpetuals.AppModuleBasic {
@@ -90,7 +88,7 @@ func TestAppModuleBasic_RegisterInterfaces(t *testing.T) {
 	// due to it using an unexported method on the interface thus we use reflection to access the field
 	// directly that contains the registrations.
 	fv := reflect.ValueOf(registry).Elem().FieldByName("implInterfaces")
-	require.Len(t, fv.MapKeys(), 10)
+	require.Len(t, fv.MapKeys(), 12)
 }
 
 func TestAppModuleBasic_DefaultGenesis(t *testing.T) {
@@ -103,8 +101,10 @@ func TestAppModuleBasic_DefaultGenesis(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(
 		t,
-		`{"perpetuals":[],"liquidity_tiers":[],"params":{"funding_rate_clamp_factor_ppm":6000000,`+
-			`"premium_vote_clamp_factor_ppm":60000000,"min_num_votes_per_sample":15}}`,
+		`{"perpetuals":[],"liquidity_tiers":[],"params":{"funding_rate_clamp_factor_ppm":6000000,"premium_vote_clamp_factor_ppm":60000000,"min_num_votes_per_sample":15},`+
+			`"collateral_pools":[{"collateral_pool_id":0,"max_cumulative_insurance_fund_delta_per_block":"1000000000000","multi_collateral_assets":{"multi_collateral_assets":[0]},"quote_asset_id":0},`+
+			`{"collateral_pool_id":1,"max_cumulative_insurance_fund_delta_per_block":"1000000000000","multi_collateral_assets":{"multi_collateral_assets":[1]},"quote_asset_id":1},`+
+			`{"collateral_pool_id":2,"max_cumulative_insurance_fund_delta_per_block":"1000000000000","multi_collateral_assets":{"multi_collateral_assets":[0]},"quote_asset_id":0}]}`,
 		string(json),
 	)
 }
@@ -162,7 +162,33 @@ func TestAppModuleBasic_ValidateGenesis(t *testing.T) {
 		   "funding_rate_clamp_factor_ppm":6000000,
 		   "premium_vote_clamp_factor_ppm":60000000,
 		   "min_num_votes_per_sample":15
-		}
+		},
+		"collateral_pools": [
+			{
+				"collateral_pool_id": 0,
+				"max_cumulative_insurance_fund_delta_per_block": 1000000000000,
+				"multi_collateral_assets": {
+					"multi_collateral_assets": [0]
+				},
+				"quote_asset_id": 0
+			},
+			{
+				"collateral_pool_id": 1,
+				"max_cumulative_insurance_fund_delta_per_block": 1000000000000,
+				"multi_collateral_assets": {
+					"multi_collateral_assets": [1]
+				},
+				"quote_asset_id": 1
+			},
+			{
+				"collateral_pool_id": 2,
+				"max_cumulative_insurance_fund_delta_per_block": 1000000000000,
+				"multi_collateral_assets": {
+					"multi_collateral_assets": [0]
+				},
+				"quote_asset_id": 0
+			}
+		]
 	 }`)
 
 	err := am.ValidateGenesis(cdc, nil, h)
@@ -211,13 +237,14 @@ func TestAppModuleBasic_GetQueryCmd(t *testing.T) {
 
 	cmd := am.GetQueryCmd()
 	require.Equal(t, "perpetuals", cmd.Use)
-	require.Equal(t, 6, len(cmd.Commands()))
-	require.Equal(t, "get-all-liquidity-tiers", cmd.Commands()[0].Name())
-	require.Equal(t, "get-params", cmd.Commands()[1].Name())
-	require.Equal(t, "get-premium-samples", cmd.Commands()[2].Name())
-	require.Equal(t, "get-premium-votes", cmd.Commands()[3].Name())
-	require.Equal(t, "list-perpetual", cmd.Commands()[4].Name())
-	require.Equal(t, "show-perpetual", cmd.Commands()[5].Name())
+	require.Equal(t, 7, len(cmd.Commands()))
+	require.Equal(t, "get-all-collateral-pools", cmd.Commands()[0].Name())
+	require.Equal(t, "get-all-liquidity-tiers", cmd.Commands()[1].Name())
+	require.Equal(t, "get-params", cmd.Commands()[2].Name())
+	require.Equal(t, "get-premium-samples", cmd.Commands()[3].Name())
+	require.Equal(t, "get-premium-votes", cmd.Commands()[4].Name())
+	require.Equal(t, "list-perpetual", cmd.Commands()[5].Name())
+	require.Equal(t, "show-perpetual", cmd.Commands()[6].Name())
 }
 
 func TestAppModule_Name(t *testing.T) {
@@ -247,39 +274,45 @@ func TestAppModule_InitExportGenesis(t *testing.T) {
 	cdc := codec.NewProtoCodec(module.InterfaceRegistry)
 
 	// The corresponding `Market` must exist, so create it.
-	am, keeper, pricesKeeper, _, ctx := createAppModuleWithKeeper(t)
-	if _, err := pricesKeeper.CreateMarket(
-		ctx,
-		pricetypes.MarketParam{
-			Id:                 0,
-			Pair:               constants.EthUsdPair,
-			Exponent:           -2,
-			MinExchanges:       1,
-			MinPriceChangePpm:  1_000,
-			ExchangeConfigJson: "{}",
-		},
-		pricetypes.MarketPrice{
-			Id:        0,
-			Exponent:  -2,
-			SpotPrice: 1_000,
-			PnlPrice:  1_000,
-		},
-	); err != nil {
-		t.Errorf("failed to create a market %s", err)
-	}
+	am, keeper, _, _, _, ctx := createAppModuleWithKeeper(t)
 
 	msg := `{
+	    "collateral_pools": [
+			{
+				"collateral_pool_id": 0,
+				"max_cumulative_insurance_fund_delta_per_block": "1000000000000",
+				"multi_collateral_assets": {
+					"multi_collateral_assets": [0]
+				},
+				"quote_asset_id": 0
+			},
+			{
+				"collateral_pool_id": 1,
+				"max_cumulative_insurance_fund_delta_per_block": "1000000000000",
+				"multi_collateral_assets": {
+					"multi_collateral_assets": [1]
+				},
+				"quote_asset_id": 1
+			},
+			{
+				"collateral_pool_id": 2,
+				"max_cumulative_insurance_fund_delta_per_block": "1000000000000",
+				"multi_collateral_assets": {
+					"multi_collateral_assets": [0]
+				},
+				"quote_asset_id": 0
+			}
+		],
 		"perpetuals":[
 		   {
 			  "params": {
 				 "ticker":"EXAM-USD",
 				 "market_id":0,
 				 "liquidity_tier":0,
-				 "market_type": "PERPETUAL_MARKET_TYPE_CROSS",
 				 "danger_index_ppm": 0,
-				 "isolated_market_max_cumulative_insurance_fund_delta_per_block": 1000000
+				 "collateral_pool_id": 0
 			  },
-			  "yield_index":"0/1"
+			  "yield_index": "0/1"
 		   }
 		],
 		"liquidity_tiers":[
@@ -319,14 +352,13 @@ func TestAppModule_InitExportGenesis(t *testing.T) {
 				 "atomic_resolution":0,
 				 "default_funding_ppm":0,
 				 "liquidity_tier":0,
-				 "market_type": "PERPETUAL_MARKET_TYPE_CROSS",
 				 "danger_index_ppm": 0,
-				 "isolated_market_max_cumulative_insurance_fund_delta_per_block": "1000000"
+				 "collateral_pool_id": 0
 			  },
 			  "funding_index":"0",
 			  "open_interest":"0",
 			  "last_funding_rate":"0",
-			  "yield_index":"0/1"
+			  "yield_index": "0/1"
 		   }
 		],
 		"liquidity_tiers":[
@@ -345,7 +377,33 @@ func TestAppModule_InitExportGenesis(t *testing.T) {
 		   "funding_rate_clamp_factor_ppm":6000000,
 		   "premium_vote_clamp_factor_ppm":60000000,
 		   "min_num_votes_per_sample":15
-		}
+		},
+		"collateral_pools": [
+			{
+			"collateral_pool_id": 0,
+			"max_cumulative_insurance_fund_delta_per_block": "1000000000000",
+			"multi_collateral_assets": {
+				"multi_collateral_assets": [0]
+			},
+			"quote_asset_id": 0
+			},
+			{
+			"collateral_pool_id": 1,
+			"max_cumulative_insurance_fund_delta_per_block": "1000000000000",
+			"multi_collateral_assets": {
+				"multi_collateral_assets": [1]
+			},
+			"quote_asset_id": 1
+			},
+			{
+			"collateral_pool_id": 2,
+			"max_cumulative_insurance_fund_delta_per_block": "1000000000000",
+			"multi_collateral_assets": {
+				"multi_collateral_assets": [0]
+			},
+			"quote_asset_id": 0
+			}
+		]
 	 }`
 	require.Equal(t,
 		testutil_json.CompactJsonString(t, expected),
@@ -354,7 +412,7 @@ func TestAppModule_InitExportGenesis(t *testing.T) {
 }
 
 func TestAppModule_InitGenesisPanic(t *testing.T) {
-	am, _, _, _, ctx := createAppModuleWithKeeper(t)
+	am, _, _, _, _, ctx := createAppModuleWithKeeper(t)
 	cdc := codec.NewProtoCodec(module.InterfaceRegistry)
 	gs := json.RawMessage(`invalid json`)
 
@@ -367,7 +425,7 @@ func TestAppModule_ConsensusVersion(t *testing.T) {
 }
 
 func TestAppModule_EndBlock(t *testing.T) {
-	am, perpKeeper, _, epochsKeeper, ctx := createAppModuleWithKeeper(t)
+	am, perpKeeper, _, epochsKeeper, _, ctx := createAppModuleWithKeeper(t)
 
 	// Initialize empty samples in storage.
 	perpKeeper.SetEmptyPremiumSamples(ctx)

@@ -147,7 +147,7 @@ func TestGenesisState_Validate(t *testing.T) {
 			},
 			expectedError: types.ErrDuplicateSubaccountIds,
 		},
-		"invalid: multiple asset positions": {
+		"Valid: multiple asset positions": {
 			genState: &types.GenesisState{
 				Subaccounts: []types.Subaccount{
 					{
@@ -157,19 +157,19 @@ func TestGenesisState_Validate(t *testing.T) {
 						},
 						AssetPositions: []*types.AssetPosition{ // multiple asset positions.
 							{
-								AssetId: 0,
+								AssetId:  0,
+								Quantums: dtypes.NewInt(1_000),
 							},
 							{
-								AssetId: 1,
+								AssetId:  1,
+								Quantums: dtypes.NewInt(1_000),
 							},
 						},
 					},
 				},
 			},
-			expectedError: types.ErrMultAssetPositionsNotSupported,
 		},
-		// TODO(DEC-582): once we support different assets, add a test case for the asset ordering.
-		"invalid: asset position id != 0": {
+		"Valid: asset position id != 0": {
 			genState: &types.GenesisState{
 				Subaccounts: []types.Subaccount{
 					{
@@ -186,7 +186,6 @@ func TestGenesisState_Validate(t *testing.T) {
 					},
 				},
 			},
-			expectedError: types.ErrAssetPositionNotSupported,
 		},
 		"invalid: AssetYieldIndex is not a rational number 1": {
 			genState: &types.GenesisState{

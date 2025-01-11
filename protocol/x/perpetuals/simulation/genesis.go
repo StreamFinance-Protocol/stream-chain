@@ -189,7 +189,6 @@ func RandomizedGenState(simState *module.SimulationState) {
 	for i := 0; i < numPerpetuals; i++ {
 		marketId := marketsForPerp[i]
 
-		marketType := types.PerpetualMarketType_PERPETUAL_MARKET_TYPE_CROSS
 		// TODO: add isolated markets when order placements for isolated markets are supported
 
 		perpetuals[i] = types.Perpetual{
@@ -200,19 +199,40 @@ func RandomizedGenState(simState *module.SimulationState) {
 				AtomicResolution:  genAtomicResolution(r, isReasonableGenesis),
 				DefaultFundingPpm: genDefaultFundingPpm(r),
 				LiquidityTier:     uint32(simtypes.RandIntBetween(r, 0, numLiquidityTiers)),
-				MarketType:        marketType,
 				DangerIndexPpm:    0,
 			},
 			FundingIndex: dtypes.ZeroInt(),
 			OpenInterest: dtypes.ZeroInt(),
-			YieldIndex:   new(big.Rat).SetInt64(0).String(),
+			YieldIndex:   "0/1",
 		}
 	}
 
+	collateralPools := []types.CollateralPool{
+		{
+			CollateralPoolId:                        0,
+			MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+			MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{0}},
+			QuoteAssetId:                            0,
+		},
+		{
+			CollateralPoolId:                        1,
+			MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+			MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{1}},
+			QuoteAssetId:                            1,
+		},
+		{
+			CollateralPoolId:                        2,
+			MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+			MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{0}},
+			QuoteAssetId:                            0,
+		},
+	}
+
 	perpetualsGenesis := types.GenesisState{
-		Perpetuals:     perpetuals,
-		LiquidityTiers: liquidityTiers,
-		Params:         params,
+		CollateralPools: collateralPools,
+		Perpetuals:      perpetuals,
+		LiquidityTiers:  liquidityTiers,
+		Params:          params,
 	}
 
 	simState.GenState[types.ModuleName] = simState.Cdc.MustMarshalJSON(&perpetualsGenesis)

@@ -143,8 +143,11 @@ func DefaultConfig(options *NetworkConfigOptions) network.Config {
 				appOptions.(*appoptions.FakeAppOptions).Set(flags.FlagHome, val.GetCtx().Config.RootDir)
 			}
 
+			// Create a more verbose logger instead of using the validator's default
+			logger := log.NewLogger(os.Stdout)
+
 			return app.New(
-				val.GetCtx().Logger,
+				logger,
 				dbm.NewMemDB(),
 				nil,
 				true,

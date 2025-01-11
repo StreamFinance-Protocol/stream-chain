@@ -10,6 +10,8 @@ import (
 
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/constants"
 	keepertest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/keeper"
+	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets"
+	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
 )
 
@@ -30,7 +32,7 @@ func TestQueryCollateralPoolAddress(t *testing.T) {
 				PerpetualId: constants.BtcUsd_NoMarginRequirement.Params.Id,
 			},
 			response: &types.QueryCollateralPoolAddressResponse{
-				CollateralPoolAddress: types.ModuleAddress.String(),
+				CollateralPoolAddress: types.CollateralPoolZeroAddress.String(),
 			},
 		},
 		"Isolated perpetual": {
@@ -38,7 +40,7 @@ func TestQueryCollateralPoolAddress(t *testing.T) {
 				PerpetualId: constants.IsoUsd_IsolatedMarket.Params.Id,
 			},
 			response: &types.QueryCollateralPoolAddressResponse{
-				CollateralPoolAddress: constants.IsoCollateralPoolAddress.String(),
+				CollateralPoolAddress: types.CollateralPoolTwoAddress.String(),
 			},
 		},
 		"Perpetual not found": {
@@ -52,9 +54,12 @@ func TestQueryCollateralPoolAddress(t *testing.T) {
 		},
 	} {
 		t.Run(testName, func(t *testing.T) {
-			ctx, keeper, pricesKeeper, perpetualsKeeper, _, _, _, _, _, _ := keepertest.SubaccountsKeepers(t, true)
-			keepertest.CreateTestMarkets(t, ctx, pricesKeeper)
+			ctx, keeper, pricesKeeper, perpetualsKeeper, _, _, assetsKeeper, _, _, _ := keepertest.SubaccountsKeepers(t, true)
+			prices.InitGenesis(ctx, *pricesKeeper, constants.Prices_DefaultGenesisState)
+			assets.InitGenesis(ctx, *assetsKeeper, constants.Assets_DefaultGenesisState)
+			keepertest.CreateNonDefaultTestMarkets(t, ctx, pricesKeeper)
 			keepertest.CreateTestLiquidityTiers(t, ctx, perpetualsKeeper)
+			keepertest.CreateTestCollateralPools(t, ctx, perpetualsKeeper)
 			keepertest.CreateTestPerpetuals(t, ctx, perpetualsKeeper)
 			response, err := keeper.CollateralPoolAddress(ctx, tc.request)
 			if tc.err != nil {

@@ -17,6 +17,7 @@ func TestStateKeys(t *testing.T) {
 	require.Equal(t, "PremVotes", types.PremiumVotesKey)
 	require.Equal(t, "PremSamples", types.PremiumSamplesKey)
 	require.Equal(t, "LiqTier:", types.LiquidityTierKeyPrefix)
+	require.Equal(t, "ColPool:", types.CollateralPoolKeyPrefix)
 	require.Equal(t, "Params", types.ParamsKey)
 }
 

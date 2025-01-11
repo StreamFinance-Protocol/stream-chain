@@ -25,6 +25,7 @@ func (k Keeper) CreateAsset(
 	marketId uint32,
 	atomicResolution int32,
 	assetYieldIndex string,
+	maxSlippagePpm uint32,
 ) (types.Asset, error) {
 	if prevAsset, exists := k.GetAsset(ctx, assetId); exists {
 		return types.Asset{}, errorsmod.Wrapf(
@@ -66,6 +67,11 @@ func (k Keeper) CreateAsset(
 		}
 	}
 
+	// validate max slippage ppm
+	if maxSlippagePpm > 1_000_000 {
+		return types.Asset{}, errorsmod.Wrap(types.ErrInvalidMaxSlippagePpm, lib.UintToString(maxSlippagePpm))
+	}
+
 	// Create the asset
 	asset := types.Asset{
 		Id:               assetId,
@@ -76,6 +82,7 @@ func (k Keeper) CreateAsset(
 		MarketId:         marketId,
 		AtomicResolution: atomicResolution,
 		AssetYieldIndex:  assetYieldIndex,
+		MaxSlippagePpm:   maxSlippagePpm,
 	}
 
 	// Validate market
@@ -190,34 +197,58 @@ func (k Keeper) GetNetCollateral(
 	ctx sdk.Context,
 	id uint32,
 	bigQuantums *big.Int,
+	quoteCurrencyAtomicResolution int32,
 ) (
 	bigNetCollateralQuoteQuantums *big.Int,
 	err error,
 ) {
-	if id == types.AssetTDai.Id {
-		return new(big.Int).Set(bigQuantums), nil
-	}
-
 	// Get asset
-	_, exists := k.GetAsset(ctx, id)
+	asset, exists := k.GetAsset(ctx, id)
 	if !exists {
 		return big.NewInt(0), errorsmod.Wrap(types.ErrAssetDoesNotExist, lib.UintToString(id))
 	}
 
 	// Balance is zero.
-	if bigQuantums.BitLen() == 0 {
+	if bigQuantums.Sign() == 0 {
 		return big.NewInt(0), nil
 	}
 
-	// Balance is positive.
-	// TODO(DEC-581): add multi-collateral support.
-	if bigQuantums.Sign() == 1 {
-		return big.NewInt(0), types.ErrNotImplementedMulticollateral
+	return k.GetSlippageAdjustedQuoteQuantums(ctx, asset, bigQuantums, quoteCurrencyAtomicResolution)
+}
+
+func (k Keeper) GetSlippageAdjustedQuoteQuantums(
+	ctx sdk.Context,
+	asset types.Asset,
+	bigQuantums *big.Int,
+	quoteCurrencyAtomicResolution int32,
+) (*big.Int, error) {
+	exponent := int32(0)
+	price := uint64(1)
+
+	if asset.HasMarket {
+		marketPrice, err := k.pricesKeeper.GetMarketPrice(ctx, asset.MarketId)
+		if err != nil {
+			return big.NewInt(0), err
+		}
+		exponent = marketPrice.Exponent
+		price = marketPrice.SpotPrice
 	}
 
-	// Balance is negative.
-	// TODO(DEC-582): add margin-trading support.
-	return big.NewInt(0), types.ErrNotImplementedMargin
+	bigQuoteQuantums := lib.BaseToQuoteQuantums(
+		bigQuantums,
+		asset.AtomicResolution,
+		quoteCurrencyAtomicResolution,
+		price,
+		exponent,
+	)
+
+	return new(big.Int).Div(
+		new(big.Int).Mul(
+			bigQuoteQuantums,
+			big.NewInt(1_000_000-int64(asset.MaxSlippagePpm)),
+		),
+		big.NewInt(1_000_000),
+	), nil
 }
 
 // GetMarginRequirements returns the initial and maintenance margin-
@@ -226,31 +257,13 @@ func (k Keeper) GetMarginRequirements(
 	ctx sdk.Context,
 	id uint32,
 	bigQuantums *big.Int,
+	quoteCurrencyAtomicResolution int32,
 ) (
 	bigInitialMarginQuoteQuantums *big.Int,
 	bigMaintenanceMarginQuoteQuantums *big.Int,
 	err error,
 ) {
-	// QuoteBalance does not contribute to any margin requirements.
-	if id == types.AssetTDai.Id {
-		return big.NewInt(0), big.NewInt(0), nil
-	}
-
-	// Get asset
-	_, exists := k.GetAsset(ctx, id)
-	if !exists {
-		return big.NewInt(0), big.NewInt(0), errorsmod.Wrap(
-			types.ErrAssetDoesNotExist, lib.UintToString(id))
-	}
-
-	// Balance is zero or positive.
-	if bigQuantums.Sign() >= 0 {
-		return big.NewInt(0), big.NewInt(0), nil
-	}
-
-	// Balance is negative.
-	// TODO(DEC-582): margin-trading
-	return big.NewInt(0), big.NewInt(0), types.ErrNotImplementedMargin
+	return big.NewInt(0), big.NewInt(0), nil
 }
 
 // ConvertAssetToCoin converts the given `assetId` and `quantums` used in `x/asset`,

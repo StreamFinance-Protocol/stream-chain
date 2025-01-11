@@ -37,14 +37,14 @@ func TestMsgWithdrawFromSubaccount_ValidateBasic(t *testing.T) {
 			},
 			err: types.ErrInvalidAccountAddress,
 		},
-		"Non-TDai asset transfer not supported": {
+		"Non-TDai asset transfer supported": {
 			msg: types.MsgWithdrawFromSubaccount{
 				Sender:    constants.Alice_Num0,
 				Recipient: constants.AliceAccAddress.String(),
 				AssetId:   uint32(1),
 				Quantums:  uint64(100),
 			},
-			err: types.ErrNonTDaiAssetTransferNotImplemented,
+			err: nil,
 		},
 		"Invalid quantums": {
 			msg: types.MsgWithdrawFromSubaccount{

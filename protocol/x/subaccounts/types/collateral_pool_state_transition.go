@@ -23,13 +23,14 @@ func (t PositionStateTransition) String() string {
 	return result
 }
 
-// Represents a state transition for an isolated perpetual position in a subaccount.
-type IsolatedPerpetualPositionStateTransition struct {
+// Represents a state transition for a collateral transfer from one
+// collateral pool to another when a perpetual position is opened or closed.
+type CollateralTransferPerpetualPositionStateTransition struct {
 	SubaccountId *SubaccountId
 	PerpetualId  uint32
-	// TODO(DEC-715): Support non-TDAI assets.
-	// Quote quantums of collateral to transfer as a result of the state transition.
-	QuoteQuantums *big.Int
+	AssetIds     []uint32
+	// BigQuantums of collateral to transfer as a result of the state transition.
+	BigQuantums []*big.Int
 	// The state transition that occurred for the isolated perpetual positions.
 	Transition PositionStateTransition
 }

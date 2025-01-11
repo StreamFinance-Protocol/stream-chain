@@ -14,14 +14,16 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/mocks"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/constants"
+	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets"
 	assetskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets/keeper"
+	clobkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/keeper"
 	delaymsgmoduletypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/delaymsg/types"
 	epochskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/epochs/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
+	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices"
 	priceskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/keeper"
-	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -70,12 +72,14 @@ func PerpetualsKeepersWithClobHelpers(
 			transientStoreKey,
 		)
 		pc.EpochsKeeper, _ = createEpochsKeeper(stateStore, db, cdc)
+		pc.AssetsKeeper, _ = createAssetsKeeper(stateStore, db, cdc, pc.PricesKeeper, transientStoreKey, true)
 		pc.PerpetualsKeeper, pc.StoreKey = createPerpetualsKeeperWithClobHelpers(
 			stateStore,
 			db,
 			cdc,
 			pc.PricesKeeper,
 			pc.EpochsKeeper,
+			pc.AssetsKeeper,
 			clobKeeper,
 			transientStoreKey,
 		)
@@ -87,6 +91,8 @@ func PerpetualsKeepersWithClobHelpers(
 	pc.MockTimeProvider.On("Now").Return(constants.TimeT)
 
 	// Initialize perpetuals module parameters to default genesis values.
+	prices.InitGenesis(pc.Ctx, *pc.PricesKeeper, constants.Prices_DefaultGenesisState)
+	assets.InitGenesis(pc.Ctx, *pc.AssetsKeeper, constants.Assets_DefaultGenesisState)
 	perpetuals.InitGenesis(pc.Ctx, *pc.PerpetualsKeeper, constants.Perpetuals_GenesisState_ParamsOnly)
 
 	return pc
@@ -98,6 +104,7 @@ func createPerpetualsKeeperWithClobHelpers(
 	cdc *codec.ProtoCodec,
 	pk *priceskeeper.Keeper,
 	ek *epochskeeper.Keeper,
+	ak *assetskeeper.Keeper,
 	pck types.PerpetualsClobKeeper,
 	transientStoreKey storetypes.StoreKey,
 ) (*keeper.Keeper, storetypes.StoreKey) {
@@ -114,6 +121,7 @@ func createPerpetualsKeeperWithClobHelpers(
 		storeKey,
 		pk,
 		ek,
+		ak,
 		mockIndexerEventsManager,
 		[]string{
 			lib.GovModuleAddress.String(),
@@ -133,9 +141,11 @@ func createPerpetualsKeeper(
 	cdc *codec.ProtoCodec,
 	pk *priceskeeper.Keeper,
 	ek *epochskeeper.Keeper,
+	ak *assetskeeper.Keeper,
+	clobKeeper *clobkeeper.Keeper,
 	transientStoreKey storetypes.StoreKey,
 ) (*keeper.Keeper, storetypes.StoreKey) {
-	return createPerpetualsKeeperWithClobHelpers(stateStore, db, cdc, pk, ek, nil, transientStoreKey)
+	return createPerpetualsKeeperWithClobHelpers(stateStore, db, cdc, pk, ek, ak, clobKeeper, transientStoreKey)
 }
 
 // PopulateTestPremiumStore populates either `PremiumVotes` (`isVote` is true) or
@@ -177,9 +187,8 @@ func CreateTestPerpetuals(t *testing.T, ctx sdk.Context, k *keeper.Keeper) {
 			p.Params.AtomicResolution,
 			p.Params.DefaultFundingPpm,
 			p.Params.LiquidityTier,
-			p.Params.MarketType,
 			p.Params.DangerIndexPpm,
-			p.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
+			p.Params.CollateralPoolId,
 			p.YieldIndex,
 		)
 		require.NoError(t, err)
@@ -199,6 +208,18 @@ func CreateTestLiquidityTiers(t *testing.T, ctx sdk.Context, k *keeper.Keeper) {
 			l.OpenInterestUpperCap,
 		)
 
+		require.NoError(t, err)
+	}
+}
+
+func CreateTestCollateralPools(t *testing.T, ctx sdk.Context, k *keeper.Keeper) {
+	for _, cp := range constants.CollateralPools {
+		_, err := k.UpsertCollateralPool(ctx,
+			cp.CollateralPoolId,
+			cp.MaxCumulativeInsuranceFundDeltaPerBlock,
+			cp.MultiCollateralAssets,
+			cp.QuoteAssetId,
+		)
 		require.NoError(t, err)
 	}
 }
@@ -267,13 +288,9 @@ func CreateNPerpetuals(
 		CreateNMarkets(t, ctx, pricesKeeper, n)
 
 		var defaultFundingPpm int32
-		marketType := types.PerpetualMarketType_PERPETUAL_MARKET_TYPE_CROSS
-		maxInsuranceFundDelta := uint64(0)
 
 		if i%3 == 0 {
 			defaultFundingPpm = 1
-			marketType = types.PerpetualMarketType_PERPETUAL_MARKET_TYPE_ISOLATED
-			maxInsuranceFundDelta = uint64(1_000_000)
 		} else if i%3 == 1 {
 			defaultFundingPpm = -1
 		} else {
@@ -288,9 +305,8 @@ func CreateNPerpetuals(
 			int32(i),             // AtomicResolution
 			defaultFundingPpm,    // DefaultFundingPpm
 			allLiquidityTiers[i%len(allLiquidityTiers)].Id, // LiquidityTier
-			marketType,
 			0,
-			maxInsuranceFundDelta,
+			0,
 			"0/1",
 		)
 		if err != nil {
@@ -302,13 +318,15 @@ func CreateNPerpetuals(
 	return items, nil
 }
 
-func CreateLiquidityTiersAndNPerpetuals(
+func CreateCollateralPoolsAndLiquidityTiersAndNPerpetuals(
 	t *testing.T,
 	ctx sdk.Context,
 	keeper *keeper.Keeper,
 	pricesKeeper *priceskeeper.Keeper,
 	n int,
 ) []types.Perpetual {
+	// Create collateral pools.
+	CreateTestCollateralPools(t, ctx, keeper)
 	// Create liquidity tiers.
 	CreateTestLiquidityTiers(t, ctx, keeper)
 	// Create perpetuals.
@@ -317,20 +335,15 @@ func CreateLiquidityTiersAndNPerpetuals(
 	return perpetuals
 }
 
-// CreateTestPricesAndPerpetualMarkets is a test utility function that creates list of given
-// prices and perpetual markets in state.
-func CreateTestPricesAndPerpetualMarkets(
+func CreatePerpetualMarkets(
 	t *testing.T,
 	ctx sdk.Context,
 	perpKeeper *keeper.Keeper,
-	pricesKeeper *priceskeeper.Keeper,
 	perpetuals []types.Perpetual,
-	markets []pricestypes.MarketParamPrice,
 ) {
 	// Create liquidity tiers.
+	CreateTestCollateralPools(t, ctx, perpKeeper)
 	CreateTestLiquidityTiers(t, ctx, perpKeeper)
-
-	CreateTestPriceMarkets(t, ctx, pricesKeeper, markets)
 
 	for _, perp := range perpetuals {
 		_, err := perpKeeper.CreatePerpetual(
@@ -341,9 +354,8 @@ func CreateTestPricesAndPerpetualMarkets(
 			perp.Params.AtomicResolution,
 			perp.Params.DefaultFundingPpm,
 			perp.Params.LiquidityTier,
-			perp.Params.MarketType,
 			perp.Params.DangerIndexPpm,
-			perp.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
+			perp.Params.CollateralPoolId,
 			perp.YieldIndex,
 		)
 		require.NoError(t, err)

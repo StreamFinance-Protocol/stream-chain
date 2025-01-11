@@ -582,12 +582,9 @@ export interface IndexerOrder {
   /** Router fee ppm for the order. */
 
   routerFeePpm: number;
-  /** Router fee subaccount owner. */
+  /** Router fee owner. */
 
-  routerFeeSubaccountOwner: string;
-  /** Router fee subaccount number. */
-
-  routerFeeSubaccountNumber: number;
+  routerFeeOwner: string;
 }
 /**
  * IndexerOrderV1 represents a single order belonging to a `Subaccount`
@@ -661,12 +658,9 @@ export interface IndexerOrderSDKType {
   /** Router fee ppm for the order. */
 
   router_fee_ppm: number;
-  /** Router fee subaccount owner. */
+  /** Router fee owner. */
 
-  router_fee_subaccount_owner: string;
-  /** Router fee subaccount number. */
-
-  router_fee_subaccount_number: number;
+  router_fee_owner: string;
 }
 
 function createBaseIndexerOrderId(): IndexerOrderId {
@@ -758,8 +752,7 @@ function createBaseIndexerOrder(): IndexerOrder {
     conditionType: 0,
     conditionalOrderTriggerSubticks: Long.UZERO,
     routerFeePpm: 0,
-    routerFeeSubaccountOwner: "",
-    routerFeeSubaccountNumber: 0
+    routerFeeOwner: ""
   };
 }
 
@@ -813,12 +806,8 @@ export const IndexerOrder = {
       writer.uint32(96).int32(message.routerFeePpm);
     }
 
-    if (message.routerFeeSubaccountOwner !== "") {
-      writer.uint32(106).string(message.routerFeeSubaccountOwner);
-    }
-
-    if (message.routerFeeSubaccountNumber !== 0) {
-      writer.uint32(112).uint32(message.routerFeeSubaccountNumber);
+    if (message.routerFeeOwner !== "") {
+      writer.uint32(106).string(message.routerFeeOwner);
     }
 
     return writer;
@@ -882,11 +871,7 @@ export const IndexerOrder = {
           break;
 
         case 13:
-          message.routerFeeSubaccountOwner = reader.string();
-          break;
-
-        case 14:
-          message.routerFeeSubaccountNumber = reader.uint32();
+          message.routerFeeOwner = reader.string();
           break;
 
         default:
@@ -912,8 +897,7 @@ export const IndexerOrder = {
     message.conditionType = object.conditionType ?? 0;
     message.conditionalOrderTriggerSubticks = object.conditionalOrderTriggerSubticks !== undefined && object.conditionalOrderTriggerSubticks !== null ? Long.fromValue(object.conditionalOrderTriggerSubticks) : Long.UZERO;
     message.routerFeePpm = object.routerFeePpm ?? 0;
-    message.routerFeeSubaccountOwner = object.routerFeeSubaccountOwner ?? "";
-    message.routerFeeSubaccountNumber = object.routerFeeSubaccountNumber ?? 0;
+    message.routerFeeOwner = object.routerFeeOwner ?? "";
     return message;
   }
 

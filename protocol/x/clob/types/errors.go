@@ -359,11 +359,18 @@ var (
 	)
 
 	// Stateful order errors.
-	ErrWouldViolateIsolatedSubaccountConstraints = errorsmod.Register(
+	ErrWouldViolateCollateralPoolConstraints = errorsmod.Register(
 		ModuleName,
 		2005,
-		"Order would violate isolated subaccount constraints.",
+		"Order would violate collateral pool constraints.",
 	)
+
+	ErrWouldViolateMultiCollateralConstraints = errorsmod.Register(
+		ModuleName,
+		2006,
+		"Order would violate multi collateral constraints.",
+	)
+
 	ErrInvalidOrderFlag = errorsmod.Register(
 		ModuleName,
 		3000,
@@ -500,10 +507,10 @@ var (
 		6003,
 		"Router fee ppm is invalid",
 	)
-	ErrInvalidRouterSubaccountId = errorsmod.Register(
+	ErrInvalidRouterOwner = errorsmod.Register(
 		ModuleName,
 		6004,
-		"Router subaccount ID is invalid",
+		"Router owner is invalid",
 	)
 
 	// Errors for unimplemented and disabled functionality.
@@ -515,7 +522,7 @@ var (
 	ErrAssetUpdateNotImplemented = errorsmod.Register(
 		ModuleName,
 		9001,
-		"Updates for assets other than TDAI are not implemented",
+		"Updates for assets other than Quote Asset are not implemented",
 	)
 	ErrNotImplemented = errorsmod.Register(
 		ModuleName,
@@ -526,6 +533,11 @@ var (
 		ModuleName,
 		9003,
 		"Reduce-only is currently disabled for non-FOK/IOC orders",
+	)
+	ErrMultiCollateralNotImplemented = errorsmod.Register(
+		ModuleName,
+		9004,
+		"Multi-collateral is not implemented",
 	)
 
 	// Equity tier limit errors.

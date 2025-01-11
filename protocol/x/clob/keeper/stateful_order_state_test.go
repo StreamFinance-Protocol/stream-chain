@@ -1270,7 +1270,7 @@ func TestGetAddAndRemoveStatefulOrderTimeSlice(t *testing.T) {
 			traceDecoder := &tracer.TraceDecoder{}
 			ks.Ctx.MultiStore().SetTracer(traceDecoder)
 
-			tc.setup(ks.Ctx, *ks.ClobKeeper)
+			tc.setup(ks.Ctx, ks.ClobKeeper)
 
 			// Verify the writes were done in the expected order.
 			traceDecoder.RequireKeyPrefixWrittenInSequence(t, tc.expectedMultiStoreWrites)
@@ -1479,7 +1479,7 @@ func TestAddOrderToStatefulOrdersTimeSlice_PanicsIfAlreadyExists(t *testing.T) {
 
 	order := constants.LongTermOrder_Alice_Num0_Id0_Clob0_Buy5_Price10_GTBT15
 	goodTilTime := constants.Time_21st_Feb_2021
-	createPartiallyFilledStatefulOrderInState(ks.Ctx, *ks.ClobKeeper, order, goodTilTime)
+	createPartiallyFilledStatefulOrderInState(ks.Ctx, ks.ClobKeeper, order, goodTilTime)
 	require.PanicsWithValue(
 		t,
 		fmt.Sprintf(

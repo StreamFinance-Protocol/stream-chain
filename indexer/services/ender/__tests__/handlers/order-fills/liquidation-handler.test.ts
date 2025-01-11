@@ -245,8 +245,7 @@ describe('LiquidationHandler', () => {
         reduceOnly: true,
         clientMetadata: 0,
         routerFeePpm: 0,
-        routerFeeSubaccountOwner: '',
-        routerFeeSubaccountNumber: 0,
+        routerFeeOwner: '',
       });
 
       const takerSubticks: number = 15_000_000;
@@ -312,8 +311,7 @@ describe('LiquidationHandler', () => {
         goodTilBlockTime: protocolTranslations.getGoodTilBlockTime(makerOrderProto),
         clientMetadata: makerOrderProto.clientMetadata.toString(),
         routerFeePpm: '0',
-        routerFeeSubaccountOwner: '""',
-        routerFeeSubaccountNumber: '0',
+        routerFeeOwner: '""',
         updatedAt: defaultDateTime.toISO() ?? '',
         updatedAtHeight: defaultHeight.toString(),
       });
@@ -506,8 +504,7 @@ describe('LiquidationHandler', () => {
         reduceOnly: true,
         clientMetadata: 0,
         routerFeePpm: 0,
-        routerFeeSubaccountOwner: '',
-        routerFeeSubaccountNumber: 0,
+        routerFeeOwner: '',
       });
       const liquidationOrder: LiquidationOrderV1 = createLiquidationOrder({
         subaccountId: defaultSubaccountId2,
@@ -556,8 +553,7 @@ describe('LiquidationHandler', () => {
         goodTilBlockTime: protocolTranslations.getGoodTilBlockTime(makerOrderProto),
         clientMetadata: makerOrderProto.clientMetadata.toString(),
         routerFeePpm: '0',
-        routerFeeSubaccountOwner: '""',
-        routerFeeSubaccountNumber: '0',
+        routerFeeOwner: '""',
         updatedAt: defaultDateTime.toISO() ?? '',
         updatedAtHeight: defaultHeight.toString(),
       });
@@ -731,8 +727,7 @@ describe('LiquidationHandler', () => {
         reduceOnly: true,
         clientMetadata: 0,
         routerFeePpm: 0,
-        routerFeeSubaccountOwner: '',
-        routerFeeSubaccountNumber: 0,
+        routerFeeOwner: '',
       });
       const liquidationOrder: LiquidationOrderV1 = createLiquidationOrder({
         subaccountId: defaultSubaccountId2,
@@ -781,8 +776,7 @@ describe('LiquidationHandler', () => {
         goodTilBlockTime: protocolTranslations.getGoodTilBlockTime(makerOrderProto),
         clientMetadata: makerOrderProto.clientMetadata.toString(),
         routerFeePpm: '0',
-        routerFeeSubaccountOwner: '""',
-        routerFeeSubaccountNumber: '0',
+        routerFeeOwner: '""',
         updatedAt: defaultDateTime.toISO() ?? '',
         updatedAtHeight: defaultHeight.toString(),
       });
@@ -881,8 +875,7 @@ describe('LiquidationHandler', () => {
       reduceOnly: false,
       clientMetadata: 0,
       routerFeePpm: 0,
-      routerFeeSubaccountOwner: '',
-      routerFeeSubaccountNumber: 0,
+      routerFeeOwner: '',
     });
 
     const takerSubticks: number = 150_000;
@@ -944,8 +937,7 @@ describe('LiquidationHandler', () => {
       goodTilBlockTime: protocolTranslations.getGoodTilBlockTime(makerOrderProto),
       clientMetadata: makerOrderProto.clientMetadata.toString(),
       routerFeePpm: '0',
-      routerFeeSubaccountOwner: '""',
-      routerFeeSubaccountNumber: '0',
+      routerFeeOwner: '""',
       updatedAt: defaultDateTime.toISO() ?? '',
       updatedAtHeight: defaultHeight.toString(),
     });
@@ -1032,8 +1024,7 @@ describe('LiquidationHandler', () => {
       reduceOnly: true,
       clientMetadata: 0,
       routerFeePpm: 0,
-      routerFeeSubaccountOwner: '',
-      routerFeeSubaccountNumber: 0,
+      routerFeeOwner: '',
     });
 
     const liquidationOrder: LiquidationOrderV1 = LiquidationOrderV1
@@ -1110,8 +1101,7 @@ describe('LiquidationHandler', () => {
         reduceOnly: false,
         clientMetadata: 0,
         routerFeePpm: 0,
-        routerFeeSubaccountOwner: '',
-        routerFeeSubaccountNumber: 0,
+        routerFeeOwner: '',
       }),
     ],
     [
@@ -1128,8 +1118,7 @@ describe('LiquidationHandler', () => {
         reduceOnly: false,
         clientMetadata: 0,
         routerFeePpm: 0,
-        routerFeeSubaccountOwner: '',
-        routerFeeSubaccountNumber: 0,
+        routerFeeOwner: '',
       }),
     ],
   ])('LiquidationOrderFillEvent fails makerOrder validation', async (

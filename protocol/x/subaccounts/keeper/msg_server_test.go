@@ -8,7 +8,6 @@ import (
 	sdkmath "cosmossdk.io/math"
 	sdaiservertypes "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/server/types/sdaioracle"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/dtypes"
-	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib"
 	testapp "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/app"
 	bank_testutil "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/bank"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/constants"
@@ -20,7 +19,6 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/stretchr/testify/require"
 )
 
@@ -51,7 +49,6 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 		perpetuals []perptypes.Perpetual
 		assets     []*asstypes.Asset
 		// Only set when specified. Defaults to 0/1.
-		// Set perpYieldIndex in the perpetuals state.
 		globalAssetYieldIndex *big.Rat
 		fundsInTDaiPool       *big.Int
 
@@ -104,7 +101,7 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 			globalAssetYieldIndex:     big.NewRat(2, 1),
 			fundsInTDaiPool:           big.NewInt(200_000_000_000),
 			collateralPoolTDaiBalances: map[string]int64{
-				types.ModuleAddress.String(): 100_000_000_000,
+				types.CollateralPoolZeroAddress.String(): 100_000_000_000,
 			},
 			perpetuals: []perptypes.Perpetual{
 				constants.BtcUsd_NoMarginRequirement,
@@ -135,22 +132,14 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 			},
 			expectedTDaiYieldPoolBalance: big.NewInt(100_000_000_000),
 			expectedCollateralPoolTDaiBalances: map[string]int64{
-				types.ModuleAddress.String(): 200_000_000_000,
+				types.CollateralPoolZeroAddress.String(): 200_000_000_000,
 			},
 		},
 		"Successfully claims yield for one perp with no asset positions existing before yield claim": {
 			globalAssetYieldIndex: big.NewRat(1, 1),
 			fundsInTDaiPool:       big.NewInt(200_000_000_000),
 			collateralPoolTDaiBalances: map[string]int64{
-				types.ModuleAddress.String(): 100_000_000_000,
-			},
-			perpetuals: []perptypes.Perpetual{
-				{
-					Params:       constants.BtcUsd_NoMarginRequirement.Params,
-					FundingIndex: constants.BtcUsd_NoMarginRequirement.FundingIndex,
-					OpenInterest: constants.BtcUsd_NoMarginRequirement.OpenInterest,
-					YieldIndex:   big.NewRat(1, 1).String(),
-				},
+				types.CollateralPoolZeroAddress.String(): 100_000_000_000,
 			},
 			perpetualPositions: []*types.PerpetualPosition{
 				{
@@ -162,6 +151,14 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 			},
 			msgClaimYieldForSubaccount: types.MsgClaimYieldForSubaccount{Id: &defaultSubaccountId},
 			expectedAssetYieldIndex:    big.NewRat(1, 1).String(),
+			perpetuals: []perptypes.Perpetual{
+				{
+					Params:       constants.BtcUsd_NoMarginRequirement.Params,
+					FundingIndex: constants.BtcUsd_NoMarginRequirement.FundingIndex,
+					OpenInterest: constants.BtcUsd_NoMarginRequirement.OpenInterest,
+					YieldIndex:   big.NewRat(1, 1).String(),
+				},
+			},
 			expectedPerpetualPositions: []*types.PerpetualPosition{
 				{
 					PerpetualId:  uint32(0),
@@ -178,7 +175,7 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 			},
 			expectedTDaiYieldPoolBalance: big.NewInt(199_000_000_000),
 			expectedCollateralPoolTDaiBalances: map[string]int64{
-				types.ModuleAddress.String(): 101_000_000_000,
+				types.CollateralPoolZeroAddress.String(): 101_000_000_000,
 			},
 		},
 		"Successfully claims yield for one perp with asset position existing but not claiming yield": {
@@ -187,7 +184,7 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 			globalAssetYieldIndex:     big.NewRat(1, 1),
 			fundsInTDaiPool:           big.NewInt(200_000_000_000),
 			collateralPoolTDaiBalances: map[string]int64{
-				types.ModuleAddress.String(): 100_000_000_000,
+				types.CollateralPoolZeroAddress.String(): 100_000_000_000,
 			},
 			perpetuals: []perptypes.Perpetual{
 				{
@@ -223,7 +220,7 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 			},
 			expectedTDaiYieldPoolBalance: big.NewInt(199_000_000_000),
 			expectedCollateralPoolTDaiBalances: map[string]int64{
-				types.ModuleAddress.String(): 101_000_000_000,
+				types.CollateralPoolZeroAddress.String(): 101_000_000_000,
 			},
 		},
 		"Successfully claims yield for tDai asset and one perp": {
@@ -232,7 +229,7 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 			globalAssetYieldIndex:     big.NewRat(1, 1),
 			fundsInTDaiPool:           big.NewInt(200_000_000_000),
 			collateralPoolTDaiBalances: map[string]int64{
-				types.ModuleAddress.String(): 100_000_000_000,
+				types.CollateralPoolZeroAddress.String(): 100_000_000_000,
 			},
 			perpetuals: []perptypes.Perpetual{
 				{
@@ -268,7 +265,7 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 			},
 			expectedTDaiYieldPoolBalance: big.NewInt(99_900_000_000),
 			expectedCollateralPoolTDaiBalances: map[string]int64{
-				types.ModuleAddress.String(): 200_100_000_000,
+				types.CollateralPoolZeroAddress.String(): 200_100_000_000,
 			},
 		},
 		"Successfully claims yield when multiple perp positions are open and tDai position open": {
@@ -277,7 +274,7 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 			globalAssetYieldIndex:     big.NewRat(26, 11),
 			fundsInTDaiPool:           big.NewInt(222_000_000_000),
 			collateralPoolTDaiBalances: map[string]int64{
-				types.ModuleAddress.String(): 50_000_000_000,
+				types.CollateralPoolZeroAddress.String(): 50_000_000_000,
 			},
 			perpetuals: []perptypes.Perpetual{
 				{
@@ -326,12 +323,12 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 			expectedAssetPositions: []*types.AssetPosition{
 				{
 					AssetId:  uint32(0),
-					Quantums: dtypes.NewInt(100_094_444_443), // Total Yield: 50_094_444_443
+					Quantums: dtypes.NewInt(100_094_444_443),
 				},
 			},
 			expectedTDaiYieldPoolBalance: big.NewInt(171_905_555_557),
 			expectedCollateralPoolTDaiBalances: map[string]int64{
-				types.ModuleAddress.String(): 100_094_444_443,
+				types.CollateralPoolZeroAddress.String(): 100_094_444_443,
 			},
 		},
 		"Successfully claims all yield in tDaiPool": {
@@ -340,7 +337,7 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 			globalAssetYieldIndex:     big.NewRat(3, 1),
 			fundsInTDaiPool:           big.NewInt(200_000_000_000),
 			collateralPoolTDaiBalances: map[string]int64{
-				types.ModuleAddress.String(): 100_000_000_000,
+				types.CollateralPoolZeroAddress.String(): 100_000_000_000,
 			},
 			perpetuals: []perptypes.Perpetual{
 				constants.BtcUsd_NoMarginRequirement,
@@ -371,7 +368,7 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 			},
 			expectedTDaiYieldPoolBalance: big.NewInt(0),
 			expectedCollateralPoolTDaiBalances: map[string]int64{
-				types.ModuleAddress.String(): 300_000_000_000,
+				types.CollateralPoolZeroAddress.String(): 300_000_000_000,
 			},
 		},
 		"Successfully claims yield for isolated market": {
@@ -380,9 +377,7 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 			globalAssetYieldIndex:     big.NewRat(5, 4),
 			fundsInTDaiPool:           big.NewInt(200_000_000_000),
 			collateralPoolTDaiBalances: map[string]int64{
-				authtypes.NewModuleAddress(
-					types.ModuleName + ":" + lib.UintToString(constants.PerpetualPosition_OneISOLong.PerpetualId),
-				).String(): 100_000_000_000,
+				types.CollateralPoolTwoAddress.String(): 100_000_000_000,
 			},
 			perpetuals: []perptypes.Perpetual{
 				{
@@ -418,17 +413,15 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 			},
 			expectedTDaiYieldPoolBalance: big.NewInt(175_080_000_000),
 			expectedCollateralPoolTDaiBalances: map[string]int64{
-				authtypes.NewModuleAddress(
-					types.ModuleName + ":" + lib.UintToString(constants.PerpetualPosition_OneISOLong.PerpetualId),
-				).String(): 124_920_000_000,
-				types.ModuleAddress.String(): 0,
+				types.CollateralPoolTwoAddress.String(): 124_920_000_000,
+				types.ModuleAddress.String():            0,
 			},
 		},
 		"Successfully does not claim yield when asset yield index is already updated": {
 			globalAssetYieldIndex: big.NewRat(5, 4),
 			fundsInTDaiPool:       big.NewInt(1_200_000_000_000),
 			collateralPoolTDaiBalances: map[string]int64{
-				types.ModuleAddress.String(): 1_000_000_000_000,
+				types.CollateralPoolZeroAddress.String(): 1_000_000_000_000,
 			},
 			subaccountAssetYieldIndex: big.NewRat(5, 4).String(),
 			assetPositions:            testutil.CreateTDaiAssetPosition(big.NewInt(100_000_000_000)),
@@ -466,7 +459,7 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 			},
 			expectedTDaiYieldPoolBalance: big.NewInt(1_200_000_000_000),
 			expectedCollateralPoolTDaiBalances: map[string]int64{
-				types.ModuleAddress.String(): 1_000_000_000_000,
+				types.CollateralPoolZeroAddress.String(): 1_000_000_000_000,
 			},
 		},
 		"Successfully does not claim yield when negative positions cancel out positive position yield claims": {
@@ -475,7 +468,7 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 			globalAssetYieldIndex:     big.NewRat(1, 1),
 			fundsInTDaiPool:           big.NewInt(200_000_000_000),
 			collateralPoolTDaiBalances: map[string]int64{
-				types.ModuleAddress.String(): 100_000_000_000,
+				types.CollateralPoolZeroAddress.String(): 100_000_000_000,
 			},
 			perpetuals: []perptypes.Perpetual{
 				{
@@ -511,7 +504,7 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 			},
 			expectedTDaiYieldPoolBalance: big.NewInt(200_000_000_000),
 			expectedCollateralPoolTDaiBalances: map[string]int64{
-				types.ModuleAddress.String(): 100_000_000_000,
+				types.CollateralPoolZeroAddress.String(): 100_000_000_000,
 			},
 		},
 		"Fails yield claim: Negative general asset yield index": {
@@ -520,7 +513,7 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 			globalAssetYieldIndex:     big.NewRat(-1, 1),
 			fundsInTDaiPool:           big.NewInt(200_000_000_000),
 			collateralPoolTDaiBalances: map[string]int64{
-				types.ModuleAddress.String(): 100_000_000_000,
+				types.CollateralPoolZeroAddress.String(): 100_000_000_000,
 			},
 			perpetuals: []perptypes.Perpetual{
 				constants.BtcUsd_NoMarginRequirement,
@@ -552,7 +545,7 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 			},
 			expectedTDaiYieldPoolBalance: big.NewInt(200_000_000_000),
 			expectedCollateralPoolTDaiBalances: map[string]int64{
-				types.ModuleAddress.String(): 100_000_000_000,
+				types.CollateralPoolZeroAddress.String(): 100_000_000_000,
 			},
 		},
 		"Fails yield claim: Asset yield index in account higher than in general ": {
@@ -561,7 +554,7 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 			globalAssetYieldIndex:     big.NewRat(1, 2),
 			fundsInTDaiPool:           big.NewInt(200_000_000_000),
 			collateralPoolTDaiBalances: map[string]int64{
-				types.ModuleAddress.String(): 100_000_000_000,
+				types.CollateralPoolZeroAddress.String(): 100_000_000_000,
 			},
 			perpetuals: []perptypes.Perpetual{
 				constants.BtcUsd_NoMarginRequirement,
@@ -593,7 +586,7 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 			},
 			expectedTDaiYieldPoolBalance: big.NewInt(200_000_000_000),
 			expectedCollateralPoolTDaiBalances: map[string]int64{
-				types.ModuleAddress.String(): 100_000_000_000,
+				types.CollateralPoolZeroAddress.String(): 100_000_000_000,
 			},
 		},
 		"Fails yield claim: Negative general perp yield index": {
@@ -734,13 +727,13 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 				types.ModuleAddress.String(): 100_000_000_000,
 			},
 		},
-		"Succesfull yield claim: not enough yield in tdai pool so we take available": {
+		"Successful yield claim: not enough yield in tdai pool so we take available": {
 			assetPositions:            testutil.CreateTDaiAssetPosition(big.NewInt(100_000_000_000)), // $100,000
 			subaccountAssetYieldIndex: constants.AssetYieldIndex_Zero,
 			globalAssetYieldIndex:     big.NewRat(1, 1),
 			fundsInTDaiPool:           big.NewInt(1),
 			collateralPoolTDaiBalances: map[string]int64{
-				types.ModuleAddress.String(): 100_000_000_000,
+				types.CollateralPoolZeroAddress.String(): 100_000_000_000,
 			},
 			perpetuals: []perptypes.Perpetual{
 				{
@@ -776,14 +769,14 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 			},
 			expectedTDaiYieldPoolBalance: big.NewInt(0),
 			expectedCollateralPoolTDaiBalances: map[string]int64{
-				types.ModuleAddress.String(): 100_000_000_001,
+				types.CollateralPoolZeroAddress.String(): 100_000_000_001,
 			},
 		},
 		"Fails yield claim: no open positions": {
 			globalAssetYieldIndex: big.NewRat(1, 1),
 			fundsInTDaiPool:       big.NewInt(100_000_000_000),
 			collateralPoolTDaiBalances: map[string]int64{
-				types.ModuleAddress.String(): 100_000_000_000,
+				types.CollateralPoolZeroAddress.String(): 100_000_000_000,
 			},
 			perpetuals: []perptypes.Perpetual{
 				{
@@ -798,14 +791,14 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 			expectedAssetYieldIndex:      big.NewRat(1, 1).String(),
 			expectedTDaiYieldPoolBalance: big.NewInt(100_000_000_000),
 			expectedCollateralPoolTDaiBalances: map[string]int64{
-				types.ModuleAddress.String(): 100_000_000_000,
+				types.CollateralPoolZeroAddress.String(): 100_000_000_000,
 			},
 		},
 		"Fails yield claim: subaccountId is nil": {
 			globalAssetYieldIndex: big.NewRat(1, 1),
 			fundsInTDaiPool:       big.NewInt(100_000_000_000),
 			collateralPoolTDaiBalances: map[string]int64{
-				types.ModuleAddress.String(): 100_000_000_000,
+				types.CollateralPoolZeroAddress.String(): 100_000_000_000,
 			},
 			perpetuals: []perptypes.Perpetual{
 				{
@@ -820,14 +813,14 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 			expectedAssetYieldIndex:      big.NewRat(1, 1).String(),
 			expectedTDaiYieldPoolBalance: big.NewInt(100_000_000_000),
 			expectedCollateralPoolTDaiBalances: map[string]int64{
-				types.ModuleAddress.String(): 100_000_000_000,
+				types.CollateralPoolZeroAddress.String(): 100_000_000_000,
 			},
 		},
 		"Fails yield claim: subaccount with yield claim exists, but different one with no positions is passed in": {
 			globalAssetYieldIndex: big.NewRat(1, 1),
 			fundsInTDaiPool:       big.NewInt(100_000_000_000),
 			collateralPoolTDaiBalances: map[string]int64{
-				types.ModuleAddress.String(): 100_000_000_000,
+				types.CollateralPoolZeroAddress.String(): 100_000_000_000,
 			},
 			perpetuals: []perptypes.Perpetual{
 				{
@@ -842,7 +835,7 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 			expectedAssetYieldIndex:      big.NewRat(1, 1).String(),
 			expectedTDaiYieldPoolBalance: big.NewInt(100_000_000_000),
 			expectedCollateralPoolTDaiBalances: map[string]int64{
-				types.ModuleAddress.String(): 100_000_000_000,
+				types.CollateralPoolZeroAddress.String(): 100_000_000_000,
 			},
 		},
 		"Successfully claims 0 yield when subaccount's yield is negative": {
@@ -851,7 +844,7 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 			globalAssetYieldIndex:     big.NewRat(1, 1),
 			fundsInTDaiPool:           big.NewInt(200_000_000_000),
 			collateralPoolTDaiBalances: map[string]int64{
-				types.ModuleAddress.String(): 100_000_000_000,
+				types.CollateralPoolZeroAddress.String(): 100_000_000_000,
 			},
 			perpetuals: []perptypes.Perpetual{
 				{
@@ -887,7 +880,7 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 			},
 			expectedTDaiYieldPoolBalance: big.NewInt(200_000_000_000),
 			expectedCollateralPoolTDaiBalances: map[string]int64{
-				types.ModuleAddress.String(): 100_000_000_000,
+				types.CollateralPoolZeroAddress.String(): 100_000_000_000,
 			},
 		},
 	}
@@ -899,7 +892,13 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 			)
 			ctx = ctx.WithTxBytes(constants.TestTxBytes)
 			testutil.CreateTestMarkets(t, ctx, pricesKeeper)
+
+			// Always creates TDai asset first
+			require.NoError(t, testutil.CreateTDaiAsset(ctx, assetsKeeper))
+			require.NoError(t, testutil.CreateBTCAsset(ctx, assetsKeeper))
+
 			testutil.CreateTestLiquidityTiers(t, ctx, perpetualsKeeper)
+			testutil.CreateTestCollateralPools(t, ctx, perpetualsKeeper)
 
 			// Set up initial sdai price
 			rateString := sdaiservertypes.TestSDAIEventRequest.ConversionRate
@@ -913,8 +912,6 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 			}
 			rateLimitKeeper.SetAssetYieldIndex(ctx, globalAssetYieldIndex)
 
-			// Always creates TDai asset first
-			require.NoError(t, testutil.CreateTDaiAsset(ctx, assetsKeeper))
 			for _, a := range tc.assets {
 				_, err := assetsKeeper.CreateAsset(
 					ctx,
@@ -926,6 +923,7 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 					a.MarketId,
 					a.AtomicResolution,
 					a.AssetYieldIndex,
+					a.MaxSlippagePpm,
 				)
 				require.NoError(t, err)
 			}

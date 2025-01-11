@@ -29,7 +29,6 @@ import {
   HistoricalFundingRequest,
   HistoricalFundingResponse,
   HistoricalFundingResponseObject,
-  MarketType,
 } from '../../../types';
 
 const router: express.Router = express.Router();
@@ -49,7 +48,7 @@ class HistoricalFundingController extends Controller {
     ) = await PerpetualMarketTable.findByTicker(ticker);
 
     if (perpetualMarket === undefined) {
-      throw new NotFoundError(`${ticker} not found in markets of type ${MarketType.PERPETUAL}`);
+      throw new NotFoundError(`${ticker} not found in markets`);
     }
 
     const fundingIndices: FundingIndexUpdatesFromDatabase[] = await

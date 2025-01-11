@@ -51,10 +51,12 @@ func TestProcessProposerMatches_Liquidation_Undercollateralized_Determinism(t *t
 					{
 						PerpetualId: 0,
 						Quantums:    dtypes.NewInt(100_000_000), // 1 BTC
+						YieldIndex:  big.NewRat(0, 1).String(),
 					},
 					{
 						PerpetualId: 1,
 						Quantums:    dtypes.NewInt(1000),
+						YieldIndex:  big.NewRat(0, 1).String(),
 					},
 				},
 			},
@@ -198,17 +200,31 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 				bk.On(
 					"SendCoins",
 					mock.Anything,
-					satypes.ModuleAddress,
+					satypes.CollateralPoolZeroAddress,
 					authtypes.NewModuleAddress(authtypes.FeeCollectorName),
 					mock.MatchedBy(testutil_bank.MatchTDaiOfAmount(10_000_000)),
 				).Return(nil)
 				bk.On(
 					"SendCoins",
 					mock.Anything,
-					satypes.ModuleAddress,
-					perptypes.InsuranceFundModuleAddress,
+					satypes.CollateralPoolZeroAddress,
+					perptypes.BaseCollateralPoolInsuranceFundModuleAddress,
 					// Subaccount pays $250 to insurance fund for liquidating 1 BTC.
 					mock.MatchedBy(testutil_bank.MatchTDaiOfAmount(250_000_000)),
+				).Return(nil).Once()
+				bk.On(
+					"SendCoins",
+					mock.Anything,
+					satypes.CollateralPoolZeroAddress,
+					satypes.ModuleAddress,
+					mock.MatchedBy(testutil_bank.MatchTDaiOfAmount(4_999_000_000-250_000_000)),
+				).Return(nil).Once()
+				bk.On(
+					"SendCoins",
+					mock.Anything,
+					satypes.CollateralPoolZeroAddress,
+					satypes.ModuleAddress,
+					mock.MatchedBy(testutil_bank.MatchTDaiOfAmount(100_000_000_000-10_000_000)),
 				).Return(nil).Once()
 				bk.On(
 					"GetBalance",
@@ -283,7 +299,7 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 				bk.On(
 					"SendCoins",
 					mock.Anything,
-					satypes.ModuleAddress,
+					satypes.CollateralPoolZeroAddress,
 					authtypes.NewModuleAddress(authtypes.FeeCollectorName),
 					mock.MatchedBy(testutil_bank.MatchTDaiOfAmount(10_100_000)),
 				).Return(nil)
@@ -302,10 +318,17 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 				bk.On(
 					"SendCoins",
 					mock.Anything,
-					perptypes.InsuranceFundModuleAddress,
-					satypes.ModuleAddress,
+					perptypes.BaseCollateralPoolInsuranceFundModuleAddress,
+					satypes.CollateralPoolZeroAddress,
 					// Insurance fund covers $1 loss for liquidating 1 BTC.
 					mock.MatchedBy(testutil_bank.MatchTDaiOfAmount(1_000_000)),
+				).Return(nil).Once()
+				bk.On(
+					"SendCoins",
+					mock.Anything,
+					satypes.CollateralPoolZeroAddress,
+					satypes.ModuleAddress,
+					mock.MatchedBy(testutil_bank.MatchTDaiOfAmount(50_000_000_000+50_500_000_000-10_100_000)),
 				).Return(nil).Once()
 			},
 			rawOperations: []types.OperationRaw{
@@ -376,7 +399,7 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 				bk.On(
 					"SendCoins",
 					mock.Anything,
-					satypes.ModuleAddress,
+					satypes.CollateralPoolZeroAddress,
 					authtypes.NewModuleAddress(authtypes.FeeCollectorName),
 					mock.MatchedBy(testutil_bank.MatchTDaiOfAmount(2_500_000)),
 				).Return(nil)
@@ -389,8 +412,8 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 				bk.On(
 					"SendCoins",
 					mock.Anything,
-					satypes.ModuleAddress,
-					perptypes.InsuranceFundModuleAddress,
+					satypes.CollateralPoolZeroAddress,
+					perptypes.BaseCollateralPoolInsuranceFundModuleAddress,
 					// Subaccount pays $62.5 to insurance fund for liquidating 0.25 BTC.
 					mock.MatchedBy(testutil_bank.MatchTDaiOfAmount(62_500_000)),
 				).Return(nil).Twice()
@@ -483,7 +506,7 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 				bk.On(
 					"SendCoins",
 					mock.Anything,
-					satypes.ModuleAddress,
+					satypes.CollateralPoolZeroAddress,
 					authtypes.NewModuleAddress(authtypes.FeeCollectorName),
 					mock.MatchedBy(testutil_bank.MatchTDaiOfAmount(2_525_000)),
 				).Return(nil)
@@ -502,8 +525,8 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 				bk.On(
 					"SendCoins",
 					mock.Anything,
-					perptypes.InsuranceFundModuleAddress,
-					satypes.ModuleAddress,
+					perptypes.BaseCollateralPoolInsuranceFundModuleAddress,
+					satypes.CollateralPoolZeroAddress,
 					// Insurance fund covers $0.25 loss for liquidating 0.25 BTC.
 					mock.MatchedBy(testutil_bank.MatchTDaiOfAmount(250_000)),
 				).Return(nil).Twice()
@@ -597,7 +620,7 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 				bk.On(
 					"SendCoins",
 					mock.Anything,
-					satypes.ModuleAddress,
+					satypes.CollateralPoolZeroAddress,
 					authtypes.NewModuleAddress(authtypes.FeeCollectorName),
 					mock.Anything,
 				).Return(nil)
@@ -616,18 +639,25 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 				bk.On(
 					"SendCoins",
 					mock.Anything,
-					satypes.ModuleAddress,
-					perptypes.InsuranceFundModuleAddress,
+					satypes.CollateralPoolZeroAddress,
+					perptypes.BaseCollateralPoolInsuranceFundModuleAddress,
 					// Pays insurance fund $0.75 for liquidating 0.75 BTC.
 					mock.MatchedBy(testutil_bank.MatchTDaiOfAmount(750_000)),
 				).Return(nil).Once()
 				bk.On(
 					"SendCoins",
 					mock.Anything,
-					perptypes.InsuranceFundModuleAddress,
-					satypes.ModuleAddress,
+					perptypes.BaseCollateralPoolInsuranceFundModuleAddress,
+					satypes.CollateralPoolZeroAddress,
 					// Insurance fund covers $0.25 loss for liquidating 0.25 BTC.
 					mock.MatchedBy(testutil_bank.MatchTDaiOfAmount(250_000)),
+				).Return(nil).Once()
+				bk.On(
+					"SendCoins",
+					mock.Anything,
+					satypes.CollateralPoolZeroAddress,
+					satypes.ModuleAddress,
+					mock.MatchedBy(testutil_bank.MatchTDaiOfAmount(100_488_400_300)),
 				).Return(nil).Once()
 			},
 			rawOperations: []types.OperationRaw{
@@ -708,7 +738,7 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 				bk.On(
 					"SendCoins",
 					mock.Anything,
-					satypes.ModuleAddress,
+					satypes.CollateralPoolZeroAddress,
 					authtypes.NewModuleAddress(authtypes.FeeCollectorName),
 					mock.Anything,
 				).Return(nil)
@@ -727,8 +757,8 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 				bk.On(
 					"SendCoins",
 					mock.Anything,
-					satypes.ModuleAddress,
-					perptypes.InsuranceFundModuleAddress,
+					satypes.CollateralPoolZeroAddress,
+					perptypes.BaseCollateralPoolInsuranceFundModuleAddress,
 					// Pays insurance fund $0.378735 (capped by InsuranceFundFeePpm)
 					// for liquidating 0.75 BTC.
 					mock.MatchedBy(testutil_bank.MatchTDaiOfAmount(378_735)),
@@ -736,20 +766,26 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 				bk.On(
 					"SendCoins",
 					mock.Anything,
-					satypes.ModuleAddress,
-					perptypes.InsuranceFundModuleAddress,
+					satypes.CollateralPoolZeroAddress,
+					perptypes.BaseCollateralPoolInsuranceFundModuleAddress,
 					// Pays insurance fund $0.121265.
 					mock.MatchedBy(testutil_bank.MatchTDaiOfAmount(121_265)),
+				).Return(nil).Once()
+				bk.On(
+					"SendCoins",
+					mock.Anything,
+					satypes.CollateralPoolZeroAddress,
+					satypes.ModuleAddress,
+					mock.MatchedBy(testutil_bank.MatchTDaiOfAmount(100_488_400_300)),
 				).Return(nil).Once()
 			},
 			liquidationConfig: &types.LiquidationsConfig{
 				// Cap the max liquidation fee ppm so that the bankruptcy price changes
 				// in the insurance fund delta calculation.
-				InsuranceFundFeePpm:             10,
-				ValidatorFeePpm:                 0,
-				LiquidityFeePpm:                 0,
-				FillablePriceConfig:             constants.FillablePriceConfig_Default,
-				MaxCumulativeInsuranceFundDelta: uint64(1_000_000_000_000),
+				InsuranceFundFeePpm: 10,
+				ValidatorFeePpm:     0,
+				LiquidityFeePpm:     0,
+				FillablePriceConfig: constants.FillablePriceConfig_Default,
 			},
 			rawOperations: []types.OperationRaw{
 				clobtest.NewShortTermOrderPlacementOperationRaw(
@@ -829,7 +865,7 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 				bk.On(
 					"SendCoins",
 					mock.Anything,
-					satypes.ModuleAddress,
+					satypes.CollateralPoolZeroAddress,
 					authtypes.NewModuleAddress(authtypes.FeeCollectorName),
 					mock.MatchedBy(testutil_bank.MatchTDaiOfAmount(5_000_000)),
 				).Return(nil)
@@ -842,8 +878,8 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 				bk.On(
 					"SendCoins",
 					mock.Anything,
-					satypes.ModuleAddress,
-					perptypes.InsuranceFundModuleAddress,
+					satypes.CollateralPoolZeroAddress,
+					perptypes.BaseCollateralPoolInsuranceFundModuleAddress,
 					// Subaccount pays $125 to insurance fund for liquidating 0.5 BTC.
 					mock.MatchedBy(testutil_bank.MatchTDaiOfAmount(125_000_000)),
 				).Return(nil).Once()
@@ -942,6 +978,7 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(-10), // Liquidatable position is smaller than StepBaseQuantums
+							YieldIndex:  big.NewRat(0, 1).String(),
 						},
 					},
 				},
@@ -951,7 +988,7 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 				bk.On(
 					"SendCoins",
 					mock.Anything,
-					satypes.ModuleAddress,
+					satypes.CollateralPoolZeroAddress,
 					authtypes.NewModuleAddress(authtypes.FeeCollectorName),
 					mock.MatchedBy(testutil_bank.MatchTDaiOfAmount(1)),
 				).Return(nil)
@@ -964,10 +1001,17 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 				bk.On(
 					"SendCoins",
 					mock.Anything,
-					satypes.ModuleAddress,
-					perptypes.InsuranceFundModuleAddress,
+					satypes.CollateralPoolZeroAddress,
+					perptypes.BaseCollateralPoolInsuranceFundModuleAddress,
 					mock.MatchedBy(testutil_bank.MatchTDaiOfAmount(25)),
 				).Return(nil)
+				bk.On(
+					"SendCoins",
+					mock.Anything,
+					satypes.CollateralPoolZeroAddress,
+					satypes.ModuleAddress,
+					mock.Anything,
+				).Return(nil).Once()
 			},
 			rawOperations: []types.OperationRaw{
 				clobtest.NewShortTermOrderPlacementOperationRaw(
@@ -1345,7 +1389,14 @@ func TestProcessProposerMatches_Liquidation_Failure(t *testing.T) {
 					"SendCoins",
 					mock.Anything,
 					mock.Anything,
-					perptypes.InsuranceFundModuleAddress,
+					perptypes.BaseCollateralPoolInsuranceFundModuleAddress,
+					mock.Anything,
+				).Return(nil)
+				bk.On(
+					"SendCoins",
+					mock.Anything,
+					satypes.CollateralPoolZeroAddress,
+					satypes.ModuleAddress,
 					mock.Anything,
 				).Return(nil)
 			},
@@ -1394,6 +1445,7 @@ func TestProcessProposerMatches_Liquidation_Failure(t *testing.T) {
 		// 				{
 		// 					PerpetualId: 0,
 		// 					Quantums:    dtypes.NewInt(-100_000_000), // 1 BTC
+		// 					YieldIndex:  big.NewRat(0, 1).String(),
 		// 				},
 		// 			},
 		// 		},
@@ -1439,6 +1491,7 @@ func TestProcessProposerMatches_Liquidation_Failure(t *testing.T) {
 		// 				{
 		// 					PerpetualId: 0,
 		// 					Quantums:    dtypes.NewInt(99_000_000), // 0.99 BTC
+		// 					YieldIndex:  big.NewRat(0, 1).String(),
 		// 				},
 		// 			},
 		// 		},
@@ -2208,14 +2261,14 @@ func TestProcessProposerMatches_Liquidation_Validation_Failure(t *testing.T) {
 				),
 			},
 			liquidationConfig: &types.LiquidationsConfig{
-				InsuranceFundFeePpm:             5_000,
-				ValidatorFeePpm:                 0,
-				LiquidityFeePpm:                 0,
-				FillablePriceConfig:             constants.FillablePriceConfig_Default,
-				MaxCumulativeInsuranceFundDelta: uint64(999_999),
+				InsuranceFundFeePpm: 5_000,
+				ValidatorFeePpm:     0,
+				LiquidityFeePpm:     0,
+				FillablePriceConfig: constants.FillablePriceConfig_Default,
 			},
-			insuranceFundBalance: math.MaxUint64,
-			expectedError:        types.ErrLiquidationExceedsMaxInsuranceLost,
+			maxCumulativeInsuranceFundDeltaPerBlock: 999_999,
+			insuranceFundBalance:                    math.MaxUint64,
+			expectedError:                           types.ErrLiquidationExceedsMaxInsuranceLost,
 		},
 		"Subaccount block limit: fails when insurance lost from multiple liquidation fills exceed block limit": {
 			perpetuals: []perptypes.Perpetual{
@@ -2259,14 +2312,14 @@ func TestProcessProposerMatches_Liquidation_Validation_Failure(t *testing.T) {
 				),
 			},
 			liquidationConfig: &types.LiquidationsConfig{
-				InsuranceFundFeePpm:             5_000,
-				ValidatorFeePpm:                 0,
-				LiquidityFeePpm:                 0,
-				FillablePriceConfig:             constants.FillablePriceConfig_Default,
-				MaxCumulativeInsuranceFundDelta: uint64(499_999),
+				InsuranceFundFeePpm: 5_000,
+				ValidatorFeePpm:     0,
+				LiquidityFeePpm:     0,
+				FillablePriceConfig: constants.FillablePriceConfig_Default,
 			},
-			insuranceFundBalance: math.MaxUint64,
-			expectedError:        types.ErrLiquidationExceedsMaxInsuranceLost,
+			maxCumulativeInsuranceFundDeltaPerBlock: 499_999,
+			insuranceFundBalance:                    math.MaxUint64,
+			expectedError:                           types.ErrLiquidationExceedsMaxInsuranceLost,
 		},
 		"Liquidation checks insurance fund delta for individual fills and not the entire liquidation order": {
 			perpetuals: []perptypes.Perpetual{
@@ -2331,13 +2384,13 @@ func TestProcessProposerMatches_Liquidation_Validation_Failure(t *testing.T) {
 			},
 			insuranceFundBalance: 10_000_000,
 			liquidationConfig: &types.LiquidationsConfig{
-				InsuranceFundFeePpm:             5_000,
-				ValidatorFeePpm:                 0,
-				LiquidityFeePpm:                 0,
-				FillablePriceConfig:             constants.FillablePriceConfig_Default,
-				MaxCumulativeInsuranceFundDelta: uint64(300_000),
+				InsuranceFundFeePpm: 5_000,
+				ValidatorFeePpm:     0,
+				LiquidityFeePpm:     0,
+				FillablePriceConfig: constants.FillablePriceConfig_Default,
 			},
-			expectedError: types.ErrLiquidationExceedsMaxInsuranceLost,
+			maxCumulativeInsuranceFundDeltaPerBlock: 300_000,
+			expectedError:                           types.ErrLiquidationExceedsMaxInsuranceLost,
 		},
 	}
 
@@ -2460,11 +2513,10 @@ func TestValidateProposerMatches_InsuranceFund(t *testing.T) {
 			},
 			insuranceFundBalance: 2_000_000, // Insurance fund has $2
 			liquidationConfig: &types.LiquidationsConfig{
-				InsuranceFundFeePpm:             5_000,
-				ValidatorFeePpm:                 0,
-				LiquidityFeePpm:                 0,
-				FillablePriceConfig:             constants.FillablePriceConfig_Default,
-				MaxCumulativeInsuranceFundDelta: uint64(1_000_000_000_000),
+				InsuranceFundFeePpm: 5_000,
+				ValidatorFeePpm:     0,
+				LiquidityFeePpm:     0,
+				FillablePriceConfig: constants.FillablePriceConfig_Default,
 			},
 			expectedError: nil,
 			expectedProcessProposerMatchesEvents: types.ProcessProposerMatchesEvents{

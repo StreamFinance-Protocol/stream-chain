@@ -54,6 +54,6 @@ enum OrderRemovalReason {
   // The order has been removed since its ClobPair has entered final settlement.
   ORDER_REMOVAL_REASON_FINAL_SETTLEMENT = 14;
   // The order has been removed since filling it would lead to the subaccount
-  // violating isolated subaccount constraints.
-  ORDER_REMOVAL_REASON_VIOLATES_ISOLATED_SUBACCOUNT_CONSTRAINTS = 15;
+  // violating collateral pool constraints.
+  ORDER_REMOVAL_REASON_VIOLATES_COLLATERAL_POOL_CONSTRAINTS = 15;
 }

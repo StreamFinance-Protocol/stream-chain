@@ -4,7 +4,11 @@ import * as pg from 'pg';
 
 import config from '../config';
 import { KafkaPublisher } from './kafka-publisher';
-import { ConsolidatedKafkaEvent, KlyraIndexerSubtypes, EventMessage } from './types';
+import {
+  ConsolidatedKafkaEvent,
+  KlyraIndexerSubtypes,
+  EventMessage,
+} from './types';
 import { Handler } from '../handlers/handler';
 
 // type alias for an array of handlers.
@@ -14,6 +18,7 @@ export const SYNCHRONOUS_SUBTYPES: KlyraIndexerSubtypes[] = [
   KlyraIndexerSubtypes.ASSET,
   KlyraIndexerSubtypes.LIQUIDITY_TIER,
   KlyraIndexerSubtypes.PERPETUAL_MARKET,
+  KlyraIndexerSubtypes.COLLATERAL_POOL,
   KlyraIndexerSubtypes.UPDATE_PERPETUAL,
   KlyraIndexerSubtypes.UPDATE_CLOB_PAIR,
   KlyraIndexerSubtypes.FUNDING,
@@ -64,7 +69,8 @@ export class SyncHandlers {
    * Adds events to the kafkaPublisher.
    */
   public async process(
-    kafkaPublisher: KafkaPublisher, resultRow: pg.QueryResultRow,
+    kafkaPublisher: KafkaPublisher,
+    resultRow: pg.QueryResultRow,
   ): Promise<void> {
     const start: number = Date.now();
     const handlerCountMapping: { [key: string]: number } = {};
@@ -76,19 +82,26 @@ export class SyncHandlers {
       }
       handlerCountMapping[handlerName] += 1;
       const events: ConsolidatedKafkaEvent[] = await handler.handle(
-        resultRow[handler.blockEventIndex]);
+        resultRow[handler.blockEventIndex],
+      );
       consolidatedKafkaEventGroup.push(events);
     }
 
-    _.forEach(consolidatedKafkaEventGroup, (events: ConsolidatedKafkaEvent[]) => {
-      kafkaPublisher.addEvents(events);
-    });
+    _.forEach(
+      consolidatedKafkaEventGroup,
+      (events: ConsolidatedKafkaEvent[]) => {
+        kafkaPublisher.addEvents(events);
+      },
+    );
     logger.info({
       at: 'SyncHandlers#process',
       message: 'Finished processing synchronous handlers',
       handlerCountMapping,
       batchProcessTime: Date.now() - start,
     });
-    stats.timing(`${config.SERVICE_NAME}.synchronous_events_process_time`, Date.now() - start);
+    stats.timing(
+      `${config.SERVICE_NAME}.synchronous_events_process_time`,
+      Date.now() - start,
+    );
   }
 }

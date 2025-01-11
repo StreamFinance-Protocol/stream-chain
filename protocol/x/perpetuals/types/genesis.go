@@ -25,6 +25,32 @@ const (
 // DefaultGenesis returns the default Perpetual genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
+		CollateralPools: []CollateralPool{
+			{
+				CollateralPoolId:                        0,
+				MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+				MultiCollateralAssets: &MultiCollateralAssetsArray{
+					MultiCollateralAssets: []uint32{0},
+				},
+				QuoteAssetId: 0,
+			},
+			{
+				CollateralPoolId:                        1,
+				MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+				MultiCollateralAssets: &MultiCollateralAssetsArray{
+					MultiCollateralAssets: []uint32{1},
+				},
+				QuoteAssetId: 1,
+			},
+			{
+				CollateralPoolId:                        2,
+				MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+				MultiCollateralAssets: &MultiCollateralAssetsArray{
+					MultiCollateralAssets: []uint32{0},
+				},
+				QuoteAssetId: 0,
+			},
+		},
 		Perpetuals:     []Perpetual{},
 		LiquidityTiers: []LiquidityTier{},
 		Params: Params{
@@ -86,6 +112,35 @@ func (gs GenesisState) Validate() error {
 		expectedLiquidityTierId = expectedLiquidityTierId + 1
 
 		if err := liquidityTier.Validate(); err != nil {
+			return err
+		}
+	}
+
+	// Validate collateral pools.
+	// 1. keys are unique.
+	// 2. At least one collateral pool
+	// 3. IDs are sequential and start from 0.
+	// 4. max cumulative insurance fund delta per block is not zero.
+	// 5. multi collateral assets is not empty and does not contain quote asset.
+
+	if len(gs.CollateralPools) == 0 {
+		return fmt.Errorf("at least one collateral pool is required")
+	}
+
+	collateralPoolKeyMap := make(map[uint32]struct{})
+	expectedCollateralPoolId := uint32(0)
+	for _, collateralPool := range gs.CollateralPools {
+		if _, exists := collateralPoolKeyMap[collateralPool.CollateralPoolId]; exists {
+			return fmt.Errorf("duplicated collateral pool id")
+		}
+		collateralPoolKeyMap[collateralPool.CollateralPoolId] = struct{}{}
+
+		if collateralPool.CollateralPoolId != expectedCollateralPoolId {
+			return fmt.Errorf("found a gap in collateral pool id")
+		}
+		expectedCollateralPoolId = expectedCollateralPoolId + 1
+
+		if err := collateralPool.Validate(); err != nil {
 			return err
 		}
 	}

@@ -15,7 +15,7 @@ import request from 'supertest';
 
 import IndexV4 from '../../src/controllers/api/index-v4';
 import Server from '../../src/request-helpers/server';
-import { RequestMethod, FillResponseObject, MarketType } from '../../src/types';
+import { RequestMethod, FillResponseObject } from '../../src/types';
 
 const app: e.Express = Server(IndexV4);
 
@@ -146,7 +146,6 @@ export function fillResponseObjectFromFillCreateObject(
   const fillResponse: Partial<FillResponseObject> = {
     side: fill.side,
     liquidity: fill.liquidity,
-    marketType: MarketType.PERPETUAL,
     price: fill.price,
     size: fill.size,
     fee: fill.fee,

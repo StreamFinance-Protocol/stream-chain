@@ -51,7 +51,12 @@ func TestMsgServerAddPremiumVotes(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// Initialize Mocks and Context.
 			mockKeeper := &mocks.PerpetualsKeeper{}
-			pc := keepertest.PerpetualsKeepers(t)
+			memClob := &mocks.MemClob{}
+			memClob.On("SetClobKeeper", mock.Anything).Return()
+
+			mockIndexerEventManager := &mocks.IndexerEventManager{}
+
+			pc := keepertest.NewClobKeepersTestContext(t, memClob, &mocks.BankKeeper{}, mockIndexerEventManager, nil)
 			tc.setupMocks(pc.Ctx, mockKeeper)
 
 			msgServer := keeper.NewMsgServerImpl(mockKeeper)

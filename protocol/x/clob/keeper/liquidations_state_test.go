@@ -109,7 +109,7 @@ func TestSetGetSubaccountLiquidationInfo(t *testing.T) {
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, bankMock, &mocks.IndexerEventManager{}, nil)
 
 			if tc.setupState != nil {
-				tc.setupState(ks.Ctx, ks.ClobKeeper)
+				tc.setupState(ks.Ctx, &ks.ClobKeeper)
 			}
 
 			// Run the test and verify expectations.
@@ -255,15 +255,9 @@ func TestIncrementCumulativeInsuranceFundDelta(t *testing.T) {
 
 			ctx := ks.Ctx.WithIsCheckTx(true)
 
-			// Create the default markets.
-			keepertest.CreateTestMarkets(t, ctx, ks.PricesKeeper)
-
 			// Create liquidity tiers.
 			keepertest.CreateTestLiquidityTiers(t, ctx, ks.PerpetualsKeeper)
-
-			// Set up TDai asset in assets module.
-			err := keepertest.CreateTDaiAsset(ctx, ks.AssetsKeeper)
-			require.NoError(t, err)
+			keepertest.CreateTestCollateralPools(t, ctx, ks.PerpetualsKeeper)
 
 			// Create perpetuals.
 			for _, p := range tc.perpetuals {
@@ -275,9 +269,8 @@ func TestIncrementCumulativeInsuranceFundDelta(t *testing.T) {
 					p.Params.AtomicResolution,
 					p.Params.DefaultFundingPpm,
 					p.Params.LiquidityTier,
-					p.Params.MarketType,
 					p.Params.DangerIndexPpm,
-					p.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
+					p.Params.CollateralPoolId,
 					p.YieldIndex,
 				)
 				require.NoError(t, err)
@@ -285,7 +278,7 @@ func TestIncrementCumulativeInsuranceFundDelta(t *testing.T) {
 
 			// Set initial deltas.
 			for perpId, initialDelta := range tc.initialDeltas {
-				err = ks.ClobKeeper.IncrementCumulativeInsuranceFundDelta(ctx, perpId, initialDelta)
+				err := ks.ClobKeeper.IncrementCumulativeInsuranceFundDelta(ctx, perpId, initialDelta)
 				if tc.expectError {
 					require.Error(t, err)
 					return
@@ -295,7 +288,7 @@ func TestIncrementCumulativeInsuranceFundDelta(t *testing.T) {
 
 			// Increment deltas.
 			for perpId, incrementDelta := range tc.incrementDeltas {
-				err = ks.ClobKeeper.IncrementCumulativeInsuranceFundDelta(ctx, perpId, incrementDelta)
+				err := ks.ClobKeeper.IncrementCumulativeInsuranceFundDelta(ctx, perpId, incrementDelta)
 				if tc.expectError {
 					require.Error(t, err)
 					return

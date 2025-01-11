@@ -1,7 +1,13 @@
-import { logger, startBugsnag, wrapBackgroundTask } from '@klyraprotocol-indexer/base';
+import {
+  logger,
+  startBugsnag,
+  wrapBackgroundTask,
+} from '@klyraprotocol-indexer/base';
 import { stopConsumer, startConsumer } from '@klyraprotocol-indexer/kafka';
 import {
-  assetRefresher, perpetualMarketRefresher, liquidityTierRefresher,
+  assetRefresher,
+  perpetualMarketRefresher,
+  liquidityTierRefresher,
 } from '@klyraprotocol-indexer/postgres';
 
 import { initializeAllCaches } from './caches/block-cache';
@@ -47,6 +53,7 @@ process.on('SIGTERM', async () => {
   });
   await stopConsumer();
   redisClient.quit();
+  process.exit(0);
 });
 
 async function start(): Promise<void> {

@@ -12,7 +12,6 @@ import express from 'express';
 import {
   checkSchema,
   matchedData,
-  query,
 } from 'express-validator';
 import _ from 'lodash';
 import {
@@ -36,8 +35,7 @@ import {
   FillRequest,
   FillResponse,
   FillResponseObject,
-  MarketAndTypeByClobPairId,
-  MarketType,
+  MarketByClobPairId,
   ParentSubaccountFillRequest,
 } from '../../../types';
 
@@ -51,7 +49,6 @@ class FillsController extends Controller {
     @Query() address: string,
       @Query() subaccountNumber: number,
       @Query() market?: string,
-      @Query() marketType?: MarketType,
       @Query() limit?: number,
       @Query() createdBeforeOrAtHeight?: number,
       @Query() createdBeforeOrAt?: IsoString,
@@ -59,11 +56,11 @@ class FillsController extends Controller {
     // TODO(DEC-656): Change to using a cache of markets in Redis similar to Librarian instead of
     // querying the DB.
     let clobPairId: string | undefined;
-    if (isDefined(market) && isDefined(marketType)) {
-      clobPairId = await getClobPairId(market!, marketType!);
+    if (isDefined(market)) {
+      clobPairId = await getClobPairId(market!);
 
       if (clobPairId === undefined) {
-        throw new NotFoundError(`${market} not found in markets of type ${marketType}`);
+        throw new NotFoundError(`${market} not found`);
       }
     }
 
@@ -84,11 +81,10 @@ class FillsController extends Controller {
     const clobPairIdToPerpetualMarket: Record<
       string,
       PerpetualMarketFromDatabase> = perpetualMarketRefresher.getClobPairIdToPerpetualMarket();
-    const clobPairIdToMarket: MarketAndTypeByClobPairId = _.mapValues(
+    const clobPairIdToMarket: MarketByClobPairId = _.mapValues(
       clobPairIdToPerpetualMarket,
       (perpetualMarket: PerpetualMarketFromDatabase) => {
         return {
-          marketType: MarketType.PERPETUAL,
           market: perpetualMarket.ticker,
         };
       },
@@ -106,7 +102,6 @@ class FillsController extends Controller {
     @Query() address: string,
       @Query() parentSubaccountNumber: number,
       @Query() market?: string,
-      @Query() marketType?: MarketType,
       @Query() limit?: number,
       @Query() createdBeforeOrAtHeight?: number,
       @Query() createdBeforeOrAt?: IsoString,
@@ -114,11 +109,11 @@ class FillsController extends Controller {
     // TODO(DEC-656): Change to using a cache of markets in Redis similar to Librarian instead of
     // querying the DB.
     let clobPairId: string | undefined;
-    if (isDefined(market) && isDefined(marketType)) {
-      clobPairId = await getClobPairId(market!, marketType!);
+    if (isDefined(market)) {
+      clobPairId = await getClobPairId(market!);
 
       if (clobPairId === undefined) {
-        throw new NotFoundError(`${market} not found in markets of type ${marketType}`);
+        throw new NotFoundError(`${market} not found`);
       }
     }
 
@@ -148,11 +143,10 @@ class FillsController extends Controller {
     const clobPairIdToPerpetualMarket: Record<
         string,
         PerpetualMarketFromDatabase> = perpetualMarketRefresher.getClobPairIdToPerpetualMarket();
-    const clobPairIdToMarket: MarketAndTypeByClobPairId = _.mapValues(
+    const clobPairIdToMarket: MarketByClobPairId = _.mapValues(
       clobPairIdToPerpetualMarket,
       (perpetualMarket: PerpetualMarketFromDatabase) => {
         return {
-          marketType: MarketType.PERPETUAL,
           market: perpetualMarket.ticker,
         };
       },
@@ -173,27 +167,13 @@ router.get(
   rateLimiterMiddleware(getReqRateLimiter),
   ...CheckSubaccountSchema,
   ...CheckLimitAndCreatedBeforeOrAtSchema,
-  // Use conditional validations such that market is required if marketType is in the query
   // parameters and vice-versa.
   // Reference https://express-validator.github.io/docs/validation-chain-api.html#ifcondition
-  query('market').if(query('marketType').exists()).notEmpty()
-    .withMessage('market must be provided if marketType is provided'),
-  query('marketType').if(query('market').exists()).notEmpty()
-    .withMessage('marketType must be provided if market is provided'),
-  // TODO(DEC-656): Validate market/marketType against cached markets.
   ...checkSchema({
     market: {
       in: ['query'],
       isString: true,
       optional: true,
-    },
-    marketType: {
-      in: ['query'],
-      isIn: {
-        options: [Object.values(MarketType)],
-      },
-      optional: true,
-      errorMessage: 'marketType must be a valid market type (PERPETUAL/SPOT)',
     },
   }),
   handleValidationErrors,
@@ -205,7 +185,6 @@ router.get(
       address,
       subaccountNumber,
       market,
-      marketType,
       limit,
       createdBeforeOrAtHeight,
       createdBeforeOrAt,
@@ -222,7 +201,6 @@ router.get(
         address,
         subaccountNum,
         market,
-        marketType,
         limit,
         createdBeforeOrAtHeight,
         createdBeforeOrAt,
@@ -251,27 +229,13 @@ router.get(
   rateLimiterMiddleware(getReqRateLimiter),
   ...CheckParentSubaccountSchema,
   ...CheckLimitAndCreatedBeforeOrAtSchema,
-  // Use conditional validations such that market is required if marketType is in the query
   // parameters and vice-versa.
   // Reference https://express-validator.github.io/docs/validation-chain-api.html#ifcondition
-  query('market').if(query('marketType').exists()).notEmpty()
-    .withMessage('market must be provided if marketType is provided'),
-  query('marketType').if(query('market').exists()).notEmpty()
-    .withMessage('marketType must be provided if market is provided'),
-  // TODO(DEC-656): Validate market/marketType against cached markets.
   ...checkSchema({
     market: {
       in: ['query'],
       isString: true,
       optional: true,
-    },
-    marketType: {
-      in: ['query'],
-      isIn: {
-        options: [Object.values(MarketType)],
-      },
-      optional: true,
-      errorMessage: 'marketType must be a valid market type (PERPETUAL/SPOT)',
     },
   }),
   handleValidationErrors,
@@ -283,7 +247,6 @@ router.get(
       address,
       parentSubaccountNumber,
       market,
-      marketType,
       limit,
       createdBeforeOrAtHeight,
       createdBeforeOrAt,
@@ -300,7 +263,6 @@ router.get(
         address,
         parentSubaccountNum,
         market,
-        marketType,
         limit,
         createdBeforeOrAtHeight,
         createdBeforeOrAt,

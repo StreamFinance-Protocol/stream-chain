@@ -14,7 +14,6 @@ var (
 			BankruptcyAdjustmentPpm:           lib.OneMillion,
 			SpreadToMaintenanceMarginRatioPpm: 100_000,
 		},
-		MaxCumulativeInsuranceFundDelta: uint64(1_000_000_000_000),
 	}
 
 	LiquidationsConfig_NoFee = LiquidationsConfig{
@@ -25,7 +24,6 @@ var (
 			BankruptcyAdjustmentPpm:           lib.OneMillion,
 			SpreadToMaintenanceMarginRatioPpm: 100_000,
 		},
-		MaxCumulativeInsuranceFundDelta: uint64(1_000_000_000_000),
 	}
 )
 

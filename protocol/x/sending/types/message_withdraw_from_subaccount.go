@@ -2,7 +2,6 @@ package types
 
 import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib"
-	assettypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -37,11 +36,6 @@ func (msg *MsgWithdrawFromSubaccount) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Recipient)
 	if err != nil {
 		return ErrInvalidAccountAddress
-	}
-
-	// Validate that asset is TDai.
-	if msg.AssetId != assettypes.AssetTDai.Id {
-		return ErrNonTDaiAssetTransferNotImplemented
 	}
 
 	// Validate that quantums is not zero.

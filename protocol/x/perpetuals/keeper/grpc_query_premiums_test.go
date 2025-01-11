@@ -1,16 +1,24 @@
 package keeper_test
 
 import (
+	"testing"
+
+	"github.com/StreamFinance-Protocol/stream-chain/protocol/mocks"
 	keepertest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"testing"
 )
 
 func TestPremiumVotes(t *testing.T) {
-	pc := keepertest.PerpetualsKeepers(t)
+	memClob := &mocks.MemClob{}
+	memClob.On("SetClobKeeper", mock.Anything).Return()
+
+	mockIndexerEventManager := &mocks.IndexerEventManager{}
+
+	pc := keepertest.NewClobKeepersTestContext(t, memClob, &mocks.BankKeeper{}, mockIndexerEventManager, nil)
 
 	tests := map[string]struct {
 		req         *types.QueryPremiumVotesRequest
@@ -42,7 +50,12 @@ func TestPremiumVotes(t *testing.T) {
 }
 
 func TestPremiumSamples(t *testing.T) {
-	pc := keepertest.PerpetualsKeepers(t)
+	memClob := &mocks.MemClob{}
+	memClob.On("SetClobKeeper", mock.Anything).Return()
+
+	mockIndexerEventManager := &mocks.IndexerEventManager{}
+
+	pc := keepertest.NewClobKeepersTestContext(t, memClob, &mocks.BankKeeper{}, mockIndexerEventManager, nil)
 
 	tests := map[string]struct {
 		req         *types.QueryPremiumSamplesRequest

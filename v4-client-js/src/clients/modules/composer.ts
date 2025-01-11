@@ -48,8 +48,7 @@ export class Composer {
     conditionType: Order_ConditionType = Order_ConditionType.CONDITION_TYPE_UNSPECIFIED,
     conditionalOrderTriggerSubticks: Long = Long.fromInt(0),
     routerFeePpm: number,
-    routerFeeSubaccountOwner: string,
-    routerFeeSubaccountNumber: number
+    routerFeeOwner: string
   ): EncodeObject {
     this.validateGoodTilBlockAndTime(
       orderFlags,
@@ -60,11 +59,6 @@ export class Composer {
     const subaccountId: SubaccountId = {
       owner: address,
       number: subaccountNumber,
-    };
-
-    const routerSubaccountId: SubaccountId = {
-      owner: routerFeeSubaccountOwner,
-      number: routerFeeSubaccountNumber,
     };
 
     const orderId: OrderId = {
@@ -84,7 +78,7 @@ export class Composer {
       reduceOnly,
       clientMetadata: clientMetadata ?? 0,
       routerFeePpm,
-      routerSubaccountId,
+      routerFeeOwner,
       conditionType,
       conditionalOrderTriggerSubticks,
     };

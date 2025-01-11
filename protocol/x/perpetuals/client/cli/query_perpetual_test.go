@@ -4,6 +4,7 @@ package cli_test
 
 import (
 	"fmt"
+	"math/big"
 	"testing"
 
 	tmcli "github.com/cometbft/cometbft/libs/cli"
@@ -72,27 +73,43 @@ func networkWithLiquidityTierAndPerpetualObjects(
 		state.LiquidityTiers = append(state.LiquidityTiers, liquidityTier)
 	}
 
+	collateralPools := []types.CollateralPool{
+		{
+			CollateralPoolId:                        0,
+			MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+			MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{0}},
+			QuoteAssetId:                            uint32(0),
+		},
+		{
+			CollateralPoolId:                        1,
+			MaxCumulativeInsuranceFundDeltaPerBlock: 2_000_000_000_000,
+			MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{1}},
+			QuoteAssetId:                            uint32(1),
+		},
+		{
+			CollateralPoolId:                        2,
+			MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+			MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{0}},
+			QuoteAssetId:                            0,
+		},
+	}
+	nullify.Fill(&collateralPools) //nolint:staticcheck
+	state.CollateralPools = append(state.CollateralPools, collateralPools...)
+
 	// Generate `n` Perpetuals.
 	for i := 0; i < n; i++ {
-		marketType := types.PerpetualMarketType_PERPETUAL_MARKET_TYPE_CROSS
-		var insuranceFundDelta uint64
-		if i%2 == 1 {
-			marketType = types.PerpetualMarketType_PERPETUAL_MARKET_TYPE_ISOLATED
-			insuranceFundDelta = 1
-		}
-
 		perpetual := types.Perpetual{
 			Params: types.PerpetualParams{
-				Id:            uint32(i),
-				Ticker:        fmt.Sprintf("test_query_ticker_%d", i),
-				LiquidityTier: uint32(i % m),
-				MarketType:    marketType,
-				IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: insuranceFundDelta,
+				Id:               uint32(i),
+				Ticker:           fmt.Sprintf("test_query_ticker_%d", i),
+				LiquidityTier:    uint32(i % m),
+				DangerIndexPpm:   uint32(0),
+				CollateralPoolId: uint32(0),
 			},
 			FundingIndex:    dtypes.ZeroInt(),
 			OpenInterest:    dtypes.ZeroInt(),
+			YieldIndex:      big.NewRat(0, 1).String(),
 			LastFundingRate: dtypes.ZeroInt(),
-			YieldIndex:      "0/1",
 		}
 		nullify.Fill(&perpetual) //nolint:staticcheck
 		state.Perpetuals = append(state.Perpetuals, perpetual)

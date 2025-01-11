@@ -330,6 +330,49 @@
         "type": "object",
         "additionalProperties": false
       },
+      "CollateralPoolsResponseObject": {
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "maxCumulativeInsuranceFundDeltaPerBlock": {
+            "type": "string"
+          },
+          "multiCollateralAssets": {
+            "items": {
+              "type": "number",
+              "format": "double"
+            },
+            "type": "array"
+          },
+          "quoteAssetId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "maxCumulativeInsuranceFundDeltaPerBlock",
+          "multiCollateralAssets",
+          "quoteAssetId"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "CollateralPoolsResponse": {
+        "properties": {
+          "collateralPools": {
+            "items": {
+              "$ref": "#/components/schemas/CollateralPoolsResponseObject"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "collateralPools"
+        ],
+        "type": "object",
+        "additionalProperties": false
+      },
       "ComplianceResponse": {
         "properties": {
           "restricted": {
@@ -369,13 +412,6 @@
         ],
         "type": "string"
       },
-      "MarketType": {
-        "enum": [
-          "PERPETUAL",
-          "SPOT"
-        ],
-        "type": "string"
-      },
       "FillResponseObject": {
         "properties": {
           "id": {
@@ -392,9 +428,6 @@
           },
           "market": {
             "type": "string"
-          },
-          "marketType": {
-            "$ref": "#/components/schemas/MarketType"
           },
           "price": {
             "type": "string"
@@ -428,7 +461,6 @@
           "liquidity",
           "type",
           "market",
-          "marketType",
           "price",
           "size",
           "fee",
@@ -708,10 +740,7 @@
           "routerFeePpm": {
             "type": "string"
           },
-          "routerFeeSubaccountOwner": {
-            "type": "string"
-          },
-          "routerFeeSubaccountNumber": {
+          "routerFeeOwner": {
             "type": "string"
           },
           "timeInForce": {
@@ -771,13 +800,6 @@
         ],
         "type": "string"
       },
-      "PerpetualMarketType": {
-        "enum": [
-          "CROSS",
-          "ISOLATED"
-        ],
-        "type": "string"
-      },
       "PerpetualMarketResponseObject": {
         "properties": {
           "clobPairId": {
@@ -825,8 +847,9 @@
             "type": "number",
             "format": "double"
           },
-          "isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock": {
-            "type": "string"
+          "collateralPoolId": {
+            "type": "number",
+            "format": "double"
           },
           "quantumConversionExponent": {
             "type": "number",
@@ -845,9 +868,6 @@
           "subticksPerTick": {
             "type": "number",
             "format": "double"
-          },
-          "marketType": {
-            "$ref": "#/components/schemas/PerpetualMarketType"
           },
           "openInterestLowerCap": {
             "type": "string"
@@ -877,13 +897,12 @@
           "openInterest",
           "atomicResolution",
           "dangerIndexPpm",
-          "isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock",
+          "collateralPoolId",
           "quantumConversionExponent",
           "tickSize",
           "stepSize",
           "stepBaseQuantums",
           "subticksPerTick",
-          "marketType",
           "baseOpenInterest",
           "perpYieldIndex"
         ],
@@ -1411,6 +1430,34 @@
         ]
       }
     },
+    "/collateralPools": {
+      "get": {
+        "operationId": "GetCollateralPools",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollateralPoolsResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
     "/screen": {
       "get": {
         "operationId": "Screen",
@@ -1483,14 +1530,6 @@
           },
           {
             "in": "query",
-            "name": "marketType",
-            "required": false,
-            "schema": {
-              "$ref": "#/components/schemas/MarketType"
-            }
-          },
-          {
-            "in": "query",
             "name": "limit",
             "required": false,
             "schema": {
@@ -1558,14 +1597,6 @@
             "required": false,
             "schema": {
               "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "marketType",
-            "required": false,
-            "schema": {
-              "$ref": "#/components/schemas/MarketType"
             }
           },
           {

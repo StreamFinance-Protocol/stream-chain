@@ -50,9 +50,9 @@ func TestGetDeltaOpenInterestFromUpdates(t *testing.T) {
 					},
 				},
 			},
-			panicErr: types.ErrMatchUpdatesMustHaveTwoToFourUpdates,
+			panicErr: types.ErrMatchUpdatesMustHaveTwoUpdates,
 		},
-		"Invalid: one of two updates contains no perp update": {
+		"Invalid: one of the updates contains no perp update": {
 			updateType: types.Match,
 			settledUpdates: []keeper.SettledUpdate{
 				{
@@ -363,49 +363,40 @@ func TestGetDeltaOpenInterestFromUpdates(t *testing.T) {
 				BaseQuantums: big.NewInt(1900),
 			},
 		},
-		"Valid: one router": {
+		"Invalid: 3 updates": {
 			updateType: types.Match,
 			settledUpdates: []keeper.SettledUpdate{
 				{
-					SettledSubaccount: types.Subaccount{
-						Id: carlSubaccountId,
-					},
-					AssetUpdates: []types.AssetUpdate{
+					SettledSubaccount: types.Subaccount{},
+					PerpetualUpdates: []types.PerpetualUpdate{
 						{
-							AssetId:          0,
-							BigQuantumsDelta: big.NewInt(100),
+							PerpetualId:      0,
+							BigQuantumsDelta: big.NewInt(1_000),
 						},
 					},
 				},
 				{
-					SettledSubaccount: types.Subaccount{
-						Id: aliceSubaccountId,
-					},
+					SettledSubaccount: types.Subaccount{},
 					PerpetualUpdates: []types.PerpetualUpdate{
 						{
-							PerpetualId:      1,
-							BigQuantumsDelta: big.NewInt(500),
+							PerpetualId:      0,
+							BigQuantumsDelta: big.NewInt(1_000),
 						},
 					},
 				},
 				{
-					SettledSubaccount: types.Subaccount{
-						Id: bobSubaccountId,
-					},
+					SettledSubaccount: types.Subaccount{},
 					PerpetualUpdates: []types.PerpetualUpdate{
 						{
-							PerpetualId:      1,
-							BigQuantumsDelta: big.NewInt(-500),
+							PerpetualId:      0,
+							BigQuantumsDelta: big.NewInt(1_000),
 						},
 					},
 				},
 			},
-			expectedVal: &perptypes.OpenInterestDelta{
-				PerpetualId:  1,
-				BaseQuantums: big.NewInt(500),
-			},
+			panicErr: types.ErrMatchUpdatesMustHaveTwoUpdates,
 		},
-		"Valid: two routers": {
+		"Invalid: four updates": {
 			updateType: types.Match,
 			settledUpdates: []keeper.SettledUpdate{
 				{
@@ -453,12 +444,9 @@ func TestGetDeltaOpenInterestFromUpdates(t *testing.T) {
 					},
 				},
 			},
-			expectedVal: &perptypes.OpenInterestDelta{
-				PerpetualId:  1,
-				BaseQuantums: big.NewInt(500),
-			},
+			panicErr: types.ErrMatchUpdatesMustHaveTwoUpdates,
 		},
-		"Invalid: three routers": {
+		"Invalid: five updates": {
 			updateType: types.Match,
 			settledUpdates: []keeper.SettledUpdate{
 				{
@@ -517,7 +505,7 @@ func TestGetDeltaOpenInterestFromUpdates(t *testing.T) {
 					},
 				},
 			},
-			panicErr: types.ErrMatchUpdatesMustHaveTwoToFourUpdates,
+			panicErr: types.ErrMatchUpdatesMustHaveTwoUpdates,
 		},
 	}
 

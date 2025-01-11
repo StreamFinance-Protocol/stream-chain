@@ -75,18 +75,28 @@ type SubaccountsKeeper interface {
 		ctx sdk.Context,
 		amount *big.Int,
 		perpetualId uint32,
+		assetId uint32,
+	) error
+	TransferRouterFee(
+		ctx sdk.Context,
+		routerFeeQuoteQuantums *big.Int,
+		routerFeeOwner string,
+		perpetualId uint32,
+		assetId uint32,
 	) error
 	TransferLiquidityFee(
 		ctx sdk.Context,
 		liquidityFeeQuoteQuantums *big.Int,
 		perpetualId uint32,
+		assetId uint32,
 	) error
 	TransferValidatorFee(
 		ctx sdk.Context,
 		validatorFeeQuoteQuantums *big.Int,
 		perpetualId uint32,
+		assetId uint32,
 	) error
-	GetCollateralPoolFromPerpetualId(
+	GetCollateralPoolAddressFromPerpetualId(
 		ctx sdk.Context,
 		perpetualId uint32,
 	) (sdk.AccAddress, error)
@@ -104,6 +114,7 @@ type SubaccountsKeeper interface {
 type AssetsKeeper interface {
 	GetAsset(ctx sdk.Context, id uint32) (val assettypes.Asset, exists bool)
 	ConvertCoinToAsset(ctx sdk.Context, assetId uint32, coin sdk.Coin) (quantums *big.Int, convertedDenom *big.Int, err error)
+	GetNetCollateral(ctx sdk.Context, id uint32, bigQuantums *big.Int, quoteCurrencyAtomicResolution int32) (bigNetCollateralQuoteQuantums *big.Int, err error)
 }
 
 type BlockTimeKeeper interface {
@@ -119,22 +130,16 @@ type PerpetualsKeeper interface {
 		ctx sdk.Context,
 		id uint32,
 		bigQuantums *big.Int,
+		quoteCurrencyAtomicResolution int32,
 	) (
 		bigNetNotionalQuoteQuantums *big.Int,
-		err error,
-	)
-	GetNotionalInBaseQuantums(
-		ctx sdk.Context,
-		id uint32,
-		bigQuoteQuantums *big.Int,
-	) (
-		bigBaseQuantums *big.Int,
 		err error,
 	)
 	GetNetCollateral(
 		ctx sdk.Context,
 		id uint32,
 		bigQuantums *big.Int,
+		quoteCurrencyAtomicResolution int32,
 	) (
 		bigNetCollateralQuoteQuantums *big.Int,
 		err error,
@@ -143,6 +148,7 @@ type PerpetualsKeeper interface {
 		ctx sdk.Context,
 		id uint32,
 		bigQuantums *big.Int,
+		quoteCurrencyAtomicResolution int32,
 	) (
 		bigInitialMarginQuoteQuantums *big.Int,
 		bigMaintenanceMarginQuoteQuantums *big.Int,
@@ -154,7 +160,11 @@ type PerpetualsKeeper interface {
 	) (val perpetualsmoduletypes.Perpetual, err error)
 	GetAllPerpetuals(ctx sdk.Context) (list []perpetualsmoduletypes.Perpetual)
 	GetAllLiquidityTiers(ctx sdk.Context) (list []perpetualsmoduletypes.LiquidityTier)
-	IsIsolatedPerpetual(ctx sdk.Context, perpetualId uint32) (bool, error)
+	GetCollateralPool(ctx sdk.Context, id uint32) (
+		collateralPool perpetualsmoduletypes.CollateralPool,
+		err error,
+	)
+	IsMainCollateralPool(ctx sdk.Context, perpetualId uint32) (bool, error)
 	GetPerpetualAndMarketPrice(
 		ctx sdk.Context,
 		perpetualId uint32,
@@ -172,6 +182,27 @@ type PerpetualsKeeper interface {
 	MaybeProcessNewFundingTickEpoch(ctx sdk.Context)
 	GetInsuranceFundModuleAddress(ctx sdk.Context, perpetualId uint32) (sdk.AccAddress, error)
 	GetInsuranceFundName(ctx sdk.Context, perpetualId uint32) (string, error)
+	GetCollateralPoolFromPerpetualId(
+		ctx sdk.Context,
+		perpetualId uint32,
+	) (
+		collateralPool perpetualsmoduletypes.CollateralPool,
+		err error,
+	)
+	GetQuoteCurrencyAtomicResolutionFromPerpetualId(
+		ctx sdk.Context,
+		perpetualId uint32,
+	) (
+		int32,
+		error,
+	)
+	GetQuoteAssetIdFromPerpetualId(
+		ctx sdk.Context,
+		perpetualId uint32,
+	) (
+		uint32,
+		error,
+	)
 }
 
 type PricesKeeper interface {

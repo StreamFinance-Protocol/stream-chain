@@ -1,5 +1,6 @@
 import { Perpetual, PerpetualSDKType, LiquidityTier, LiquidityTierSDKType } from "./perpetual";
 import { Params, ParamsSDKType } from "./params";
+import { CollateralPool, CollateralPoolSDKType } from "./collateral";
 import * as _m0 from "protobufjs/minimal";
 import { DeepPartial } from "../../helpers";
 /** GenesisState defines the perpetuals module's genesis state. */
@@ -8,6 +9,7 @@ export interface GenesisState {
   perpetuals: Perpetual[];
   liquidityTiers: LiquidityTier[];
   params?: Params;
+  collateralPools: CollateralPool[];
 }
 /** GenesisState defines the perpetuals module's genesis state. */
 
@@ -15,13 +17,15 @@ export interface GenesisStateSDKType {
   perpetuals: PerpetualSDKType[];
   liquidity_tiers: LiquidityTierSDKType[];
   params?: ParamsSDKType;
+  collateral_pools: CollateralPoolSDKType[];
 }
 
 function createBaseGenesisState(): GenesisState {
   return {
     perpetuals: [],
     liquidityTiers: [],
-    params: undefined
+    params: undefined,
+    collateralPools: []
   };
 }
 
@@ -37,6 +41,10 @@ export const GenesisState = {
 
     if (message.params !== undefined) {
       Params.encode(message.params, writer.uint32(26).fork()).ldelim();
+    }
+
+    for (const v of message.collateralPools) {
+      CollateralPool.encode(v!, writer.uint32(34).fork()).ldelim();
     }
 
     return writer;
@@ -63,6 +71,10 @@ export const GenesisState = {
           message.params = Params.decode(reader, reader.uint32());
           break;
 
+        case 4:
+          message.collateralPools.push(CollateralPool.decode(reader, reader.uint32()));
+          break;
+
         default:
           reader.skipType(tag & 7);
           break;
@@ -77,6 +89,7 @@ export const GenesisState = {
     message.perpetuals = object.perpetuals?.map(e => Perpetual.fromPartial(e)) || [];
     message.liquidityTiers = object.liquidityTiers?.map(e => LiquidityTier.fromPartial(e)) || [];
     message.params = object.params !== undefined && object.params !== null ? Params.fromPartial(object.params) : undefined;
+    message.collateralPools = object.collateralPools?.map(e => CollateralPool.fromPartial(e)) || [];
     return message;
   }
 

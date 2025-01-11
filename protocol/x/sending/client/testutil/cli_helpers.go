@@ -19,6 +19,7 @@ func MsgCreateTransferExec(
 	senderNumber uint32,
 	recipientOwner sdk.AccAddress,
 	recipientNumber uint32,
+	assetId uint32,
 	amount uint64,
 ) (testutil.BufferWriter, error) {
 	args := []string{
@@ -26,6 +27,7 @@ func MsgCreateTransferExec(
 		fmt.Sprint(senderNumber),
 		recipientOwner.String(),
 		fmt.Sprint(recipientNumber),
+		fmt.Sprint(assetId),
 		fmt.Sprint(amount),
 	}
 

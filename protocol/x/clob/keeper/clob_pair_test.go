@@ -13,6 +13,7 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/indexer/indexer_manager"
 	indexershared "github.com/StreamFinance-Protocol/stream-chain/protocol/indexer/shared/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib"
+	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals"
 	ratelimitkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/keeper"
 
 	"cosmossdk.io/store/prefix"
@@ -22,14 +23,9 @@ import (
 	keepertest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/nullify"
 	perptest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/perpetuals"
-	pricestest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/prices"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/memclob"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
-	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals"
-	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
-	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices"
-	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/stretchr/testify/mock"
@@ -44,14 +40,13 @@ func TestCreatePerpetualClobPair_MultiplePerpetual(t *testing.T) {
 	mockIndexerEventManager := &mocks.IndexerEventManager{}
 	ks := keepertest.NewClobKeepersTestContext(t, memClob, &mocks.BankKeeper{}, mockIndexerEventManager, nil)
 
+	perpetuals.InitGenesis(ks.Ctx, *ks.PerpetualsKeeper, constants.Perpetuals_DefaultGenesisState)
+
 	rateString := sdaiservertypes.TestSDAIEventRequest.ConversionRate
 	rate, conversionErr := ratelimitkeeper.ConvertStringToBigInt(rateString)
 	require.NoError(t, conversionErr)
 	ks.RatelimitKeeper.SetSDAIPrice(ks.Ctx, rate)
 	ks.RatelimitKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
-
-	prices.InitGenesis(ks.Ctx, *ks.PricesKeeper, constants.Prices_DefaultGenesisState)
-	perpetuals.InitGenesis(ks.Ctx, *ks.PerpetualsKeeper, constants.Perpetuals_DefaultGenesisState)
 
 	clobPairs := []types.ClobPair{
 		constants.ClobPair_Btc,
@@ -75,14 +70,13 @@ func TestCreatePerpetualClobPair_MultiplePerpetual(t *testing.T) {
 					clobPair.SubticksPerTick,
 					clobPair.StepBaseQuantums,
 					constants.Perpetuals_DefaultGenesisState.Perpetuals[i].Params.LiquidityTier,
-					constants.Perpetuals_DefaultGenesisState.Perpetuals[i].Params.MarketType,
 					constants.Perpetuals_DefaultGenesisState.Perpetuals[i].Params.DangerIndexPpm,
-					fmt.Sprintf("%d", constants.Perpetuals_DefaultGenesisState.Perpetuals[i].Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock),
+					constants.Perpetuals_DefaultGenesisState.Perpetuals[i].Params.CollateralPoolId,
 				),
 			),
 		).Once().Return()
 		//nolint: errcheck
-		ks.ClobKeeper.CreatePerpetualClobPair(
+		_, err := ks.ClobKeeper.CreatePerpetualClobPair(
 			ks.Ctx,
 			clobPair.Id,
 			clobtest.MustPerpetualId(clobPair),
@@ -91,6 +85,7 @@ func TestCreatePerpetualClobPair_MultiplePerpetual(t *testing.T) {
 			clobPair.SubticksPerTick,
 			clobPair.Status,
 		)
+		require.NoError(t, err)
 	}
 
 	require.Equal(
@@ -117,24 +112,32 @@ func TestCreatePerpetualClobPair_FailsWithPerpetualAssociatedWithExistingClobPai
 		mockIndexerEventManager,
 		nil,
 	)
-	// Create test perpetual and market (id 0).
-	keepertest.CreateTestPricesAndPerpetualMarkets(
-		t,
+
+	// Create liquidity tiers.
+	keepertest.CreateTestCollateralPools(t, ks.Ctx, ks.PerpetualsKeeper)
+	keepertest.CreateTestLiquidityTiers(t, ks.Ctx, ks.PerpetualsKeeper)
+
+	perp := perptest.GeneratePerpetual(perptest.WithId(0), perptest.WithMarketId(0))
+
+	_, err := ks.PerpetualsKeeper.CreatePerpetual(
 		ks.Ctx,
-		ks.PerpetualsKeeper,
-		ks.PricesKeeper,
-		[]perptypes.Perpetual{
-			*perptest.GeneratePerpetual(perptest.WithId(0), perptest.WithMarketId(0)),
-		},
-		[]pricestypes.MarketParamPrice{
-			*pricestest.GenerateMarketParamPrice(pricestest.WithId(0)),
-		},
+		perp.Params.Id,
+		perp.Params.Ticker,
+		perp.Params.MarketId,
+		perp.Params.AtomicResolution,
+		perp.Params.DefaultFundingPpm,
+		perp.Params.LiquidityTier,
+		perp.Params.DangerIndexPpm,
+		perp.Params.CollateralPoolId,
+		perp.YieldIndex,
 	)
+	require.NoError(t, err)
+
 	// Create test clob pair id 0, associated with perpetual id 0.
 	keepertest.CreateTestClobPairs(
 		t,
 		ks.Ctx,
-		ks.ClobKeeper,
+		&ks.ClobKeeper,
 		[]types.ClobPair{
 			*clobtest.GenerateClobPair(clobtest.WithId(0), clobtest.WithPerpetualId(0)),
 		},
@@ -142,7 +145,7 @@ func TestCreatePerpetualClobPair_FailsWithPerpetualAssociatedWithExistingClobPai
 
 	// Create test clob pair id 1, associated with perpetual id 0.
 	newClobPair := clobtest.GenerateClobPair(clobtest.WithId(1), clobtest.WithPerpetualId(0))
-	_, err := ks.ClobKeeper.CreatePerpetualClobPair(
+	_, err = ks.ClobKeeper.CreatePerpetualClobPair(
 		ks.Ctx,
 		newClobPair.Id,
 		newClobPair.MustGetPerpetualId(),
@@ -168,7 +171,7 @@ func TestCreatePerpetualClobPair_FailsWithDuplicateClobPairId(t *testing.T) {
 		mockIndexerEventManager,
 		nil,
 	)
-	prices.InitGenesis(ks.Ctx, *ks.PricesKeeper, constants.Prices_DefaultGenesisState)
+
 	perpetuals.InitGenesis(ks.Ctx, *ks.PerpetualsKeeper, constants.Perpetuals_DefaultGenesisState)
 
 	// Read a new `ClobPair` and make sure it does not exist.
@@ -201,9 +204,8 @@ func TestCreatePerpetualClobPair_FailsWithDuplicateClobPairId(t *testing.T) {
 				clobPair.SubticksPerTick,
 				clobPair.StepBaseQuantums,
 				constants.Perpetuals_DefaultGenesisState.Perpetuals[0].Params.LiquidityTier,
-				constants.Perpetuals_DefaultGenesisState.Perpetuals[0].Params.MarketType,
 				constants.Perpetuals_DefaultGenesisState.Perpetuals[0].Params.DangerIndexPpm,
-				fmt.Sprintf("%d", constants.Perpetuals_DefaultGenesisState.Perpetuals[0].Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock),
+				constants.Perpetuals_DefaultGenesisState.Perpetuals[0].Params.CollateralPoolId,
 			),
 		),
 	).Once().Return()
@@ -272,8 +274,8 @@ func TestCreatePerpetualClobPair(t *testing.T) {
 			mockIndexerEventManager := &mocks.IndexerEventManager{}
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, &mocks.BankKeeper{}, mockIndexerEventManager, nil)
 
-			prices.InitGenesis(ks.Ctx, *ks.PricesKeeper, constants.Prices_DefaultGenesisState)
 			perpetuals.InitGenesis(ks.Ctx, *ks.PerpetualsKeeper, constants.Perpetuals_DefaultGenesisState)
+
 			// PerpetualMarketCreateEvents are emitted when initializing the genesis state, so we need to mock
 			// the indexer event manager to expect these events.
 			if tc.expectedErr == "" {
@@ -295,9 +297,8 @@ func TestCreatePerpetualClobPair(t *testing.T) {
 							tc.clobPair.SubticksPerTick,
 							tc.clobPair.StepBaseQuantums,
 							perpetual.Params.LiquidityTier,
-							perpetual.Params.MarketType,
 							perpetual.Params.DangerIndexPpm,
-							fmt.Sprintf("%d", perpetual.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock),
+							perpetual.Params.CollateralPoolId,
 						),
 					),
 				).Return()
@@ -426,7 +427,6 @@ func TestCreateMultipleClobPairs(t *testing.T) {
 			mockIndexerEventManager := &mocks.IndexerEventManager{}
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, &mocks.BankKeeper{}, mockIndexerEventManager, nil)
 
-			prices.InitGenesis(ks.Ctx, *ks.PricesKeeper, constants.Prices_DefaultGenesisState)
 			perpetuals.InitGenesis(ks.Ctx, *ks.PerpetualsKeeper, constants.Perpetuals_DefaultGenesisState)
 
 			// Perform the method under test.
@@ -450,9 +450,8 @@ func TestCreateMultipleClobPairs(t *testing.T) {
 								make.clobPair.SubticksPerTick,
 								make.clobPair.StepBaseQuantums,
 								perpetual.Params.LiquidityTier,
-								perpetual.Params.MarketType,
 								perpetual.Params.DangerIndexPpm,
-								fmt.Sprintf("%d", perpetual.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock),
+								perpetual.Params.CollateralPoolId,
 							),
 						),
 					).Return()
@@ -563,9 +562,10 @@ func TestClobPairGet(t *testing.T) {
 	mockIndexerEventManager := &mocks.IndexerEventManager{}
 	ks := keepertest.NewClobKeepersTestContext(t, memClob, &mocks.BankKeeper{}, mockIndexerEventManager, nil)
 	items := keepertest.CreateNClobPair(t,
-		ks.ClobKeeper,
+		&ks.ClobKeeper,
 		ks.PerpetualsKeeper,
 		ks.PricesKeeper,
+		ks.AssetsKeeper,
 		ks.Ctx,
 		10,
 		mockIndexerEventManager,
@@ -586,9 +586,10 @@ func TestClobPairRemove(t *testing.T) {
 	mockIndexerEventManager := &mocks.IndexerEventManager{}
 	ks := keepertest.NewClobKeepersTestContext(t, memClob, &mocks.BankKeeper{}, mockIndexerEventManager, nil)
 	items := keepertest.CreateNClobPair(t,
-		ks.ClobKeeper,
+		&ks.ClobKeeper,
 		ks.PerpetualsKeeper,
 		ks.PricesKeeper,
+		ks.AssetsKeeper,
 		ks.Ctx,
 		10,
 		mockIndexerEventManager,
@@ -609,9 +610,10 @@ func TestClobPairGetAll(t *testing.T) {
 	mockIndexerEventManager := &mocks.IndexerEventManager{}
 	ks := keepertest.NewClobKeepersTestContext(t, memClob, &mocks.BankKeeper{}, mockIndexerEventManager, nil)
 	items := keepertest.CreateNClobPair(t,
-		ks.ClobKeeper,
+		&ks.ClobKeeper,
 		ks.PerpetualsKeeper,
 		ks.PricesKeeper,
+		ks.AssetsKeeper,
 		ks.Ctx,
 		10,
 		mockIndexerEventManager,
@@ -626,7 +628,6 @@ func TestUpdateClobPair_FinalSettlement(t *testing.T) {
 	memClob := memclob.NewMemClobPriceTimePriority(false)
 	mockIndexerEventManager := &mocks.IndexerEventManager{}
 	ks := keepertest.NewClobKeepersTestContext(t, memClob, &mocks.BankKeeper{}, mockIndexerEventManager, nil)
-	prices.InitGenesis(ks.Ctx, *ks.PricesKeeper, constants.Prices_DefaultGenesisState)
 	perpetuals.InitGenesis(ks.Ctx, *ks.PerpetualsKeeper, constants.Perpetuals_DefaultGenesisState)
 
 	clobPair := constants.ClobPair_Btc
@@ -646,9 +647,8 @@ func TestUpdateClobPair_FinalSettlement(t *testing.T) {
 				clobPair.SubticksPerTick,
 				clobPair.StepBaseQuantums,
 				constants.Perpetuals_DefaultGenesisState.Perpetuals[0].Params.LiquidityTier,
-				constants.Perpetuals_DefaultGenesisState.Perpetuals[0].Params.MarketType,
 				constants.Perpetuals_DefaultGenesisState.Perpetuals[0].Params.DangerIndexPpm,
-				fmt.Sprintf("%d", constants.Perpetuals_DefaultGenesisState.Perpetuals[0].Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock),
+				constants.Perpetuals_DefaultGenesisState.Perpetuals[0].Params.CollateralPoolId,
 			),
 		),
 	).Once().Return()
@@ -765,9 +765,8 @@ func TestUpdateClobPair(t *testing.T) {
 							clobPair.SubticksPerTick,
 							clobPair.StepBaseQuantums,
 							constants.Perpetuals_DefaultGenesisState.Perpetuals[0].Params.LiquidityTier,
-							constants.Perpetuals_DefaultGenesisState.Perpetuals[0].Params.MarketType,
 							constants.Perpetuals_DefaultGenesisState.Perpetuals[0].Params.DangerIndexPpm,
-							fmt.Sprintf("%d", constants.Perpetuals_DefaultGenesisState.Perpetuals[0].Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock),
+							constants.Perpetuals_DefaultGenesisState.Perpetuals[0].Params.CollateralPoolId,
 						),
 					),
 				).Once().Return()
@@ -825,9 +824,8 @@ func TestUpdateClobPair(t *testing.T) {
 							clobPair.SubticksPerTick,
 							clobPair.StepBaseQuantums,
 							constants.Perpetuals_DefaultGenesisState.Perpetuals[0].Params.LiquidityTier,
-							constants.Perpetuals_DefaultGenesisState.Perpetuals[0].Params.MarketType,
 							constants.Perpetuals_DefaultGenesisState.Perpetuals[0].Params.DangerIndexPpm,
-							fmt.Sprintf("%d", constants.Perpetuals_DefaultGenesisState.Perpetuals[0].Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock),
+							constants.Perpetuals_DefaultGenesisState.Perpetuals[0].Params.CollateralPoolId,
 						),
 					),
 				).Once().Return()
@@ -865,9 +863,8 @@ func TestUpdateClobPair(t *testing.T) {
 							clobPair.SubticksPerTick,
 							clobPair.StepBaseQuantums,
 							constants.Perpetuals_DefaultGenesisState.Perpetuals[0].Params.LiquidityTier,
-							constants.Perpetuals_DefaultGenesisState.Perpetuals[0].Params.MarketType,
 							constants.Perpetuals_DefaultGenesisState.Perpetuals[0].Params.DangerIndexPpm,
-							fmt.Sprintf("%d", constants.Perpetuals_DefaultGenesisState.Perpetuals[0].Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock),
+							constants.Perpetuals_DefaultGenesisState.Perpetuals[0].Params.CollateralPoolId,
 						),
 					),
 				).Once().Return()
@@ -893,7 +890,6 @@ func TestUpdateClobPair(t *testing.T) {
 			memClob := memclob.NewMemClobPriceTimePriority(false)
 			mockIndexerEventManager := &mocks.IndexerEventManager{}
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, &mocks.BankKeeper{}, mockIndexerEventManager, nil)
-			prices.InitGenesis(ks.Ctx, *ks.PricesKeeper, constants.Prices_DefaultGenesisState)
 			perpetuals.InitGenesis(ks.Ctx, *ks.PerpetualsKeeper, constants.Perpetuals_DefaultGenesisState)
 
 			tc.setup(t, ks, mockIndexerEventManager)
@@ -928,7 +924,8 @@ func TestGetAllClobPairs_Sorted(t *testing.T) {
 	memClob := memclob.NewMemClobPriceTimePriority(false)
 	mockIndexerEventManager := &mocks.IndexerEventManager{}
 	ks := keepertest.NewClobKeepersTestContext(t, memClob, &mocks.BankKeeper{}, mockIndexerEventManager, nil)
-	keepertest.CreateLiquidityTiersAndNPerpetuals(t,
+
+	keepertest.CreateCollateralPoolsAndLiquidityTiersAndNPerpetuals(t,
 		ks.Ctx,
 		ks.PerpetualsKeeper,
 		ks.PricesKeeper,
@@ -1072,7 +1069,7 @@ func TestIsPerpetualClobPairActive(t *testing.T) {
 			memClob := memclob.NewMemClobPriceTimePriority(false)
 			mockIndexerEventManager := &mocks.IndexerEventManager{}
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, &mocks.BankKeeper{}, mockIndexerEventManager, nil)
-			prices.InitGenesis(ks.Ctx, *ks.PricesKeeper, constants.Prices_DefaultGenesisState)
+
 			perpetuals.InitGenesis(ks.Ctx, *ks.PerpetualsKeeper, constants.Perpetuals_DefaultGenesisState)
 
 			if tc.clobPair != nil {

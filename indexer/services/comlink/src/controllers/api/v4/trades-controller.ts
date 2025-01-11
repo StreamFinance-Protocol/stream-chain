@@ -29,7 +29,6 @@ import { handleValidationErrors } from '../../../request-helpers/error-handler';
 import ExportResponseCodeStats from '../../../request-helpers/export-response-code-stats';
 import { fillToTradeResponseObject } from '../../../request-helpers/request-transformer';
 import {
-  MarketType,
   TradeRequest,
   TradeResponse,
   TradeResponseObject,
@@ -51,7 +50,7 @@ class TradesController extends Controller {
       .getClobPairIdFromTicker(ticker);
 
     if (clobPairId === undefined) {
-      throw new NotFoundError(`${ticker} not found in tickers of type ${MarketType.PERPETUAL}`);
+      throw new NotFoundError(`${ticker} not found in tickers`);
     }
 
     const fills: FillFromDatabase[] = await FillTable.findAll(

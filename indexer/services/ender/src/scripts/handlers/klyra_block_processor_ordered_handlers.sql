@@ -63,6 +63,8 @@ BEGIN
                 rval[i] = klyra_funding_handler(block_height, block_time, event_data, event_index, transaction_index);
             WHEN '"open_interest_update"'::jsonb THEN
                 rval[i] = klyra_open_interest_update_handler(event_data);
+            WHEN '"collateral_pool"'::jsonb THEN
+                rval[i] = klyra_collateral_pool_handler(event_data);
             ELSE
                 NULL;
             END CASE;

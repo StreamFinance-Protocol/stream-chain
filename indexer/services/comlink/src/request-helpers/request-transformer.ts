@@ -26,6 +26,7 @@ import {
   TransferType,
   parentSubaccountHelpers,
   YieldParamsFromDatabase,
+  CollateralPoolFromDatabase,
 } from '@klyraprotocol-indexer/postgres';
 import { OrderbookLevels, PriceLevel } from '@klyraprotocol-indexer/redis';
 import { RedisOrder } from '@klyraprotocol-indexer/v4-protos';
@@ -39,7 +40,7 @@ import {
   CandleResponseObject,
   FillResponseObject,
   HistoricalFundingResponseObject,
-  MarketAndTypeByClobPairId,
+  MarketByClobPairId,
   OrderbookResponseObject,
   ParentSubaccountTransferResponseObject,
   OrderbookResponsePriceLevel,
@@ -57,6 +58,7 @@ import {
   TradeResponseObject,
   TransferResponseObject,
   YieldParamsResponseObject,
+  CollateralPoolsResponseObject,
 } from '../types';
 
 /**
@@ -76,10 +78,12 @@ export function perpetualPositionToResponseObject(
   // Realized pnl is calculated from the difference in price between the average entry/exit price
   // (order depending on side of the position) multiplied by amount of the position that was closed
   // in addition to the funding payments.
-  const priceDiff: Big = (position.side === PositionSide.LONG)
+  const priceDiff: Big = position.side === PositionSide.LONG
     ? Big(position.exitPrice ?? 0).minus(position.entryPrice)
     : Big(position.entryPrice).minus(position.exitPrice ?? 0);
-  const netFunding: Big = Big(position.settledFunding).plus(position.unsettledFunding);
+  const netFunding: Big = Big(position.settledFunding).plus(
+    position.unsettledFunding,
+  );
   const realizedPnl: string = priceDiff
     .mul(position.sumClose)
     .plus(netFunding)
@@ -95,7 +99,9 @@ export function perpetualPositionToResponseObject(
     exitPrice: position.exitPrice && Big(position.exitPrice).toFixed(),
     realizedPnl,
     unrealizedPnl: helpers.getUnrealizedPnl(
-      position, perpetualMarketsMap[position.perpetualId], marketsMap,
+      position,
+      perpetualMarketsMap[position.perpetualId],
+      marketsMap,
     ),
     createdAt: position.createdAt,
     createdAtHeight: position.createdAtHeight,
@@ -119,7 +125,6 @@ export function assetPositionToResponseObject(
   assetMap: AssetById,
   subaccountNumber: number,
 ): AssetPositionResponseObject {
-
   return {
     symbol: assetMap[position.assetId].symbol,
     side: position.isLong ? PositionSide.LONG : PositionSide.SHORT,
@@ -137,7 +142,7 @@ export function assetPositionToResponseObject(
  */
 export function fillToResponseObject(
   fill: FillFromDatabase,
-  marketsByClobPairId: MarketAndTypeByClobPairId,
+  marketsByClobPairId: MarketByClobPairId,
   subaccountNumber: number,
 ): FillResponseObject {
   return {
@@ -146,7 +151,6 @@ export function fillToResponseObject(
     liquidity: fill.liquidity,
     type: fill.type,
     market: marketsByClobPairId[fill.clobPairId].market,
-    marketType: marketsByClobPairId[fill.clobPairId].marketType,
     price: fill.price,
     size: fill.size,
     fee: fill.fee,
@@ -213,15 +217,19 @@ export function transferToResponseObject(
   return {
     id: transfer.id,
     sender: {
-      address: transfer.senderWalletAddress ?? subaccountMap[transfer.senderSubaccountId!].address,
-      subaccountNumber: transfer.senderWalletAddress ? undefined
+      address:
+        transfer.senderWalletAddress ??
+        subaccountMap[transfer.senderSubaccountId!].address,
+      subaccountNumber: transfer.senderWalletAddress
+        ? undefined
         : subaccountMap[transfer.senderSubaccountId!].subaccountNumber,
     },
     recipient: {
-      address: transfer.recipientWalletAddress ?? subaccountMap[
-        transfer.recipientSubaccountId!
-      ].address,
-      subaccountNumber: transfer.recipientWalletAddress ? undefined
+      address:
+        transfer.recipientWalletAddress ??
+        subaccountMap[transfer.recipientSubaccountId!].address,
+      subaccountNumber: transfer.recipientWalletAddress
+        ? undefined
         : subaccountMap[transfer.recipientSubaccountId!].subaccountNumber,
     },
     size: transfer.size,
@@ -239,7 +247,6 @@ export function transferToParentSubaccountResponseObject(
   subaccountMap: SubaccountById,
   parentSubaccountNumber: number,
 ): ParentSubaccountTransferResponseObject {
-
   const senderParentSubaccountNum = transfer.senderWalletAddress
     ? undefined
     : parentSubaccountHelpers.getParentSubaccountNum(
@@ -271,13 +278,15 @@ export function transferToParentSubaccountResponseObject(
   return {
     id: transfer.id,
     sender: {
-      address: transfer.senderWalletAddress ?? subaccountMap[transfer.senderSubaccountId!].address,
+      address:
+        transfer.senderWalletAddress ??
+        subaccountMap[transfer.senderSubaccountId!].address,
       parentSubaccountNumber: senderParentSubaccountNum,
     },
     recipient: {
-      address: transfer.recipientWalletAddress ?? subaccountMap[
-        transfer.recipientSubaccountId!
-      ].address,
+      address:
+        transfer.recipientWalletAddress ??
+        subaccountMap[transfer.recipientSubaccountId!].address,
       parentSubaccountNumber: recipientParentSubaccountNum,
     },
     size: transfer.size,
@@ -311,11 +320,11 @@ export function subaccountToResponseObject({
   openPerpetualPositions = {},
   assetPositions = {},
 }: {
-  subaccount: SubaccountFromDatabase,
-  equity: string,
-  freeCollateral: string,
-  openPerpetualPositions: PerpetualPositionsMap,
-  assetPositions: AssetPositionsMap,
+  subaccount: SubaccountFromDatabase;
+  equity: string;
+  freeCollateral: string;
+  openPerpetualPositions: PerpetualPositionsMap;
+  assetPositions: AssetPositionsMap;
 }): SubaccountResponseObject {
   return {
     address: subaccount.address,
@@ -345,7 +354,9 @@ export function perpetualMarketToResponseObject(
     volume24H: perpetualMarket.volume24H,
     trades24H: perpetualMarket.trades24H,
     nextFundingRate: perpetualMarket.nextFundingRate,
-    initialMarginFraction: helpers.ppmToString(Number(liquidityTier.initialMarginPpm)),
+    initialMarginFraction: helpers.ppmToString(
+      Number(liquidityTier.initialMarginPpm),
+    ),
     maintenanceMarginFraction: helpers.ppmToString(
       helpers.getMaintenanceMarginPpm(
         Number(liquidityTier.initialMarginPpm),
@@ -355,14 +366,12 @@ export function perpetualMarketToResponseObject(
     openInterest: perpetualMarket.openInterest,
     atomicResolution: perpetualMarket.atomicResolution,
     dangerIndexPpm: perpetualMarket.dangerIndexPpm,
-    isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock:
-      perpetualMarket.isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
+    collateralPoolId: perpetualMarket.collateralPoolId,
     quantumConversionExponent: perpetualMarket.quantumConversionExponent,
     tickSize: protocolTranslations.getTickSize(perpetualMarket),
     stepSize: protocolTranslations.getStepSize(perpetualMarket),
     stepBaseQuantums: perpetualMarket.stepBaseQuantums,
     subticksPerTick: perpetualMarket.subticksPerTick,
-    marketType: perpetualMarket.marketType,
     openInterestLowerCap: liquidityTier.openInterestLowerCap,
     openInterestUpperCap: liquidityTier.openInterestUpperCap,
     baseOpenInterest: perpetualMarket.baseOpenInterest,
@@ -375,8 +384,14 @@ export function OrderbookLevelsToResponseObject(
   perpetualMarket: PerpetualMarketFromDatabase,
 ): OrderbookResponseObject {
   return {
-    bids: OrderbookPriceLevelsToResponsePriceLevels(orderbookLevels.bids, perpetualMarket),
-    asks: OrderbookPriceLevelsToResponsePriceLevels(orderbookLevels.asks, perpetualMarket),
+    bids: OrderbookPriceLevelsToResponsePriceLevels(
+      orderbookLevels.bids,
+      perpetualMarket,
+    ),
+    asks: OrderbookPriceLevelsToResponsePriceLevels(
+      orderbookLevels.asks,
+      perpetualMarket,
+    ),
   };
 }
 
@@ -452,8 +467,11 @@ export function postgresAndRedisOrderToResponseObject(
     ...orderResponse,
     size: redisOrder.size,
     price: redisOrder.price,
-    goodTilBlock: protocolTranslations.getGoodTilBlock(redisOrder.order!)?.toString() ?? undefined,
-    goodTilBlockTime: protocolTranslations.getGoodTilBlockTime(redisOrder.order!) ?? undefined,
+    goodTilBlock:
+      protocolTranslations.getGoodTilBlock(redisOrder.order!)?.toString() ??
+      undefined,
+    goodTilBlockTime:
+      protocolTranslations.getGoodTilBlockTime(redisOrder.order!) ?? undefined,
     timeInForce: apiTranslations.orderTIFToAPITIF(redisOrderTIF),
     postOnly: apiTranslations.isOrderTIFPostOnly(redisOrderTIF),
     reduceOnly: redisOrder.order!.reduceOnly,
@@ -471,10 +489,11 @@ export function postgresOrderToResponseObject(
     goodTilBlock: order.goodTilBlock ?? undefined,
     goodTilBlockTime: order.goodTilBlockTime ?? undefined,
     createdAtHeight: order.createdAtHeight ?? undefined,
-    ticker: perpetualMarketRefresher.getPerpetualMarketTicker(order.clobPairId)!,
+    ticker: perpetualMarketRefresher.getPerpetualMarketTicker(
+      order.clobPairId,
+    )!,
     triggerPrice: order.triggerPrice ?? undefined,
-    routerFeeSubaccountNumber: order.routerFeeSubaccountNumber ?? undefined,
-    routerFeeSubaccountOwner: order.routerFeeSubaccountOwner ?? undefined,
+    routerFeeOwner: order.routerFeeOwner ?? undefined,
     subaccountNumber,
   };
 }
@@ -488,10 +507,14 @@ export function redisOrderToResponseObject(
   );
   return {
     id: redisOrder.id,
-    subaccountId: SubaccountTable.subaccountIdToUuid(redisOrder.order!.orderId!.subaccountId!),
+    subaccountId: SubaccountTable.subaccountIdToUuid(
+      redisOrder.order!.orderId!.subaccountId!,
+    ),
     clientId: redisOrder.order!.orderId!.clientId.toString(),
     clobPairId,
-    side: protocolTranslations.protocolOrderSideToOrderSide(redisOrder.order!.side),
+    side: protocolTranslations.protocolOrderSideToOrderSide(
+      redisOrder.order!.side,
+    ),
     size: redisOrder.size,
     totalFilled: '0',
     price: redisOrder.price,
@@ -500,15 +523,16 @@ export function redisOrderToResponseObject(
     timeInForce: apiTranslations.orderTIFToAPITIF(orderTIF),
     postOnly: apiTranslations.isOrderTIFPostOnly(orderTIF),
     reduceOnly: redisOrder.order!.reduceOnly,
-    goodTilBlock: protocolTranslations.getGoodTilBlock(redisOrder.order!)
-      ?.toString() ?? undefined,
-    goodTilBlockTime: protocolTranslations.getGoodTilBlockTime(redisOrder.order!) ?? undefined,
+    goodTilBlock:
+      protocolTranslations.getGoodTilBlock(redisOrder.order!)?.toString() ??
+      undefined,
+    goodTilBlockTime:
+      protocolTranslations.getGoodTilBlockTime(redisOrder.order!) ?? undefined,
     ticker: perpetualMarketRefresher.getPerpetualMarketTicker(clobPairId)!,
     orderFlags: redisOrder.order!.orderId!.orderFlags.toString(),
     clientMetadata: redisOrder.order!.clientMetadata.toString(),
     routerFeePpm: redisOrder.order!.routerFeePpm.toString(),
-    routerFeeSubaccountOwner: redisOrder.order!.routerFeeSubaccountOwner ?? undefined,
-    routerFeeSubaccountNumber: redisOrder.order!.routerFeeSubaccountNumber?.toString() ?? undefined,
+    routerFeeOwner: redisOrder.order!.routerFeeOwner ?? undefined,
     subaccountNumber: redisOrder.order!.orderId!.subaccountId!.number,
   };
 }
@@ -529,7 +553,10 @@ export function candlesToSparklineResponseObject(
   );
   return _.reduce(
     unsortedTickerCandles,
-    (accumulator: { [ticker: string]: string[] }, candle: CandleFromDatabase) => {
+    (
+      accumulator: { [ticker: string]: string[] },
+      candle: CandleFromDatabase,
+    ) => {
       if (accumulator[candle.ticker].length < limit) {
         accumulator[candle.ticker].push(candle[CandleColumns.close]);
       }
@@ -537,7 +564,8 @@ export function candlesToSparklineResponseObject(
       // Since candles are sorted by startedAt in descending order, the first 'limit' candles
       // will be the most recent candles.
       return accumulator;
-    }, response,
+    },
+    response,
   );
 }
 
@@ -550,5 +578,18 @@ export function yieldParamsToResponseObject(
     assetYieldIndex: yieldParams.assetYieldIndex,
     createdAt: yieldParams.createdAt,
     createdAtHeight: yieldParams.createdAtHeight,
+  };
+}
+
+export function collateralPoolToResponseObject(
+  collateralPool: CollateralPoolFromDatabase,
+): CollateralPoolsResponseObject {
+  return {
+    id: collateralPool.id.toString(),
+    maxCumulativeInsuranceFundDeltaPerBlock:
+      collateralPool.maxCumulativeInsuranceFundDeltaPerBlock.toString(),
+    multiCollateralAssets:
+      collateralPool.multiCollateralAssets as unknown as number[],
+    quoteAssetId: collateralPool.quoteAssetId.toString(),
   };
 }

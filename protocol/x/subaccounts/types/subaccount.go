@@ -81,7 +81,7 @@ func (m *Subaccount) SetTDaiAssetPosition(newTDaiPosition *big.Int) {
 	TDaiAssetPosition := m.getTDaiAssetPosition()
 	if newTDaiPosition == nil || newTDaiPosition.Sign() == 0 {
 		if TDaiAssetPosition != nil {
-			m.AssetPositions = m.AssetPositions[1:]
+			m.removeTDaiAssetPosition()
 		}
 	} else {
 		if TDaiAssetPosition == nil {
@@ -99,9 +99,80 @@ func (m *Subaccount) getTDaiAssetPosition() *AssetPosition {
 		return nil
 	}
 
-	firstAsset := m.AssetPositions[0]
-	if firstAsset.AssetId != assettypes.AssetTDai.Id {
+	for _, assetPosition := range m.AssetPositions {
+		if assetPosition.AssetId == assettypes.AssetTDai.Id {
+			return assetPosition
+		}
+	}
+	return nil
+}
+
+func (m *Subaccount) removeTDaiAssetPosition() {
+	if m == nil || len(m.AssetPositions) == 0 {
+		return
+	}
+
+	for i, assetPosition := range m.AssetPositions {
+		if assetPosition.AssetId == assettypes.AssetTDai.Id {
+			// Remove the TDai asset position from the slice
+			m.AssetPositions = append(m.AssetPositions[:i], m.AssetPositions[i+1:]...)
+			return
+		}
+	}
+}
+
+func (m *Subaccount) getAssetPosition(assetId uint32) *AssetPosition {
+	if m == nil || len(m.AssetPositions) == 0 {
 		return nil
 	}
-	return firstAsset
+
+	for _, assetPosition := range m.AssetPositions {
+		if assetPosition.AssetId == assetId {
+			return assetPosition
+		}
+	}
+	return nil
+}
+
+func (m *Subaccount) GetAssetPosition(assetId uint32) *big.Int {
+	assetPosition := m.getAssetPosition(assetId)
+	if assetPosition == nil {
+		return new(big.Int)
+	}
+	return assetPosition.GetBigQuantums()
+}
+
+func (m *Subaccount) SetAssetPosition(newAssetPosition *big.Int, assetId uint32) {
+	if m == nil {
+		return
+	}
+
+	assetPosition := m.getAssetPosition(assetId)
+	if newAssetPosition == nil || newAssetPosition.Sign() == 0 {
+		if assetPosition != nil {
+			m.removeAssetPosition(assetId)
+		}
+	} else {
+		if assetPosition == nil {
+			assetPosition = &AssetPosition{
+				AssetId: assetId,
+			}
+			m.AssetPositions = append([]*AssetPosition{assetPosition}, m.AssetPositions...)
+		}
+		assetPosition.Quantums = dtypes.NewIntFromBigInt(newAssetPosition)
+	}
+}
+
+func (m *Subaccount) removeAssetPosition(assetId uint32) {
+	if m == nil || len(m.AssetPositions) == 0 {
+		return
+	}
+
+	for i, assetPosition := range m.AssetPositions {
+		if assetPosition.AssetId == assetId {
+			// Remove the asset position from the slice
+			m.AssetPositions = append(m.AssetPositions[:i], m.AssetPositions[i+1:]...)
+			return
+		}
+	}
 }

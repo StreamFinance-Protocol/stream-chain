@@ -1,6 +1,7 @@
 package types
 
 import (
+	assettypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets/types"
 	epochstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/epochs/types"
 	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -47,4 +48,8 @@ type EpochsKeeper interface {
 	MustGetFundingSampleEpochInfo(
 		ctx sdk.Context,
 	) epochstypes.EpochInfo
+}
+
+type AssetsKeeper interface {
+	GetAsset(ctx sdk.Context, id uint32) (val assettypes.Asset, exists bool)
 }

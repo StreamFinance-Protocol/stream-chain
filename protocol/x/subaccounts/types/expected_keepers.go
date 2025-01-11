@@ -17,6 +17,7 @@ type ProductKeeper interface {
 		ctx sdk.Context,
 		id uint32,
 		bigQuantums *big.Int,
+		quoteCurrencyAtomicResolution int32,
 	) (
 		bigNetCollateralQuoteQuantums *big.Int,
 		err error,
@@ -25,6 +26,7 @@ type ProductKeeper interface {
 		ctx sdk.Context,
 		id uint32,
 		bigQuantums *big.Int,
+		quoteCurrencyAtomicResolution int32,
 	) (
 		bigInitialMarginQuoteQuantums *big.Int,
 		bigMaintenanceMarginQuoteQuantums *big.Int,
@@ -85,7 +87,15 @@ type PerpetualsKeeper interface {
 	GetInsuranceFundName(ctx sdk.Context, perpetualId uint32) (string, error)
 	GetInsuranceFundModuleAddress(ctx sdk.Context, perpetualId uint32) (sdk.AccAddress, error)
 	ModifyOpenInterest(ctx sdk.Context, perpetualId uint32, bigQuantums *big.Int) error
-	IsIsolatedPerpetual(ctx sdk.Context, perpetualId uint32) (bool, error)
+	GetCollateralPool(ctx sdk.Context, id uint32) (
+		collateralPool perptypes.CollateralPool,
+		err error,
+	)
+	GetCollateralPoolFromPerpetualId(ctx sdk.Context, perpetualId uint32) (
+		collateralPool perptypes.CollateralPool,
+		err error,
+	)
+	GetQuoteCurrencyAtomicResolutionFromPerpetualId(ctx sdk.Context, perpetualId uint32) (int32, error)
 }
 
 // BankKeeper defines the expected interface needed to retrieve account balances.

@@ -84,7 +84,6 @@ func TestGenesisState_Validate(t *testing.T) {
 						BankruptcyAdjustmentPpm:           lib.OneMillion + 1,
 						SpreadToMaintenanceMarginRatioPpm: 1,
 					},
-					MaxCumulativeInsuranceFundDelta: uint64(1_000_000_000_000),
 				},
 			},
 			expectedError: nil,
@@ -125,7 +124,6 @@ func TestGenesisState_Validate(t *testing.T) {
 						BankruptcyAdjustmentPpm:           lib.OneMillion,
 						SpreadToMaintenanceMarginRatioPpm: 0,
 					},
-					MaxCumulativeInsuranceFundDelta: uint64(1_000_000_000_000),
 				},
 			},
 			expectedError: errors.New(
@@ -141,7 +139,6 @@ func TestGenesisState_Validate(t *testing.T) {
 						BankruptcyAdjustmentPpm:           lib.OneMillion,
 						SpreadToMaintenanceMarginRatioPpm: lib.OneMillion + 1,
 					},
-					MaxCumulativeInsuranceFundDelta: uint64(1_000_000_000_000),
 				},
 			},
 		},
@@ -155,7 +152,6 @@ func TestGenesisState_Validate(t *testing.T) {
 						BankruptcyAdjustmentPpm:           0,
 						SpreadToMaintenanceMarginRatioPpm: lib.OneMillion,
 					},
-					MaxCumulativeInsuranceFundDelta: uint64(1_000_000_000_000),
 				},
 			},
 			expectedError: errors.New(
@@ -171,7 +167,6 @@ func TestGenesisState_Validate(t *testing.T) {
 						BankruptcyAdjustmentPpm:           lib.OneMillion - 1,
 						SpreadToMaintenanceMarginRatioPpm: lib.OneMillion,
 					},
-					MaxCumulativeInsuranceFundDelta: uint64(1_000_000_000_000),
 				},
 			},
 			expectedError: errors.New(
@@ -180,11 +175,10 @@ func TestGenesisState_Validate(t *testing.T) {
 		"max liquidation fee ppm of zero is invalid": {
 			genState: &types.GenesisState{
 				LiquidationsConfig: types.LiquidationsConfig{
-					InsuranceFundFeePpm:             0,
-					ValidatorFeePpm:                 200_000,
-					LiquidityFeePpm:                 800_000,
-					FillablePriceConfig:             constants.FillablePriceConfig_Default,
-					MaxCumulativeInsuranceFundDelta: uint64(1_000_000_000_000),
+					InsuranceFundFeePpm: 0,
+					ValidatorFeePpm:     200_000,
+					LiquidityFeePpm:     800_000,
+					FillablePriceConfig: constants.FillablePriceConfig_Default,
 				},
 			},
 			expectedError: errors.New(
@@ -193,11 +187,10 @@ func TestGenesisState_Validate(t *testing.T) {
 		"max liquidation fee ppm of greater than one million is invalid": {
 			genState: &types.GenesisState{
 				LiquidationsConfig: types.LiquidationsConfig{
-					InsuranceFundFeePpm:             lib.OneMillion + 1,
-					ValidatorFeePpm:                 200_000,
-					LiquidityFeePpm:                 800_000,
-					FillablePriceConfig:             constants.FillablePriceConfig_Default,
-					MaxCumulativeInsuranceFundDelta: uint64(1_000_000_000_000),
+					InsuranceFundFeePpm: lib.OneMillion + 1,
+					ValidatorFeePpm:     200_000,
+					LiquidityFeePpm:     800_000,
+					FillablePriceConfig: constants.FillablePriceConfig_Default,
 				},
 			},
 			expectedError: errors.New(

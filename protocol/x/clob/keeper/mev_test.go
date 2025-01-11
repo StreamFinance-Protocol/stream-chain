@@ -854,7 +854,7 @@ func TestRecordMevMetrics(t *testing.T) {
 			mockBankKeeper.On(
 				"GetBalance",
 				mock.Anything,
-				perptypes.InsuranceFundModuleAddress,
+				perptypes.BaseCollateralPoolInsuranceFundModuleAddress,
 				constants.TDai.Denom,
 			).Return(
 				sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int))),
@@ -865,7 +865,6 @@ func TestRecordMevMetrics(t *testing.T) {
 			ctx := ks.Ctx.WithIsCheckTx(true)
 
 			// Create the default markets.
-			keepertest.CreateTestMarkets(t, ctx, ks.PricesKeeper)
 			err := ks.PricesKeeper.UpdateSpotAndPnlMarketPrices(
 				ctx,
 				&pricestypes.MarketPriceUpdate{
@@ -879,12 +878,9 @@ func TestRecordMevMetrics(t *testing.T) {
 
 			// Create liquidity tiers.
 			keepertest.CreateTestLiquidityTiers(t, ctx, ks.PerpetualsKeeper)
+			keepertest.CreateTestCollateralPools(t, ctx, ks.PerpetualsKeeper)
 
 			require.NoError(t, ks.FeeTiersKeeper.SetPerpetualFeeParams(ctx, tc.feeParams))
-
-			// Set up tDAI asset in assets module.
-			err = keepertest.CreateTDaiAsset(ctx, ks.AssetsKeeper)
-			require.NoError(t, err)
 
 			// Create all perpetuals.
 			for _, p := range tc.perpetuals {
@@ -896,9 +892,8 @@ func TestRecordMevMetrics(t *testing.T) {
 					p.Params.AtomicResolution,
 					p.Params.DefaultFundingPpm,
 					p.Params.LiquidityTier,
-					p.Params.MarketType,
 					p.Params.DangerIndexPpm,
-					p.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
+					p.Params.CollateralPoolId,
 					p.YieldIndex,
 				)
 				require.NoError(t, err)
@@ -1269,17 +1264,11 @@ func TestGetMidPrices(t *testing.T) {
 			ks.RatelimitKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
 			ctx := ks.Ctx.WithIsCheckTx(true)
 
-			// Create the default markets.
-			keepertest.CreateTestMarkets(t, ctx, ks.PricesKeeper)
-
 			// Create liquidity tiers.
 			keepertest.CreateTestLiquidityTiers(t, ctx, ks.PerpetualsKeeper)
+			keepertest.CreateTestCollateralPools(t, ctx, ks.PerpetualsKeeper)
 
 			require.NoError(t, ks.FeeTiersKeeper.SetPerpetualFeeParams(ctx, constants.PerpetualFeeParams))
-
-			// Set up tDAI asset in assets module.
-			err := keepertest.CreateTDaiAsset(ctx, ks.AssetsKeeper)
-			require.NoError(t, err)
 
 			// Create all perpetuals.
 			for _, p := range tc.perpetuals {
@@ -1291,9 +1280,8 @@ func TestGetMidPrices(t *testing.T) {
 					p.Params.AtomicResolution,
 					p.Params.DefaultFundingPpm,
 					p.Params.LiquidityTier,
-					p.Params.MarketType,
 					p.Params.DangerIndexPpm,
-					p.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
+					p.Params.CollateralPoolId,
 					p.YieldIndex,
 				)
 				require.NoError(t, err)
@@ -1306,7 +1294,7 @@ func TestGetMidPrices(t *testing.T) {
 
 			// Create all CLOBs.
 			for _, clobPair := range tc.clobPairs {
-				_, err = ks.ClobKeeper.CreatePerpetualClobPair(
+				_, err := ks.ClobKeeper.CreatePerpetualClobPair(
 					ctx,
 					clobPair.Id,
 					clobtest.MustPerpetualId(clobPair),

@@ -9,7 +9,6 @@ import (
 	v1types "github.com/StreamFinance-Protocol/stream-chain/protocol/indexer/protocol/v1/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/constants"
 	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
-	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
 	"github.com/stretchr/testify/require"
 )
@@ -337,8 +336,7 @@ func TestOrderToIndexerOrderV1(t *testing.T) {
 				ConditionType:                   v1.OrderConditionTypeToIndexerOrderConditionType(shortTermOrder.ConditionType),
 				ConditionalOrderTriggerSubticks: shortTermOrder.ConditionalOrderTriggerSubticks,
 				RouterFeePpm:                    int32(0),
-				RouterFeeSubaccountOwner:        v1.HandleEmptyRouterSubaccountIdForOwner(shortTermOrder),
-				RouterFeeSubaccountNumber:       v1.HandleEmptyRouterSubaccountIdForNumber(shortTermOrder),
+				RouterFeeOwner:                  v1.HandleEmptyRouterSubaccountIdForOwner(shortTermOrder),
 			},
 		},
 		"Maps stateful order to IndexerOrderV1": {
@@ -365,8 +363,7 @@ func TestOrderToIndexerOrderV1(t *testing.T) {
 				ConditionType:                   v1.OrderConditionTypeToIndexerOrderConditionType(statefulOrder.ConditionType),
 				ConditionalOrderTriggerSubticks: statefulOrder.ConditionalOrderTriggerSubticks,
 				RouterFeePpm:                    int32(0),
-				RouterFeeSubaccountOwner:        v1.HandleEmptyRouterSubaccountIdForOwner(statefulOrder),
-				RouterFeeSubaccountNumber:       v1.HandleEmptyRouterSubaccountIdForNumber(statefulOrder),
+				RouterFeeOwner:                  v1.HandleEmptyRouterSubaccountIdForOwner(statefulOrder),
 			},
 		},
 	}
@@ -431,34 +428,6 @@ func TestConvertToClobPairStatus(t *testing.T) {
 					v1.ConvertToClobPairStatus(tc.status),
 				)
 			}
-		})
-	}
-}
-
-func TestConvertToPerpetualMarketType(t *testing.T) {
-	type convertToPerpetualMarketTypeTestCase struct {
-		status         perptypes.PerpetualMarketType
-		expectedStatus v1types.PerpetualMarketType
-	}
-
-	tests := make(map[string]convertToPerpetualMarketTypeTestCase)
-	// Iterate through all the values for PerpetualMarketType to create test cases.
-	for name, value := range perptypes.PerpetualMarketType_value {
-		testName := fmt.Sprintf("Converts PerpetualMarketType %s to v1.PerpetualMarketType", name)
-		testCase := convertToPerpetualMarketTypeTestCase{
-			status:         perptypes.PerpetualMarketType(value),
-			expectedStatus: v1types.PerpetualMarketType(perptypes.PerpetualMarketType_value[name]),
-		}
-		tests[testName] = testCase
-	}
-
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
-			require.Equal(
-				t,
-				tc.expectedStatus,
-				v1.ConvertToPerpetualMarketType(tc.status),
-			)
 		})
 	}
 }

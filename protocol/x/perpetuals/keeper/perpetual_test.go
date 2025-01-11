@@ -8,6 +8,8 @@ import (
 	"testing"
 
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/app/module"
+	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets"
+	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices"
 
 	errorsmod "cosmossdk.io/errors"
 	"github.com/cosmos/gogoproto/proto"
@@ -26,6 +28,7 @@ import (
 	"cosmossdk.io/store/prefix"
 	indexerevents "github.com/StreamFinance-Protocol/stream-chain/protocol/indexer/events"
 	big_testutil "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/big"
+	cptest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/collateral_pool"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/constants"
 	keepertest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/keeper"
 	lttest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/liquidity_tier"
@@ -33,6 +36,7 @@ import (
 	perptest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/perpetuals"
 	pricefeed_testutil "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/pricefeed"
 	pricestest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/prices"
+	assettypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets/types"
 	epochstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/epochs/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
@@ -66,8 +70,7 @@ func assertPerpetualtUpdateEventsInIndexerBlock(
 			perp.Params.GetAtomicResolution(),
 			perp.Params.GetLiquidityTier(),
 			perp.Params.GetDangerIndexPpm(),
-			lib.UintToString(perp.Params.GetIsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock()),
-			perp.GetYieldIndex(),
+			perp.YieldIndex,
 		)
 
 		for _, event := range perpetualEvents {
@@ -81,8 +84,8 @@ func assertPerpetualtUpdateEventsInIndexerBlock(
 func TestModifyPerpetual_Success(t *testing.T) {
 	pc := keepertest.PerpetualsKeepers(t)
 	numLiquidityTiers := 4
-	// Create liquidity tiers and perpetuals,
-	perps := keepertest.CreateLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 100)
+
+	perps := keepertest.CreateCollateralPoolsAndLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 100)
 	numMarkets := keepertest.GetNumMarkets(t, pc.Ctx, pc.PricesKeeper)
 	expectedIndexerEvents := make([]*indexerevents.UpdatePerpetualEventV1, len(perps))
 	for i, item := range perps {
@@ -99,27 +102,25 @@ func TestModifyPerpetual_Success(t *testing.T) {
 			marketId,
 			defaultFundingPpm,
 			liquidityTier,
-			uint32(0),
-			uint64(1000000),
+			0,
 		)
 		require.NoError(t, err)
 
 		// Record the indexer event expected to emit from above `ModifyPerpetual`.
-		defaultPerpYieldIndex := "0/1"
 		expectedIndexerEvents[i] = &indexerevents.UpdatePerpetualEventV1{
 			Id:               item.Params.Id,
 			Ticker:           ticker,
 			MarketId:         marketId,
 			AtomicResolution: item.Params.AtomicResolution,
 			LiquidityTier:    liquidityTier,
-			PerpYieldIndex:   defaultPerpYieldIndex,
 			DangerIndexPpm:   uint32(0),
-			IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: "1000000",
+			PerpYieldIndex:   "0/1",
 		}
 
 		// Verify updatedp perpetual in store.
 		newItem, err := pc.PerpetualsKeeper.GetPerpetual(pc.Ctx, item.Params.Id)
 		require.NoError(t, err)
+
 		require.Equal(
 			t,
 			retItem,
@@ -157,8 +158,8 @@ func TestModifyPerpetual_Success(t *testing.T) {
 		)
 		require.Equal(
 			t,
-			uint64(1000000),
-			newItem.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
+			uint32(0),
+			newItem.Params.CollateralPoolId,
 		)
 	}
 
@@ -192,17 +193,16 @@ func getUpdatePerpetualEventsFromIndexerBlock(
 
 func TestCreatePerpetual_Failure(t *testing.T) {
 	tests := map[string]struct {
-		id                                                    uint32
-		ticker                                                string
-		marketId                                              uint32
-		atomicResolution                                      int32
-		defaultFundingPpm                                     int32
-		liquidityTier                                         uint32
-		marketType                                            types.PerpetualMarketType
-		dangerIndexPpm                                        uint32
-		isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock uint64
-		expectedError                                         error
-		yieldIndex                                            string
+		id                uint32
+		ticker            string
+		marketId          uint32
+		atomicResolution  int32
+		defaultFundingPpm int32
+		liquidityTier     uint32
+		dangerIndexPpm    uint32
+		collateralPoolId  uint32
+		expectedError     error
+		yieldIndex        string
 	}{
 		"Price doesn't exist": {
 			id:                0,
@@ -211,11 +211,9 @@ func TestCreatePerpetual_Failure(t *testing.T) {
 			atomicResolution:  -10,
 			defaultFundingPpm: 0,
 			liquidityTier:     0,
-			marketType:        types.PerpetualMarketType_PERPETUAL_MARKET_TYPE_CROSS,
 			dangerIndexPpm:    0,
-			isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: uint64(0),
-			expectedError: errorsmod.Wrap(pricestypes.ErrMarketPriceDoesNotExist, fmt.Sprint(999)),
-			yieldIndex:    "0/1",
+			expectedError:     errorsmod.Wrap(pricestypes.ErrMarketPriceDoesNotExist, fmt.Sprint(999)),
+			yieldIndex:        "0/1",
 		},
 		"Positive default funding magnitude exceeds maximum": {
 			id:                0,
@@ -224,10 +222,8 @@ func TestCreatePerpetual_Failure(t *testing.T) {
 			atomicResolution:  -10,
 			defaultFundingPpm: int32(lib.OneMillion + 1),
 			liquidityTier:     0,
-			marketType:        types.PerpetualMarketType_PERPETUAL_MARKET_TYPE_CROSS,
 			yieldIndex:        "0/1",
 			dangerIndexPpm:    0,
-			isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: uint64(0),
 			expectedError: errorsmod.Wrap(
 				types.ErrDefaultFundingPpmMagnitudeExceedsMax,
 				fmt.Sprint(int32(lib.OneMillion+1)),
@@ -240,10 +236,8 @@ func TestCreatePerpetual_Failure(t *testing.T) {
 			atomicResolution:  -10,
 			defaultFundingPpm: 0 - int32(lib.OneMillion) - 1,
 			liquidityTier:     0,
-			marketType:        types.PerpetualMarketType_PERPETUAL_MARKET_TYPE_CROSS,
 			yieldIndex:        "0/1",
 			dangerIndexPpm:    0,
-			isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: uint64(0),
 			expectedError: errorsmod.Wrap(
 				types.ErrDefaultFundingPpmMagnitudeExceedsMax,
 				fmt.Sprint(0-int32(lib.OneMillion)-1),
@@ -256,11 +250,9 @@ func TestCreatePerpetual_Failure(t *testing.T) {
 			atomicResolution:  -10,
 			defaultFundingPpm: math.MinInt32,
 			liquidityTier:     0,
-			marketType:        types.PerpetualMarketType_PERPETUAL_MARKET_TYPE_CROSS,
 			yieldIndex:        "0/1",
 			dangerIndexPpm:    0,
-			isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: uint64(0),
-			expectedError: errorsmod.Wrap(types.ErrDefaultFundingPpmMagnitudeExceedsMax, fmt.Sprint(math.MinInt32)),
+			expectedError:     errorsmod.Wrap(types.ErrDefaultFundingPpmMagnitudeExceedsMax, fmt.Sprint(math.MinInt32)),
 		},
 		"Ticker is an empty string": {
 			id:                0,
@@ -269,27 +261,21 @@ func TestCreatePerpetual_Failure(t *testing.T) {
 			atomicResolution:  -10,
 			defaultFundingPpm: 0,
 			liquidityTier:     0,
-			marketType:        types.PerpetualMarketType_PERPETUAL_MARKET_TYPE_CROSS,
 			yieldIndex:        "0/1",
 			dangerIndexPpm:    0,
-			isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: uint64(0),
-			expectedError: types.ErrTickerEmptyString,
+			expectedError:     types.ErrTickerEmptyString,
 		},
-		"Invalid market type": {
+		"Collateral pool doesn't exist": {
 			id:                0,
-			ticker:            "",
+			ticker:            "ticker",
 			marketId:          0,
 			atomicResolution:  -10,
 			defaultFundingPpm: 0,
 			liquidityTier:     0,
-			marketType:        3,
 			yieldIndex:        "0/1",
 			dangerIndexPpm:    0,
-			isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: uint64(0),
-			expectedError: errorsmod.Wrap(
-				types.ErrInvalidMarketType,
-				fmt.Sprintf("market type %v", 3),
-			),
+			collateralPoolId:  9999,
+			expectedError:     errorsmod.Wrap(types.ErrCollateralPoolDoesNotExist, fmt.Sprint(9999)),
 		},
 	}
 
@@ -298,6 +284,7 @@ func TestCreatePerpetual_Failure(t *testing.T) {
 	keepertest.CreateNMarkets(t, pc.Ctx, pc.PricesKeeper, 1)
 	// Create Liquidity Tiers
 	keepertest.CreateTestLiquidityTiers(t, pc.Ctx, pc.PerpetualsKeeper)
+	keepertest.CreateTestCollateralPools(t, pc.Ctx, pc.PerpetualsKeeper)
 	// Run tests.
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
@@ -309,9 +296,8 @@ func TestCreatePerpetual_Failure(t *testing.T) {
 				tc.atomicResolution,
 				tc.defaultFundingPpm,
 				tc.liquidityTier,
-				tc.marketType,
 				tc.dangerIndexPpm,
-				tc.isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
+				tc.collateralPoolId,
 				tc.yieldIndex,
 			)
 
@@ -323,14 +309,14 @@ func TestCreatePerpetual_Failure(t *testing.T) {
 
 func TestModifyPerpetual_Failure(t *testing.T) {
 	tests := map[string]struct {
-		id                                                    uint32
-		ticker                                                string
-		marketId                                              uint32
-		defaultFundingPpm                                     int32
-		liquidityTier                                         uint32
-		dangerIndexPpm                                        uint32
-		isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock uint64
-		expectedError                                         error
+		id                uint32
+		ticker            string
+		marketId          uint32
+		defaultFundingPpm int32
+		liquidityTier     uint32
+		dangerIndexPpm    uint32
+		collateralPoolId  uint32
+		expectedError     error
 	}{
 		"Perpetual doesn't exist": {
 			id:                999,
@@ -339,18 +325,7 @@ func TestModifyPerpetual_Failure(t *testing.T) {
 			defaultFundingPpm: 0,
 			liquidityTier:     0,
 			dangerIndexPpm:    0,
-			isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: uint64(0),
-			expectedError: errorsmod.Wrap(types.ErrPerpetualDoesNotExist, fmt.Sprint(999)),
-		},
-		"Isolated market requires non zero max delta": {
-			id:                0,
-			ticker:            "ticker",
-			marketId:          999,
-			defaultFundingPpm: 0,
-			liquidityTier:     0,
-			dangerIndexPpm:    0,
-			isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: uint64(0),
-			expectedError: errorsmod.Wrap(types.ErrIsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlockZero, fmt.Sprint(0)),
+			expectedError:     errorsmod.Wrap(types.ErrPerpetualDoesNotExist, fmt.Sprint(999)),
 		},
 		"Price doesn't exist": {
 			id:                0,
@@ -359,8 +334,7 @@ func TestModifyPerpetual_Failure(t *testing.T) {
 			defaultFundingPpm: 0,
 			liquidityTier:     0,
 			dangerIndexPpm:    0,
-			isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: uint64(1_000_000),
-			expectedError: errorsmod.Wrap(pricestypes.ErrMarketPriceDoesNotExist, fmt.Sprint(999)),
+			expectedError:     errorsmod.Wrap(pricestypes.ErrMarketPriceDoesNotExist, fmt.Sprint(999)),
 		},
 		"Ticker is an empty string": {
 			id:                0,
@@ -369,8 +343,7 @@ func TestModifyPerpetual_Failure(t *testing.T) {
 			defaultFundingPpm: 0,
 			liquidityTier:     0,
 			dangerIndexPpm:    0,
-			isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: uint64(0),
-			expectedError: types.ErrTickerEmptyString,
+			expectedError:     types.ErrTickerEmptyString,
 		},
 		"Modified to empty liquidity tier": {
 			id:                0,
@@ -379,15 +352,14 @@ func TestModifyPerpetual_Failure(t *testing.T) {
 			defaultFundingPpm: 0,
 			liquidityTier:     999,
 			dangerIndexPpm:    0,
-			isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: uint64(1_000_000),
-			expectedError: errorsmod.Wrap(types.ErrLiquidityTierDoesNotExist, fmt.Sprint(999)),
+			expectedError:     errorsmod.Wrap(types.ErrLiquidityTierDoesNotExist, fmt.Sprint(999)),
 		},
 	}
 
 	// Test setup.
 	pc := keepertest.PerpetualsKeepers(t)
 	// Create liquidity tiers and perpetuals,
-	_ = keepertest.CreateLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 1)
+	_ = keepertest.CreateCollateralPoolsAndLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 1)
 
 	// Run tests.
 	for name, tc := range tests {
@@ -400,7 +372,6 @@ func TestModifyPerpetual_Failure(t *testing.T) {
 				tc.defaultFundingPpm,
 				tc.liquidityTier,
 				tc.dangerIndexPpm,
-				tc.isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
 			)
 
 			require.Error(t, err)
@@ -412,7 +383,7 @@ func TestModifyPerpetual_Failure(t *testing.T) {
 func TestGetPerpetual_Success(t *testing.T) {
 	pc := keepertest.PerpetualsKeepers(t)
 	// Create liquidity tiers and perpetuals,
-	perps := keepertest.CreateLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 10)
+	perps := keepertest.CreateCollateralPoolsAndLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 10)
 
 	for _, perp := range perps {
 		rst, err := pc.PerpetualsKeeper.GetPerpetual(pc.Ctx,
@@ -432,31 +403,13 @@ func TestHasPerpetual(t *testing.T) {
 
 	// Create liquidity tiers and perpetuals
 	keepertest.CreateTestLiquidityTiers(t, pc.Ctx, pc.PerpetualsKeeper)
+	keepertest.CreateTestCollateralPools(t, pc.Ctx, pc.PerpetualsKeeper)
 	perps := []types.Perpetual{
 		*perptest.GeneratePerpetual(perptest.WithId(0)),
 		*perptest.GeneratePerpetual(perptest.WithId(5)),
 		*perptest.GeneratePerpetual(perptest.WithId(20)),
 		*perptest.GeneratePerpetual(perptest.WithId(999)),
 	}
-
-	_, err := pc.PricesKeeper.CreateMarket(
-		pc.Ctx,
-		pricestypes.MarketParam{
-			Id:                 0,
-			Pair:               "marketName",
-			Exponent:           -10,
-			MinExchanges:       uint32(1),
-			MinPriceChangePpm:  uint32(50),
-			ExchangeConfigJson: "{}",
-		},
-		pricestypes.MarketPrice{
-			Id:        0,
-			Exponent:  -10,
-			SpotPrice: 1_000, // leave this as a placeholder b/c we cannot set the price to 0
-			PnlPrice:  1_000, // leave this as a placeholder b/c we cannot set the price to 0
-		},
-	)
-	require.NoError(t, err)
 
 	for perp := range perps {
 		_, err := pc.PerpetualsKeeper.CreatePerpetual(
@@ -467,9 +420,8 @@ func TestHasPerpetual(t *testing.T) {
 			perps[perp].Params.AtomicResolution,
 			perps[perp].Params.DefaultFundingPpm,
 			perps[perp].Params.LiquidityTier,
-			perps[perp].Params.MarketType,
 			perps[perp].Params.DangerIndexPpm,
-			perps[perp].Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
+			perps[perp].Params.CollateralPoolId,
 			perps[perp].YieldIndex,
 		)
 		require.NoError(t, err)
@@ -499,7 +451,7 @@ func TestGetPerpetual_NotFound(t *testing.T) {
 func TestGetPerpetuals_Success(t *testing.T) {
 	pc := keepertest.PerpetualsKeepers(t)
 	// Create liquidity tiers and perpetuals,
-	perps := keepertest.CreateLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 10)
+	perps := keepertest.CreateCollateralPoolsAndLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 10)
 
 	require.ElementsMatch(t,
 		nullify.Fill(perps), //nolint:staticcheck
@@ -513,6 +465,7 @@ func TestGetAllPerpetuals_Sorted(t *testing.T) {
 
 	// Create liquidity tiers and perpetuals
 	keepertest.CreateTestLiquidityTiers(t, pc.Ctx, pc.PerpetualsKeeper)
+	keepertest.CreateTestCollateralPools(t, pc.Ctx, pc.PerpetualsKeeper)
 	perps := []types.Perpetual{
 		*perptest.GeneratePerpetual(perptest.WithId(999)),
 		*perptest.GeneratePerpetual(perptest.WithId(5)),
@@ -520,25 +473,6 @@ func TestGetAllPerpetuals_Sorted(t *testing.T) {
 		*perptest.GeneratePerpetual(perptest.WithId(20)),
 		*perptest.GeneratePerpetual(perptest.WithId(1)),
 	}
-
-	_, err := pc.PricesKeeper.CreateMarket(
-		pc.Ctx,
-		pricestypes.MarketParam{
-			Id:                 0,
-			Pair:               "marketName",
-			Exponent:           -10,
-			MinExchanges:       uint32(1),
-			MinPriceChangePpm:  uint32(50),
-			ExchangeConfigJson: "{}",
-		},
-		pricestypes.MarketPrice{
-			Id:        0,
-			Exponent:  -10,
-			SpotPrice: 1_000, // leave this as a placeholder b/c we cannot set the price to 0
-			PnlPrice:  1_000, // leave this as a placeholder b/c we cannot set the price to 0
-		},
-	)
-	require.NoError(t, err)
 
 	for perp := range perps {
 		_, err := pc.PerpetualsKeeper.CreatePerpetual(
@@ -549,9 +483,8 @@ func TestGetAllPerpetuals_Sorted(t *testing.T) {
 			perps[perp].Params.AtomicResolution,
 			perps[perp].Params.DefaultFundingPpm,
 			perps[perp].Params.LiquidityTier,
-			perps[perp].Params.MarketType,
 			perps[perp].Params.DangerIndexPpm,
-			perps[perp].Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
+			perps[perp].Params.CollateralPoolId,
 			perps[perp].YieldIndex,
 		)
 		require.NoError(t, err)
@@ -595,7 +528,7 @@ func TestModifyOpenInterest_Failure(t *testing.T) {
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
 			pc := keepertest.PerpetualsKeepers(t)
-			perps := keepertest.CreateLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 1)
+			perps := keepertest.CreateCollateralPoolsAndLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 1)
 
 			// Set up initial open interest
 			require.NoError(t, pc.PerpetualsKeeper.ModifyOpenInterest(
@@ -617,7 +550,7 @@ func TestModifyOpenInterest_Failure(t *testing.T) {
 func TestModifyOpenInterest_Mixed(t *testing.T) {
 	pc := keepertest.PerpetualsKeepers(t)
 	// Create liquidity tiers and perpetuals,
-	perps := keepertest.CreateLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 100)
+	perps := keepertest.CreateCollateralPoolsAndLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 100)
 
 	for _, perp := range perps {
 		openInterestDeltaBaseQuantums := big.NewInt(2_000_000_000*(int64(perp.Params.Id)%2) - 1)
@@ -967,6 +900,8 @@ func TestGetMarginRequirements_Success(t *testing.T) {
 			)
 			require.NoError(t, err)
 
+			keepertest.CreateTestCollateralPools(t, pc.Ctx, pc.PerpetualsKeeper)
+
 			// Create `Perpetual` struct with baseAssetAtomicResolution and marketId.
 			perpetual, err := pc.PerpetualsKeeper.CreatePerpetual(
 				pc.Ctx,
@@ -976,7 +911,6 @@ func TestGetMarginRequirements_Success(t *testing.T) {
 				tc.baseCurrencyAtomicResolution, // AtomicResolution
 				int32(0),                        // DefaultFundingPpm
 				0,                               // LiquidityTier
-				types.PerpetualMarketType_PERPETUAL_MARKET_TYPE_CROSS,
 				0,
 				0,
 				"0/1",
@@ -997,6 +931,7 @@ func TestGetMarginRequirements_Success(t *testing.T) {
 				pc.Ctx,
 				perpetual.Params.Id,
 				tc.bigBaseQuantums,
+				assettypes.AssetTDai.AtomicResolution,
 			)
 			require.NoError(t, err)
 
@@ -1026,6 +961,7 @@ func TestGetMarginRequirements_PerpetualNotFound(t *testing.T) {
 		pc.Ctx,
 		nonExistentPerpetualId,
 		big.NewInt(-1),
+		assettypes.AssetTDai.AtomicResolution,
 	)
 	require.EqualError(t, err, errorsmod.Wrap(types.ErrPerpetualDoesNotExist, fmt.Sprint(nonExistentPerpetualId)).Error())
 	require.ErrorIs(t, err, types.ErrPerpetualDoesNotExist)
@@ -1035,7 +971,7 @@ func TestGetMarginRequirements_MarketNotFound(t *testing.T) {
 	pc := keepertest.PerpetualsKeepers(t)
 
 	// Create liquidity tiers and perpetuals,
-	perps := keepertest.CreateLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 1)
+	perps := keepertest.CreateCollateralPoolsAndLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 1)
 	perpetual := perps[0]
 
 	// Store the perpetual with a bad MarketId.
@@ -1051,6 +987,7 @@ func TestGetMarginRequirements_MarketNotFound(t *testing.T) {
 		pc.Ctx,
 		perpetual.Params.Id,
 		big.NewInt(-1),
+		assettypes.AssetTDai.AtomicResolution,
 	)
 
 	expectedErrorStr := fmt.Sprintf(
@@ -1066,7 +1003,7 @@ func TestGetMarginRequirements_LiquidityTierNotFound(t *testing.T) {
 	pc := keepertest.PerpetualsKeepers(t)
 
 	// Create liquidity tiers and perpetuals,
-	perps := keepertest.CreateLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 1)
+	perps := keepertest.CreateCollateralPoolsAndLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 1)
 	perpetual := perps[0]
 
 	// Store the perpetual with a bad LiquidityTier.
@@ -1082,6 +1019,7 @@ func TestGetMarginRequirements_LiquidityTierNotFound(t *testing.T) {
 		pc.Ctx,
 		perpetual.Params.Id,
 		big.NewInt(-1),
+		assettypes.AssetTDai.AtomicResolution,
 	)
 
 	require.EqualError(
@@ -1160,8 +1098,9 @@ func TestGetNetNotional_Success(t *testing.T) {
 			pc := keepertest.PerpetualsKeepers(t)
 			// Create liquidity tiers.
 			keepertest.CreateTestLiquidityTiers(t, pc.Ctx, pc.PerpetualsKeeper)
+			keepertest.CreateTestCollateralPools(t, pc.Ctx, pc.PerpetualsKeeper)
 			// Create a new market param and price.
-			marketId := uint32(0)
+			marketId := uint32(constants.DefaultMarketIdNotUsedInGenesis)
 			_, err := pc.PricesKeeper.CreateMarket(
 				pc.Ctx,
 				pricestypes.MarketParam{
@@ -1190,7 +1129,6 @@ func TestGetNetNotional_Success(t *testing.T) {
 				tc.baseCurrencyAtomicResolution, // AtomicResolution
 				int32(0),                        // DefaultFundingPpm
 				0,                               // LiquidityTier
-				types.PerpetualMarketType_PERPETUAL_MARKET_TYPE_CROSS,
 				0,
 				0,
 				"0/1",
@@ -1202,6 +1140,7 @@ func TestGetNetNotional_Success(t *testing.T) {
 				pc.Ctx,
 				perpetual.Params.Id,
 				tc.bigBaseQuantums,
+				assettypes.AssetTDai.AtomicResolution,
 			)
 			require.NoError(t, err)
 
@@ -1224,6 +1163,7 @@ func TestGetNetNotional_PerpetualNotFound(t *testing.T) {
 		pc.Ctx,
 		nonExistentPerpetualId,
 		big.NewInt(-1),
+		assettypes.AssetTDai.AtomicResolution,
 	)
 	require.EqualError(t, err, errorsmod.Wrap(types.ErrPerpetualDoesNotExist, fmt.Sprint(nonExistentPerpetualId)).Error())
 	require.ErrorIs(t, err, types.ErrPerpetualDoesNotExist)
@@ -1233,7 +1173,7 @@ func TestGetNetNotional_MarketNotFound(t *testing.T) {
 	pc := keepertest.PerpetualsKeepers(t)
 
 	// Create liquidity tiers and perpetuals,
-	perps := keepertest.CreateLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 1)
+	perps := keepertest.CreateCollateralPoolsAndLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 1)
 	perpetual := perps[0]
 
 	// Store the perpetual with a bad MarketId.
@@ -1249,172 +1189,7 @@ func TestGetNetNotional_MarketNotFound(t *testing.T) {
 		pc.Ctx,
 		perpetual.Params.Id,
 		big.NewInt(-1),
-	)
-	expectedErrorStr := fmt.Sprintf(
-		"Market ID %d does not exist on perpetual ID %d",
-		perpetual.Params.MarketId,
-		perpetual.Params.Id,
-	)
-	require.EqualError(t, err, errorsmod.Wrap(types.ErrMarketDoesNotExist, expectedErrorStr).Error())
-	require.ErrorIs(t, err, types.ErrMarketDoesNotExist)
-}
-
-func TestGetNotionalInBaseQuantums_Success(t *testing.T) {
-	tests := map[string]struct {
-		price                              uint64
-		exponent                           int32
-		baseCurrencyAtomicResolution       int32
-		bigQuoteQuantums                   *big.Int
-		bigExpectedNetNotionalBaseQuantums *big.Int
-	}{
-		"Positive exponent, atomic resolution 6, long position": {
-			price:                              5_555,
-			exponent:                           2,
-			baseCurrencyAtomicResolution:       -6,
-			bigQuoteQuantums:                   big.NewInt(3_888_500_000),
-			bigExpectedNetNotionalBaseQuantums: big.NewInt(7_000),
-		},
-		"Positive exponent, atomic resolution 6, short position": {
-			price:                              5_555,
-			exponent:                           2,
-			baseCurrencyAtomicResolution:       -6,
-			bigQuoteQuantums:                   big.NewInt(-3_888_500_000),
-			bigExpectedNetNotionalBaseQuantums: big.NewInt(-7_000),
-		},
-		"Negative exponent, atomic resolution 6, short position": {
-			price:                              5_555,
-			exponent:                           -2,
-			baseCurrencyAtomicResolution:       -6,
-			bigQuoteQuantums:                   big.NewInt(-388_850),
-			bigExpectedNetNotionalBaseQuantums: big.NewInt(-7_000),
-		},
-		"Zero exponent, atomic resolution 6, short position": {
-			price:                              5_555,
-			exponent:                           0,
-			baseCurrencyAtomicResolution:       -6,
-			bigQuoteQuantums:                   big.NewInt(-38_885_000),
-			bigExpectedNetNotionalBaseQuantums: big.NewInt(-7_000),
-		},
-		"Positive exponent, atomic resolution 4, long position": {
-			price:                              5_555,
-			exponent:                           4,
-			baseCurrencyAtomicResolution:       -4,
-			bigQuoteQuantums:                   big.NewInt(38_885_000_000_000),
-			bigExpectedNetNotionalBaseQuantums: big.NewInt(7_000),
-		},
-		"Positive exponent, atomic resolution 0, long position": {
-			price:                              5_555,
-			exponent:                           4,
-			baseCurrencyAtomicResolution:       -0,
-			bigQuoteQuantums:                   big.NewInt(388_850_000_000_000_000),
-			bigExpectedNetNotionalBaseQuantums: big.NewInt(7_000),
-		},
-		"Price and quantums are max uints": {
-			price:                        math.MaxUint64,
-			exponent:                     1,
-			baseCurrencyAtomicResolution: -6,
-			bigQuoteQuantums: big_testutil.MustFirst(
-				new(big.Int).SetString("3402823669209384634264811192843491082250", 10),
-			),
-			bigExpectedNetNotionalBaseQuantums: new(big.Int).SetUint64(math.MaxUint64),
-		},
-	}
-
-	// Run tests.
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
-			// Test suite setup.
-			pc := keepertest.PerpetualsKeepers(t)
-			// Create liquidity tiers.
-			keepertest.CreateTestLiquidityTiers(t, pc.Ctx, pc.PerpetualsKeeper) // Create a new market param and price.
-			marketId := keepertest.GetNumMarkets(t, pc.Ctx, pc.PricesKeeper)
-			_, err := pc.PricesKeeper.CreateMarket(
-				pc.Ctx,
-				pricestypes.MarketParam{
-					Id:                 marketId,
-					Pair:               "marketName",
-					Exponent:           tc.exponent,
-					MinExchanges:       uint32(1),
-					MinPriceChangePpm:  uint32(50),
-					ExchangeConfigJson: "{}",
-				},
-				pricestypes.MarketPrice{
-					Id:        marketId,
-					Exponent:  tc.exponent,
-					SpotPrice: tc.price,
-					PnlPrice:  tc.price,
-				},
-			)
-			require.NoError(t, err)
-
-			// Create `Perpetual` struct with baseAssetAtomicResolution and marketId.
-			perpetual, err := pc.PerpetualsKeeper.CreatePerpetual(
-				pc.Ctx,
-				0,                               // PerpetualId
-				"GetNetNotionalTicker",          // Ticker
-				marketId,                        // MarketId
-				tc.baseCurrencyAtomicResolution, // AtomicResolution
-				int32(0),                        // DefaultFundingPpm
-				0,                               // LiquidityTier
-				types.PerpetualMarketType_PERPETUAL_MARKET_TYPE_CROSS,
-				0,
-				0,
-				"0/1",
-			)
-			require.NoError(t, err)
-
-			// Verify collateral requirements are calculated correctly.
-			bigNotionalBaseQuantums, err := pc.PerpetualsKeeper.GetNotionalInBaseQuantums(
-				pc.Ctx,
-				perpetual.Params.Id,
-				tc.bigQuoteQuantums,
-			)
-			require.NoError(t, err)
-
-			if tc.bigExpectedNetNotionalBaseQuantums.Cmp(bigNotionalBaseQuantums) != 0 {
-				t.Fatalf(
-					"%s: expectedNetNotionalBaseQuantums: %s, collateralBaseQuantums: %s",
-					name,
-					tc.bigExpectedNetNotionalBaseQuantums.String(),
-					bigNotionalBaseQuantums.String(),
-				)
-			}
-		})
-	}
-}
-
-func TestGetNotionalInBaseQuantums_PerpetualNotFound(t *testing.T) {
-	pc := keepertest.PerpetualsKeepers(t)
-	nonExistentPerpetualId := uint32(0)
-	_, err := pc.PerpetualsKeeper.GetNotionalInBaseQuantums(
-		pc.Ctx,
-		nonExistentPerpetualId,
-		big.NewInt(-1),
-	)
-	require.EqualError(t, err, errorsmod.Wrap(types.ErrPerpetualDoesNotExist, fmt.Sprint(nonExistentPerpetualId)).Error())
-	require.ErrorIs(t, err, types.ErrPerpetualDoesNotExist)
-}
-
-func TestGetNotionalInBaseQuantums_MarketNotFound(t *testing.T) {
-	pc := keepertest.PerpetualsKeepers(t)
-
-	// Create liquidity tiers and perpetuals,
-	perps := keepertest.CreateLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 1)
-	perpetual := perps[0]
-
-	// Store the perpetual with a bad MarketId.
-	nonExistentMarketId := uint32(999)
-	perpetual.Params.MarketId = nonExistentMarketId
-	cdc := codec.NewProtoCodec(module.InterfaceRegistry)
-	b := cdc.MustMarshal(&perpetual)
-	perpetualStore := prefix.NewStore(pc.Ctx.KVStore(pc.StoreKey), []byte(types.PerpetualKeyPrefix))
-	perpetualStore.Set(lib.Uint32ToKey(perpetual.Params.Id), b)
-
-	// Getting margin requirements for perpetual with bad MarketId should return an error.
-	_, err := pc.PerpetualsKeeper.GetNotionalInBaseQuantums(
-		pc.Ctx,
-		perpetual.Params.Id,
-		big.NewInt(-1),
+		assettypes.AssetTDai.AtomicResolution,
 	)
 	expectedErrorStr := fmt.Sprintf(
 		"Market ID %d does not exist on perpetual ID %d",
@@ -1493,6 +1268,7 @@ func TestGetNetCollateral_Success(t *testing.T) {
 			pc := keepertest.PerpetualsKeepers(t)
 			// Create liquidity tiers.
 			keepertest.CreateTestLiquidityTiers(t, pc.Ctx, pc.PerpetualsKeeper) // Test setup.
+			keepertest.CreateTestCollateralPools(t, pc.Ctx, pc.PerpetualsKeeper)
 			// Create a new market.
 			marketId := keepertest.GetNumMarkets(t, pc.Ctx, pc.PricesKeeper)
 			_, err := pc.PricesKeeper.CreateMarket(
@@ -1523,7 +1299,6 @@ func TestGetNetCollateral_Success(t *testing.T) {
 				tc.baseCurrencyAtomicResolution, // AtomicResolution
 				int32(0),                        // DefaultFundingPpm
 				0,
-				types.PerpetualMarketType_PERPETUAL_MARKET_TYPE_CROSS,
 				0,
 				0,
 				"0/1",
@@ -1535,6 +1310,7 @@ func TestGetNetCollateral_Success(t *testing.T) {
 				pc.Ctx,
 				perpetual.Params.Id,
 				tc.bigBaseQuantums,
+				assettypes.AssetTDai.AtomicResolution,
 			)
 			require.NoError(t, err)
 
@@ -1557,6 +1333,7 @@ func TestGetNetCollateral_PerpetualNotFound(t *testing.T) {
 		pc.Ctx,
 		nonExistentPerpetualId,
 		big.NewInt(-1),
+		assettypes.AssetTDai.AtomicResolution,
 	)
 	require.EqualError(t, err, errorsmod.Wrap(types.ErrPerpetualDoesNotExist, fmt.Sprint(nonExistentPerpetualId)).Error())
 	require.ErrorIs(t, err, types.ErrPerpetualDoesNotExist)
@@ -1566,7 +1343,7 @@ func TestGetNetCollateral_MarketNotFound(t *testing.T) {
 	pc := keepertest.PerpetualsKeepers(t)
 
 	// Create liquidity tiers and perpetuals,
-	perps := keepertest.CreateLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 1)
+	perps := keepertest.CreateCollateralPoolsAndLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 1)
 	perpetual := perps[0]
 
 	// Store the perpetual with a bad MarketId.
@@ -1582,6 +1359,7 @@ func TestGetNetCollateral_MarketNotFound(t *testing.T) {
 		pc.Ctx,
 		perpetual.Params.Id,
 		big.NewInt(-1),
+		assettypes.AssetTDai.AtomicResolution,
 	)
 	expectedErrorStr := fmt.Sprintf(
 		"Market ID %d does not exist on perpetual ID %d",
@@ -1656,6 +1434,7 @@ func TestGetSettlementPpm_Success(t *testing.T) {
 			pc := keepertest.PerpetualsKeepers(t)
 			// Create liquidity tiers.
 			keepertest.CreateTestLiquidityTiers(t, pc.Ctx, pc.PerpetualsKeeper)
+			keepertest.CreateTestCollateralPools(t, pc.Ctx, pc.PerpetualsKeeper)
 			perps, err := keepertest.CreateNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 1)
 			require.NoError(t, err)
 
@@ -1703,7 +1482,7 @@ func TestGetSettlementPpm_PerpetualNotFound(t *testing.T) {
 func TestModifyFundingIndex_Success(t *testing.T) {
 	pc := keepertest.PerpetualsKeepers(t)
 	// Create liquidity tiers and perpetuals,
-	perps := keepertest.CreateLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 100)
+	perps := keepertest.CreateCollateralPoolsAndLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 100)
 
 	for _, perp := range perps {
 		testFundingIndexDelta := big.NewInt(2*(int64(perp.Params.Id)%2) - 1)
@@ -1763,7 +1542,7 @@ func TestModifyFundingIndex_IntegerOverflowUnderflow(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			pc := keepertest.PerpetualsKeepers(t)
 			// Create liquidity tiers and perpetuals,
-			_ = keepertest.CreateLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 1)
+			_ = keepertest.CreateCollateralPoolsAndLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 1)
 
 			// Set up intitial funding index, should succeed.
 			err := pc.PerpetualsKeeper.ModifyFundingIndex(
@@ -1800,7 +1579,7 @@ func TestModifyLastFundingRate_Success(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			pc := keepertest.PerpetualsKeepers(t)
 			// Create liquidity tiers and perpetuals,
-			_ = keepertest.CreateLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 1)
+			_ = keepertest.CreateCollateralPoolsAndLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 1)
 			err := pc.PerpetualsKeeper.ModifyLastFundingRate(pc.Ctx, tc.perpetualId, tc.lastFundingRateDelta)
 			require.NoError(t, err)
 			perpetual, err := pc.PerpetualsKeeper.GetPerpetual(pc.Ctx, tc.perpetualId)
@@ -2240,13 +2019,18 @@ func TestMaybeProcessNewFundingTickEpoch_ProcessNewEpoch(t *testing.T) {
 
 	for name, tc := range tests {
 		t.Run(name, func(*testing.T) {
-			pc := keepertest.PerpetualsKeepers(t)
+			memClob := &mocks.MemClob{}
+			memClob.On("SetClobKeeper", mock.Anything).Return()
+
+			mockIndexerEventManager := &mocks.IndexerEventManager{}
+
+			pc := keepertest.NewClobKeepersTestContext(t, memClob, &mocks.BankKeeper{}, mockIndexerEventManager, nil)
+
 			ctx := pc.Ctx.WithTxBytes(constants.TestTxBytes)
-			// Create the default markets.
-			keepertest.CreateTestMarkets(t, ctx, pc.PricesKeeper)
 
 			// Create liquidity tiers.
 			keepertest.CreateTestLiquidityTiers(t, ctx, pc.PerpetualsKeeper)
+			keepertest.CreateTestCollateralPools(t, ctx, pc.PerpetualsKeeper)
 
 			// Create test perpetuals.
 			// 1BTC = $50,000.
@@ -2260,9 +2044,8 @@ func TestMaybeProcessNewFundingTickEpoch_ProcessNewEpoch(t *testing.T) {
 					p.Params.AtomicResolution,
 					p.Params.DefaultFundingPpm,
 					p.Params.LiquidityTier,
-					p.Params.MarketType,
 					p.Params.DangerIndexPpm,
-					p.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
+					p.Params.CollateralPoolId,
 					p.YieldIndex,
 				)
 				require.NoError(t, err)
@@ -2400,9 +2183,6 @@ func TestMaybeProcessNewFundingTickEpoch_Failure(t *testing.T) {
 		t.Run(name, func(*testing.T) {
 			pc := keepertest.PerpetualsKeepers(t)
 
-			// Create the default markets.
-			keepertest.CreateTestMarkets(t, pc.Ctx, pc.PricesKeeper)
-
 			// Insert test funding sample.
 			keepertest.PopulateTestPremiumStore(
 				t,
@@ -2449,7 +2229,7 @@ func TestMaybeProcessNewFundingTickEpoch_NoNewEpoch(t *testing.T) {
 
 	pc := keepertest.PerpetualsKeepers(t)
 	// Create liquidity tiers and perpetuals,
-	perps := keepertest.CreateLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 100)
+	perps := keepertest.CreateCollateralPoolsAndLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 100)
 
 	err := pc.EpochsKeeper.CreateEpochInfo(
 		pc.Ctx,
@@ -2571,6 +2351,11 @@ func TestGetAddPremiumVotes_Success(t *testing.T) {
 				mock.Anything,
 				mock.Anything,
 			).Return(tc.samplePremiumPpm, nil)
+			mockPricePremiumGetter.On(
+				"GetQuoteCurrencyAtomicResolutionFromPerpetualId",
+				mock.Anything,
+				mock.Anything,
+			).Return(int32(-6), nil)
 
 			pc := keepertest.PerpetualsKeepersWithClobHelpers(t, &mockPricePremiumGetter)
 
@@ -2584,7 +2369,7 @@ func TestGetAddPremiumVotes_Success(t *testing.T) {
 			)
 
 			// Create liquidity tiers and perpetuals,
-			_ = keepertest.CreateLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, tc.numPerpetuals)
+			_ = keepertest.CreateCollateralPoolsAndLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, tc.numPerpetuals)
 
 			err := pc.EpochsKeeper.CreateEpochInfo(
 				pc.Ctx,
@@ -2714,7 +2499,7 @@ func TestAddPremiums_Success(t *testing.T) {
 
 		// Create liquidity tiers and perpetuals,
 		numPerpetuals := 10
-		perps := keepertest.CreateLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, numPerpetuals)
+		perps := keepertest.CreateCollateralPoolsAndLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, numPerpetuals)
 
 		// Insert one round of premiums for all perps.
 		firstPremiums := make([]types.FundingPremium, numPerpetuals)
@@ -2844,7 +2629,7 @@ func TestAddPremiums_NonExistingPerpetuals(t *testing.T) {
 		}
 
 		// Create liquidity tiers and perpetuals,
-		_ = keepertest.CreateLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 3)
+		_ = keepertest.CreateCollateralPoolsAndLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 3)
 
 		err := tc.addPremiumFunc(pc.PerpetualsKeeper, pc.Ctx, newPremiums)
 		require.ErrorIs(t, err, types.ErrPerpetualDoesNotExist)
@@ -3108,7 +2893,7 @@ func TestMaybeProcessNewFundingSampleEpoch(t *testing.T) {
 			require.NoError(t, err)
 
 			// Create liquidity tiers and perpetuals,
-			_ = keepertest.CreateLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 4)
+			_ = keepertest.CreateCollateralPoolsAndLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 4)
 			require.NoError(t, err)
 
 			params := pc.PerpetualsKeeper.GetParams(pc.Ctx)
@@ -3481,6 +3266,263 @@ func TestSetLiquidityTier_Existing_Failure(t *testing.T) {
 	}
 }
 
+func TestGetAllCollateralPools_Sorted(t *testing.T) {
+	// Setup context and keepers
+	pc := keepertest.PerpetualsKeepers(t)
+
+	// Create liquidity tiers and perpetuals
+	// keepertest.CreateTestLiquidityTiers(t, pc.Ctx, pc.PerpetualsKeeper)
+	pools := []types.CollateralPool{
+		*cptest.GenerateCollateralPool(cptest.WithCollateralPoolId(0)),
+		*cptest.GenerateCollateralPool(cptest.WithCollateralPoolId(100)),
+		*cptest.GenerateCollateralPool(cptest.WithCollateralPoolId(5)),
+		*cptest.GenerateCollateralPool(cptest.WithCollateralPoolId(72)),
+		*cptest.GenerateCollateralPool(cptest.WithCollateralPoolId(16)),
+	}
+
+	for _, pool := range pools {
+		_, err := pc.PerpetualsKeeper.UpsertCollateralPool(
+			pc.Ctx,
+			pool.CollateralPoolId,
+			pool.MaxCumulativeInsuranceFundDeltaPerBlock,
+			pool.MultiCollateralAssets,
+			pool.QuoteAssetId,
+		)
+		require.NoError(t, err)
+	}
+
+	got := pc.PerpetualsKeeper.GetAllCollateralPools(pc.Ctx)
+	require.Equal(
+		t,
+		[]types.CollateralPool{
+			*cptest.GenerateCollateralPool(cptest.WithCollateralPoolId(0)),
+			*cptest.GenerateCollateralPool(cptest.WithCollateralPoolId(5)),
+			*cptest.GenerateCollateralPool(cptest.WithCollateralPoolId(16)),
+			*cptest.GenerateCollateralPool(cptest.WithCollateralPoolId(72)),
+			*cptest.GenerateCollateralPool(cptest.WithCollateralPoolId(100)),
+		},
+		got,
+	)
+}
+
+func TestHasCollateralPool(t *testing.T) {
+	// Setup context and keepers
+	pc := keepertest.PerpetualsKeepers(t)
+
+	pools := []types.CollateralPool{
+		*cptest.GenerateCollateralPool(cptest.WithCollateralPoolId(0)),
+		*cptest.GenerateCollateralPool(cptest.WithCollateralPoolId(5)),
+		*cptest.GenerateCollateralPool(cptest.WithCollateralPoolId(16)),
+		*cptest.GenerateCollateralPool(cptest.WithCollateralPoolId(72)),
+		*cptest.GenerateCollateralPool(cptest.WithCollateralPoolId(100)),
+	}
+
+	for _, pool := range pools {
+		_, err := pc.PerpetualsKeeper.UpsertCollateralPool(
+			pc.Ctx,
+			pool.CollateralPoolId,
+			pool.MaxCumulativeInsuranceFundDeltaPerBlock,
+			pool.MultiCollateralAssets,
+			pool.QuoteAssetId,
+		)
+		require.NoError(t, err)
+	}
+
+	for _, pool := range pools {
+		// Test if HasCollateralPool correctly identifies an existing collateral pool.
+		require.True(t, pc.PerpetualsKeeper.HasCollateralPool(pc.Ctx, pool.CollateralPoolId))
+	}
+
+	found := pc.PerpetualsKeeper.HasCollateralPool(pc.Ctx, 9999)
+	require.False(t, found, "Expected not to find collateral pool with id 9999, but it was found")
+}
+
+func TestCreateCollateralPool_Success(t *testing.T) {
+	pc := keepertest.PerpetualsKeepers(t)
+	for _, pool := range constants.CollateralPools {
+		// Create CollateralPool without error.
+		_, err := pc.PerpetualsKeeper.UpsertCollateralPool(
+			pc.Ctx,
+			pool.CollateralPoolId,
+			pool.MaxCumulativeInsuranceFundDeltaPerBlock,
+			pool.MultiCollateralAssets,
+			pool.QuoteAssetId,
+		)
+		require.NoError(t, err)
+
+		// Validate liquidity tier exists in store.
+		require.True(t, pc.PerpetualsKeeper.HasCollateralPool(pc.Ctx, pool.CollateralPoolId))
+
+		// Validate fields of CollateralPool object in store.
+		collateralPool, err := pc.PerpetualsKeeper.GetCollateralPool(pc.Ctx, pool.CollateralPoolId)
+		require.NoError(t, err)
+		require.Equal(t, pool.CollateralPoolId, collateralPool.CollateralPoolId)
+		require.Equal(t, pool.MaxCumulativeInsuranceFundDeltaPerBlock, collateralPool.MaxCumulativeInsuranceFundDeltaPerBlock)
+		require.Equal(t, pool.MultiCollateralAssets, collateralPool.MultiCollateralAssets)
+		require.Equal(t, pool.QuoteAssetId, collateralPool.QuoteAssetId)
+	}
+}
+
+func TestUpsertCollateralPool_New_Failure(t *testing.T) {
+	tests := map[string]struct {
+		collateralPoolId                        uint32
+		maxCumulativeInsuranceFundDeltaPerBlock uint64
+		multiCollateralAssets                   *types.MultiCollateralAssetsArray
+		quoteAssetId                            uint32
+		expectedError                           error
+	}{
+		"Max cumulative insurance fund delta per block is zero": {
+			collateralPoolId:                        0,
+			maxCumulativeInsuranceFundDeltaPerBlock: 0,
+			multiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{0}},
+			quoteAssetId:                            0,
+			expectedError:                           types.ErrMaxCumulativeInsuranceFundDeltaPerBlockZero,
+		},
+		"Supported assets is empty": {
+			collateralPoolId:                        0,
+			maxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+			multiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{}},
+			quoteAssetId:                            0,
+			expectedError:                           types.ErrMultiCollateralAssetsEmpty,
+		},
+		"Supported assets does not contain quote asset": {
+			collateralPoolId:                        0,
+			maxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+			multiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{0}},
+			quoteAssetId:                            1,
+			expectedError:                           types.ErrIsolatedMarketMultiCollateralAssetDoesNotContainQuoteAsset,
+		},
+	}
+
+	// Test setup.
+	pc := keepertest.PerpetualsKeepers(t)
+
+	// Run tests.
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			_, err := pc.PerpetualsKeeper.UpsertCollateralPool(
+				pc.Ctx,
+				tc.collateralPoolId,
+				tc.maxCumulativeInsuranceFundDeltaPerBlock,
+				tc.multiCollateralAssets,
+				tc.quoteAssetId,
+			)
+
+			require.Error(t, err)
+			require.ErrorContains(t, err, tc.expectedError.Error())
+		})
+	}
+}
+
+func TestModifyCollateralPool_Success(t *testing.T) {
+	pc := keepertest.PerpetualsKeepers(t)
+	for _, pool := range constants.CollateralPools {
+		_, err := pc.PerpetualsKeeper.UpsertCollateralPool(
+			pc.Ctx,
+			pool.CollateralPoolId,
+			pool.MaxCumulativeInsuranceFundDeltaPerBlock,
+			pool.MultiCollateralAssets,
+			pool.QuoteAssetId,
+		)
+		require.NoError(t, err)
+	}
+
+	for i, pool := range constants.CollateralPools {
+		// Modify each field arbitrarily and
+		// verify the fields are modified in state.
+		maxCumulativeInsuranceFundDeltaPerBlock := uint64(i + 1_000_000_000_000)
+		multiCollateralAssets := pool.MultiCollateralAssets
+		quoteAssetId := pool.QuoteAssetId
+		modifiedPool, err := pc.PerpetualsKeeper.UpsertCollateralPool(
+			pc.Ctx,
+			pool.CollateralPoolId,
+			maxCumulativeInsuranceFundDeltaPerBlock,
+			multiCollateralAssets,
+			quoteAssetId,
+		)
+		require.NoError(t, err)
+		obtainedPool, err := pc.PerpetualsKeeper.GetCollateralPool(pc.Ctx, pool.CollateralPoolId)
+		require.NoError(t, err)
+		require.Equal(
+			t,
+			modifiedPool,
+			obtainedPool,
+		)
+		require.Equal(
+			t,
+			pool.CollateralPoolId,
+			obtainedPool.CollateralPoolId,
+		)
+		require.Equal(
+			t,
+			maxCumulativeInsuranceFundDeltaPerBlock,
+			obtainedPool.MaxCumulativeInsuranceFundDeltaPerBlock,
+		)
+		require.Equal(
+			t,
+			multiCollateralAssets,
+			obtainedPool.MultiCollateralAssets,
+		)
+		require.Equal(
+			t,
+			quoteAssetId,
+			obtainedPool.QuoteAssetId,
+		)
+	}
+}
+
+func TestUpsertCollateralPool_Existing_Failure(t *testing.T) {
+	tests := map[string]struct {
+		collateralPoolId                        uint32
+		maxCumulativeInsuranceFundDeltaPerBlock uint64
+		multiCollateralAssets                   *types.MultiCollateralAssetsArray
+		quoteAssetId                            uint32
+		expectedError                           error
+	}{
+		"Insurance fund delta per block is zero": {
+			collateralPoolId:                        0,
+			maxCumulativeInsuranceFundDeltaPerBlock: 0,
+			multiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{0}},
+			quoteAssetId:                            0,
+			expectedError:                           types.ErrMaxCumulativeInsuranceFundDeltaPerBlockZero,
+		},
+		"Supported assets is empty": {
+			collateralPoolId:                        1,
+			maxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+			multiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{}},
+			quoteAssetId:                            0,
+			expectedError:                           types.ErrMultiCollateralAssetsEmpty,
+		},
+		"Supported assets does not contain quote asset": {
+			collateralPoolId:                        1,
+			maxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+			multiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{0}},
+			quoteAssetId:                            1,
+			expectedError:                           types.ErrIsolatedMarketMultiCollateralAssetDoesNotContainQuoteAsset,
+		},
+	}
+
+	// Test setup.
+	pc := keepertest.PerpetualsKeepers(t)
+	// Create collateral pools.
+	keepertest.CreateTestCollateralPools(t, pc.Ctx, pc.PerpetualsKeeper)
+	// Run tests.
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			_, err := pc.PerpetualsKeeper.UpsertCollateralPool(
+				pc.Ctx,
+				tc.collateralPoolId,
+				tc.maxCumulativeInsuranceFundDeltaPerBlock,
+				tc.multiCollateralAssets,
+				tc.quoteAssetId,
+			)
+
+			require.Error(t, err)
+			require.ErrorContains(t, err, tc.expectedError.Error())
+		})
+	}
+}
+
 func TestSetParams(t *testing.T) {
 	tests := map[string]struct {
 		params      types.Params
@@ -3548,11 +3590,11 @@ func TestIsPositionUpdatable(t *testing.T) {
 		"Updatable": {
 			perp: *perptest.GeneratePerpetual(
 				perptest.WithId(1),
-				perptest.WithMarketId(1),
+				perptest.WithMarketId(constants.DefaultMarketIdNotUsedInGenesis),
 			),
 			queryPerpId: 1,
 			marketParamPrice: *pricestest.GenerateMarketParamPrice(
-				pricestest.WithId(1),
+				pricestest.WithId(constants.DefaultMarketIdNotUsedInGenesis),
 				pricestest.WithSpotPriceValue(1000), // non-zero
 				pricestest.WithPnlPriceValue(1000),  // non-zero
 			),
@@ -3561,11 +3603,11 @@ func TestIsPositionUpdatable(t *testing.T) {
 		"Not updatable due to zero oracle price": {
 			perp: *perptest.GeneratePerpetual(
 				perptest.WithId(1),
-				perptest.WithMarketId(1),
+				perptest.WithMarketId(constants.DefaultMarketIdNotUsedInGenesis),
 			),
 			queryPerpId: 1,
 			marketParamPrice: *pricestest.GenerateMarketParamPrice(
-				pricestest.WithId(1),
+				pricestest.WithId(constants.DefaultMarketIdNotUsedInGenesis),
 				pricestest.WithSpotPriceValue(0),
 				pricestest.WithPnlPriceValue(0),
 			),
@@ -3574,11 +3616,11 @@ func TestIsPositionUpdatable(t *testing.T) {
 		"Error: Perp Id not found": {
 			perp: *perptest.GeneratePerpetual(
 				perptest.WithId(1),
-				perptest.WithMarketId(1),
+				perptest.WithMarketId(constants.DefaultMarketIdNotUsedInGenesis),
 			),
 			queryPerpId: 100, // doesn't exist
 			marketParamPrice: *pricestest.GenerateMarketParamPrice(
-				pricestest.WithId(1),
+				pricestest.WithId(constants.DefaultMarketIdNotUsedInGenesis),
 			),
 			expectedErr: "Perpetual does not exist",
 		},
@@ -3587,13 +3629,13 @@ func TestIsPositionUpdatable(t *testing.T) {
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
 			pc := keepertest.PerpetualsKeepers(t)
-			keepertest.CreateTestPricesAndPerpetualMarkets(
+
+			keepertest.CreateTestPriceMarkets(t, pc.Ctx, pc.PricesKeeper, []pricestypes.MarketParamPrice{tc.marketParamPrice})
+			keepertest.CreatePerpetualMarkets(
 				t,
 				pc.Ctx,
 				pc.PerpetualsKeeper,
-				pc.PricesKeeper,
 				[]types.Perpetual{tc.perp},
-				[]pricestypes.MarketParamPrice{tc.marketParamPrice},
 			)
 
 			updatable, err := pc.PerpetualsKeeper.IsPositionUpdatable(pc.Ctx, tc.queryPerpId)
@@ -3607,21 +3649,20 @@ func TestIsPositionUpdatable(t *testing.T) {
 	}
 }
 
-func TestIsIsolatedPerpetual(t *testing.T) {
+func TestIsMainCollateralPool(t *testing.T) {
 	testCases := map[string]struct {
 		perp     types.Perpetual
 		expected bool
 	}{
-		"Isolated Perpetual": {
+		"Main Collateral Pool": {
 			perp: *perptest.GeneratePerpetual(
-				perptest.WithMarketType(types.PerpetualMarketType_PERPETUAL_MARKET_TYPE_ISOLATED),
-				perptest.WithIsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock(1_000_000),
+				perptest.WithCollateralPoolId(0),
 			),
 			expected: true,
 		},
-		"Cross Perpetual": {
+		"Other Collateral Pool": {
 			perp: *perptest.GeneratePerpetual(
-				perptest.WithMarketType(types.PerpetualMarketType_PERPETUAL_MARKET_TYPE_CROSS),
+				perptest.WithCollateralPoolId(1),
 			),
 			expected: false,
 		},
@@ -3630,19 +3671,22 @@ func TestIsIsolatedPerpetual(t *testing.T) {
 	for name, tc := range testCases {
 		t.Run(
 			name, func(t *testing.T) {
-				ctx, _, pricesKeeper, perpetualsKeeper, _, _, _, _, _, _ := keepertest.SubaccountsKeepers(
+				ctx, _, pricesKeeper, perpetualsKeeper, _, _, assetsKeeper, _, _, _ := keepertest.SubaccountsKeepers(
 					t,
 					false,
 				)
+
 				ctx = ctx.WithTxBytes(constants.TestTxBytes)
-				keepertest.CreateTestMarkets(t, ctx, pricesKeeper)
+				prices.InitGenesis(ctx, *pricesKeeper, constants.Prices_DefaultGenesisState)
+				assets.InitGenesis(ctx, *assetsKeeper, constants.Assets_DefaultGenesisState)
 				keepertest.CreateTestLiquidityTiers(t, ctx, perpetualsKeeper)
+				keepertest.CreateTestCollateralPools(t, ctx, perpetualsKeeper)
 
 				err := perpetualsKeeper.ValidateAndSetPerpetual(ctx, tc.perp)
 				require.NoError(t, err)
-				isIsolated, err := perpetualsKeeper.IsIsolatedPerpetual(ctx, tc.perp.Params.Id)
+				isMainCollateralPool, err := perpetualsKeeper.IsMainCollateralPool(ctx, tc.perp.Params.Id)
 				require.NoError(t, err)
-				require.Equal(t, tc.expected, isIsolated)
+				require.Equal(t, tc.expected, isMainCollateralPool)
 			},
 		)
 	}
@@ -3650,7 +3694,7 @@ func TestIsIsolatedPerpetual(t *testing.T) {
 
 func TestModifyOpenInterest_store(t *testing.T) {
 	pc := keepertest.PerpetualsKeepers(t)
-	perps := keepertest.CreateLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 100)
+	perps := keepertest.CreateCollateralPoolsAndLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 100)
 	pc.Ctx = pc.Ctx.WithExecMode(sdk.ExecModeFinalize)
 	for _, perp := range perps {
 		openInterestDeltaBaseQuantums := big.NewInt(2_000_000 * (int64(perp.Params.Id)))
@@ -3831,6 +3875,9 @@ func TestCalculateYieldIndexForEpoch(t *testing.T) {
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
 			pc := keepertest.PerpetualsKeepers(t)
+			pc.PerpetualsKeeper.SetPerpetualForTest(pc.Ctx, tc.perpetual)
+			keepertest.CreateTestCollateralPools(t, pc.Ctx, pc.PerpetualsKeeper)
+
 			yieldIndex, err := pc.PerpetualsKeeper.CalculateYieldIndexForEpoch(
 				pc.Ctx,
 				tc.totalTDaiPreMint,
@@ -3852,7 +3899,25 @@ func TestCalculateYieldIndexForEpoch(t *testing.T) {
 	}
 }
 
-func TestCalculateNewTotalYieldIndex(t *testing.T) {
+func TestGeneratePerpetualWithUpdatedYieldIndex(t *testing.T) {
+	testId := uint32(999)
+	testTicker := "TEST-USD"
+	testBasePerpetual := types.Perpetual{
+		Params: types.PerpetualParams{
+			Id:                testId,
+			Ticker:            testTicker,
+			MarketId:          testId,
+			AtomicResolution:  constants.BtcUsd_0DefaultFunding_6AtomicResolution.Params.AtomicResolution,
+			DefaultFundingPpm: constants.BtcUsd_0DefaultFunding_6AtomicResolution.Params.DefaultFundingPpm,
+			LiquidityTier:     constants.BtcUsd_0DefaultFunding_6AtomicResolution.Params.LiquidityTier,
+			DangerIndexPpm:    constants.BtcUsd_0DefaultFunding_6AtomicResolution.Params.DangerIndexPpm,
+			CollateralPoolId:  constants.BtcUsd_0DefaultFunding_6AtomicResolution.Params.CollateralPoolId,
+		},
+		FundingIndex: constants.BtcUsd_0DefaultFunding_6AtomicResolution.FundingIndex,
+		OpenInterest: constants.BtcUsd_0DefaultFunding_6AtomicResolution.OpenInterest,
+		YieldIndex:   constants.BtcUsd_0DefaultFunding_6AtomicResolution.YieldIndex,
+	}
+
 	testCases := map[string]struct {
 		totalTDaiPreMint *big.Int
 		totalTDaiMinted  *big.Int
@@ -3865,17 +3930,17 @@ func TestCalculateNewTotalYieldIndex(t *testing.T) {
 			totalTDaiPreMint: big.NewInt(100_000_000_000_000),
 			totalTDaiMinted:  big.NewInt(5_000_000_000),
 			marketPrice: pricestypes.MarketPrice{
-				Id:        0,
+				Id:        testId,
 				Exponent:  -5,
 				SpotPrice: 100_000,
 				PnlPrice:  100_000,
 			},
-			perpetual:   constants.BtcUsd_0DefaultFunding_6AtomicResolution,
+			perpetual:   testBasePerpetual,
 			expectedErr: nil,
 			expectedPerp: types.Perpetual{
-				Params:       constants.BtcUsd_0DefaultFunding_6AtomicResolution.Params,
-				FundingIndex: constants.BtcUsd_0DefaultFunding_6AtomicResolution.FundingIndex,
-				OpenInterest: constants.BtcUsd_0DefaultFunding_6AtomicResolution.OpenInterest,
+				Params:       testBasePerpetual.Params,
+				FundingIndex: testBasePerpetual.FundingIndex,
+				OpenInterest: testBasePerpetual.OpenInterest,
 				YieldIndex:   big.NewRat(1, 20_000).String(),
 			},
 		},
@@ -3883,22 +3948,22 @@ func TestCalculateNewTotalYieldIndex(t *testing.T) {
 			totalTDaiPreMint: big.NewInt(100_000_000_000_000),
 			totalTDaiMinted:  big.NewInt(5_000_000_000),
 			marketPrice: pricestypes.MarketPrice{
-				Id:        0,
+				Id:        testId,
 				Exponent:  -2,
 				SpotPrice: 200,
 				PnlPrice:  200,
 			},
 			perpetual: types.Perpetual{
-				Params:       constants.BtcUsd_0DefaultFunding_6AtomicResolution.Params,
-				FundingIndex: constants.BtcUsd_0DefaultFunding_6AtomicResolution.FundingIndex,
-				OpenInterest: constants.BtcUsd_0DefaultFunding_6AtomicResolution.OpenInterest,
+				Params:       testBasePerpetual.Params,
+				FundingIndex: testBasePerpetual.FundingIndex,
+				OpenInterest: testBasePerpetual.OpenInterest,
 				YieldIndex:   big.NewRat(1, 20_000).String(),
 			},
 			expectedErr: nil,
 			expectedPerp: types.Perpetual{
-				Params:       constants.BtcUsd_0DefaultFunding_6AtomicResolution.Params,
-				FundingIndex: constants.BtcUsd_0DefaultFunding_6AtomicResolution.FundingIndex,
-				OpenInterest: constants.BtcUsd_0DefaultFunding_6AtomicResolution.OpenInterest,
+				Params:       testBasePerpetual.Params,
+				FundingIndex: testBasePerpetual.FundingIndex,
+				OpenInterest: testBasePerpetual.OpenInterest,
 				YieldIndex:   big.NewRat(3, 20_000).String(),
 			},
 		},
@@ -3906,51 +3971,51 @@ func TestCalculateNewTotalYieldIndex(t *testing.T) {
 			totalTDaiPreMint: big.NewInt(0),
 			totalTDaiMinted:  big.NewInt(500_000_000),
 			marketPrice: pricestypes.MarketPrice{
-				Id:        0,
+				Id:        testId,
 				Exponent:  -5,
 				SpotPrice: 12345,
 				PnlPrice:  12345,
 			},
-			perpetual:   constants.BtcUsd_0DefaultFunding_6AtomicResolution,
+			perpetual:   testBasePerpetual,
 			expectedErr: types.ErrTotalTDaiPreMintIsNil,
 		},
 		"Failure: total tDai pre-mint is nil": {
 			totalTDaiPreMint: nil,
 			totalTDaiMinted:  big.NewInt(500_000_000),
 			marketPrice: pricestypes.MarketPrice{
-				Id:        0,
+				Id:        testId,
 				Exponent:  -5,
 				SpotPrice: 12345,
 				PnlPrice:  12345,
 			},
-			perpetual:   constants.BtcUsd_0DefaultFunding_6AtomicResolution,
+			perpetual:   testBasePerpetual,
 			expectedErr: types.ErrTotalTDaiPreMintIsNil,
 		},
 		"Failure: total tDai minted is nil": {
 			totalTDaiPreMint: big.NewInt(100_000_000),
 			totalTDaiMinted:  nil,
 			marketPrice: pricestypes.MarketPrice{
-				Id:        0,
+				Id:        testId,
 				Exponent:  -5,
 				SpotPrice: 12345,
 				PnlPrice:  12345,
 			},
-			perpetual:   constants.BtcUsd_0DefaultFunding_6AtomicResolution,
+			perpetual:   testBasePerpetual,
 			expectedErr: types.ErrTotalTDaiMintedIsNil,
 		},
 		"Failure: perp yield index malformed and cannot be parsed": {
 			totalTDaiPreMint: big.NewInt(100_000_000),
 			totalTDaiMinted:  nil,
 			marketPrice: pricestypes.MarketPrice{
-				Id:        0,
+				Id:        testId,
 				Exponent:  -5,
 				SpotPrice: 12345,
 				PnlPrice:  12345,
 			},
 			perpetual: types.Perpetual{
-				Params:       constants.BtcUsd_0DefaultFunding_6AtomicResolution.Params,
-				FundingIndex: constants.BtcUsd_0DefaultFunding_6AtomicResolution.FundingIndex,
-				OpenInterest: constants.BtcUsd_0DefaultFunding_6AtomicResolution.OpenInterest,
+				Params:       testBasePerpetual.Params,
+				FundingIndex: testBasePerpetual.FundingIndex,
+				OpenInterest: testBasePerpetual.OpenInterest,
 				YieldIndex:   "malformed",
 			},
 			expectedErr: types.ErrTotalTDaiMintedIsNil,
@@ -3959,12 +4024,12 @@ func TestCalculateNewTotalYieldIndex(t *testing.T) {
 			totalTDaiPreMint: big.NewInt(100_000_000),
 			totalTDaiMinted:  nil,
 			marketPrice: pricestypes.MarketPrice{
-				Id:        1,
+				Id:        testId + 1,
 				Exponent:  -5,
 				SpotPrice: 12345,
 				PnlPrice:  12345,
 			},
-			perpetual:   constants.BtcUsd_0DefaultFunding_6AtomicResolution,
+			perpetual:   testBasePerpetual,
 			expectedErr: types.ErrTotalTDaiMintedIsNil,
 		},
 	}
@@ -3972,6 +4037,9 @@ func TestCalculateNewTotalYieldIndex(t *testing.T) {
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
 			pc := keepertest.PerpetualsKeepers(t)
+			pc.PerpetualsKeeper.SetPerpetualForTest(pc.Ctx, tc.perpetual)
+			keepertest.CreateTestCollateralPools(t, pc.Ctx, pc.PerpetualsKeeper)
+
 			_, err := pc.PricesKeeper.CreateMarket(
 				pc.Ctx,
 				pricestypes.MarketParam{
@@ -3991,7 +4059,7 @@ func TestCalculateNewTotalYieldIndex(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			resultPerp, err := pc.PerpetualsKeeper.CalculateNewTotalYieldIndex(
+			resultPerp, err := pc.PerpetualsKeeper.GeneratePerpetualWithUpdatedYieldIndex(
 				pc.Ctx,
 				tc.totalTDaiPreMint,
 				tc.totalTDaiMinted,
@@ -4011,6 +4079,42 @@ func TestCalculateNewTotalYieldIndex(t *testing.T) {
 }
 
 func TestUpdateYieldIndexToNewMint(t *testing.T) {
+	testId1 := uint32(999)
+	testTicker1 := "TEST1-USD"
+	testBasePerpetual1 := types.Perpetual{
+		Params: types.PerpetualParams{
+			Id:                testId1,
+			Ticker:            testTicker1,
+			MarketId:          testId1,
+			AtomicResolution:  constants.BtcUsd_0DefaultFunding_6AtomicResolution.Params.AtomicResolution,
+			DefaultFundingPpm: constants.BtcUsd_0DefaultFunding_6AtomicResolution.Params.DefaultFundingPpm,
+			LiquidityTier:     constants.BtcUsd_0DefaultFunding_6AtomicResolution.Params.LiquidityTier,
+			DangerIndexPpm:    constants.BtcUsd_0DefaultFunding_6AtomicResolution.Params.DangerIndexPpm,
+			CollateralPoolId:  constants.BtcUsd_0DefaultFunding_6AtomicResolution.Params.CollateralPoolId,
+		},
+		FundingIndex: constants.BtcUsd_0DefaultFunding_6AtomicResolution.FundingIndex,
+		OpenInterest: constants.BtcUsd_0DefaultFunding_6AtomicResolution.OpenInterest,
+		YieldIndex:   constants.BtcUsd_0DefaultFunding_6AtomicResolution.YieldIndex,
+	}
+
+	testId2 := uint32(1000)
+	testTicker2 := "TEST2-USD"
+	testBasePerpetual2 := types.Perpetual{
+		Params: types.PerpetualParams{
+			Id:                testId2,
+			Ticker:            testTicker2,
+			MarketId:          testId2,
+			AtomicResolution:  constants.EthUsd_0DefaultFunding_6AtomicResolution.Params.AtomicResolution,
+			DefaultFundingPpm: constants.EthUsd_0DefaultFunding_6AtomicResolution.Params.DefaultFundingPpm,
+			LiquidityTier:     constants.EthUsd_0DefaultFunding_6AtomicResolution.Params.LiquidityTier,
+			DangerIndexPpm:    constants.EthUsd_0DefaultFunding_6AtomicResolution.Params.DangerIndexPpm,
+			CollateralPoolId:  constants.EthUsd_0DefaultFunding_6AtomicResolution.Params.CollateralPoolId,
+		},
+		FundingIndex: constants.EthUsd_0DefaultFunding_6AtomicResolution.FundingIndex,
+		OpenInterest: constants.EthUsd_0DefaultFunding_6AtomicResolution.OpenInterest,
+		YieldIndex:   constants.EthUsd_0DefaultFunding_6AtomicResolution.YieldIndex,
+	}
+
 	testCases := map[string]struct {
 		totalTDaiPreMint *big.Int
 		totalTDaiMinted  *big.Int
@@ -4024,21 +4128,21 @@ func TestUpdateYieldIndexToNewMint(t *testing.T) {
 			totalTDaiMinted:  big.NewInt(5_000_000_000),
 			markets: []pricestypes.MarketPrice{
 				{
-					Id:        0,
+					Id:        testId1,
 					Exponent:  -5,
 					SpotPrice: 100_000,
 					PnlPrice:  100_000,
 				},
 			},
 			perps: []types.Perpetual{
-				constants.BtcUsd_0DefaultFunding_6AtomicResolution,
+				testBasePerpetual1,
 			},
 			expectedPerps: []types.Perpetual{
 				{
-					Params:          constants.BtcUsd_0DefaultFunding_6AtomicResolution.Params,
-					FundingIndex:    constants.BtcUsd_0DefaultFunding_6AtomicResolution.FundingIndex,
-					OpenInterest:    constants.BtcUsd_0DefaultFunding_6AtomicResolution.OpenInterest,
-					LastFundingRate: constants.BtcUsd_0DefaultFunding_6AtomicResolution.LastFundingRate,
+					Params:          testBasePerpetual1.Params,
+					FundingIndex:    testBasePerpetual1.FundingIndex,
+					OpenInterest:    testBasePerpetual1.OpenInterest,
+					LastFundingRate: testBasePerpetual1.LastFundingRate,
 					YieldIndex:      big.NewRat(1, 20_000).String(),
 				},
 			},
@@ -4049,35 +4153,35 @@ func TestUpdateYieldIndexToNewMint(t *testing.T) {
 			totalTDaiMinted:  big.NewInt(5_000_000_000),
 			markets: []pricestypes.MarketPrice{
 				{
-					Id:        0,
+					Id:        testId1,
 					Exponent:  -5,
 					SpotPrice: 100_000,
 					PnlPrice:  100_000,
 				},
 				{
-					Id:        1,
+					Id:        testId2,
 					Exponent:  -5,
 					SpotPrice: 200_000,
 					PnlPrice:  200_000,
 				},
 			},
 			perps: []types.Perpetual{
-				constants.BtcUsd_0DefaultFunding_6AtomicResolution,
-				constants.EthUsd_0DefaultFunding_6AtomicResolution,
+				testBasePerpetual1,
+				testBasePerpetual2,
 			},
 			expectedPerps: []types.Perpetual{
 				{
-					Params:          constants.BtcUsd_0DefaultFunding_6AtomicResolution.Params,
-					FundingIndex:    constants.BtcUsd_0DefaultFunding_6AtomicResolution.FundingIndex,
-					OpenInterest:    constants.BtcUsd_0DefaultFunding_6AtomicResolution.OpenInterest,
-					LastFundingRate: constants.BtcUsd_0DefaultFunding_6AtomicResolution.LastFundingRate,
+					Params:          testBasePerpetual1.Params,
+					FundingIndex:    testBasePerpetual1.FundingIndex,
+					OpenInterest:    testBasePerpetual1.OpenInterest,
+					LastFundingRate: testBasePerpetual1.LastFundingRate,
 					YieldIndex:      big.NewRat(1, 20_000).String(),
 				},
 				{
-					Params:          constants.EthUsd_0DefaultFunding_6AtomicResolution.Params,
-					FundingIndex:    constants.EthUsd_0DefaultFunding_6AtomicResolution.FundingIndex,
-					OpenInterest:    constants.EthUsd_0DefaultFunding_6AtomicResolution.OpenInterest,
-					LastFundingRate: constants.BtcUsd_0DefaultFunding_6AtomicResolution.LastFundingRate,
+					Params:          testBasePerpetual2.Params,
+					FundingIndex:    testBasePerpetual2.FundingIndex,
+					OpenInterest:    testBasePerpetual2.OpenInterest,
+					LastFundingRate: testBasePerpetual2.LastFundingRate,
 					YieldIndex:      big.NewRat(1, 10_000).String(),
 				},
 			},
@@ -4088,14 +4192,14 @@ func TestUpdateYieldIndexToNewMint(t *testing.T) {
 			totalTDaiMinted:  big.NewInt(500_000_000),
 			markets: []pricestypes.MarketPrice{
 				{
-					Id:        0,
+					Id:        testId1,
 					Exponent:  -5,
 					SpotPrice: 12345,
 					PnlPrice:  12345,
 				},
 			},
 			perps: []types.Perpetual{
-				constants.BtcUsd_0DefaultFunding_6AtomicResolution,
+				testBasePerpetual1,
 			},
 			expectedErr: types.ErrTotalTDaiPreMintIsNil,
 		},
@@ -4104,14 +4208,14 @@ func TestUpdateYieldIndexToNewMint(t *testing.T) {
 			totalTDaiMinted:  big.NewInt(500_000_000),
 			markets: []pricestypes.MarketPrice{
 				{
-					Id:        0,
+					Id:        testId1,
 					Exponent:  -5,
 					SpotPrice: 12345,
 					PnlPrice:  12345,
 				},
 			},
 			perps: []types.Perpetual{
-				constants.BtcUsd_0DefaultFunding_6AtomicResolution,
+				testBasePerpetual1,
 			},
 			expectedErr: types.ErrTotalTDaiPreMintIsNil,
 		},
@@ -4120,14 +4224,14 @@ func TestUpdateYieldIndexToNewMint(t *testing.T) {
 			totalTDaiMinted:  nil,
 			markets: []pricestypes.MarketPrice{
 				{
-					Id:        0,
+					Id:        testId1,
 					Exponent:  -5,
 					SpotPrice: 12345,
 					PnlPrice:  12345,
 				},
 			},
 			perps: []types.Perpetual{
-				constants.BtcUsd_0DefaultFunding_6AtomicResolution,
+				testBasePerpetual1,
 			},
 			expectedErr: types.ErrTotalTDaiMintedIsNil,
 		},
@@ -4136,14 +4240,14 @@ func TestUpdateYieldIndexToNewMint(t *testing.T) {
 			totalTDaiMinted:  big.NewInt(1),
 			markets: []pricestypes.MarketPrice{
 				{
-					Id:        0,
+					Id:        testId1,
 					Exponent:  -5,
 					SpotPrice: 12345,
 					PnlPrice:  12345,
 				},
 			},
 			perps: []types.Perpetual{
-				constants.BtcUsd_0DefaultFunding_6AtomicResolution,
+				testBasePerpetual1,
 			},
 			expectedErr: types.ErrTotalTDaiMintedIsNil,
 		},
@@ -4152,6 +4256,7 @@ func TestUpdateYieldIndexToNewMint(t *testing.T) {
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
 			pc := keepertest.PerpetualsKeepers(t)
+			keepertest.CreateTestCollateralPools(t, pc.Ctx, pc.PerpetualsKeeper)
 
 			for _, market := range tc.markets {
 				_, err := pc.PricesKeeper.CreateMarket(

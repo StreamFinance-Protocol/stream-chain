@@ -31,7 +31,6 @@ import { handleValidationErrors } from '../../../request-helpers/error-handler';
 import ExportResponseCodeStats from '../../../request-helpers/export-response-code-stats';
 import { perpetualMarketToResponseObject } from '../../../request-helpers/request-transformer';
 import {
-  MarketType,
   PerpetualMarketRequest,
   PerpetualMarketResponse,
   PerpetualMarketResponseObject,
@@ -54,7 +53,7 @@ class PerpetualMarketsController extends Controller {
       ) = await PerpetualMarketTable.findByTicker(ticker);
 
       if (perpetualMarket === undefined) {
-        throw new NotFoundError(`${ticker} not found in markets of type ${MarketType.PERPETUAL}`);
+        throw new NotFoundError(`${ticker} not found in markets`);
       }
 
       const market: (

@@ -17,7 +17,7 @@ import { rejectRestrictedCountries } from '../../../lib/restrict-countries';
 import { handleValidationErrors } from '../../../request-helpers/error-handler';
 import ExportResponseCodeStats from '../../../request-helpers/export-response-code-stats';
 import { OrderbookLevelsToResponseObject } from '../../../request-helpers/request-transformer';
-import { MarketType, OrderbookRequest, OrderbookResponseObject } from '../../../types';
+import { OrderbookRequest, OrderbookResponseObject } from '../../../types';
 
 const router: express.Router = express.Router();
 const controllerName: string = 'orderbook-controller';
@@ -33,7 +33,7 @@ class OrderbookController extends Controller {
 
     if (perpetualMarket === undefined) {
       throw new NotFoundError(
-        `${ticker} not found in markets of type ${MarketType.PERPETUAL}`,
+        `${ticker} not found in markets`,
       );
     }
 

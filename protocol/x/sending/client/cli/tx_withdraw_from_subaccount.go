@@ -1,7 +1,6 @@
 package cli
 
 import (
-	assettypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -15,7 +14,7 @@ import (
 // to a recipient (an `x/banks` account).
 func CmdWithdrawFromSubaccount() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "withdraw-from-subaccount [sender_key_or_address] [sender_subaccount_number] [recipient_address] [quantums]",
+		Use:   "withdraw-from-subaccount [sender_key_or_address] [sender_subaccount_number] [recipient_address] [asset_id] [quantums]",
 		Short: "Withdraw funds from a subaccount to an account.",
 		Long: `Withdraw funds from a subaccount to an account.
 Note, the '--from' flag is ignored as it is implied from [sender_key_or_address].
@@ -37,7 +36,12 @@ Note, the '--from' flag is ignored as it is implied from [sender_key_or_address]
 			// Recipient address validation done in `ValidateBasic()` below.
 			argRecipient := args[2]
 
-			argAmount, err := cast.ToUint64E(args[3])
+			argAssetId, err := cast.ToUint32E(args[3])
+			if err != nil {
+				return err
+			}
+
+			argAmount, err := cast.ToUint64E(args[4])
 			if err != nil {
 				return err
 			}
@@ -53,7 +57,7 @@ Note, the '--from' flag is ignored as it is implied from [sender_key_or_address]
 					Number: argSenderNumber,
 				},
 				argRecipient,
-				assettypes.AssetTDai.Id,
+				argAssetId,
 				argAmount,
 			)
 

@@ -486,7 +486,6 @@ func (s *PreBlockTestSuite) getVoteExtensionsForValidatorsWithSamePrices(
 }
 
 func (s *PreBlockTestSuite) mockValStoreAndTotalBondedTokensCall(validators []string) {
-
 	for _, valName := range validators {
 		s.buildAndMockValidator(valName, math.NewInt(1))
 	}
@@ -507,13 +506,5 @@ func (s *PreBlockTestSuite) getValidatorConsAddr(name string) sdk.ConsAddress {
 		return constants.AliceConsAddress
 	} else {
 		return constants.BobConsAddress
-	}
-}
-
-func (s *PreBlockTestSuite) getValidatorValAddress(name string) sdk.ValAddress {
-	if name == "alice" {
-		return constants.AliceValAddress
-	} else {
-		return constants.BobValAddress
 	}
 }

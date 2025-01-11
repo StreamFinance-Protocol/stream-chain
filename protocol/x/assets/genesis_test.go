@@ -1,19 +1,23 @@
 package assets_test
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"testing"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/constants"
 	keepertest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets/types"
+	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices"
 	"github.com/stretchr/testify/require"
 )
 
 func TestGenesis(t *testing.T) {
 	expected := types.DefaultGenesis()
-	ctx, k, _, _, _, _ := keepertest.AssetsKeepers(t, true)
+	ctx, k, pricesKeeper, _, _, _ := keepertest.AssetsKeepers(t, true)
+	prices.InitGenesis(ctx, *pricesKeeper, constants.Prices_DefaultGenesisState)
 	assets.InitGenesis(ctx, *k, *expected)
 	assertAssetCreateEventsInIndexerBlock(t, k, ctx, len(expected.Assets))
 	actual := assets.ExportGenesis(ctx, *k)

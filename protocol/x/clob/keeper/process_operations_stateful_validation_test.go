@@ -341,7 +341,7 @@ func TestProcessProposerMatches_LongTerm_StatefulValidation_Failure(t *testing.T
 				bk.On(
 					"SendCoins",
 					mock.Anything,
-					satypes.ModuleAddress,
+					satypes.CollateralPoolZeroAddress,
 					authtypes.NewModuleAddress(authtypes.FeeCollectorName),
 					mock.MatchedBy(
 						testutil_bank.MatchTDaiOfAmount(
@@ -637,7 +637,7 @@ func TestProcessProposerMatches_Conditional_Validation_Failure(t *testing.T) {
 				bk.On(
 					"SendCoins",
 					mock.Anything,
-					satypes.ModuleAddress,
+					satypes.CollateralPoolZeroAddress,
 					authtypes.NewModuleAddress(authtypes.FeeCollectorName),
 					mock.MatchedBy(
 						testutil_bank.MatchTDaiOfAmount(

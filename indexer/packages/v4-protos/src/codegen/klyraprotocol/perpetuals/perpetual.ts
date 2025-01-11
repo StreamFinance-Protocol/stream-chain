@@ -1,50 +1,5 @@
 import * as _m0 from "protobufjs/minimal";
 import { DeepPartial, Long } from "../../helpers";
-export enum PerpetualMarketType {
-  /** PERPETUAL_MARKET_TYPE_CROSS - Market type for cross margin perpetual markets. */
-  PERPETUAL_MARKET_TYPE_CROSS = 0,
-
-  /** PERPETUAL_MARKET_TYPE_ISOLATED - Market type for isolated margin perpetual markets. */
-  PERPETUAL_MARKET_TYPE_ISOLATED = 1,
-  UNRECOGNIZED = -1,
-}
-export enum PerpetualMarketTypeSDKType {
-  /** PERPETUAL_MARKET_TYPE_CROSS - Market type for cross margin perpetual markets. */
-  PERPETUAL_MARKET_TYPE_CROSS = 0,
-
-  /** PERPETUAL_MARKET_TYPE_ISOLATED - Market type for isolated margin perpetual markets. */
-  PERPETUAL_MARKET_TYPE_ISOLATED = 1,
-  UNRECOGNIZED = -1,
-}
-export function perpetualMarketTypeFromJSON(object: any): PerpetualMarketType {
-  switch (object) {
-    case 0:
-    case "PERPETUAL_MARKET_TYPE_CROSS":
-      return PerpetualMarketType.PERPETUAL_MARKET_TYPE_CROSS;
-
-    case 1:
-    case "PERPETUAL_MARKET_TYPE_ISOLATED":
-      return PerpetualMarketType.PERPETUAL_MARKET_TYPE_ISOLATED;
-
-    case -1:
-    case "UNRECOGNIZED":
-    default:
-      return PerpetualMarketType.UNRECOGNIZED;
-  }
-}
-export function perpetualMarketTypeToJSON(object: PerpetualMarketType): string {
-  switch (object) {
-    case PerpetualMarketType.PERPETUAL_MARKET_TYPE_CROSS:
-      return "PERPETUAL_MARKET_TYPE_CROSS";
-
-    case PerpetualMarketType.PERPETUAL_MARKET_TYPE_ISOLATED:
-      return "PERPETUAL_MARKET_TYPE_ISOLATED";
-
-    case PerpetualMarketType.UNRECOGNIZED:
-    default:
-      return "UNRECOGNIZED";
-  }
-}
 /** Perpetual represents a perpetual on the Klyra exchange. */
 
 export interface Perpetual {
@@ -92,7 +47,23 @@ export interface PerpetualSDKType {
   yield_index: string;
 }
 /**
- * PerpetualParams represents the parameters of a perpetual on the Klyra
+ * MultiCollateralAssetsArray is an array of assets represented by their
+ * asset ids.
+ */
+
+export interface MultiCollateralAssetsArray {
+  multiCollateralAssets: number[];
+}
+/**
+ * MultiCollateralAssetsArray is an array of assets represented by their
+ * asset ids.
+ */
+
+export interface MultiCollateralAssetsArraySDKType {
+  multi_collateral_assets: number[];
+}
+/**
+ * PerpetualParams represents the parameters of a perpetual on the dYdX
  * exchange.
  */
 
@@ -126,21 +97,16 @@ export interface PerpetualParams {
   /** The liquidity_tier that this perpetual is associated with. */
 
   liquidityTier: number;
-  /** The market type specifying if this perpetual is cross or isolated */
-
-  marketType: PerpetualMarketType;
   /**
    * The danger index is used to prioritze certain accounts and positions in
    * liquidations
    */
 
   dangerIndexPpm: number;
-  /** The maximum insurance fund delta per block for isolated perpetual markets. */
-
-  isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: Long;
+  collateralPoolId: number;
 }
 /**
- * PerpetualParams represents the parameters of a perpetual on the Klyra
+ * PerpetualParams represents the parameters of a perpetual on the dYdX
  * exchange.
  */
 
@@ -174,18 +140,13 @@ export interface PerpetualParamsSDKType {
   /** The liquidity_tier that this perpetual is associated with. */
 
   liquidity_tier: number;
-  /** The market type specifying if this perpetual is cross or isolated */
-
-  market_type: PerpetualMarketTypeSDKType;
   /**
    * The danger index is used to prioritze certain accounts and positions in
    * liquidations
    */
 
   danger_index_ppm: number;
-  /** The maximum insurance fund delta per block for isolated perpetual markets. */
-
-  isolated_market_max_cumulative_insurance_fund_delta_per_block: Long;
+  collateral_pool_id: number;
 }
 /** MarketPremiums stores a list of premiums for a single perpetual market. */
 
@@ -463,6 +424,63 @@ export const Perpetual = {
 
 };
 
+function createBaseMultiCollateralAssetsArray(): MultiCollateralAssetsArray {
+  return {
+    multiCollateralAssets: []
+  };
+}
+
+export const MultiCollateralAssetsArray = {
+  encode(message: MultiCollateralAssetsArray, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    writer.uint32(10).fork();
+
+    for (const v of message.multiCollateralAssets) {
+      writer.uint32(v);
+    }
+
+    writer.ldelim();
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MultiCollateralAssetsArray {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMultiCollateralAssetsArray();
+
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+
+      switch (tag >>> 3) {
+        case 1:
+          if ((tag & 7) === 2) {
+            const end2 = reader.uint32() + reader.pos;
+
+            while (reader.pos < end2) {
+              message.multiCollateralAssets.push(reader.uint32());
+            }
+          } else {
+            message.multiCollateralAssets.push(reader.uint32());
+          }
+
+          break;
+
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+
+    return message;
+  },
+
+  fromPartial(object: DeepPartial<MultiCollateralAssetsArray>): MultiCollateralAssetsArray {
+    const message = createBaseMultiCollateralAssetsArray();
+    message.multiCollateralAssets = object.multiCollateralAssets?.map(e => e) || [];
+    return message;
+  }
+
+};
+
 function createBasePerpetualParams(): PerpetualParams {
   return {
     id: 0,
@@ -471,9 +489,8 @@ function createBasePerpetualParams(): PerpetualParams {
     atomicResolution: 0,
     defaultFundingPpm: 0,
     liquidityTier: 0,
-    marketType: 0,
     dangerIndexPpm: 0,
-    isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: Long.UZERO
+    collateralPoolId: 0
   };
 }
 
@@ -503,16 +520,12 @@ export const PerpetualParams = {
       writer.uint32(48).uint32(message.liquidityTier);
     }
 
-    if (message.marketType !== 0) {
-      writer.uint32(56).int32(message.marketType);
-    }
-
     if (message.dangerIndexPpm !== 0) {
-      writer.uint32(64).uint32(message.dangerIndexPpm);
+      writer.uint32(56).uint32(message.dangerIndexPpm);
     }
 
-    if (!message.isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock.isZero()) {
-      writer.uint32(72).uint64(message.isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock);
+    if (message.collateralPoolId !== 0) {
+      writer.uint32(64).uint32(message.collateralPoolId);
     }
 
     return writer;
@@ -552,15 +565,11 @@ export const PerpetualParams = {
           break;
 
         case 7:
-          message.marketType = (reader.int32() as any);
-          break;
-
-        case 8:
           message.dangerIndexPpm = reader.uint32();
           break;
 
-        case 9:
-          message.isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock = (reader.uint64() as Long);
+        case 8:
+          message.collateralPoolId = reader.uint32();
           break;
 
         default:
@@ -580,9 +589,8 @@ export const PerpetualParams = {
     message.atomicResolution = object.atomicResolution ?? 0;
     message.defaultFundingPpm = object.defaultFundingPpm ?? 0;
     message.liquidityTier = object.liquidityTier ?? 0;
-    message.marketType = object.marketType ?? 0;
     message.dangerIndexPpm = object.dangerIndexPpm ?? 0;
-    message.isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock = object.isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock !== undefined && object.isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock !== null ? Long.fromValue(object.isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock) : Long.UZERO;
+    message.collateralPoolId = object.collateralPoolId ?? 0;
     return message;
   }
 

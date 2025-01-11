@@ -55,6 +55,9 @@ export interface Asset {
    */
 
   assetYieldIndex: string;
+  /** The max slippage in ppm for the asset. */
+
+  maxSlippagePpm: number;
 }
 /** Asset defines a single exchangable asset. */
 
@@ -111,6 +114,9 @@ export interface AssetSDKType {
    */
 
   asset_yield_index: string;
+  /** The max slippage in ppm for the asset. */
+
+  max_slippage_ppm: number;
 }
 
 function createBaseAsset(): Asset {
@@ -122,7 +128,8 @@ function createBaseAsset(): Asset {
     hasMarket: false,
     marketId: 0,
     atomicResolution: 0,
-    assetYieldIndex: ""
+    assetYieldIndex: "",
+    maxSlippagePpm: 0
   };
 }
 
@@ -158,6 +165,10 @@ export const Asset = {
 
     if (message.assetYieldIndex !== "") {
       writer.uint32(66).string(message.assetYieldIndex);
+    }
+
+    if (message.maxSlippagePpm !== 0) {
+      writer.uint32(72).uint32(message.maxSlippagePpm);
     }
 
     return writer;
@@ -204,6 +215,10 @@ export const Asset = {
           message.assetYieldIndex = reader.string();
           break;
 
+        case 9:
+          message.maxSlippagePpm = reader.uint32();
+          break;
+
         default:
           reader.skipType(tag & 7);
           break;
@@ -223,6 +238,7 @@ export const Asset = {
     message.marketId = object.marketId ?? 0;
     message.atomicResolution = object.atomicResolution ?? 0;
     message.assetYieldIndex = object.assetYieldIndex ?? "";
+    message.maxSlippagePpm = object.maxSlippagePpm ?? 0;
     return message;
   }
 

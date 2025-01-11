@@ -22,6 +22,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 			asset.MarketId,
 			asset.AtomicResolution,
 			asset.AssetYieldIndex,
+			asset.MaxSlippagePpm,
 		)
 		if err != nil {
 			panic(err)

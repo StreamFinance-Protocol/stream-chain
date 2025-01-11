@@ -48,7 +48,8 @@ func DelayMsgKeepers(
 
 		epochsKeeper, _ := createEpochsKeeper(stateStore, db, cdc)
 		pricesKeeper, _, _, _, _ = createPricesKeeper(stateStore, db, cdc, transientStoreKey)
-		perpsKeeper, _ = createPerpetualsKeeper(stateStore, db, cdc, pricesKeeper, epochsKeeper, transientStoreKey)
+		assetsKeeper, _ := createAssetsKeeper(stateStore, db, cdc, pricesKeeper, transientStoreKey, true)
+		perpsKeeper, _ = createPerpetualsKeeper(stateStore, db, cdc, pricesKeeper, epochsKeeper, assetsKeeper, nil, transientStoreKey)
 
 		// Register perps keeper msg server for msg routing.
 		perpetualstypes.RegisterMsgServer(router, perpetualskeeper.NewMsgServerImpl(perpsKeeper))

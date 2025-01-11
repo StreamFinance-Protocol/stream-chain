@@ -16,7 +16,6 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/memclob"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals"
-	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
@@ -254,7 +253,6 @@ func TestMsgServerUpdateClobPair(t *testing.T) {
 			memClob := memclob.NewMemClobPriceTimePriority(false)
 			mockIndexerEventManager := &mocks.IndexerEventManager{}
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, &mocks.BankKeeper{}, mockIndexerEventManager, nil)
-			prices.InitGenesis(ks.Ctx, *ks.PricesKeeper, constants.Prices_DefaultGenesisState)
 			perpetuals.InitGenesis(ks.Ctx, *ks.PerpetualsKeeper, constants.Perpetuals_DefaultGenesisState)
 
 			if tc.setup != nil {
@@ -262,7 +260,7 @@ func TestMsgServerUpdateClobPair(t *testing.T) {
 			}
 
 			k := ks.ClobKeeper
-			msgServer := keeper.NewMsgServerImpl(k)
+			msgServer := keeper.NewMsgServerImpl(&k)
 
 			resp, err := msgServer.UpdateClobPair(ks.Ctx, tc.msg)
 			require.Equal(t, tc.expectedResp, resp)

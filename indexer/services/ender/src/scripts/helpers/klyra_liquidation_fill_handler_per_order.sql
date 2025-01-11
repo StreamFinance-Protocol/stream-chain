@@ -17,8 +17,7 @@ DECLARE
     order_price numeric;
     order_client_metadata bigint;
     router_fee_ppm bigint;
-    router_fee_subaccount_owner text;
-    router_fee_subaccount_number bigint;
+    router_fee_owner text;
     fee numeric;
     fill_amount numeric;
     total_filled numeric;
@@ -91,8 +90,7 @@ BEGIN
         subaccount_uuid = klyra_uuid_from_subaccount_id(jsonb_extract_path(order_, 'orderId', 'subaccountId'));
         order_client_metadata = (order_->'clientMetadata')::bigint;
         router_fee_ppm = (order_->'routerFeePpm')::bigint;
-        router_fee_subaccount_owner = (order_->'routerFeeSubaccountOwner')::text;
-        router_fee_subaccount_number = (order_->'routerFeeSubaccountNumber')::bigint;
+        router_fee_owner = (order_->'routerFeeOwner')::text;
         order_side = klyra_from_protocol_order_side(order_->'side');
     ELSE
         order_uuid = NULL;
@@ -118,8 +116,7 @@ BEGIN
         order_record."goodTilBlockTime" = to_timestamp((order_->'goodTilBlockTime')::double precision);
         order_record."clientMetadata" = order_client_metadata;
         order_record."routerFeePpm" = router_fee_ppm;
-        order_record."routerFeeSubaccountOwner" = router_fee_subaccount_owner;
-        order_record."routerFeeSubaccountNumber" = router_fee_subaccount_number;
+        order_record."routerFeeOwner" = router_fee_owner;
         order_record."updatedAt" = block_time;
         order_record."updatedAtHeight" = block_height;
 
@@ -141,8 +138,7 @@ BEGIN
                 "reduceOnly" = order_record."reduceOnly",
                 "clientMetadata" = order_record."clientMetadata",
                 "routerFeePpm" = order_record."routerFeePpm",
-                "routerFeeSubaccountOwner" = order_record."routerFeeSubaccountOwner",
-                "routerFeeSubaccountNumber" = order_record."routerFeeSubaccountNumber",
+                "routerFeeOwner" = order_record."routerFeeOwner",
                 "updatedAt" = order_record."updatedAt",
                 "updatedAtHeight" = order_record."updatedAtHeight"
             WHERE id = order_uuid;
@@ -160,7 +156,7 @@ BEGIN
             INSERT INTO orders
             ("id", "subaccountId", "clientId", "clobPairId", "side", "size", "totalFilled", "price", "type",
              "status", "timeInForce", "reduceOnly", "orderFlags", "goodTilBlock", "goodTilBlockTime", "createdAtHeight",
-             "clientMetadata", "routerFeePpm", "routerFeeSubaccountOwner", "routerFeeSubaccountNumber", "triggerPrice", "updatedAt", "updatedAtHeight")
+             "clientMetadata", "routerFeePpm", "routerFeeOwner", "triggerPrice", "updatedAt", "updatedAtHeight")
             VALUES (order_record.*);
         END IF;
     END IF;

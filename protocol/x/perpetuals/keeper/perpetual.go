@@ -23,6 +23,7 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib/log"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib/metrics"
+	assettypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets/types"
 	epochstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/epochs/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
@@ -30,15 +31,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	gometrics "github.com/hashicorp/go-metrics"
 )
-
-func (k Keeper) IsIsolatedPerpetual(ctx sdk.Context, perpetualId uint32) (bool, error) {
-	perpetual, err := k.GetPerpetual(ctx, perpetualId)
-	if err != nil {
-		return false, err
-	}
-
-	return perpetual.Params.MarketType == types.PerpetualMarketType_PERPETUAL_MARKET_TYPE_ISOLATED, nil
-}
 
 // GetInsuranceFundName returns the name of the insurance fund account for a given perpetual.
 // For isolated markets, the name is "insurance-fund:<perpetualId>".
@@ -49,13 +41,7 @@ func (k Keeper) GetInsuranceFundName(ctx sdk.Context, perpetualId uint32) (strin
 		return "", err
 	}
 
-	if perpetual.Params.MarketType == types.PerpetualMarketType_PERPETUAL_MARKET_TYPE_ISOLATED {
-		return types.InsuranceFundName + ":" + lib.UintToString(perpetualId), nil
-	} else if perpetual.Params.MarketType == types.PerpetualMarketType_PERPETUAL_MARKET_TYPE_CROSS {
-		return types.InsuranceFundName, nil
-	}
-
-	panic(fmt.Sprintf("invalid market type %v for perpetual %d", perpetual.Params.MarketType, perpetualId))
+	return types.InsuranceFundName + ":" + lib.UintToString(perpetual.Params.CollateralPoolId), nil
 }
 
 // GetInsuranceFundModuleAddress returns the address of the insurance fund account for a given perpetual.
@@ -78,9 +64,8 @@ func (k Keeper) CreatePerpetual(
 	atomicResolution int32,
 	defaultFundingPpm int32,
 	liquidityTier uint32,
-	marketType types.PerpetualMarketType,
 	dangerIndexPpm uint32,
-	isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock uint64,
+	collateralPoolId uint32,
 	yieldIndex string,
 ) (types.Perpetual, error) {
 	// Check if perpetual exists.
@@ -100,9 +85,8 @@ func (k Keeper) CreatePerpetual(
 			AtomicResolution:  atomicResolution,
 			DefaultFundingPpm: defaultFundingPpm,
 			LiquidityTier:     liquidityTier,
-			MarketType:        marketType,
 			DangerIndexPpm:    dangerIndexPpm,
-			IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
+			CollateralPoolId:  collateralPoolId,
 		},
 		FundingIndex:    dtypes.ZeroInt(),
 		OpenInterest:    dtypes.ZeroInt(),
@@ -146,7 +130,6 @@ func (k Keeper) ModifyPerpetual(
 	defaultFundingPpm int32,
 	liquidityTier uint32,
 	dangerIndexPpm uint32,
-	isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock uint64,
 ) (types.Perpetual, error) {
 	// Get perpetual.
 	perpetual, err := k.GetPerpetual(ctx, id)
@@ -160,8 +143,6 @@ func (k Keeper) ModifyPerpetual(
 	perpetual.Params.DefaultFundingPpm = defaultFundingPpm
 	perpetual.Params.LiquidityTier = liquidityTier
 	perpetual.Params.DangerIndexPpm = dangerIndexPpm
-	perpetual.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock = isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock
-
 	// Store the modified perpetual.
 	if err := k.ValidateAndSetPerpetual(ctx, perpetual); err != nil {
 		return types.Perpetual{}, err
@@ -180,7 +161,6 @@ func (k Keeper) ModifyPerpetual(
 				perpetual.Params.AtomicResolution,
 				perpetual.Params.LiquidityTier,
 				perpetual.Params.DangerIndexPpm,
-				lib.UintToString(perpetual.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock),
 				perpetual.YieldIndex,
 			),
 		),
@@ -417,6 +397,7 @@ func (k Keeper) getFundingIndexDelta(
 	perp types.Perpetual,
 	big8hrFundingRatePpm *big.Int,
 	timeSinceLastFunding uint32,
+	quoteCurrencyAtomicResolution int32,
 ) (
 	fundingIndexDelta *big.Int,
 	err error,
@@ -442,6 +423,7 @@ func (k Keeper) getFundingIndexDelta(
 	bigFundingIndexDelta := lib.FundingRateToIndex(
 		proratedFundingRate,
 		perp.Params.AtomicResolution,
+		quoteCurrencyAtomicResolution,
 		marketPrice.SpotPrice,
 		marketPrice.Exponent,
 	)
@@ -542,6 +524,12 @@ func (k Keeper) sampleAllPerpetuals(ctx sdk.Context) (
 		if !exists {
 			panic(types.ErrLiquidityTierDoesNotExist)
 		}
+
+		quoteCurrencyAtomicResolution, err := k.GetQuoteCurrencyAtomicResolutionFromPerpetualId(ctx, perp.Params.Id)
+		if err != nil {
+			panic(err)
+		}
+
 		premiumPpm, err := k.clobKeeper.GetPricePremiumForPerpetual(
 			ctx,
 			perp.Params.Id,
@@ -552,7 +540,7 @@ func (k Keeper) sampleAllPerpetuals(ctx sdk.Context) (
 					SpotPrice: daemonPrice.SpotPrice,
 				},
 				BaseAtomicResolution:        perp.Params.AtomicResolution,
-				QuoteAtomicResolution:       lib.QuoteCurrencyAtomicResolution,
+				QuoteAtomicResolution:       quoteCurrencyAtomicResolution,
 				ImpactNotionalQuoteQuantums: bigImpactNotionalQuoteQuantums,
 				MaxAbsPremiumVotePpm:        maxAbsPremiumVotePpm,
 			},
@@ -648,7 +636,16 @@ func (k Keeper) UpdateYieldIndexToNewMint(
 	allPerps := k.GetAllPerpetuals(ctx)
 
 	for _, perp := range allPerps {
-		modifiedPerp, err := k.CalculateNewTotalYieldIndex(
+		collateralPool, err := k.GetCollateralPool(ctx, perp.Params.CollateralPoolId)
+		if err != nil {
+			return err
+		}
+
+		if collateralPool.QuoteAssetId != assettypes.AssetTDai.Id {
+			continue
+		}
+
+		modifiedPerp, err := k.GeneratePerpetualWithUpdatedYieldIndex(
 			ctx,
 			totalTDaiPreMint,
 			totalTDaiMinted,
@@ -675,7 +672,6 @@ func (k Keeper) UpdateYieldIndexToNewMint(
 					modifiedPerp.Params.AtomicResolution,
 					modifiedPerp.Params.LiquidityTier,
 					modifiedPerp.Params.DangerIndexPpm,
-					lib.UintToString(modifiedPerp.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock),
 					modifiedPerp.YieldIndex,
 				),
 			),
@@ -685,7 +681,7 @@ func (k Keeper) UpdateYieldIndexToNewMint(
 	return nil
 }
 
-func (k Keeper) CalculateNewTotalYieldIndex(
+func (k Keeper) GeneratePerpetualWithUpdatedYieldIndex(
 	ctx sdk.Context,
 	totalTDaiPreMint *big.Int,
 	totalTDaiMinted *big.Int,
@@ -740,11 +736,17 @@ func (k Keeper) CalculateYieldIndexForEpoch(
 		return nil, errorsmod.Wrapf(types.ErrPerpAndPriceMarketsMismatched, "Perpetual Market Id: %v. Price Market Id: %v.", perpetual.Params.MarketId, marketPrice.Id)
 	}
 
+	quoteCurrencyAtomicResolution, err := k.GetQuoteCurrencyAtomicResolutionFromPerpetualId(ctx, perpetual.Params.Id)
+	if err != nil {
+		return nil, err
+	}
+
 	oneBaseQuantum := big.NewInt(1)
 
 	priceForOneBaseQuantum := lib.BaseToQuoteQuantums(
 		oneBaseQuantum,
 		perpetual.Params.AtomicResolution,
+		quoteCurrencyAtomicResolution,
 		marketPrice.PnlPrice,
 		marketPrice.Exponent,
 	)
@@ -885,6 +887,11 @@ func (k Keeper) MaybeProcessNewFundingTickEpoch(ctx sdk.Context) {
 		}
 
 		if bigFundingRatePpm.Sign() != 0 {
+			quoteCurrencyAtomicResolution, err := k.GetQuoteCurrencyAtomicResolutionFromPerpetualId(ctx, perp.Params.Id)
+			if err != nil {
+				panic(err)
+			}
+
 			fundingIndexDelta, err := k.getFundingIndexDelta(
 				ctx,
 				perp,
@@ -893,6 +900,7 @@ func (k Keeper) MaybeProcessNewFundingTickEpoch(ctx sdk.Context) {
 				// TODO(DEC-1483): Handle the case when duration value is updated
 				// during the epoch.
 				fundingTickEpochInfo.Duration,
+				quoteCurrencyAtomicResolution,
 			)
 			if err != nil {
 				panic(err)
@@ -941,6 +949,7 @@ func (k Keeper) GetNetNotional(
 	ctx sdk.Context,
 	id uint32,
 	bigQuantums *big.Int,
+	quoteCurrencyAtomicResolution int32,
 ) (
 	bigNetNotionalQuoteQuantums *big.Int,
 	err error,
@@ -964,7 +973,7 @@ func (k Keeper) GetNetNotional(
 		return new(big.Int), err
 	}
 
-	return GetNetNotionalInQuoteQuantums(perpetual, marketPrice, bigQuantums), nil
+	return GetNetNotionalInQuoteQuantums(perpetual, marketPrice, bigQuantums, quoteCurrencyAtomicResolution), nil
 }
 
 // GetNetNotionalInQuoteQuantums returns the net notional in quote quantums, which can be
@@ -978,52 +987,19 @@ func GetNetNotionalInQuoteQuantums(
 	perpetual types.Perpetual,
 	marketPrice pricestypes.MarketPrice,
 	bigQuantums *big.Int,
+	quoteCurrencyAtomicResolution int32,
 ) (
 	bigNetNotionalQuoteQuantums *big.Int,
 ) {
 	bigQuoteQuantums := lib.BaseToQuoteQuantums(
 		bigQuantums,
 		perpetual.Params.AtomicResolution,
+		quoteCurrencyAtomicResolution,
 		marketPrice.PnlPrice,
 		marketPrice.Exponent,
 	)
 
 	return bigQuoteQuantums
-}
-
-// GetNotionalInBaseQuantums returns the net notional in base quantums, which can be represented
-// by the following equation:
-// `quoteQuantums * 10^baseAtomicResolution / (marketPrice * 10^marketExponent * 10^quoteAtomicResolution)`.
-// Note that longs are positive, and shorts are negative.
-// Returns an error if a perpetual with `id` does not exist or if the `perpetual.Params.MarketId` does
-// not exist.
-func (k Keeper) GetNotionalInBaseQuantums(
-	ctx sdk.Context,
-	id uint32,
-	bigQuoteQuantums *big.Int,
-) (
-	bigBaseQuantums *big.Int,
-	err error,
-) {
-	defer telemetry.ModuleMeasureSince(
-		types.ModuleName,
-		time.Now(),
-		metrics.GetNotionalInBaseQuantums,
-		metrics.Latency,
-	)
-
-	perpetual, marketPrice, err := k.GetPerpetualAndMarketPrice(ctx, id)
-	if err != nil {
-		return new(big.Int), err
-	}
-
-	bigBaseQuantums = lib.QuoteToBaseQuantums(
-		bigQuoteQuantums,
-		perpetual.Params.AtomicResolution,
-		marketPrice.PnlPrice,
-		marketPrice.Exponent,
-	)
-	return bigBaseQuantums, nil
 }
 
 // GetNetCollateral returns the net collateral in quote quantums. The net collateral is equal to
@@ -1036,12 +1012,13 @@ func (k Keeper) GetNetCollateral(
 	ctx sdk.Context,
 	id uint32,
 	bigQuantums *big.Int,
+	quoteCurrencyAtomicResolution int32,
 ) (
 	bigNetCollateralQuoteQuantums *big.Int,
 	err error,
 ) {
 	// The net collateral is equal to the net open notional.
-	return k.GetNetNotional(ctx, id, bigQuantums)
+	return k.GetNetNotional(ctx, id, bigQuantums, quoteCurrencyAtomicResolution)
 }
 
 // GetMarginRequirements returns initial and maintenance margin requirements in quote quantums, given the position
@@ -1062,6 +1039,7 @@ func (k Keeper) GetMarginRequirements(
 	ctx sdk.Context,
 	id uint32,
 	bigQuantums *big.Int,
+	quoteCurrencyAtomicResolution int32,
 ) (
 	bigInitialMarginQuoteQuantums *big.Int,
 	bigMaintenanceMarginQuoteQuantums *big.Int,
@@ -1098,6 +1076,7 @@ func (k Keeper) GetMarginRequirements(
 		marketPrice,
 		liquidityTier,
 		bigQuantums,
+		quoteCurrencyAtomicResolution,
 	)
 	return bigInitialMarginQuoteQuantums, bigMaintenanceMarginQuoteQuantums, nil
 }
@@ -1111,6 +1090,7 @@ func GetMarginRequirementsInQuoteQuantums(
 	marketPrice pricestypes.MarketPrice,
 	liquidityTier types.LiquidityTier,
 	bigQuantums *big.Int,
+	quoteCurrencyAtomicResolution int32,
 ) (
 	bigInitialMarginQuoteQuantums *big.Int,
 	bigMaintenanceMarginQuoteQuantums *big.Int,
@@ -1122,6 +1102,7 @@ func GetMarginRequirementsInQuoteQuantums(
 	bigQuoteQuantums := lib.BaseToQuoteQuantums(
 		bigAbsQuantums,
 		perpetual.Params.AtomicResolution,
+		quoteCurrencyAtomicResolution,
 		marketPrice.PnlPrice,
 		marketPrice.Exponent,
 	)
@@ -1130,6 +1111,7 @@ func GetMarginRequirementsInQuoteQuantums(
 	openInterestQuoteQuantums := lib.BaseToQuoteQuantums(
 		perpetual.OpenInterest.BigInt(), // OpenInterest is represented as base quantums.
 		perpetual.Params.AtomicResolution,
+		quoteCurrencyAtomicResolution,
 		marketPrice.PnlPrice,
 		marketPrice.Exponent,
 	)
@@ -1549,6 +1531,11 @@ func (k Keeper) validatePerpetual(
 		return errorsmod.Wrap(types.ErrLiquidityTierDoesNotExist, lib.UintToString(perpetual.Params.LiquidityTier))
 	}
 
+	// Validate `collateralPool` exists.
+	if !k.HasCollateralPool(ctx, perpetual.Params.CollateralPoolId) {
+		return errorsmod.Wrap(types.ErrCollateralPoolDoesNotExist, lib.UintToString(perpetual.Params.CollateralPoolId))
+	}
+
 	if perpetual.YieldIndex == "" {
 		return types.ErrYieldIndexDoesNotExist
 	}
@@ -1772,6 +1759,220 @@ func (k Keeper) setLiquidityTier(
 	b := k.cdc.MustMarshal(&liquidityTier)
 	liquidityTierStore := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.LiquidityTierKeyPrefix))
 	liquidityTierStore.Set(lib.Uint32ToKey(liquidityTier.Id), b)
+}
+
+/* === COLLATERAL POOL FUNCTIONS === */
+
+func (k Keeper) GetQuoteAssetIdFromPerpetualId(ctx sdk.Context, perpetualId uint32) (uint32, error) {
+	quoteAsset, err := k.GetQuoteAssetFromPerpetualId(ctx, perpetualId)
+	if err != nil {
+		return 0, err
+	}
+
+	return quoteAsset.Id, nil
+}
+
+func (k Keeper) GetQuoteCurrencyAtomicResolutionFromPerpetualId(ctx sdk.Context, perpetualId uint32) (int32, error) {
+	quoteAsset, err := k.GetQuoteAssetFromPerpetualId(ctx, perpetualId)
+	if err != nil {
+		return 0, err
+	}
+
+	return quoteAsset.AtomicResolution, nil
+}
+
+func (k Keeper) GetQuoteAssetFromPerpetualId(ctx sdk.Context, perpetualId uint32) (assettypes.Asset, error) {
+	collateralPool, err := k.GetCollateralPoolFromPerpetualId(ctx, perpetualId)
+	if err != nil {
+		return assettypes.Asset{}, err
+	}
+
+	quoteAsset, exists := k.assetsKeeper.GetAsset(ctx, collateralPool.QuoteAssetId)
+	if !exists {
+		return assettypes.Asset{}, errorsmod.Wrapf(assettypes.ErrAssetDoesNotExist, "Quote asset not found for perpetual Id %+v", perpetualId)
+	}
+
+	return quoteAsset, nil
+}
+
+func (k Keeper) GetCollateralPoolFromPerpetualId(ctx sdk.Context, perpetualId uint32) (
+	collateralPool types.CollateralPool,
+	err error,
+) {
+	perpetual, err := k.GetPerpetual(ctx, perpetualId)
+	if err != nil {
+		return collateralPool, err
+	}
+	return k.GetCollateralPool(ctx, perpetual.Params.CollateralPoolId)
+}
+
+// HasCollateralPool checks if a collateral pool exists in the store.
+func (k Keeper) HasCollateralPool(
+	ctx sdk.Context,
+	id uint32,
+) (found bool) {
+	cpStore := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.CollateralPoolKeyPrefix))
+	return cpStore.Has(lib.Uint32ToKey(id))
+}
+
+// `UpsertCollateralPool` creates or updates a collateral pool in the store (i.e. updates if `id` exists and creates otherwise).
+// Returns an error if any of its fields fails validation.
+func (k Keeper) UpsertCollateralPool(
+	ctx sdk.Context,
+	collateralPoolId uint32,
+	maxCumulativeInsuranceFundDeltaPerBlock uint64,
+	multiCollateralAssets *types.MultiCollateralAssetsArray,
+	quoteAssetId uint32,
+) (
+	collateralPool types.CollateralPool,
+	err error,
+) {
+	// Construct collateral pool.
+	collateralPool = types.CollateralPool{
+		CollateralPoolId:                        collateralPoolId,
+		MaxCumulativeInsuranceFundDeltaPerBlock: maxCumulativeInsuranceFundDeltaPerBlock,
+		MultiCollateralAssets:                   multiCollateralAssets,
+		QuoteAssetId:                            quoteAssetId,
+	}
+
+	// Validate collateral pool's fields.
+	if err := collateralPool.Validate(); err != nil {
+		return collateralPool, err
+	}
+
+	if !k.EnsureMultiCollateralAssetsExists(ctx, multiCollateralAssets) {
+		return collateralPool, errorsmod.Wrap(types.ErrMultiCollateralAssetDoesNotExist, lib.UintToString(quoteAssetId))
+	}
+
+	doesCollatPoolExits := k.HasCollateralPool(ctx, collateralPoolId)
+
+	if doesCollatPoolExits {
+		if err := k.HandleExistingCollateralPool(ctx, collateralPoolId, multiCollateralAssets, quoteAssetId); err != nil {
+			return collateralPool, err
+		}
+	}
+
+	// Set collateral pool in store.
+	k.writeCollateralPoolToStore(ctx, collateralPool)
+
+	k.GetIndexerEventManager().AddTxnEvent(
+		ctx,
+		indexerevents.SubtypeCollateralPool,
+		indexerevents.CollateralPoolEventVersion,
+		indexer_manager.GetBytes(
+			indexerevents.NewCollateralPoolUpsertEvent(
+				collateralPoolId,
+				maxCumulativeInsuranceFundDeltaPerBlock,
+				multiCollateralAssets.MultiCollateralAssets,
+				quoteAssetId,
+			),
+		),
+	)
+
+	return collateralPool, nil
+}
+
+func (k Keeper) HandleExistingCollateralPool(
+	ctx sdk.Context,
+	collateralPoolId uint32,
+	multiCollateralAssets *types.MultiCollateralAssetsArray,
+	quoteAssetId uint32,
+
+) (err error) {
+	if !k.HasCollateralPool(ctx, collateralPoolId) {
+		return nil
+	}
+
+	collateralPool, err := k.GetCollateralPool(ctx, collateralPoolId)
+	if err != nil {
+		return err
+	}
+
+	if collateralPool.QuoteAssetId != quoteAssetId {
+		return types.ErrCannotModifyCollateralPoolQuoteAsset
+	}
+
+	// Create a map of new assets for O(1) lookups
+	newAssetsMap := make(map[uint32]struct{}, len(multiCollateralAssets.MultiCollateralAssets))
+	for _, newAsset := range multiCollateralAssets.MultiCollateralAssets {
+		newAssetsMap[newAsset] = struct{}{}
+	}
+
+	// Check that all existing assets are present in the new set
+	for _, existingAsset := range collateralPool.MultiCollateralAssets.MultiCollateralAssets {
+		if _, exists := newAssetsMap[existingAsset]; !exists {
+			return types.ErrCannotRemoveMultiCollateralAssetFromCollateralPool
+		}
+	}
+
+	return nil
+}
+
+func (k Keeper) EnsureMultiCollateralAssetsExists(
+	ctx sdk.Context,
+	multiCollateralAssets *types.MultiCollateralAssetsArray,
+) (exists bool) {
+	for _, assetId := range multiCollateralAssets.MultiCollateralAssets {
+		_, exists = k.assetsKeeper.GetAsset(ctx, assetId)
+		if !exists {
+			return false
+		}
+	}
+	return true
+}
+
+// `GetCollateralPool` gets a collateral pool given its id.
+func (k Keeper) GetCollateralPool(ctx sdk.Context, id uint32) (
+	collateralPool types.CollateralPool,
+	err error,
+) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.CollateralPoolKeyPrefix))
+
+	b := store.Get(lib.Uint32ToKey(id))
+	if b == nil {
+		return collateralPool, errorsmod.Wrap(types.ErrCollateralPoolDoesNotExist, lib.UintToString(id))
+	}
+
+	k.cdc.MustUnmarshal(b, &collateralPool)
+	return collateralPool, nil
+}
+
+// `GetAllCollateralPools` returns all collateral pools, sorted by id.
+func (k Keeper) GetAllCollateralPools(ctx sdk.Context) (list []types.CollateralPool) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.CollateralPoolKeyPrefix))
+	iterator := storetypes.KVStorePrefixIterator(store, []byte{})
+
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var val types.CollateralPool
+		k.cdc.MustUnmarshal(iterator.Value(), &val)
+		list = append(list, val)
+	}
+
+	sort.Slice(list, func(i, j int) bool {
+		return list[i].CollateralPoolId < list[j].CollateralPoolId
+	})
+
+	return list
+}
+
+// `writeCollateralPoolToStore` writes a collateral pool in store.
+func (k Keeper) writeCollateralPoolToStore(
+	ctx sdk.Context,
+	collateralPool types.CollateralPool,
+) {
+	b := k.cdc.MustMarshal(&collateralPool)
+	collateralPoolStore := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.CollateralPoolKeyPrefix))
+	collateralPoolStore.Set(lib.Uint32ToKey(collateralPool.CollateralPoolId), b)
+}
+
+func (k Keeper) IsMainCollateralPool(ctx sdk.Context, perpetualId uint32) (bool, error) {
+	perpetual, err := k.GetPerpetual(ctx, perpetualId)
+	if err != nil {
+		return false, err
+	}
+	return perpetual.Params.CollateralPoolId == 0, nil
 }
 
 /* === PARAMETERS FUNCTIONS === */

@@ -13,7 +13,7 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/delaymsg/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/delaymsg/types"
 	perpetualstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
-	subaccounttypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
+	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 )
@@ -177,7 +177,7 @@ func TestDelayMessageByBlocks_Failures(t *testing.T) {
 		},
 		"Message fails validation": {
 			msg: &perpetualstypes.MsgUpdateParams{
-				Authority: subaccounttypes.ModuleAddress.String(),
+				Authority: satypes.ModuleAddress.String(),
 				Params:    constants.PerpetualsGenesisParams,
 			},
 			expectedError: "message signer must be delaymsg module address: Invalid signer",
@@ -361,7 +361,7 @@ func TestValidateMsg(t *testing.T) {
 		},
 		"Message fails validateSigners": {
 			msg: &perpetualstypes.MsgUpdateParams{
-				Authority: subaccounttypes.ModuleAddress.String(),
+				Authority: satypes.ModuleAddress.String(),
 				Params:    constants.PerpetualsGenesisParams,
 			},
 			signer:        []byte("other signer"),
@@ -407,7 +407,7 @@ func TestSetDelayedMessage(t *testing.T) {
 				Msg: encoding.EncodeMessageToAny(
 					t,
 					&perpetualstypes.MsgUpdateParams{
-						Authority: subaccounttypes.ModuleAddress.String(),
+						Authority: satypes.ModuleAddress.String(),
 						Params:    constants.PerpetualsGenesisParams,
 					},
 				),

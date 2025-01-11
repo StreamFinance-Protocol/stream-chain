@@ -43,6 +43,8 @@ const (
 	initialSDAIBalance                       = int64(10_000_000_000) // 100 sDAI
 	cancelsSubaccountNumberZero              = uint32(0)
 	cancelsSubaccountNumberOne               = uint32(1)
+	cancelsSubaccountNumberTwo               = uint32(2)
+	cancelsSubaccountNumberThree             = uint32(3)
 )
 
 type CancelOrderIntegrationTestSuite struct {
@@ -53,7 +55,6 @@ type CancelOrderIntegrationTestSuite struct {
 }
 
 func GetBalanceAfterYield(clientCtx client.Context, initialBalance *big.Int) (balance int64, err error) {
-
 	args := []string{}
 	data, err := clitestutil.ExecTestCLICmd(clientCtx, ratelimitcli.CmdGetSDAIPriceQuery(), args)
 	if err != nil {
@@ -65,7 +66,6 @@ func GetBalanceAfterYield(clientCtx client.Context, initialBalance *big.Int) (ba
 	if err != nil {
 		return 0, err
 	}
-	fmt.Println("SDAI: ", resp)
 
 	priceFloat, success := new(big.Float).SetString(resp.Price)
 	if !success {
@@ -141,17 +141,19 @@ func (s *CancelOrderIntegrationTestSuite) SetupTest() {
 
 	s.cfg.MinGasPrices = fmt.Sprintf("0%s", sdk.DefaultBondDenom)
 
-	clobPair := constants.ClobPair_Btc
 	state := types.GenesisState{}
 
-	state.ClobPairs = append(state.ClobPairs, clobPair)
+	state.ClobPairs = append(state.ClobPairs, constants.ClobPair_Btc)
+	state.ClobPairs = append(state.ClobPairs, constants.ClobPair_BtcBtc)
+
 	state.LiquidationsConfig = types.LiquidationsConfig_NoFee
 
 	perpstate := perptypes.GenesisState{}
 	perpstate.LiquidityTiers = constants.LiquidityTiers
+	perpstate.CollateralPools = constants.CollateralPools
 	perpstate.Params = constants.PerpetualsGenesisParams
-	perpetual := constants.BtcUsd_50PercentInitial_40PercentMaintenance
-	perpstate.Perpetuals = append(perpstate.Perpetuals, perpetual)
+	perpstate.Perpetuals = append(perpstate.Perpetuals, constants.BtcUsd_50PercentInitial_40PercentMaintenance)
+	perpstate.Perpetuals = append(perpstate.Perpetuals, constants.BtcBtc_10_20MarginRequirement_CollatPool1_Id10)
 
 	pricesstate := constants.Prices_DefaultGenesisState
 
@@ -193,6 +195,32 @@ func (s *CancelOrderIntegrationTestSuite) SetupTest() {
 			},
 			PerpetualPositions: []*satypes.PerpetualPosition{},
 		},
+		satypes.Subaccount{
+			Id: &satypes.SubaccountId{
+				Owner:  s.validatorAddress.String(),
+				Number: 2,
+			},
+			AssetPositions: []*satypes.AssetPosition{
+				{
+					AssetId:  1,
+					Quantums: dtypes.NewInt(1000000000),
+				},
+			},
+			PerpetualPositions: []*satypes.PerpetualPosition{},
+		},
+		satypes.Subaccount{
+			Id: &satypes.SubaccountId{
+				Owner:  s.validatorAddress.String(),
+				Number: 3,
+			},
+			AssetPositions: []*satypes.AssetPosition{
+				{
+					AssetId:  1,
+					Quantums: dtypes.NewInt(1000000000),
+				},
+			},
+			PerpetualPositions: []*satypes.PerpetualPosition{},
+		},
 	)
 
 	epstate := constants.GenerateEpochGenesisStateWithoutFunding()
@@ -224,7 +252,6 @@ func (s *CancelOrderIntegrationTestSuite) SetupTest() {
 
 	_, err = s.network.WaitForHeight(1)
 	s.Require().NoError(err)
-
 }
 
 // TestCLICancelPendingOrder places then cancels an order from a subaccount, and then places an order from
@@ -234,7 +261,6 @@ func (s *CancelOrderIntegrationTestSuite) SetupTest() {
 // The subaccounts are then queried and assertions are performed on their QuoteBalance and PerpetualPositions.
 // The account which places the orders is also the validator's AccAddress.
 func (s *CancelOrderIntegrationTestSuite) TestCLICancelPendingOrder() {
-
 	val := s.network.Validators[0]
 	ctx := val.ClientCtx
 
@@ -330,10 +356,11 @@ func (s *CancelOrderIntegrationTestSuite) TestCLICancelPendingOrder() {
 	}
 
 	// Check that the `subaccounts` module account balance has not changed.
-	saModuleTDaiBalance, err := testutil_bank.GetModuleAccTDaiBalance(
+	saModuleTDaiBalance, err := testutil_bank.GetModuleAccAssetBalance(
 		val,
 		s.network.Config.Codec,
 		satypes.ModuleName,
+		"utdai",
 	)
 	s.Require().NoError(err)
 	s.Require().Equal(
@@ -341,15 +368,134 @@ func (s *CancelOrderIntegrationTestSuite) TestCLICancelPendingOrder() {
 		saModuleTDaiBalance,
 	)
 
-	distrModuleTDaiBalance, err := testutil_bank.GetModuleAccTDaiBalance(
+	distrModuleTDaiBalance, err := testutil_bank.GetModuleAccAssetBalance(
 		val,
 		s.network.Config.Codec,
 		distrtypes.ModuleName,
+		"utdai",
 	)
 
 	s.Require().NoError(err)
 	s.Require().Equal(int64(0), distrModuleTDaiBalance)
+}
 
+func (s *CancelOrderIntegrationTestSuite) TestCLICancelPendingOrderBtcCollat() {
+	val := s.network.Validators[0]
+	ctx := val.ClientCtx
+
+	currentHeight, err := s.network.LatestHeight()
+	s.Require().NoError(err)
+
+	goodTilBlock := uint32(currentHeight) + types.ShortBlockWindow
+	clientId := uint64(1)
+	quantums := satypes.BaseQuantums(1_000)
+	subticks := types.Subticks(50_000_000_000)
+
+	// Place the first order.
+	_, err = cli_testutil.MsgPlaceOrderExec(
+		ctx,
+		s.validatorAddress,
+		cancelsSubaccountNumberTwo,
+		clientId,
+		constants.ClobPair_BtcBtc.Id,
+		types.Order_SIDE_BUY,
+		quantums,
+		subticks.ToUint64(),
+		goodTilBlock,
+	)
+	s.Require().NoError(err)
+
+	// Cancel the first order.
+	_, err = cli_testutil.MsgCancelOrderExec(
+		ctx,
+		s.validatorAddress,
+		cancelsSubaccountNumberTwo,
+		clientId,
+		constants.ClobPair_BtcBtc.Id,
+		goodTilBlock,
+	)
+	s.Require().NoError(err)
+
+	// Place the second order.
+	_, err = cli_testutil.MsgPlaceOrderExec(
+		ctx,
+		s.validatorAddress,
+		cancelsSubaccountNumberThree,
+		clientId,
+		constants.ClobPair_BtcBtc.Id,
+		types.Order_SIDE_SELL,
+		quantums,
+		subticks.ToUint64(),
+		goodTilBlock,
+	)
+	s.Require().NoError(err)
+
+	// Cancel an unknown order.
+	unknownClientId := uint64(10)
+	_, err = cli_testutil.MsgCancelOrderExec(
+		ctx,
+		s.validatorAddress,
+		cancelsSubaccountNumberTwo,
+		unknownClientId,
+		constants.ClobPair_BtcBtc.Id,
+		goodTilBlock,
+	)
+	s.Require().NoError(err)
+
+	currentHeight, err = s.network.LatestHeight()
+	s.Require().NoError(err)
+
+	// Wait for a few blocks.
+	_, err = s.network.WaitForHeight(currentHeight + 3)
+	s.Require().NoError(err)
+
+	// Check that subaccounts balance have not changed, and no positions were opened.
+	for _, subaccountNumber := range []uint32{cancelsSubaccountNumberTwo, cancelsSubaccountNumberThree} {
+		resp, err := sa_testutil.MsgQuerySubaccountExec(
+			ctx,
+			s.validatorAddress,
+			subaccountNumber,
+		)
+		s.Require().NoError(err)
+
+		var subaccountResp satypes.QuerySubaccountResponse
+		s.Require().NoError(s.network.Config.Codec.UnmarshalJSON(resp.Bytes(), &subaccountResp))
+		subaccount := subaccountResp.Subaccount
+
+		s.Require().Equal(
+			new(big.Int).SetInt64(cancelsInitialQuoteBalance),
+			subaccount.GetAssetPosition(1),
+		)
+		s.Require().Len(subaccount.PerpetualPositions, 0)
+
+		s.Require().Equal(
+			new(big.Int).SetInt64(cancelsInitialQuoteBalance),
+			subaccount.GetAssetPosition(1))
+		s.Require().Len(subaccount.PerpetualPositions, 0)
+	}
+
+	// Check that the `subaccounts` module account balance has not changed.
+	saModuleBtcBalance, err := testutil_bank.GetModuleAccAssetBalance(
+		val,
+		s.network.Config.Codec,
+		satypes.ModuleName,
+		"btc-denom",
+	)
+	s.Require().NoError(err)
+	s.Require().Equal(
+		cancelsInitialSubaccountModuleAccBalance,
+		saModuleBtcBalance,
+	)
+
+	distrModuleBtcBalance, err := testutil_bank.GetModuleAccAssetBalance(
+		val,
+		s.network.Config.Codec,
+		distrtypes.ModuleName,
+		"btc-denom",
+	)
+
+	s.Require().NoError(err)
+	s.Require().Equal(int64(0), distrModuleBtcBalance)
 }
 
 // TestCLICancelMatchingOrders places two matching orders from two different subaccounts (with the
@@ -358,7 +504,6 @@ func (s *CancelOrderIntegrationTestSuite) TestCLICancelPendingOrder() {
 // The subaccounts are then queried and assertions are performed on their QuoteBalance and PerpetualPositions.
 // The account which places the orders is also the validator's AccAddress.
 func (s *CancelOrderIntegrationTestSuite) TestCLICancelMatchingOrders() {
-
 	val := s.network.Validators[0]
 	ctx := val.ClientCtx
 
@@ -464,13 +609,6 @@ func (s *CancelOrderIntegrationTestSuite) TestCLICancelMatchingOrders() {
 		int64(constants.PerpetualFeeParams.Tiers[0].MakerFeePpm) /
 		int64(lib.OneMillion)
 
-	fmt.Println(subaccountZero.GetTDaiPosition())
-	fmt.Println(subaccountOne.GetTDaiPosition())
-	fmt.Println(cancelsInitialQuoteBalance)
-	fmt.Println(fillSizeQuoteQuantums)
-	fmt.Println(takerFee)
-	fmt.Println(makerFee)
-
 	s.Require().Contains(
 		[]*big.Int{
 			new(big.Int).SetInt64(cancelsInitialQuoteBalance - fillSizeQuoteQuantums - takerFee),
@@ -495,21 +633,39 @@ func (s *CancelOrderIntegrationTestSuite) TestCLICancelMatchingOrders() {
 	)
 
 	// Check that the `subaccounts` module account has expected remaining TDAI balance.
-	saModuleTDaiBalance, err := testutil_bank.GetModuleAccTDaiBalance(
+	collateralPoolAddress := satypes.ModuleName + ":0"
+
+	saModuleTDaiBalance, err := testutil_bank.GetModuleAccAssetBalance(
 		val,
 		s.network.Config.Codec,
 		satypes.ModuleName,
+		"utdai",
 	)
+
 	s.Require().NoError(err)
 	s.Require().Equal(
-		int64(cancelsInitialSubaccountModuleAccBalance-takerFee-makerFee),
+		cancelsInitialSubaccountModuleAccBalance-initialQuoteBalance-initialQuoteBalance,
 		saModuleTDaiBalance,
 	)
 
-	distrModuleTDaiBalance, err := testutil_bank.GetModuleAccTDaiBalance(
+	collateralPoolModuleTDaiBalance, err := testutil_bank.GetModuleAccAssetBalance(
+		val,
+		s.network.Config.Codec,
+		collateralPoolAddress,
+		"utdai",
+	)
+
+	s.Require().NoError(err)
+	s.Require().Equal(
+		initialQuoteBalance+initialQuoteBalance-takerFee-makerFee,
+		collateralPoolModuleTDaiBalance,
+	)
+
+	distrModuleTDaiBalance, err := testutil_bank.GetModuleAccAssetBalance(
 		val,
 		s.network.Config.Codec,
 		distrtypes.ModuleName,
+		"utdai",
 	)
 
 	s.Require().NoError(err)
@@ -547,4 +703,170 @@ func (s *CancelOrderIntegrationTestSuite) TestCLICancelMatchingOrders() {
 	// require.True(s.T(), comparison.Cmp(maxThreshold) <= 0, "Price should be at most 116% of chi")
 
 	// network.CleanupCustomNetwork()
+}
+
+func (s *CancelOrderIntegrationTestSuite) TestCLICancelMatchingOrdersBtcCollat() {
+	val := s.network.Validators[0]
+	ctx := val.ClientCtx
+
+	currentHeight, err := s.network.LatestHeight()
+	s.Require().NoError(err)
+
+	goodTilBlock := uint32(currentHeight) + types.ShortBlockWindow
+	clientId := uint64(2)
+	quantums := satypes.BaseQuantums(1_000)
+	subticks := types.Subticks(50_000_000_000)
+
+	// Place the first order.
+	_, err = cli_testutil.MsgPlaceOrderExec(
+		ctx,
+		s.validatorAddress,
+		cancelsSubaccountNumberTwo,
+		clientId,
+		constants.ClobPair_BtcBtc.Id,
+		types.Order_SIDE_BUY,
+		quantums,
+		subticks.ToUint64(),
+		goodTilBlock,
+	)
+	s.Require().NoError(err)
+
+	// Place the second order.
+	_, err = cli_testutil.MsgPlaceOrderExec(
+		ctx,
+		s.validatorAddress,
+		cancelsSubaccountNumberThree,
+		clientId,
+		constants.ClobPair_BtcBtc.Id,
+		types.Order_SIDE_SELL,
+		quantums,
+		subticks.ToUint64(),
+		goodTilBlock,
+	)
+	s.Require().NoError(err)
+
+	currentHeight, err = s.network.LatestHeight()
+	s.Require().NoError(err)
+
+	// Wait for a few blocks.
+	_, err = s.network.WaitForHeight(currentHeight + 3)
+	s.Require().NoError(err)
+
+	// Cancel the first order.
+	_, err = cli_testutil.MsgCancelOrderExec(
+		ctx,
+		s.validatorAddress,
+		cancelsSubaccountNumberTwo,
+		clientId,
+		constants.ClobPair_BtcBtc.Id,
+		goodTilBlock,
+	)
+	s.Require().NoError(err)
+
+	currentHeight, err = s.network.LatestHeight()
+	s.Require().NoError(err)
+
+	// Wait for a few blocks.
+	_, err = s.network.WaitForHeight(currentHeight + 3)
+	s.Require().NoError(err)
+
+	// Query both subaccounts.
+	accResp, accErr := sa_testutil.MsgQuerySubaccountExec(
+		ctx,
+		s.validatorAddress,
+		cancelsSubaccountNumberTwo,
+	)
+	s.Require().NoError(accErr)
+
+	var subaccountResp satypes.QuerySubaccountResponse
+	s.Require().NoError(s.network.Config.Codec.UnmarshalJSON(accResp.Bytes(), &subaccountResp))
+	subaccountTwo := subaccountResp.Subaccount
+
+	accResp, accErr = sa_testutil.MsgQuerySubaccountExec(
+		ctx,
+		s.validatorAddress,
+		cancelsSubaccountNumberThree,
+	)
+	s.Require().NoError(accErr)
+
+	s.Require().NoError(s.network.Config.Codec.UnmarshalJSON(accResp.Bytes(), &subaccountResp))
+	subaccountThree := subaccountResp.Subaccount
+
+	// Compute the fill price so as to know how much QuoteBalance should be remaining.
+	fillSizeQuoteQuantums := types.FillAmountToQuoteQuantums(
+		subticks,
+		quantums,
+		constants.ClobPair_BtcBtc.QuantumConversionExponent,
+	).Int64()
+
+	// Assert that both Subaccounts have the appropriate state.
+	// Order could be maker or taker after Uncross, so assert that account could have been either.
+	takerFee := fillSizeQuoteQuantums *
+		int64(constants.PerpetualFeeParams.Tiers[0].TakerFeePpm) /
+		int64(lib.OneMillion)
+	makerFee := fillSizeQuoteQuantums *
+		int64(constants.PerpetualFeeParams.Tiers[0].MakerFeePpm) /
+		int64(lib.OneMillion)
+
+	s.Require().Contains(
+		[]*big.Int{
+			new(big.Int).SetInt64(cancelsInitialQuoteBalance - fillSizeQuoteQuantums - takerFee),
+			new(big.Int).SetInt64(cancelsInitialQuoteBalance - fillSizeQuoteQuantums - makerFee),
+		},
+		subaccountTwo.GetAssetPosition(1),
+	)
+	s.Require().Len(subaccountTwo.PerpetualPositions, 1)
+	s.Require().Equal(quantums.ToBigInt(), subaccountTwo.PerpetualPositions[0].GetBigQuantums())
+
+	s.Require().Contains(
+		[]*big.Int{
+			new(big.Int).SetInt64(cancelsInitialQuoteBalance + fillSizeQuoteQuantums - takerFee),
+			new(big.Int).SetInt64(cancelsInitialQuoteBalance + fillSizeQuoteQuantums - makerFee),
+		},
+		subaccountThree.GetAssetPosition(1),
+	)
+	s.Require().Len(subaccountThree.PerpetualPositions, 1)
+	s.Require().Equal(new(big.Int).Neg(
+		quantums.ToBigInt()),
+		subaccountThree.PerpetualPositions[0].GetBigQuantums(),
+	)
+
+	// Check that the `subaccounts` module account has expected remaining TDAI balance.
+	collateralPoolAddress := satypes.ModuleName + ":1"
+
+	saModuleBtcBalance, err := testutil_bank.GetModuleAccAssetBalance(
+		val,
+		s.network.Config.Codec,
+		satypes.ModuleName,
+		"btc-denom",
+	)
+
+	s.Require().NoError(err)
+	s.Require().Equal(
+		cancelsInitialSubaccountModuleAccBalance-initialQuoteBalance-initialQuoteBalance,
+		saModuleBtcBalance,
+	)
+
+	collateralPoolModuleBtcBalance, err := testutil_bank.GetModuleAccAssetBalance(
+		val,
+		s.network.Config.Codec,
+		collateralPoolAddress,
+		"btc-denom",
+	)
+
+	s.Require().NoError(err)
+	s.Require().Equal(
+		initialQuoteBalance+initialQuoteBalance-takerFee-makerFee,
+		collateralPoolModuleBtcBalance,
+	)
+
+	distrModuleBtcBalance, err := testutil_bank.GetModuleAccAssetBalance(
+		val,
+		s.network.Config.Codec,
+		distrtypes.ModuleName,
+		"btc-denom",
+	)
+
+	s.Require().NoError(err)
+	s.Require().Equal(makerFee+takerFee, distrModuleBtcBalance)
 }

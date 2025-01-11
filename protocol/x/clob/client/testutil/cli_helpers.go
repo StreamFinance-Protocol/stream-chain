@@ -93,6 +93,65 @@ func CreateBankGenesisState(
 						"utdai",
 						10000000000,
 					),
+					sdk.NewInt64Coin(
+						"btc-denom",
+						10000000000,
+					),
+				},
+			},
+			{
+				Address: "klyra1r3fsd6humm0ghyq0te5jf8eumklmclyaw0hs3y",
+				Coins: []sdk.Coin{
+					{
+						Denom:  "ibc/DEEFE2DEFDC8EA8879923C4CCA42BB888C3CD03FF7ECFEFB1C2FEC27A732ACC8",
+						Amount: sdkmath.NewIntFromBigInt(new(big.Int).Exp(big.NewInt(10), big.NewInt(22), nil)),
+					},
+				},
+			},
+		},
+	}
+
+	bankbuf, err := cfg.Codec.MarshalJSON(&bankGenState)
+	require.NoError(t, err)
+
+	return bankbuf
+}
+
+func CreateBankGenesisStateForLiquidationTest(
+	t testing.TB,
+	cfg network.Config,
+) []byte {
+	bankGenState := banktypes.GenesisState{
+		Balances: []banktypes.Balance{
+			{
+				Address: "klyra1v88c3xv9xyv3eetdx0tvcmq7ung3dywptd5ps3",
+				Coins: []sdk.Coin{
+					sdk.NewInt64Coin(
+						"utdai",
+						1000000000000,
+					),
+					sdk.NewInt64Coin(
+						"btc-denom",
+						1000000000000000,
+					),
+				},
+			},
+			{
+				Address: "klyra1qt3f40penefk5eyemv8s2zznpzpmklkffr4czn",
+				Coins: []sdk.Coin{
+					sdk.NewInt64Coin(
+						"utdai",
+						1000000000000,
+					),
+				},
+			},
+			{
+				Address: "klyra1daqtvgfdcsgne505p4cltcwq5cfum94a7par8n",
+				Coins: []sdk.Coin{
+					sdk.NewInt64Coin(
+						"btc-denom",
+						1000000000000000,
+					),
 				},
 			},
 			{

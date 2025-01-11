@@ -132,6 +132,8 @@ var (
 		// perpetuals
 		"/klyraprotocol.perpetuals.MsgCreatePerpetual":               &perpetuals.MsgCreatePerpetual{},
 		"/klyraprotocol.perpetuals.MsgCreatePerpetualResponse":       nil,
+		"/klyraprotocol.perpetuals.MsgSetCollateralPool":             &perpetuals.MsgSetCollateralPool{},
+		"/klyraprotocol.perpetuals.MsgSetCollateralPoolResponse":     nil,
 		"/klyraprotocol.perpetuals.MsgSetLiquidityTier":              &perpetuals.MsgSetLiquidityTier{},
 		"/klyraprotocol.perpetuals.MsgSetLiquidityTierResponse":      nil,
 		"/klyraprotocol.perpetuals.MsgUpdateParams":                  &perpetuals.MsgUpdateParams{},

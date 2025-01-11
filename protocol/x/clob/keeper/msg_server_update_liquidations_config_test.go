@@ -12,7 +12,6 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/memclob"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals"
-	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/stretchr/testify/require"
 )
@@ -38,7 +37,6 @@ func TestUpdateLiquidationsConfig(t *testing.T) {
 					FillablePriceConfig: types.FillablePriceConfig{
 						BankruptcyAdjustmentPpm: 0,
 					},
-					MaxCumulativeInsuranceFundDelta: uint64(1_000_000_000_000),
 				},
 			},
 			expectedError: types.ErrInvalidLiquidationsConfig,
@@ -56,10 +54,9 @@ func TestUpdateLiquidationsConfig(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			memClob := memclob.NewMemClobPriceTimePriority(false)
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, &mocks.BankKeeper{}, &mocks.IndexerEventManager{}, nil)
-			prices.InitGenesis(ks.Ctx, *ks.PricesKeeper, constants.Prices_DefaultGenesisState)
 			perpetuals.InitGenesis(ks.Ctx, *ks.PerpetualsKeeper, constants.Perpetuals_DefaultGenesisState)
 
-			msgServer := keeper.NewMsgServerImpl(ks.ClobKeeper)
+			msgServer := keeper.NewMsgServerImpl(&ks.ClobKeeper)
 			_, err := msgServer.UpdateLiquidationsConfig(ks.Ctx, tc.msg)
 
 			if tc.expectedError != nil {

@@ -189,6 +189,8 @@ var (
 		"/klyraprotocol.perpetuals.MsgAddPremiumVotesResponse":       {},
 		"/klyraprotocol.perpetuals.MsgCreatePerpetual":               {},
 		"/klyraprotocol.perpetuals.MsgCreatePerpetualResponse":       {},
+		"/klyraprotocol.perpetuals.MsgSetCollateralPool":             {},
+		"/klyraprotocol.perpetuals.MsgSetCollateralPoolResponse":     {},
 		"/klyraprotocol.perpetuals.MsgSetLiquidityTier":              {},
 		"/klyraprotocol.perpetuals.MsgSetLiquidityTierResponse":      {},
 		"/klyraprotocol.perpetuals.MsgUpdateParams":                  {},

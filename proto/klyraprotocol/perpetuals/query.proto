@@ -6,7 +6,7 @@ import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "klyraprotocol/perpetuals/params.proto";
 import "klyraprotocol/perpetuals/perpetual.proto";
-
+import "klyraprotocol/perpetuals/collateral.proto";
 option go_package = "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types";
 
 // Query defines the gRPC querier service.
@@ -26,6 +26,12 @@ service Query {
   rpc AllLiquidityTiers(QueryAllLiquidityTiersRequest)
       returns (QueryAllLiquidityTiersResponse) {
     option (google.api.http).get = "/klyraprotocol/perpetuals/liquidity_tiers";
+  }
+
+  // Queries a list of CollateralPools.
+  rpc AllCollateralPools(QueryAllCollateralPoolsRequest)
+      returns (QueryAllCollateralPoolsResponse) {
+    option (google.api.http).get = "/klyraprotocol/perpetuals/collateral_pools";
   }
 
   // Queries a list of premium votes.
@@ -74,6 +80,18 @@ message QueryAllLiquidityTiersRequest {
 // method.
 message QueryAllLiquidityTiersResponse {
   repeated LiquidityTier liquidity_tiers = 1 [ (gogoproto.nullable) = false ];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// Queries a list of CollateralPool items.
+message QueryAllCollateralPoolsRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryAllCollateralPoolsResponse is response type for the AllCollateralPools RPC
+// method.
+message QueryAllCollateralPoolsResponse {
+  repeated CollateralPool collateral_pools = 1 [ (gogoproto.nullable) = false ];
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 

@@ -31,7 +31,6 @@ import config from '../config';
 import {
   AssetPositionResponseObject,
   AssetPositionsMap,
-  MarketType,
   PerpetualPositionWithFunding,
   Risk,
 } from '../types';
@@ -127,17 +126,16 @@ export function create4xxResponse(
 
 export async function getClobPairId(
   market: string,
-  marketType: MarketType,
 ): Promise<string | undefined> {
-  if (marketType === MarketType.PERPETUAL) {
-    const perpetualMarket: (
-      PerpetualMarketFromDatabase | undefined
-    ) = await PerpetualMarketTable.findByTicker(market);
 
-    if (perpetualMarket !== undefined) {
-      return perpetualMarket.clobPairId;
-    }
+  const perpetualMarket: (
+    PerpetualMarketFromDatabase | undefined
+  ) = await PerpetualMarketTable.findByTicker(market);
+
+  if (perpetualMarket !== undefined) {
+    return perpetualMarket.clobPairId;
   }
+
   // spot markets are not supported in V4 yet
 
   return undefined;

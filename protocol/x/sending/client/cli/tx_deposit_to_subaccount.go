@@ -1,7 +1,6 @@
 package cli
 
 import (
-	assettypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -15,7 +14,7 @@ import (
 // to a recipient (an `x/subaccounts` subaccount).
 func CmdDepositToSubaccount() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "deposit-to-subaccount [sender_key_or_address] [recipient_address] [recipient_subaccount_number] [quantums]",
+		Use:   "deposit-to-subaccount [sender_key_or_address] [recipient_address] [recipient_subaccount_number] [asset_id] [quantums]",
 		Short: "Deposit funds from an account to a subaccount.",
 		Long: `Deposit funds from an account to a subaccount.
 Note, the '--from' flag is ignored as it is implied from [sender_key_or_address].
@@ -37,7 +36,12 @@ Note, the '--from' flag is ignored as it is implied from [sender_key_or_address]
 				return err
 			}
 
-			argAmount, err := cast.ToUint64E(args[3])
+			argAssetId, err := cast.ToUint32E(args[3])
+			if err != nil {
+				return err
+			}
+
+			argAmount, err := cast.ToUint64E(args[4])
 			if err != nil {
 				return err
 			}
@@ -53,7 +57,7 @@ Note, the '--from' flag is ignored as it is implied from [sender_key_or_address]
 					Owner:  argRecipientOwner,
 					Number: argRecipientNumber,
 				},
-				assettypes.AssetTDai.Id,
+				argAssetId,
 				argAmount,
 			)
 

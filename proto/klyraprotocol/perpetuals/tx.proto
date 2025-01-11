@@ -6,6 +6,7 @@ import "cosmos/msg/v1/msg.proto";
 import "gogoproto/gogo.proto";
 import "klyraprotocol/perpetuals/params.proto";
 import "klyraprotocol/perpetuals/perpetual.proto";
+import "klyraprotocol/perpetuals/collateral.proto";
 
 option go_package = "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types";
 
@@ -21,6 +22,10 @@ service Msg {
   // updates the existing liquidity tier otherwise.
   rpc SetLiquidityTier(MsgSetLiquidityTier)
       returns (MsgSetLiquidityTierResponse);
+  // SetCollateralPool creates an collateral pool if the ID doesn't exist, and
+  // updates the existing collateral pool otherwise.
+  rpc SetCollateralPool(MsgSetCollateralPool)
+      returns (MsgSetCollateralPoolResponse);
   // UpdatePerpetualParams updates the parameters of a perpetual market.
   rpc UpdatePerpetualParams(MsgUpdatePerpetualParams)
       returns (MsgUpdatePerpetualParamsResponse);
@@ -57,6 +62,21 @@ message MsgSetLiquidityTier {
 
 // MsgSetLiquidityTierResponse defines the SetLiquidityTier response type.
 message MsgSetLiquidityTierResponse {}
+
+// MsgSetCollateralPool is a message used by x/gov to create or update a
+// collateral pool.
+message MsgSetCollateralPool {
+  option (cosmos.msg.v1.signer) = "authority";
+
+  // The address that controls the module.
+  string authority = 1 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+
+  // The collateral pool to create or update.
+  CollateralPool collateral_pool = 2 [ (gogoproto.nullable) = false ];
+}
+
+// MsgSetCollateralPoolResponse defines the SetCollateralPool response type.
+message MsgSetCollateralPoolResponse {}
 
 // MsgUpdatePerpetualParams is a message used by x/gov to update the parameters
 // of a perpetual.

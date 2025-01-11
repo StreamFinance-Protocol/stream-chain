@@ -5,7 +5,6 @@ import (
 	"sort"
 
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib"
-	assettypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
 )
 
@@ -13,7 +12,6 @@ import (
 type PendingUpdates struct {
 	subaccountAssetUpdates     map[satypes.SubaccountId]map[uint32]*big.Int
 	subaccountPerpetualUpdates map[satypes.SubaccountId]map[uint32]*big.Int
-	subaccountFee              map[satypes.SubaccountId]*big.Int
 }
 
 // newPendingUpdates returns a new `pendingUpdates`.
@@ -21,7 +19,6 @@ func NewPendingUpdates() *PendingUpdates {
 	return &PendingUpdates{
 		subaccountAssetUpdates:     make(map[satypes.SubaccountId]map[uint32]*big.Int),
 		subaccountPerpetualUpdates: make(map[satypes.SubaccountId]map[uint32]*big.Int),
-		subaccountFee:              make(map[satypes.SubaccountId]*big.Int),
 	}
 }
 
@@ -56,20 +53,10 @@ func (p *PendingUpdates) ConvertToUpdates() []satypes.Update {
 			assetUpdates = append(assetUpdates, assetUpdate)
 		}
 
-		if _, exists := pendingAssetUpdates[assettypes.AssetTDai.Id]; !exists {
-			pendingAssetUpdates[assettypes.AssetTDai.Id] = new(big.Int)
-		}
-
-		// Subtract quote balance delta with total fees paid by subaccount.
-		pendingAssetUpdates[assettypes.AssetTDai.Id].Sub(
-			pendingAssetUpdates[assettypes.AssetTDai.Id],
-			p.subaccountFee[subaccountId],
-		)
-
 		// Panic if there is more than one asset updates since we only support
-		// TDAI asset at the moment.
+		// Quote Asset at the moment.
 		if len(assetUpdates) > 1 {
-			panic(ErrAssetUpdateNotImplemented)
+			panic(ErrMultiCollateralNotImplemented)
 		}
 
 		// Create an empty slice to store the perpetual updates for this subaccount.
@@ -110,6 +97,7 @@ func (p *PendingUpdates) ConvertToUpdates() []satypes.Update {
 func (p *PendingUpdates) AddPerpetualFill(
 	subaccountId satypes.SubaccountId,
 	perpetualId uint32,
+	quoteAssetId uint32,
 	isBuy bool,
 	feePpm int32,
 	bigFillBaseQuantums *big.Int,
@@ -124,10 +112,10 @@ func (p *PendingUpdates) AddPerpetualFill(
 		subaccountAssetUpdates = make(map[uint32]*big.Int)
 		p.subaccountAssetUpdates[subaccountId] = subaccountAssetUpdates
 	}
-	quoteBalanceUpdate, exists = subaccountAssetUpdates[assettypes.AssetTDai.Id]
+	quoteBalanceUpdate, exists = subaccountAssetUpdates[quoteAssetId]
 	if !exists {
 		quoteBalanceUpdate = big.NewInt(0)
-		subaccountAssetUpdates[assettypes.AssetTDai.Id] = quoteBalanceUpdate
+		subaccountAssetUpdates[quoteAssetId] = quoteBalanceUpdate
 	}
 
 	subaccountPerpetualUpdates, exists = p.subaccountPerpetualUpdates[subaccountId]
@@ -164,16 +152,9 @@ func (p *PendingUpdates) AddPerpetualFill(
 		)
 	}
 
-	totalFee, exists := p.subaccountFee[subaccountId]
-	if !exists {
-		totalFee = big.NewInt(0)
-	}
-
 	bigFeeQuoteQuantums := lib.BigIntMulSignedPpm(bigFillQuoteQuantums, feePpm, true)
-
-	totalFee.Add(
-		totalFee,
+	quoteBalanceUpdate.Sub(
+		quoteBalanceUpdate,
 		bigFeeQuoteQuantums,
 	)
-	p.subaccountFee[subaccountId] = totalFee
 }

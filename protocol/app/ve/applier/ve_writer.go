@@ -288,7 +288,6 @@ func (vea *VEApplier) WriteSDaiConversionRateToStoreAndMaybeCache(
 	txHash []byte,
 	writeToCache bool,
 ) error {
-
 	if sDaiConversionRate == nil {
 		if writeToCache {
 			vea.sDaiConversionRateCache.SetValue(ctx, sDaiConversionRate, txHash)
@@ -380,7 +379,6 @@ func (vea *VEApplier) shouldWritePriceToStore(
 	shouldWriteSpot bool,
 	shouldWritePnl bool,
 ) {
-
 	if prices.SpotPrice == nil || prices.PnlPrice == nil {
 		vea.logger.Error(
 			"price is nil",

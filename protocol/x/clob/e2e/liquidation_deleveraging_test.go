@@ -14,7 +14,6 @@ import (
 	testapp "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/app"
 	clobtest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/clob"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/constants"
-	assettypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets/types"
 	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	feetiertypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
@@ -62,11 +61,10 @@ func TestLiquidationConfig(t *testing.T) {
 				&constants.Order_Dave_Num0_Id0_Clob0_Sell1BTC_Price50500_GTB10,  // Order at $50,500
 			},
 			liquidationConfig: clobtypes.LiquidationsConfig{
-				InsuranceFundFeePpm:             5_000,
-				ValidatorFeePpm:                 200_000,
-				LiquidityFeePpm:                 800_000,
-				FillablePriceConfig:             constants.FillablePriceConfig_Max_Smmr,
-				MaxCumulativeInsuranceFundDelta: uint64(500_000),
+				InsuranceFundFeePpm: 5_000,
+				ValidatorFeePpm:     200_000,
+				LiquidityFeePpm:     800_000,
+				FillablePriceConfig: constants.FillablePriceConfig_Max_Smmr,
 			},
 
 			liquidityTiers: constants.LiquidityTiers,
@@ -115,6 +113,77 @@ func TestLiquidationConfig(t *testing.T) {
 				},
 			},
 		},
+		`Liquidating short BTC collat correct`: {
+			subaccounts: []satypes.Subaccount{
+				// Bob_Num11 is irrelevant to the test, but is used to seed the insurance fund.
+				constants.Bob_Num11_20Link_Short_10499BTC,
+				constants.Carl_Num11_20Link_Short_10099BTC,
+				constants.Dave_Num11_20Link_Long_1BTC,
+			},
+
+			placedMatchableOrders: []clobtypes.MatchableOrder{
+				// This order is irrelevant to the test, but is used to seed the insurance fund.
+				&constants.Order_Dave_Num11_Id2_Clob10_Sell20Link_Price0_0495_GTB10, // Order at 0.0495 BTC
+
+				&constants.Order_Dave_Num11_Id1_Clob10_Sell2Link_Price0_0505_GTB10, // Order at 0.0505 BTC
+				&constants.Order_Dave_Num11_Id0_Clob10_Sell20Link_Price0_505_GTB10, // Order at 0.0505 BTC
+			},
+			liquidationConfig: clobtypes.LiquidationsConfig{
+				InsuranceFundFeePpm: 5_000,
+				ValidatorFeePpm:     200_000,
+				LiquidityFeePpm:     800_000,
+				FillablePriceConfig: constants.FillablePriceConfig_Max_Smmr,
+			},
+
+			marketIdToOraclePriceOverride: map[uint32]uint64{
+				0: 100_000,
+			},
+
+			liquidityTiers: constants.LiquidityTiers,
+			perpetuals: []perptypes.Perpetual{
+				constants.LinkBtc_10_20MarginRequirement_CollatPool1_Id11_OpenInterest20,
+			},
+			clobPairs: []clobtypes.ClobPair{constants.ClobPair_LinkBtc},
+
+			expectedSubaccounts: []satypes.Subaccount{
+				{
+					Id: &constants.Carl_Num11,
+					AssetPositions: []*satypes.AssetPosition{
+						{
+							AssetId:  1,
+							Quantums: dtypes.NewInt(100_990_000 - 10_100_000 + 1000),
+						},
+					},
+					PerpetualPositions: []*satypes.PerpetualPosition{
+						{
+							PerpetualId:  11,
+							Quantums:     dtypes.NewInt(-1_800_000_000), // -18 Link
+							FundingIndex: dtypes.NewInt(0),
+							YieldIndex:   big.NewRat(0, 1).String(),
+						},
+					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
+				},
+				{
+					Id: &constants.Dave_Num11,
+					AssetPositions: []*satypes.AssetPosition{
+						{
+							AssetId:  1,
+							Quantums: dtypes.NewInt(100_000_000 + 99_000_000 + 10_100_000),
+						},
+					},
+					PerpetualPositions: []*satypes.PerpetualPosition{
+						{
+							PerpetualId:  11,
+							Quantums:     dtypes.NewInt(-200_000_000), // -2 Link
+							FundingIndex: dtypes.NewInt(0),
+							YieldIndex:   big.NewRat(0, 1).String(),
+						},
+					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
+				},
+			},
+		},
 		`Liquidating long correct`: {
 			subaccounts: []satypes.Subaccount{
 				// Carl_Num0 is irrelevant to the test, but is used to seed the insurance fund.
@@ -135,11 +204,10 @@ func TestLiquidationConfig(t *testing.T) {
 				&constants.Order_Carl_Num0_Id0_Clob0_Buy1BTC_Price49500_GTB10,  // Order at $49,500
 			},
 			liquidationConfig: clobtypes.LiquidationsConfig{
-				InsuranceFundFeePpm:             5_000,
-				ValidatorFeePpm:                 200_000,
-				LiquidityFeePpm:                 800_000,
-				FillablePriceConfig:             constants.FillablePriceConfig_Max_Smmr,
-				MaxCumulativeInsuranceFundDelta: uint64(500_000),
+				InsuranceFundFeePpm: 5_000,
+				ValidatorFeePpm:     200_000,
+				LiquidityFeePpm:     800_000,
+				FillablePriceConfig: constants.FillablePriceConfig_Max_Smmr,
 			},
 
 			liquidityTiers: constants.LiquidityTiers,
@@ -195,14 +263,6 @@ func TestLiquidationConfig(t *testing.T) {
 				genesis = testapp.DefaultGenesis()
 				testapp.UpdateGenesisDocWithAppStateForModule(
 					&genesis,
-					func(genesisState *assettypes.GenesisState) {
-						genesisState.Assets = []assettypes.Asset{
-							*constants.TDai,
-						}
-					},
-				)
-				testapp.UpdateGenesisDocWithAppStateForModule(
-					&genesis,
 					func(genesisState *prices.GenesisState) {
 						// Set oracle prices in the genesis.
 						pricesGenesis := constants.TestPricesGenesisState
@@ -233,6 +293,24 @@ func TestLiquidationConfig(t *testing.T) {
 						genesisState.Params = constants.PerpetualsGenesisParams
 						genesisState.LiquidityTiers = tc.liquidityTiers
 						genesisState.Perpetuals = tc.perpetuals
+						genesisState.CollateralPools = []perptypes.CollateralPool{
+							{
+								CollateralPoolId:                        0,
+								MaxCumulativeInsuranceFundDeltaPerBlock: 500_000,
+								MultiCollateralAssets: &perptypes.MultiCollateralAssetsArray{
+									MultiCollateralAssets: []uint32{0},
+								},
+								QuoteAssetId: 0,
+							},
+							{
+								CollateralPoolId:                        1,
+								MaxCumulativeInsuranceFundDeltaPerBlock: 5_000,
+								MultiCollateralAssets: &perptypes.MultiCollateralAssetsArray{
+									MultiCollateralAssets: []uint32{1},
+								},
+								QuoteAssetId: 1,
+							},
+						}
 					},
 				)
 				testapp.UpdateGenesisDocWithAppStateForModule(
@@ -511,6 +589,47 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 				},
 			},
 		},
+		`BTC Collat: Can place a liquidation order that is unfilled and full position size is deleveraged`: {
+			subaccounts: []satypes.Subaccount{
+				constants.Carl_Num11_20Link_Short_10099BTC,
+				constants.Dave_Num11_20Link_Long_1BTC,
+			},
+			marketIdToOraclePriceOverride: map[uint32]uint64{
+				constants.BtcUsd.MarketId: 100_000,
+				5:                         5_050_000,
+			},
+
+			placedMatchableOrders: []clobtypes.MatchableOrder{
+				// Carl's bankruptcy price to close 20 Link short is $0.0504..., and closing at 0.0505
+				// would require $1 from the insurance fund. Since the insurance fund is empty,
+				// deleveraging is required to close this position.
+				&constants.Order_Dave_Num11_Id1_Clob10_Sell5Link_Price0_0505_GTB11,
+			},
+			liquidationConfig: constants.LiquidationsConfig_FillablePrice_Max_Smmr,
+
+			liquidityTiers: constants.LiquidityTiers,
+			perpetuals: []perptypes.Perpetual{
+				constants.LinkBtc_10_20MarginRequirement_CollatPool1_Id11_OpenInterest20,
+			},
+			clobPairs: []clobtypes.ClobPair{constants.ClobPair_LinkBtc},
+
+			expectedSubaccounts: []satypes.Subaccount{
+				{
+					Id:              &constants.Carl_Num11,
+					AssetYieldIndex: big.NewRat(1, 1).String(),
+				},
+				{
+					Id: &constants.Dave_Num11,
+					AssetPositions: []*satypes.AssetPosition{
+						{
+							AssetId:  1,
+							Quantums: dtypes.NewInt(100_000_000 + 100_990_000),
+						},
+					},
+					AssetYieldIndex: big.NewRat(1, 1).String(),
+				},
+			},
+		},
 		`Can place a liquidation order that is partially-filled and deleveraging is skipped`: {
 			subaccounts: []satypes.Subaccount{
 				constants.Carl_Num0_1BTC_Short_50499USD,
@@ -737,11 +856,10 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 				&constants.Order_Dave_Num0_Id1_Clob0_Sell025BTC_Price50500_GTB11,
 			},
 			liquidationConfig: clobtypes.LiquidationsConfig{
-				InsuranceFundFeePpm:             5_000,
-				ValidatorFeePpm:                 200_000,
-				LiquidityFeePpm:                 800_000,
-				FillablePriceConfig:             constants.FillablePriceConfig_Max_Smmr,
-				MaxCumulativeInsuranceFundDelta: uint64(1_000_000_000_000),
+				InsuranceFundFeePpm: 5_000,
+				ValidatorFeePpm:     200_000,
+				LiquidityFeePpm:     800_000,
+				FillablePriceConfig: constants.FillablePriceConfig_Max_Smmr,
 			},
 
 			liquidityTiers: constants.LiquidityTiers,
@@ -846,14 +964,6 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 				genesis = testapp.DefaultGenesis()
 				testapp.UpdateGenesisDocWithAppStateForModule(
 					&genesis,
-					func(genesisState *assettypes.GenesisState) {
-						genesisState.Assets = []assettypes.Asset{
-							*constants.TDai,
-						}
-					},
-				)
-				testapp.UpdateGenesisDocWithAppStateForModule(
-					&genesis,
 					func(genesisState *prices.GenesisState) {
 						// Set oracle prices in the genesis.
 						pricesGenesis := constants.TestPricesGenesisState
@@ -884,6 +994,7 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 						genesisState.Params = constants.PerpetualsGenesisParams
 						genesisState.LiquidityTiers = tc.liquidityTiers
 						genesisState.Perpetuals = tc.perpetuals
+						genesisState.CollateralPools = constants.CollateralPools
 					},
 				)
 				testapp.UpdateGenesisDocWithAppStateForModule(

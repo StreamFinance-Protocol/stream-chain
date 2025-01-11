@@ -1,6 +1,8 @@
 package types
 
-import "github.com/StreamFinance-Protocol/stream-chain/protocol/lib"
+import (
+	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib"
+)
 
 const (
 	// TDai denom is defined as equal to the Uusdc denom.
@@ -16,8 +18,18 @@ var (
 		DenomExponent:    TDaiDenomExponent,
 		Denom:            TDaiDenom,
 		HasMarket:        false,
-		AtomicResolution: lib.QuoteCurrencyAtomicResolution,
+		AtomicResolution: lib.TDAIAtomicResolution,
 		AssetYieldIndex:  "1/1",
+		MaxSlippagePpm:   uint32(0),
+	}
+	AssetBtc = Asset{
+		Id:               1,
+		Symbol:           "BTC",
+		Denom:            "btc-denom",
+		DenomExponent:    int32(-8),
+		HasMarket:        false,
+		AtomicResolution: int32(-8),
+		MaxSlippagePpm:   uint32(0),
 	}
 )
 
@@ -26,6 +38,7 @@ func DefaultGenesis() *GenesisState {
 	return &GenesisState{
 		Assets: []Asset{
 			AssetTDai,
+			AssetBtc,
 		},
 	}
 }
@@ -62,6 +75,9 @@ func (gs GenesisState) Validate() error {
 		}
 		if !asset.HasMarket && asset.MarketId > 0 {
 			return ErrInvalidMarketId
+		}
+		if asset.MaxSlippagePpm > 1_000_000 {
+			return ErrInvalidMaxSlippagePpm
 		}
 		assetIdSet[asset.Id] = struct{}{}
 		denomSet[asset.Denom] = struct{}{}

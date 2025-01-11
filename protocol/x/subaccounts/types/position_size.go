@@ -24,6 +24,16 @@ type PositionSize interface {
 	GetProductType() string
 }
 
+type Position interface {
+	// Returns true if and only if the position size is positive.
+	GetIsLong() bool
+	// Returns the signed position size in big.Int.
+	GetBigQuantums() *big.Int
+	GetId() uint32
+	GetProductType() string
+	SetBigQuantums(sizeQuantums *big.Int)
+}
+
 type PositionUpdate struct {
 	Id          uint32
 	BigQuantums *big.Int
@@ -78,12 +88,20 @@ func (m *AssetPosition) GetProductType() string {
 	return AssetProductType
 }
 
+func (m *AssetPosition) SetBigQuantums(sizeQuantums *big.Int) {
+	m.Quantums = dtypes.NewIntFromBigInt(sizeQuantums)
+}
+
 func (m *PerpetualPosition) GetId() uint32 {
 	return m.GetPerpetualId()
 }
 
 func (m *PerpetualPosition) SetQuantums(sizeQuantums int64) {
 	m.Quantums = dtypes.NewInt(sizeQuantums)
+}
+
+func (m *PerpetualPosition) SetBigQuantums(sizeQuantums *big.Int) {
+	m.Quantums = dtypes.NewIntFromBigInt(sizeQuantums)
 }
 
 // Get the perpetual position quantum size in big.Int. Panics if the size is zero.

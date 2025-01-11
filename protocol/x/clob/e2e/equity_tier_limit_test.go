@@ -702,7 +702,6 @@ func TestPlaceOrder_EquityTierLimit(t *testing.T) {
 			for _, allowedOrder := range tc.allowedOrders {
 				for _, tx := range testapp.MustMakeCheckTxsWithClobMsg(ctx, tApp.App, *clobtypes.NewMsgPlaceOrder(allowedOrder)) {
 					resp := tApp.CheckTx(tx)
-					fmt.Println("RESPONSE BLOCK 3, ", resp)
 					require.Conditionf(t, resp.IsOK, "Expected CheckTx to succeed. Response: %+v", resp)
 				}
 			}
@@ -714,7 +713,6 @@ func TestPlaceOrder_EquityTierLimit(t *testing.T) {
 			if tc.cancellation != nil {
 				for _, tx := range testapp.MustMakeCheckTxsWithClobMsg(ctx, tApp.App, *tc.cancellation) {
 					resp := tApp.CheckTx(tx)
-					fmt.Println("RESPONSE BLOCK 4, ", resp)
 					require.Conditionf(t, resp.IsOK, "Expected CheckTx to succeed. Response: %+v", resp)
 				}
 			}
@@ -725,7 +723,6 @@ func TestPlaceOrder_EquityTierLimit(t *testing.T) {
 
 			for _, tx := range testapp.MustMakeCheckTxsWithClobMsg(ctx, tApp.App, *clobtypes.NewMsgPlaceOrder(tc.limitedOrder)) {
 				resp := tApp.CheckTx(tx)
-				fmt.Println("RESPONSE BLOCK 5, ", resp)
 				if tc.expectError {
 					require.Conditionf(t, resp.IsErr, "Expected CheckTx to error. Response: %+v", resp)
 					require.Contains(
@@ -743,8 +740,6 @@ func TestPlaceOrder_EquityTierLimit(t *testing.T) {
 					require.Conditionf(t, resp.IsOK, "Expected CheckTx to succeed. Response: %+v", resp)
 				}
 			}
-
-			fmt.Println("YOLO")
 
 			// Ensure that any successful transactions can be delivered.
 			tApp.AdvanceToBlock(5, testapp.AdvanceToBlockOptions{})

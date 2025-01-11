@@ -179,11 +179,12 @@ const (
 	// LiquidationExceededSubaccountMaxInsuranceLost indicates that the liquidation order could not
 	// be matched because it exceeded the maximum funds lost for the insurance fund in this block.
 	LiquidationExceededSubaccountMaxInsuranceLost
-	// ViolatesIsolatedSubaccountConstraints indicates that matching the order would lead to the
+	// ViolatesCollateralPoolConstraints indicates that matching the order would lead to the
 	// subaccount violating constraints for isolated perpetuals, where the subaccount would end up
 	// with either multiple positions in isolated perpetuals or both an isolated and a cross perpetual
 	// position.
-	ViolatesIsolatedSubaccountConstraints
+	ViolatesCollateralPoolConstraints
+	ViolatesMultiCollateralConstraints
 )
 
 // String returns a string representation of this `OrderStatus` enum.
@@ -203,8 +204,10 @@ func (os OrderStatus) String() string {
 		return "LiquidationRequiresDeleveraging"
 	case LiquidationExceededSubaccountMaxInsuranceLost:
 		return "LiquidationExceededSubaccountMaxInsuranceLost"
-	case ViolatesIsolatedSubaccountConstraints:
-		return "ViolatesIsolatedSubaccountConstraints"
+	case ViolatesCollateralPoolConstraints:
+		return "ViolatesCollateralPoolConstraints"
+	case ViolatesMultiCollateralConstraints:
+		return "ViolatesMultiCollateralConstraints"
 	default:
 		return "Unknown"
 	}

@@ -18,7 +18,6 @@ func TestMsgUpdatePerpetualParams_ValidateBasic(t *testing.T) {
 				PerpetualParams: types.PerpetualParams{
 					Ticker:            "test",
 					DefaultFundingPpm: 217,
-					MarketType:        types.PerpetualMarketType_PERPETUAL_MARKET_TYPE_CROSS,
 				},
 			},
 		},
@@ -32,8 +31,7 @@ func TestMsgUpdatePerpetualParams_ValidateBasic(t *testing.T) {
 			msg: types.MsgUpdatePerpetualParams{
 				Authority: validAuthority,
 				PerpetualParams: types.PerpetualParams{
-					Ticker:     "",
-					MarketType: types.PerpetualMarketType_PERPETUAL_MARKET_TYPE_CROSS,
+					Ticker: "",
 				},
 			},
 			expectedErr: "Ticker must be non-empty string",
@@ -44,7 +42,6 @@ func TestMsgUpdatePerpetualParams_ValidateBasic(t *testing.T) {
 				PerpetualParams: types.PerpetualParams{
 					Ticker:            "test",
 					DefaultFundingPpm: 100_000_000,
-					MarketType:        types.PerpetualMarketType_PERPETUAL_MARKET_TYPE_CROSS,
 				},
 			},
 			expectedErr: "DefaultFundingPpm magnitude exceeds maximum value",

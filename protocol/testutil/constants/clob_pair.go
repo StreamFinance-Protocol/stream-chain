@@ -127,6 +127,18 @@ var (
 		QuantumConversionExponent: -8,
 		Status:                    clobtypes.ClobPair_STATUS_PAUSED,
 	}
+	ClobPair_2_Sol = clobtypes.ClobPair{
+		Id: 2,
+		Metadata: &clobtypes.ClobPair_PerpetualClobMetadata{
+			PerpetualClobMetadata: &clobtypes.PerpetualClobMetadata{
+				PerpetualId: 2,
+			},
+		},
+		StepBaseQuantums:          5,
+		SubticksPerTick:           5,
+		QuantumConversionExponent: -8,
+		Status:                    clobtypes.ClobPair_STATUS_ACTIVE,
+	}
 	ClobPair_3_Iso = clobtypes.ClobPair{
 		Id: 3,
 		Metadata: &clobtypes.ClobPair_PerpetualClobMetadata{
@@ -160,6 +172,66 @@ var (
 		},
 		StepBaseQuantums:          5,
 		SubticksPerTick:           5,
+		QuantumConversionExponent: -8,
+		Status:                    clobtypes.ClobPair_STATUS_ACTIVE,
+	}
+	ClobPair_5_IsoBtc = clobtypes.ClobPair{
+		Id: 5,
+		Metadata: &clobtypes.ClobPair_PerpetualClobMetadata{
+			PerpetualClobMetadata: &clobtypes.PerpetualClobMetadata{
+				PerpetualId: 5,
+			},
+		},
+		StepBaseQuantums:          5,
+		SubticksPerTick:           5,
+		QuantumConversionExponent: -8,
+		Status:                    clobtypes.ClobPair_STATUS_ACTIVE,
+	}
+	ClobPair_6_IsoBtc_CollatPool4 = clobtypes.ClobPair{
+		Id: 6,
+		Metadata: &clobtypes.ClobPair_PerpetualClobMetadata{
+			PerpetualClobMetadata: &clobtypes.PerpetualClobMetadata{
+				PerpetualId: 6,
+			},
+		},
+		StepBaseQuantums:          5,
+		SubticksPerTick:           5,
+		QuantumConversionExponent: -8,
+		Status:                    clobtypes.ClobPair_STATUS_ACTIVE,
+	}
+	ClobPair_5_Iso2Btc = clobtypes.ClobPair{
+		Id: 7,
+		Metadata: &clobtypes.ClobPair_PerpetualClobMetadata{
+			PerpetualClobMetadata: &clobtypes.PerpetualClobMetadata{
+				PerpetualId: 7,
+			},
+		},
+		StepBaseQuantums:          5,
+		SubticksPerTick:           5,
+		QuantumConversionExponent: -8,
+		Status:                    clobtypes.ClobPair_STATUS_ACTIVE,
+	}
+	ClobPair_BtcBtc = clobtypes.ClobPair{
+		Id: 9,
+		Metadata: &clobtypes.ClobPair_PerpetualClobMetadata{
+			PerpetualClobMetadata: &clobtypes.PerpetualClobMetadata{
+				PerpetualId: 10,
+			},
+		},
+		StepBaseQuantums:          5,
+		SubticksPerTick:           5,
+		QuantumConversionExponent: -8,
+		Status:                    clobtypes.ClobPair_STATUS_ACTIVE,
+	}
+	ClobPair_LinkBtc = clobtypes.ClobPair{
+		Id: 10,
+		Metadata: &clobtypes.ClobPair_PerpetualClobMetadata{
+			PerpetualClobMetadata: &clobtypes.PerpetualClobMetadata{
+				PerpetualId: 11,
+			},
+		},
+		StepBaseQuantums:          1,
+		SubticksPerTick:           1,
 		QuantumConversionExponent: -8,
 		Status:                    clobtypes.ClobPair_STATUS_ACTIVE,
 	}

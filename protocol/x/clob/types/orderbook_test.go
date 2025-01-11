@@ -73,10 +73,15 @@ func TestString(t *testing.T) {
 
 			expectedString: "LiquidationExceededSubaccountMaxInsuranceLost",
 		},
-		"Order status is ViolatesIsolatedSubaccountConstraints": {
-			orderStatus: types.ViolatesIsolatedSubaccountConstraints,
+		"Order status is ViolatesCollateralPoolConstraints": {
+			orderStatus: types.ViolatesCollateralPoolConstraints,
 
-			expectedString: "ViolatesIsolatedSubaccountConstraints",
+			expectedString: "ViolatesCollateralPoolConstraints",
+		},
+		"Order status is ViolatesMultiCollateralConstraints": {
+			orderStatus: types.ViolatesMultiCollateralConstraints,
+
+			expectedString: "ViolatesMultiCollateralConstraints",
 		},
 		"Order status is unknown enum value": {
 			orderStatus: 999,

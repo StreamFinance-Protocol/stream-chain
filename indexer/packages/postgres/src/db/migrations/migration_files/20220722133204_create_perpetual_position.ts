@@ -34,7 +34,6 @@ export async function up(knex: Knex): Promise<void> {
       // indicates the subaccount received funding, negative indicates the subaccount paid funding.
       table.decimal('settledFunding', null).notNullable();
       table.string('perpYieldIndex').notNullable();
-
       // Foreign
       table.foreign('perpetualId').references('perpetual_markets.id');
       table.foreign('subaccountId').references('subaccounts.id');

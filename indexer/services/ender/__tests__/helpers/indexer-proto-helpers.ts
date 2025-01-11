@@ -31,8 +31,12 @@ import {
   IsoString,
   fillTypeToTradeType,
   OrderSubaccountMessageContents,
+  CollateralPoolFromDatabase,
 } from '@klyraprotocol-indexer/postgres';
-import { getOrderIdHash, ORDER_FLAG_CONDITIONAL } from '@klyraprotocol-indexer/v4-proto-parser';
+import {
+  getOrderIdHash,
+  ORDER_FLAG_CONDITIONAL,
+} from '@klyraprotocol-indexer/v4-proto-parser';
 import {
   LiquidationOrderV1,
   MarketMessage,
@@ -54,15 +58,13 @@ import {
   DeleveragingEventV1,
   protoTimestampToDate,
 } from '@klyraprotocol-indexer/v4-protos';
-import {
-  PerpetualMarketType,
-} from '@klyraprotocol-indexer/v4-protos/build/codegen/klyraprotocol/indexer/protocol/v1/perpetual';
 import { IHeaders, Message, ProducerRecord } from 'kafkajs';
 import _ from 'lodash';
 import Long from 'long';
 
 import {
   convertPerpetualPosition,
+  generateCollateralPoolMessage,
   generateFillSubaccountMessage,
   generatePerpetualMarketMessage,
   generatePerpetualPositionsContents,
@@ -116,7 +118,10 @@ export function createTxHashes(numTx: number): string[] {
   const txHashes: string[] = [];
   _.times(numTx, () => {
     const txHashArray: string[] = [];
-    const randomString: string = randomUUID().substring(0, NUM_CHARS_IN_TX_HASH);
+    const randomString: string = randomUUID().substring(
+      0,
+      NUM_CHARS_IN_TX_HASH,
+    );
     _.times(randomString.length, (index: number) => {
       txHashArray.push(randomString.charCodeAt(index).toString(16));
     });
@@ -147,12 +152,12 @@ export function expectSubaccountKafkaMessage({
   contents,
   subaccountIdProto,
 }: {
-  producerSendMock: jest.SpyInstance,
-  blockHeight: string,
-  transactionIndex: number,
-  eventIndex: number,
-  contents: string,
-  subaccountIdProto: IndexerSubaccountId,
+  producerSendMock: jest.SpyInstance;
+  blockHeight: string;
+  transactionIndex: number;
+  eventIndex: number;
+  contents: string;
+  subaccountIdProto: IndexerSubaccountId;
 }): void {
   expect(producerSendMock.mock.calls.length).toBeGreaterThanOrEqual(1);
   expect(producerSendMock.mock.calls[0].length).toBeGreaterThanOrEqual(1);
@@ -160,7 +165,10 @@ export function expectSubaccountKafkaMessage({
   const subaccountProducerRecords: ProducerRecord[] = _.filter(
     _.flatten(producerSendMock.mock.calls) as ProducerRecord[],
     (producerRecord: ProducerRecord) => {
-      return producerRecord.topic === KafkaTopics.TO_WEBSOCKETS_SUBACCOUNTS.toString();
+      return (
+        producerRecord.topic ===
+        KafkaTopics.TO_WEBSOCKETS_SUBACCOUNTS.toString()
+      );
     },
   );
   expect(subaccountProducerRecords.length).toEqual(1);
@@ -180,12 +188,15 @@ export function expectSubaccountKafkaMessage({
   );
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const subaccountMessageJsons: any[] = _.map(subaccountMessages, (message: SubaccountMessage) => {
-    return {
-      ...message,
-      contents: JSON.parse(message.contents),
-    };
-  });
+  const subaccountMessageJsons: any[] = _.map(
+    subaccountMessages,
+    (message: SubaccountMessage) => {
+      return {
+        ...message,
+        contents: JSON.parse(message.contents),
+      };
+    },
+  );
   const expectedSubaccountMessage: SubaccountMessage = SubaccountMessage.fromPartial({
     blockHeight,
     transactionIndex,
@@ -212,12 +223,21 @@ export function expectPerpetualMarketKafkaMessage(
   });
 }
 
+export function expectCollateralPoolKafkaMessage(
+  producerSendMock: jest.SpyInstance,
+  collateralPools: CollateralPoolFromDatabase[],
+) {
+  expectMarketKafkaMessage({
+    producerSendMock,
+    contents: JSON.stringify(generateCollateralPoolMessage(collateralPools)),
+  });
+}
 export function expectMarketKafkaMessage({
   producerSendMock,
   contents,
 }: {
-  producerSendMock: jest.SpyInstance,
-  contents: string,
+  producerSendMock: jest.SpyInstance;
+  contents: string;
 }): void {
   expect(producerSendMock.mock.calls.length).toBeGreaterThanOrEqual(1);
   expect(producerSendMock.mock.calls[0].length).toBeGreaterThanOrEqual(1);
@@ -225,7 +245,9 @@ export function expectMarketKafkaMessage({
   const marketProducerRecords: ProducerRecord[] = _.filter(
     _.flatten(producerSendMock.mock.calls) as ProducerRecord[],
     (producerRecord: ProducerRecord) => {
-      return producerRecord.topic === KafkaTopics.TO_WEBSOCKETS_MARKETS.toString();
+      return (
+        producerRecord.topic === KafkaTopics.TO_WEBSOCKETS_MARKETS.toString()
+      );
     },
   );
   expect(marketProducerRecords.length).toEqual(1);
@@ -245,12 +267,15 @@ export function expectMarketKafkaMessage({
   );
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const marketMessageJsons: any[] = _.map(marketMessages, (message: MarketMessage) => {
-    return {
-      ...message,
-      contents: JSON.parse(message.contents),
-    };
-  });
+  const marketMessageJsons: any[] = _.map(
+    marketMessages,
+    (message: MarketMessage) => {
+      return {
+        ...message,
+        contents: JSON.parse(message.contents),
+      };
+    },
+  );
   const expectedMarketMessage: MarketMessage = MarketMessage.fromPartial({
     contents,
     version: MARKETS_WEBSOCKET_MESSAGE_VERSION,
@@ -269,10 +294,10 @@ export function expectTradeKafkaMessage({
   contents,
   clobPairId,
 }: {
-  producerSendMock: jest.SpyInstance,
-  blockHeight: string,
-  contents: string,
-  clobPairId: string,
+  producerSendMock: jest.SpyInstance;
+  blockHeight: string;
+  contents: string;
+  clobPairId: string;
 }): void {
   expect(producerSendMock.mock.calls.length).toBeGreaterThanOrEqual(1);
   expect(producerSendMock.mock.calls[0].length).toBeGreaterThanOrEqual(1);
@@ -280,7 +305,9 @@ export function expectTradeKafkaMessage({
   const tradeProducerRecords: ProducerRecord[] = _.filter(
     _.flatten(producerSendMock.mock.calls) as ProducerRecord[],
     (producerRecord: ProducerRecord) => {
-      return producerRecord.topic === KafkaTopics.TO_WEBSOCKETS_TRADES.toString();
+      return (
+        producerRecord.topic === KafkaTopics.TO_WEBSOCKETS_TRADES.toString()
+      );
     },
   );
   expect(tradeProducerRecords.length).toEqual(1);
@@ -300,12 +327,15 @@ export function expectTradeKafkaMessage({
   );
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const tradeMessageJsons: any[] = _.map(tradeMessages, (message: TradeMessage) => {
-    return {
-      ...message,
-      contents: JSON.parse(message.contents),
-    };
-  });
+  const tradeMessageJsons: any[] = _.map(
+    tradeMessages,
+    (message: TradeMessage) => {
+      return {
+        ...message,
+        contents: JSON.parse(message.contents),
+      };
+    },
+  );
   const expectedTradeMessage: TradeMessage = TradeMessage.fromPartial({
     blockHeight,
     contents,
@@ -326,10 +356,10 @@ export function expectVulcanKafkaMessage({
   offchainUpdate,
   headers,
 }: {
-  producerSendMock: jest.SpyInstance,
-  orderId: IndexerOrderId,
-  offchainUpdate: OffChainUpdateV1,
-  headers?: IHeaders,
+  producerSendMock: jest.SpyInstance;
+  orderId: IndexerOrderId;
+  offchainUpdate: OffChainUpdateV1;
+  headers?: IHeaders;
 }): void {
   expect(producerSendMock.mock.calls.length).toBeGreaterThanOrEqual(1);
   expect(producerSendMock.mock.calls[0].length).toBeGreaterThanOrEqual(1);
@@ -376,12 +406,12 @@ export function createLiquidationOrder({
   isBuy,
   subticks,
 }: {
-  subaccountId: IndexerSubaccountId,
-  clobPairId: string,
-  perpetualId: string,
-  quantums: number,
-  isBuy: boolean,
-  subticks: number,
+  subaccountId: IndexerSubaccountId;
+  clobPairId: string;
+  perpetualId: string;
+  quantums: number;
+  isBuy: boolean;
+  subticks: number;
 }): LiquidationOrderV1 {
   return LiquidationOrderV1.fromPartial({
     liquidated: subaccountId,
@@ -406,23 +436,21 @@ export function createOrder({
   reduceOnly,
   clientMetadata,
   routerFeePpm,
-  routerFeeSubaccountOwner,
-  routerFeeSubaccountNumber,
+  routerFeeOwner,
 }: {
-  subaccountId: IndexerSubaccountId,
-  clientId: number,
-  side: IndexerOrder_Side,
-  quantums: number | Long,
-  subticks: number | Long,
-  goodTilOneof: Partial<IndexerOrder>,
-  clobPairId: string,
-  orderFlags: string,
-  timeInForce: IndexerOrder_TimeInForce,
-  reduceOnly: boolean,
-  clientMetadata: number,
-  routerFeePpm: number,
-  routerFeeSubaccountOwner: string,
-  routerFeeSubaccountNumber: number,
+  subaccountId: IndexerSubaccountId;
+  clientId: number;
+  side: IndexerOrder_Side;
+  quantums: number | Long;
+  subticks: number | Long;
+  goodTilOneof: Partial<IndexerOrder>;
+  clobPairId: string;
+  orderFlags: string;
+  timeInForce: IndexerOrder_TimeInForce;
+  reduceOnly: boolean;
+  clientMetadata: number;
+  routerFeePpm: number;
+  routerFeeOwner: string;
 }): IndexerOrder {
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   let orderJSON: any = {
@@ -439,8 +467,7 @@ export function createOrder({
     reduceOnly,
     clientMetadata,
     routerFeePpm,
-    routerFeeSubaccountOwner,
-    routerFeeSubaccountNumber,
+    routerFeeOwner,
   };
   if (goodTilOneof.goodTilBlock !== undefined) {
     orderJSON = {
@@ -464,12 +491,12 @@ export function createKafkaMessageFromOrderFillEvent({
   time,
   txHash,
 }: {
-  orderFillEvent: OrderFillEventV1,
-  transactionIndex: number,
-  eventIndex: number,
-  height: number,
-  time: Timestamp,
-  txHash: string,
+  orderFillEvent: OrderFillEventV1;
+  transactionIndex: number;
+  eventIndex: number;
+  height: number;
+  time: Timestamp;
+  txHash: string;
 }) {
   const events: IndexerTendermintEvent[] = [
     createIndexerTendermintEvent(
@@ -487,7 +514,9 @@ export function createKafkaMessageFromOrderFillEvent({
     [txHash],
   );
 
-  const binaryBlock: Uint8Array = Uint8Array.from(IndexerTendermintBlock.encode(block).finish());
+  const binaryBlock: Uint8Array = Uint8Array.from(
+    IndexerTendermintBlock.encode(block).finish(),
+  );
   return createKafkaMessage(Buffer.from(binaryBlock));
 }
 
@@ -499,12 +528,12 @@ export function createKafkaMessageFromDeleveragingEvent({
   time,
   txHash,
 }: {
-  deleveragingEvent: DeleveragingEventV1,
-  transactionIndex: number,
-  eventIndex: number,
-  height: number,
-  time: Timestamp,
-  txHash: string,
+  deleveragingEvent: DeleveragingEventV1;
+  transactionIndex: number;
+  eventIndex: number;
+  height: number;
+  time: Timestamp;
+  txHash: string;
 }) {
   const events: IndexerTendermintEvent[] = [
     createIndexerTendermintEvent(
@@ -522,7 +551,9 @@ export function createKafkaMessageFromDeleveragingEvent({
     [txHash],
   );
 
-  const binaryBlock: Uint8Array = Uint8Array.from(IndexerTendermintBlock.encode(block).finish());
+  const binaryBlock: Uint8Array = Uint8Array.from(
+    IndexerTendermintBlock.encode(block).finish(),
+  );
   return createKafkaMessage(Buffer.from(binaryBlock));
 }
 
@@ -551,56 +582,62 @@ export async function expectFillInDatabase({
   fee,
   hasOrderId = true,
 }: {
-  subaccountId: string,
-  clientId: string,
-  liquidity: Liquidity,
-  size: string,
-  price: string,
-  quoteAmount: string,
-  eventId: Buffer,
-  transactionHash: string,
-  createdAt: string,
-  createdAtHeight: string,
-  type: FillType,
-  clobPairId: string,
-  side: OrderSide,
-  orderFlags: string,
-  clientMetadata: string | null,
-  fee: string,
-  hasOrderId?: boolean,
+  subaccountId: string;
+  clientId: string;
+  liquidity: Liquidity;
+  size: string;
+  price: string;
+  quoteAmount: string;
+  eventId: Buffer;
+  transactionHash: string;
+  createdAt: string;
+  createdAtHeight: string;
+  type: FillType;
+  clobPairId: string;
+  side: OrderSide;
+  orderFlags: string;
+  clientMetadata: string | null;
+  fee: string;
+  hasOrderId?: boolean;
 }): Promise<void> {
   const fillId: string = FillTable.uuid(eventId, liquidity);
   const fill: FillFromDatabase | undefined = await FillTable.findById(fillId);
 
   expect(fill).not.toEqual(undefined);
-  expect(fill).toEqual(expect.objectContaining({
-    subaccountId,
-    side,
-    liquidity,
-    type,
-    clobPairId,
-    orderId: hasOrderId ? OrderTable.uuid(subaccountId, clientId, clobPairId, orderFlags) : null,
-    size,
-    price,
-    quoteAmount,
-    eventId,
-    transactionHash,
-    createdAt,
-    createdAtHeight,
-    clientMetadata,
-    fee,
-  }));
+  expect(fill).toEqual(
+    expect.objectContaining({
+      subaccountId,
+      side,
+      liquidity,
+      type,
+      clobPairId,
+      orderId: hasOrderId
+        ? OrderTable.uuid(subaccountId, clientId, clobPairId, orderFlags)
+        : null,
+      size,
+      price,
+      quoteAmount,
+      eventId,
+      transactionHash,
+      createdAt,
+      createdAtHeight,
+      clientMetadata,
+      fee,
+    }),
+  );
 }
 
 export async function expectNoOrdersExistForSubaccountClobPairId({
   subaccountId,
   clobPairId,
 }: {
-  subaccountId: string,
-  clobPairId: string,
+  subaccountId: string;
+  clobPairId: string;
 }): Promise<void> {
-  const ordersFromDatabase: OrderFromDatabase[] = await
-  OrderTable.findBySubaccountIdAndClobPair(subaccountId, clobPairId);
+  const ordersFromDatabase: OrderFromDatabase[] = await OrderTable.findBySubaccountIdAndClobPair(
+    subaccountId,
+    clobPairId,
+  );
   expect(ordersFromDatabase).toHaveLength(0);
 }
 
@@ -620,58 +657,61 @@ export async function expectOrderInDatabase({
   goodTilBlockTime,
   clientMetadata,
   routerFeePpm,
-  routerFeeSubaccountOwner,
-  routerFeeSubaccountNumber,
+  routerFeeOwner,
   updatedAt,
   updatedAtHeight,
 }: {
-  subaccountId: string,
-  clientId: string,
-  size: string,
-  totalFilled: string,
-  price: string,
-  status: OrderStatus,
-  clobPairId: string,
-  side: OrderSide,
-  orderFlags: string,
-  timeInForce: TimeInForce,
-  reduceOnly: boolean,
-  goodTilBlock?: string,
-  goodTilBlockTime?: string,
-  clientMetadata: string,
-  routerFeePpm: string,
-  routerFeeSubaccountOwner?: string,
-  routerFeeSubaccountNumber?: string,
-  updatedAt: IsoString,
-  updatedAtHeight: string,
+  subaccountId: string;
+  clientId: string;
+  size: string;
+  totalFilled: string;
+  price: string;
+  status: OrderStatus;
+  clobPairId: string;
+  side: OrderSide;
+  orderFlags: string;
+  timeInForce: TimeInForce;
+  reduceOnly: boolean;
+  goodTilBlock?: string;
+  goodTilBlockTime?: string;
+  clientMetadata: string;
+  routerFeePpm: string;
+  routerFeeOwner?: string;
+  updatedAt: IsoString;
+  updatedAtHeight: string;
 }): Promise<void> {
-  const orderId: string = OrderTable.uuid(subaccountId, clientId, clobPairId, orderFlags);
-  const orderFromDatabase: OrderFromDatabase | undefined = await
-  OrderTable.findById(orderId);
-
-  expect(orderFromDatabase).not.toEqual(undefined);
-  expect(orderFromDatabase).toEqual(expect.objectContaining({
+  const orderId: string = OrderTable.uuid(
     subaccountId,
     clientId,
     clobPairId,
-    side,
-    size,
-    totalFilled,
-    price,
-    type: OrderType.LIMIT, // TODO: Add additional order types
-    status,
-    timeInForce,
-    reduceOnly,
     orderFlags,
-    goodTilBlock: goodTilBlock ?? null,
-    goodTilBlockTime: goodTilBlockTime ?? null,
-    clientMetadata,
-    routerFeePpm,
-    routerFeeSubaccountOwner: routerFeeSubaccountOwner ?? '',
-    routerFeeSubaccountNumber: routerFeeSubaccountNumber ?? '0',
-    updatedAt,
-    updatedAtHeight,
-  }));
+  );
+  const orderFromDatabase: OrderFromDatabase | undefined = await OrderTable.findById(orderId);
+
+  expect(orderFromDatabase).not.toEqual(undefined);
+  expect(orderFromDatabase).toEqual(
+    expect.objectContaining({
+      subaccountId,
+      clientId,
+      clobPairId,
+      side,
+      size,
+      totalFilled,
+      price,
+      type: OrderType.LIMIT, // TODO: Add additional order types
+      status,
+      timeInForce,
+      reduceOnly,
+      orderFlags,
+      goodTilBlock: goodTilBlock ?? null,
+      goodTilBlockTime: goodTilBlockTime ?? null,
+      clientMetadata,
+      routerFeePpm,
+      routerFeeOwner: routerFeeOwner ?? '',
+      updatedAt,
+      updatedAtHeight,
+    }),
+  );
 }
 
 export async function expectFillSubaccountKafkaMessageFromLiquidationEvent(
@@ -684,12 +724,9 @@ export async function expectFillSubaccountKafkaMessageFromLiquidationEvent(
   eventIndex: number = 0,
   ticker: string = defaultPerpetualMarketTicker,
 ) {
-  const [
-    fill,
-    position,
-  ]: [
+  const [fill, position]: [
     FillFromDatabase | undefined,
-    PerpetualPositionFromDatabase | undefined,
+    PerpetualPositionFromDatabase | undefined
   ] = await Promise.all([
     FillTable.findById(fillId),
     PerpetualPositionTable.findById(positionId),
@@ -698,9 +735,7 @@ export async function expectFillSubaccountKafkaMessageFromLiquidationEvent(
   expect(position).toBeDefined();
 
   const contents: SubaccountMessageContents = {
-    fills: [
-      generateFillSubaccountMessage(fill!, ticker),
-    ],
+    fills: [generateFillSubaccountMessage(fill!, ticker)],
     perpetualPositions: generatePerpetualPositionsContents(
       subaccountIdProto,
       [convertPerpetualPosition(position!)],
@@ -756,9 +791,7 @@ export function expectOrderSubaccountKafkaMessage(
     };
   }
   const contents: SubaccountMessageContents = {
-    orders: [
-      orderObject,
-    ],
+    orders: [orderObject],
   };
 
   expectSubaccountKafkaMessage({
@@ -781,24 +814,17 @@ export async function expectOrderFillAndPositionSubaccountKafkaMessageFromIds(
   transactionIndex: number = 0,
   eventIndex: number = 0,
 ) {
-  const [
-    order,
-    fill,
-    position,
-  ]: [
+  const [order, fill, position]: [
     OrderFromDatabase | undefined,
     FillFromDatabase | undefined,
-    PerpetualPositionFromDatabase | undefined,
+    PerpetualPositionFromDatabase | undefined
   ] = await Promise.all([
     OrderTable.findById(orderId),
     FillTable.findById(fillId),
     PerpetualPositionTable.findById(positionId),
   ]);
 
-  const perpetualMarket: PerpetualMarketFromDatabase | undefined = await PerpetualMarketTable
-    .findById(
-      position!.perpetualId,
-    );
+  const perpetualMarket = await PerpetualMarketTable.findById(position!.perpetualId);
 
   expect(order).toBeDefined();
   expect(fill).toBeDefined();
@@ -815,9 +841,7 @@ export async function expectOrderFillAndPositionSubaccountKafkaMessageFromIds(
         ticker: perpetualMarket!.ticker,
       },
     ],
-    fills: [
-      generateFillSubaccountMessage(fill!, perpetualMarket!.ticker),
-    ],
+    fills: [generateFillSubaccountMessage(fill!, perpetualMarket!.ticker)],
   };
 
   if (position !== undefined) {
@@ -844,7 +868,9 @@ export async function expectDefaultTradeKafkaMessageFromTakerFillId(
   blockHeight: string = '3',
 ) {
   const takerFillId: string = FillTable.uuid(eventId, Liquidity.TAKER);
-  const takerFill: FillFromDatabase | undefined = await FillTable.findById(takerFillId);
+  const takerFill: FillFromDatabase | undefined = await FillTable.findById(
+    takerFillId,
+  );
   expect(takerFill).toBeDefined();
 
   const contents: TradeMessageContents = {
@@ -871,16 +897,13 @@ export async function expectDefaultTradeKafkaMessageFromTakerFillId(
 export async function expectPerpetualPosition(
   perpetualPositionId: string,
   fields: {
-    sumOpen?: string,
-    sumClose?: string,
-    entryPrice?: string,
-    exitPrice?: string | null,
+    sumOpen?: string;
+    sumClose?: string;
+    entryPrice?: string;
+    exitPrice?: string | null;
   },
 ) {
-  const perpetualPosition:
-  PerpetualPositionFromDatabase | undefined = await PerpetualPositionTable.findById(
-    perpetualPositionId,
-  );
+  const perpetualPosition = await PerpetualPositionTable.findById(perpetualPositionId);
 
   expect(perpetualPosition).toBeDefined();
 
@@ -915,22 +938,23 @@ export function expectPerpetualMarketV1(
   perpetual: PerpetualMarketCreateEventV1,
 ): void {
   // TODO(IND-219): Set initialMarginFraction/maintenanceMarginFraction using LiquidityTier
-  expect(perpetualMarket).toEqual(expect.objectContaining({
-    ...HARDCODED_PERPETUAL_MARKET_VALUES,
-    id: perpetual.id.toString(),
-    status: PerpetualMarketStatus.INITIALIZING,
-    clobPairId: perpetual.clobPairId.toString(),
-    ticker: perpetual.ticker,
-    marketId: perpetual.marketId,
-    quantumConversionExponent: perpetual.quantumConversionExponent,
-    atomicResolution: perpetual.atomicResolution,
-    dangerIndexPpm: 1000000,
-    isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: '0',
-    subticksPerTick: perpetual.subticksPerTick,
-    stepBaseQuantums: Number(perpetual.stepBaseQuantums),
-    liquidityTierId: perpetual.liquidityTier,
-    marketType: 'CROSS',
-  }));
+  expect(perpetualMarket).toEqual(
+    expect.objectContaining({
+      ...HARDCODED_PERPETUAL_MARKET_VALUES,
+      id: perpetual.id.toString(),
+      status: PerpetualMarketStatus.INITIALIZING,
+      clobPairId: perpetual.clobPairId.toString(),
+      ticker: perpetual.ticker,
+      marketId: perpetual.marketId,
+      quantumConversionExponent: perpetual.quantumConversionExponent,
+      atomicResolution: perpetual.atomicResolution,
+      dangerIndexPpm: 1000000,
+      collateralPoolId: 0,
+      subticksPerTick: perpetual.subticksPerTick,
+      stepBaseQuantums: Number(perpetual.stepBaseQuantums),
+      liquidityTierId: perpetual.liquidityTier,
+    }),
+  );
 }
 
 export function expectPerpetualMarketV2(
@@ -938,36 +962,22 @@ export function expectPerpetualMarketV2(
   perpetual: PerpetualMarketCreateEventV2,
 ): void {
   // TODO(IND-219): Set initialMarginFraction/maintenanceMarginFraction using LiquidityTier
-  expect(perpetualMarket).toEqual(expect.objectContaining({
-    ...HARDCODED_PERPETUAL_MARKET_VALUES,
-    id: perpetual.id.toString(),
-    status: PerpetualMarketStatus.INITIALIZING,
-    clobPairId: perpetual.clobPairId.toString(),
-    ticker: perpetual.ticker,
-    marketId: perpetual.marketId,
-    quantumConversionExponent: perpetual.quantumConversionExponent,
-    atomicResolution: perpetual.atomicResolution,
-    dangerIndexPpm: perpetual.dangerIndexPpm,
-    isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock:
-      perpetual.isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
-    subticksPerTick: perpetual.subticksPerTick,
-    stepBaseQuantums: Number(perpetual.stepBaseQuantums),
-    liquidityTierId: perpetual.liquidityTier,
-    marketType: eventPerpetualMarketTypeToIndexerPerpetualMarketType(
-      perpetual.marketType,
-    ),
-  }));
-}
+  expect(perpetualMarket).toEqual(
+    expect.objectContaining({
+      ...HARDCODED_PERPETUAL_MARKET_VALUES,
+      id: perpetual.id.toString(),
+      status: PerpetualMarketStatus.INITIALIZING,
+      clobPairId: perpetual.clobPairId.toString(),
+      ticker: perpetual.ticker,
+      marketId: perpetual.marketId,
+      quantumConversionExponent: perpetual.quantumConversionExponent,
+      atomicResolution: perpetual.atomicResolution,
+      dangerIndexPpm: perpetual.dangerIndexPpm,
+      collateralPoolId: perpetual.collateralPoolId,
 
-function eventPerpetualMarketTypeToIndexerPerpetualMarketType(
-  perpetualMarketType: PerpetualMarketType,
-): string {
-  switch (perpetualMarketType) {
-    case PerpetualMarketType.PERPETUAL_MARKET_TYPE_CROSS:
-      return 'CROSS';
-    case PerpetualMarketType.PERPETUAL_MARKET_TYPE_ISOLATED:
-      return 'ISOLATED';
-    default:
-      throw new Error(`Unknown perpetual market type: ${perpetualMarketType}`);
-  }
+      subticksPerTick: perpetual.subticksPerTick,
+      stepBaseQuantums: Number(perpetual.stepBaseQuantums),
+      liquidityTierId: perpetual.liquidityTier,
+    }),
+  );
 }

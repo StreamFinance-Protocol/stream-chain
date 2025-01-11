@@ -4,6 +4,7 @@ package cli_test
 
 import (
 	"fmt"
+	"math/big"
 	"strconv"
 	"testing"
 
@@ -49,9 +50,9 @@ func networkWithClobPairObjects(t *testing.T, n int) (*network.Network, []types.
 					Id:            uint32(i),
 					Ticker:        fmt.Sprintf("genesis_test_ticker_%d", i),
 					LiquidityTier: 0,
-					MarketType:    perpetualstypes.PerpetualMarketType_PERPETUAL_MARKET_TYPE_CROSS,
 				},
 				FundingIndex: dtypes.ZeroInt(),
+				YieldIndex:   big.NewRat(0, 1).String(),
 			},
 		)
 	}

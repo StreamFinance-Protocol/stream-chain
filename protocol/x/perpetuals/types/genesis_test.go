@@ -20,6 +20,26 @@ func TestGenesisState_Validate(t *testing.T) {
 		},
 		"valid": {
 			genState: &types.GenesisState{
+				CollateralPools: []types.CollateralPool{
+					{
+						CollateralPoolId:                        0,
+						MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+						MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{0}},
+						QuoteAssetId:                            0,
+					},
+					{
+						CollateralPoolId:                        1,
+						MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+						MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{1}},
+						QuoteAssetId:                            1,
+					},
+					{
+						CollateralPoolId:                        2,
+						MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+						MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{0}},
+						QuoteAssetId:                            0,
+					},
+				},
 				Perpetuals: []types.Perpetual{
 					{
 						Params: types.PerpetualParams{
@@ -49,6 +69,26 @@ func TestGenesisState_Validate(t *testing.T) {
 		},
 		"invalid: duplicate perpetual ids": {
 			genState: &types.GenesisState{
+				CollateralPools: []types.CollateralPool{
+					{
+						CollateralPoolId:                        0,
+						MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+						MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{0}},
+						QuoteAssetId:                            0,
+					},
+					{
+						CollateralPoolId:                        1,
+						MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+						MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{1}},
+						QuoteAssetId:                            1,
+					},
+					{
+						CollateralPoolId:                        2,
+						MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+						MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{0}},
+						QuoteAssetId:                            0,
+					},
+				},
 				Perpetuals: []types.Perpetual{
 					{
 						Params: types.PerpetualParams{
@@ -86,6 +126,26 @@ func TestGenesisState_Validate(t *testing.T) {
 		},
 		"invalid: found a gap in perpetual id": {
 			genState: &types.GenesisState{
+				CollateralPools: []types.CollateralPool{
+					{
+						CollateralPoolId:                        0,
+						MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+						MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{0}},
+						QuoteAssetId:                            0,
+					},
+					{
+						CollateralPoolId:                        1,
+						MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+						MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{1}},
+						QuoteAssetId:                            1,
+					},
+					{
+						CollateralPoolId:                        2,
+						MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+						MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{0}},
+						QuoteAssetId:                            0,
+					},
+				},
 				Perpetuals: []types.Perpetual{
 					{
 						Params: types.PerpetualParams{
@@ -123,6 +183,26 @@ func TestGenesisState_Validate(t *testing.T) {
 		},
 		"invalid: empty ticker": {
 			genState: &types.GenesisState{
+				CollateralPools: []types.CollateralPool{
+					{
+						CollateralPoolId:                        0,
+						MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+						MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{0}},
+						QuoteAssetId:                            0,
+					},
+					{
+						CollateralPoolId:                        1,
+						MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+						MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{1}},
+						QuoteAssetId:                            1,
+					},
+					{
+						CollateralPoolId:                        2,
+						MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+						MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{0}},
+						QuoteAssetId:                            0,
+					},
+				},
 				Perpetuals: []types.Perpetual{
 					{
 						Params: types.PerpetualParams{
@@ -152,6 +232,26 @@ func TestGenesisState_Validate(t *testing.T) {
 		},
 		"invalid: initial margin ppm > max": {
 			genState: &types.GenesisState{
+				CollateralPools: []types.CollateralPool{
+					{
+						CollateralPoolId:                        0,
+						MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+						MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{0}},
+						QuoteAssetId:                            0,
+					},
+					{
+						CollateralPoolId:                        1,
+						MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+						MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{1}},
+						QuoteAssetId:                            1,
+					},
+					{
+						CollateralPoolId:                        2,
+						MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+						MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{0}},
+						QuoteAssetId:                            0,
+					},
+				},
 				Perpetuals: []types.Perpetual{
 					{
 						Params: types.PerpetualParams{
@@ -181,6 +281,26 @@ func TestGenesisState_Validate(t *testing.T) {
 		},
 		"invalid: maintenance fraction ppm > max": {
 			genState: &types.GenesisState{
+				CollateralPools: []types.CollateralPool{
+					{
+						CollateralPoolId:                        0,
+						MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+						MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{0}},
+						QuoteAssetId:                            0,
+					},
+					{
+						CollateralPoolId:                        1,
+						MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+						MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{1}},
+						QuoteAssetId:                            1,
+					},
+					{
+						CollateralPoolId:                        2,
+						MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+						MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{0}},
+						QuoteAssetId:                            0,
+					},
+				},
 				Perpetuals: []types.Perpetual{
 					{
 						Params: types.PerpetualParams{
@@ -210,6 +330,26 @@ func TestGenesisState_Validate(t *testing.T) {
 		},
 		"invalid: funding rate clamp factor ppm is zero": {
 			genState: &types.GenesisState{
+				CollateralPools: []types.CollateralPool{
+					{
+						CollateralPoolId:                        0,
+						MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+						MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{0}},
+						QuoteAssetId:                            0,
+					},
+					{
+						CollateralPoolId:                        1,
+						MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+						MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{1}},
+						QuoteAssetId:                            1,
+					},
+					{
+						CollateralPoolId:                        2,
+						MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+						MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{0}},
+						QuoteAssetId:                            0,
+					},
+				},
 				Perpetuals: []types.Perpetual{
 					{
 						Params: types.PerpetualParams{
@@ -239,6 +379,26 @@ func TestGenesisState_Validate(t *testing.T) {
 		},
 		"invalid: premium vote clamp factor ppm is zero": {
 			genState: &types.GenesisState{
+				CollateralPools: []types.CollateralPool{
+					{
+						CollateralPoolId:                        0,
+						MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+						MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{0}},
+						QuoteAssetId:                            0,
+					},
+					{
+						CollateralPoolId:                        1,
+						MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+						MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{1}},
+						QuoteAssetId:                            1,
+					},
+					{
+						CollateralPoolId:                        2,
+						MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+						MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{0}},
+						QuoteAssetId:                            0,
+					},
+				},
 				Perpetuals: []types.Perpetual{
 					{
 						Params: types.PerpetualParams{
@@ -268,6 +428,26 @@ func TestGenesisState_Validate(t *testing.T) {
 		},
 		"invalid: min num votes per sample": {
 			genState: &types.GenesisState{
+				CollateralPools: []types.CollateralPool{
+					{
+						CollateralPoolId:                        0,
+						MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+						MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{0}},
+						QuoteAssetId:                            0,
+					},
+					{
+						CollateralPoolId:                        1,
+						MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+						MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{1}},
+						QuoteAssetId:                            1,
+					},
+					{
+						CollateralPoolId:                        2,
+						MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+						MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{0}},
+						QuoteAssetId:                            0,
+					},
+				},
 				Perpetuals: []types.Perpetual{
 					{
 						Params: types.PerpetualParams{
@@ -297,6 +477,26 @@ func TestGenesisState_Validate(t *testing.T) {
 		},
 		"invalid: impact notional is zero": {
 			genState: &types.GenesisState{
+				CollateralPools: []types.CollateralPool{
+					{
+						CollateralPoolId:                        0,
+						MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+						MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{0}},
+						QuoteAssetId:                            0,
+					},
+					{
+						CollateralPoolId:                        1,
+						MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+						MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{1}},
+						QuoteAssetId:                            1,
+					},
+					{
+						CollateralPoolId:                        2,
+						MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+						MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{0}},
+						QuoteAssetId:                            0,
+					},
+				},
 				Perpetuals: []types.Perpetual{
 					{
 						Params: types.PerpetualParams{
@@ -323,6 +523,117 @@ func TestGenesisState_Validate(t *testing.T) {
 				},
 			},
 			expectedError: errors.New("Impact notional is zero"),
+		},
+		"invalid: max cumulative insurance fund delta per block is zero": {
+			genState: &types.GenesisState{
+				CollateralPools: []types.CollateralPool{
+					{
+						CollateralPoolId:                        0,
+						MaxCumulativeInsuranceFundDeltaPerBlock: 0,
+						MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{0}},
+						QuoteAssetId:                            0,
+					},
+				},
+				Perpetuals: []types.Perpetual{
+					{
+						Params: types.PerpetualParams{
+							Id:            0,
+							Ticker:        "EXAM-USD",
+							LiquidityTier: 0,
+						},
+						FundingIndex: dtypes.ZeroInt(),
+					},
+				},
+				LiquidityTiers: []types.LiquidityTier{
+					{
+						Id:                     0,
+						Name:                   "Large-Cap",
+						InitialMarginPpm:       500_000,
+						MaintenanceFractionPpm: 750_000,
+						ImpactNotional:         1_000_000_000,
+					},
+				},
+				Params: types.Params{
+					FundingRateClampFactorPpm: 3_000_000,
+					PremiumVoteClampFactorPpm: 30_000_000,
+					MinNumVotesPerSample:      15,
+				},
+			},
+			expectedError: errors.New("max cumulative insurance fund delta per block is zero"),
+		},
+		"invalid: multi collateral assets is empty": {
+			genState: &types.GenesisState{
+				CollateralPools: []types.CollateralPool{
+					{
+						CollateralPoolId:                        0,
+						MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+						MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{}},
+						QuoteAssetId:                            0,
+					},
+				},
+				Perpetuals: []types.Perpetual{
+					{
+						Params: types.PerpetualParams{
+							Id:            0,
+							Ticker:        "EXAM-USD",
+							LiquidityTier: 0,
+						},
+						FundingIndex: dtypes.ZeroInt(),
+					},
+				},
+				LiquidityTiers: []types.LiquidityTier{
+					{
+						Id:                     0,
+						Name:                   "Large-Cap",
+						InitialMarginPpm:       500_000,
+						MaintenanceFractionPpm: 750_000,
+						ImpactNotional:         1_000_000_000,
+					},
+				},
+				Params: types.Params{
+					FundingRateClampFactorPpm: 3_000_000,
+					PremiumVoteClampFactorPpm: 30_000_000,
+					MinNumVotesPerSample:      15,
+				},
+			},
+			expectedError: errors.New("collateral asssets is empty"),
+		},
+		"invalid: multi collateral does not contain quote asset": {
+			genState: &types.GenesisState{
+				CollateralPools: []types.CollateralPool{
+					{
+						CollateralPoolId:                        0,
+						MaxCumulativeInsuranceFundDeltaPerBlock: 1_000_000_000_000,
+						MultiCollateralAssets:                   &types.MultiCollateralAssetsArray{MultiCollateralAssets: []uint32{1}},
+						QuoteAssetId:                            0,
+					},
+				},
+				Perpetuals: []types.Perpetual{
+					{
+						Params: types.PerpetualParams{
+							Id:            0,
+							Ticker:        "EXAM-USD",
+							LiquidityTier: 0,
+						},
+						FundingIndex: dtypes.ZeroInt(),
+					},
+				},
+				LiquidityTiers: []types.LiquidityTier{
+					{
+						Id:                     0,
+						Name:                   "Large-Cap",
+						InitialMarginPpm:       500_000,
+						MaintenanceFractionPpm: 750_000,
+						ImpactNotional:         1_000_000_000,
+					},
+				},
+				Params: types.Params{
+					FundingRateClampFactorPpm: 3_000_000,
+					PremiumVoteClampFactorPpm: 30_000_000,
+					MinNumVotesPerSample:      15,
+				},
+			},
+			expectedError: errors.New("multi collateral asset does not contain quote asset"),
 		},
 	}
 

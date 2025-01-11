@@ -5,8 +5,8 @@ import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
 import "klyraprotocol/indexer/shared/removal_reason.proto";
 import "klyraprotocol/indexer/protocol/v1/clob.proto";
-import "klyraprotocol/indexer/protocol/v1/perpetual.proto";
 import "klyraprotocol/indexer/protocol/v1/subaccount.proto";
+
 
 option go_package = "github.com/StreamFinance-Protocol/stream-chain/protocol/indexer/events";
 
@@ -361,6 +361,22 @@ message PerpetualMarketCreateEventV1 {
   uint32 liquidity_tier = 10;
 }
 
+// CollateralPoolUpsertEvent indicates any contains information about
+// a new collateral pool or updates to an existing collateral pool.
+message CollateralPoolUpsertEvent {
+  // The id of the collateral pool.
+  uint32 id = 1;
+
+  // The maximum insurance fund delta per block for isolated perpetual markets.
+  uint64 max_cumulative_insurance_fund_delta_per_block = 2;
+
+  // The multi collateral assets for the collateral pool.
+  repeated uint32 multi_collateral_assets = 3;
+
+  // The id of the quote asset.
+  uint32 quote_asset_id = 4;
+}
+
 // PerpetualMarketCreateEventV2 message contains all the information about a
 // new Perpetual Market on the Klyra chain.
 message PerpetualMarketCreateEventV2 {
@@ -410,15 +426,13 @@ message PerpetualMarketCreateEventV2 {
   // Defined in perpetuals.perpetual
   uint32 liquidity_tier = 10;
 
-  // Market type of the perpetual.
-  klyraprotocol.indexer.protocol.v1.PerpetualMarketType market_type = 11;
-
   // The danger index is used to prioritze certain accounts and positions in
   // liquidations
-  uint32 danger_index_ppm = 12;
+  uint32 danger_index_ppm = 11;
 
-  // The maximum cumulative insurance fund delta per block for isolated markets.
-  string isolated_market_max_cumulative_insurance_fund_delta_per_block = 13;
+  // The collateral pool id is used to signify which collateral pool this
+  // perpetual belongs to
+  uint32 collateral_pool_id = 12;
 }
 
 // LiquidityTierUpsertEventV1 message contains all the information to
@@ -561,11 +575,8 @@ message UpdatePerpetualEventV1 {
   // liquidations
   uint32 danger_index_ppm = 6;
 
-  // The maximum cumulative insurance fund delta per block for isolated markets.
-  string isolated_market_max_cumulative_insurance_fund_delta_per_block = 7;
-
   // The perp yield index of this perpetual market
-  string perp_yield_index = 8;
+  string perp_yield_index = 7;
 }
 
 // UpdateYieldParamsV1 message contains all the information about an update

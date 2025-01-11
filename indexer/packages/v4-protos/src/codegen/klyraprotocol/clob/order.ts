@@ -606,7 +606,9 @@ export interface Order {
   /** Router fee ppm for the order. */
 
   routerFeePpm: number;
-  routerSubaccountId?: SubaccountId;
+  /** Router fee owner. */
+
+  routerFeeOwner: string;
 }
 /**
  * Order represents a single order belonging to a `Subaccount`
@@ -680,7 +682,9 @@ export interface OrderSDKType {
   /** Router fee ppm for the order. */
 
   router_fee_ppm: number;
-  router_subaccount_id?: SubaccountIdSDKType;
+  /** Router fee owner. */
+
+  router_fee_owner: string;
 }
 /**
  * TransactionOrdering represents a unique location in the block where a
@@ -1110,7 +1114,7 @@ function createBaseOrder(): Order {
     conditionType: 0,
     conditionalOrderTriggerSubticks: Long.UZERO,
     routerFeePpm: 0,
-    routerSubaccountId: undefined
+    routerFeeOwner: ""
   };
 }
 
@@ -1164,8 +1168,8 @@ export const Order = {
       writer.uint32(96).int32(message.routerFeePpm);
     }
 
-    if (message.routerSubaccountId !== undefined) {
-      SubaccountId.encode(message.routerSubaccountId, writer.uint32(106).fork()).ldelim();
+    if (message.routerFeeOwner !== "") {
+      writer.uint32(106).string(message.routerFeeOwner);
     }
 
     return writer;
@@ -1229,7 +1233,7 @@ export const Order = {
           break;
 
         case 13:
-          message.routerSubaccountId = SubaccountId.decode(reader, reader.uint32());
+          message.routerFeeOwner = reader.string();
           break;
 
         default:
@@ -1255,7 +1259,7 @@ export const Order = {
     message.conditionType = object.conditionType ?? 0;
     message.conditionalOrderTriggerSubticks = object.conditionalOrderTriggerSubticks !== undefined && object.conditionalOrderTriggerSubticks !== null ? Long.fromValue(object.conditionalOrderTriggerSubticks) : Long.UZERO;
     message.routerFeePpm = object.routerFeePpm ?? 0;
-    message.routerSubaccountId = object.routerSubaccountId !== undefined && object.routerSubaccountId !== null ? SubaccountId.fromPartial(object.routerSubaccountId) : undefined;
+    message.routerFeeOwner = object.routerFeeOwner ?? "";
     return message;
   }
 

@@ -1,7 +1,6 @@
 package keeper_test
 
 import (
-	"fmt"
 	"math/big"
 	"testing"
 	"time"
@@ -57,8 +56,9 @@ type processProposerOperationsTestCase struct {
 	setupMockBankKeeper func(bk *mocks.BankKeeper)
 
 	// Liquidation specific setup.
-	liquidationConfig    *types.LiquidationsConfig
-	insuranceFundBalance uint64
+	liquidationConfig                       *types.LiquidationsConfig
+	maxCumulativeInsuranceFundDeltaPerBlock uint64
+	insuranceFundBalance                    uint64
 
 	// Expectations.
 	// Note that for expectedProcessProposerMatchesEvents, the OperationsProposedInLastBlock field is populated from
@@ -127,6 +127,7 @@ func TestProcessProposerOperations(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(1_000_000_000), // 10 BTC
+							YieldIndex:  big.NewRat(0, 1).String(),
 						},
 					},
 				},
@@ -139,6 +140,7 @@ func TestProcessProposerOperations(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(1_000_000_000), // 10 BTC
+							YieldIndex:  big.NewRat(0, 1).String(),
 						},
 					},
 				},
@@ -253,6 +255,7 @@ func TestProcessProposerOperations(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(1_000_000_000), // 10 BTC
+							YieldIndex:  big.NewRat(0, 1).String(),
 						},
 					},
 				},
@@ -265,6 +268,7 @@ func TestProcessProposerOperations(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(1_000_000_000), // 10 BTC
+							YieldIndex:  big.NewRat(0, 1).String(),
 						},
 					},
 				},
@@ -379,6 +383,7 @@ func TestProcessProposerOperations(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(1_000_000_000), // 10 BTC
+							YieldIndex:  big.NewRat(0, 1).String(),
 						},
 					},
 				},
@@ -391,6 +396,7 @@ func TestProcessProposerOperations(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(1_000_000_000), // 10 BTC
+							YieldIndex:  big.NewRat(0, 1).String(),
 						},
 					},
 				},
@@ -492,6 +498,7 @@ func TestProcessProposerOperations(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(1_000_000_000), // 10 BTC
+							YieldIndex:  big.NewRat(0, 1).String(),
 						},
 					},
 				},
@@ -504,6 +511,7 @@ func TestProcessProposerOperations(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(1_000_000_000), // 10 BTC
+							YieldIndex:  big.NewRat(0, 1).String(),
 						},
 					},
 				},
@@ -586,6 +594,7 @@ func TestProcessProposerOperations(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(1_000_000_000), // 10 BTC
+							YieldIndex:  big.NewRat(0, 1).String(),
 						},
 					},
 				},
@@ -598,6 +607,7 @@ func TestProcessProposerOperations(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(1_000_000_000), // 10 BTC
+							YieldIndex:  big.NewRat(0, 1).String(),
 						},
 					},
 				},
@@ -610,6 +620,7 @@ func TestProcessProposerOperations(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(1_000_000_000), // 10 BTC
+							YieldIndex:  big.NewRat(0, 1).String(),
 						},
 					},
 				},
@@ -1325,6 +1336,7 @@ func TestProcessProposerOperations(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(1_000_000_000), // 10 BTC
+							YieldIndex:  big.NewRat(0, 1).String(),
 						},
 					},
 				},
@@ -1337,6 +1349,7 @@ func TestProcessProposerOperations(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(1_000_000_000), // 10 BTC
+							YieldIndex:  big.NewRat(0, 1).String(),
 						},
 					},
 				},
@@ -1477,6 +1490,7 @@ func TestProcessProposerOperations(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(1_000_000_000), // 10 BTC
+							YieldIndex:  big.NewRat(0, 1).String(),
 						},
 					},
 				},
@@ -1489,6 +1503,7 @@ func TestProcessProposerOperations(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(1_000_000_000), // 10 BTC
+							YieldIndex:  big.NewRat(0, 1).String(),
 						},
 					},
 				},
@@ -1573,6 +1588,7 @@ func TestProcessProposerOperations(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(1_000_000_000), // 10 BTC
+							YieldIndex:  big.NewRat(0, 1).String(),
 						},
 					},
 				},
@@ -1585,6 +1601,7 @@ func TestProcessProposerOperations(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(1_000_000_000), // 10 BTC
+							YieldIndex:  big.NewRat(0, 1).String(),
 						},
 					},
 				},
@@ -1627,6 +1644,7 @@ func TestProcessProposerOperations(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(1_000_000_000), // 10 BTC
+							YieldIndex:  big.NewRat(0, 1).String(),
 						},
 					},
 				},
@@ -1639,6 +1657,7 @@ func TestProcessProposerOperations(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(1_000_000_000), // 10 BTC
+							YieldIndex:  big.NewRat(0, 1).String(),
 						},
 					},
 				},
@@ -2167,13 +2186,13 @@ func TestProcessProposerOperations(t *testing.T) {
 			rawOperations: []types.OperationRaw{
 				clobtest.NewShortTermOrderPlacementOperationRaw(
 					types.Order{
-						OrderId:            types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
-						Side:               types.Order_SIDE_BUY,
-						Quantums:           100_000_000, // 1 BTC
-						Subticks:           50_000_000,
-						GoodTilOneof:       &types.Order_GoodTilBlock{GoodTilBlock: 25},
-						RouterSubaccountId: &constants.Carl_Num0,
-						RouterFeePpm:       1000,
+						OrderId:        types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
+						Side:           types.Order_SIDE_BUY,
+						Quantums:       100_000_000, // 1 BTC
+						Subticks:       50_000_000,
+						GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+						RouterFeeOwner: constants.Carl_Num0.Owner,
+						RouterFeePpm:   1000,
 					},
 				),
 				clobtest.NewShortTermOrderPlacementOperationRaw(
@@ -2212,13 +2231,13 @@ func TestProcessProposerOperations(t *testing.T) {
 							GoodTilOneof: &types.Order_GoodTilBlock{GoodTilBlock: 25},
 						},
 						MakerOrder: &types.Order{
-							OrderId:            types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
-							Side:               types.Order_SIDE_BUY,
-							Quantums:           100_000_000,
-							Subticks:           50_000_000,
-							GoodTilOneof:       &types.Order_GoodTilBlock{GoodTilBlock: 25},
-							RouterSubaccountId: &constants.Carl_Num0,
-							RouterFeePpm:       1000,
+							OrderId:        types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
+							Side:           types.Order_SIDE_BUY,
+							Quantums:       100_000_000,
+							Subticks:       50_000_000,
+							GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+							RouterFeeOwner: constants.Carl_Num0.Owner,
+							RouterFeePpm:   1000,
 						},
 						FillAmount: 100_000_000,
 						MakerFee:   60_000,
@@ -2239,7 +2258,6 @@ func TestProcessProposerOperations(t *testing.T) {
 			expectedQuoteBalances: map[satypes.SubaccountId]int64{
 				constants.Alice_Num0: constants.TDai_Asset_100_000.GetBigQuantums().Int64() - 50_000_000 - 60_000,
 				constants.Bob_Num0:   constants.TDai_Asset_100_000.GetBigQuantums().Int64() + 50_000_000 - 25_000,
-				constants.Carl_Num0:  50_000,
 			},
 			expectedPerpetualPositions: map[satypes.SubaccountId][]*satypes.PerpetualPosition{
 				constants.Bob_Num0: {
@@ -2307,13 +2325,13 @@ func TestProcessProposerOperations(t *testing.T) {
 				),
 				clobtest.NewShortTermOrderPlacementOperationRaw(
 					types.Order{
-						OrderId:            types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
-						Side:               types.Order_SIDE_SELL,
-						Quantums:           100_000_000, // 1 BTC
-						Subticks:           50_000_000,
-						GoodTilOneof:       &types.Order_GoodTilBlock{GoodTilBlock: 25},
-						RouterSubaccountId: &constants.Carl_Num0,
-						RouterFeePpm:       1000,
+						OrderId:        types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
+						Side:           types.Order_SIDE_SELL,
+						Quantums:       100_000_000, // 1 BTC
+						Subticks:       50_000_000,
+						GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+						RouterFeeOwner: constants.Carl_Num0.Owner,
+						RouterFeePpm:   1000,
 					},
 				),
 				clobtest.NewMatchOperationRaw(
@@ -2336,13 +2354,13 @@ func TestProcessProposerOperations(t *testing.T) {
 				{
 					MatchWithOrders: types.MatchWithOrders{
 						TakerOrder: &types.Order{
-							OrderId:            types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
-							Side:               types.Order_SIDE_SELL,
-							Quantums:           100_000_000,
-							Subticks:           50_000_000,
-							GoodTilOneof:       &types.Order_GoodTilBlock{GoodTilBlock: 25},
-							RouterSubaccountId: &constants.Carl_Num0,
-							RouterFeePpm:       1000,
+							OrderId:        types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
+							Side:           types.Order_SIDE_SELL,
+							Quantums:       100_000_000,
+							Subticks:       50_000_000,
+							GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+							RouterFeeOwner: constants.Carl_Num0.Owner,
+							RouterFeePpm:   1000,
 						},
 						MakerOrder: &types.Order{
 							OrderId:      types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
@@ -2370,7 +2388,6 @@ func TestProcessProposerOperations(t *testing.T) {
 			expectedQuoteBalances: map[satypes.SubaccountId]int64{
 				constants.Alice_Num0: constants.TDai_Asset_100_000.GetBigQuantums().Int64() - 50_000_000 - 10_000,
 				constants.Bob_Num0:   constants.TDai_Asset_100_000.GetBigQuantums().Int64() + 50_000_000 - 75_000,
-				constants.Carl_Num0:  50_000,
 			},
 			expectedPerpetualPositions: map[satypes.SubaccountId][]*satypes.PerpetualPosition{
 				constants.Bob_Num0: {
@@ -2429,24 +2446,24 @@ func TestProcessProposerOperations(t *testing.T) {
 			rawOperations: []types.OperationRaw{
 				clobtest.NewShortTermOrderPlacementOperationRaw(
 					types.Order{
-						OrderId:            types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
-						Side:               types.Order_SIDE_BUY,
-						Quantums:           100_000_000, // 1 BTC
-						Subticks:           50_000_000,
-						GoodTilOneof:       &types.Order_GoodTilBlock{GoodTilBlock: 25},
-						RouterSubaccountId: &constants.Carl_Num0,
-						RouterFeePpm:       1000,
+						OrderId:        types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
+						Side:           types.Order_SIDE_BUY,
+						Quantums:       100_000_000, // 1 BTC
+						Subticks:       50_000_000,
+						GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+						RouterFeeOwner: constants.Carl_Num0.Owner,
+						RouterFeePpm:   1000,
 					},
 				),
 				clobtest.NewShortTermOrderPlacementOperationRaw(
 					types.Order{
-						OrderId:            types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
-						Side:               types.Order_SIDE_SELL,
-						Quantums:           100_000_000, // 1 BTC
-						Subticks:           50_000_000,
-						GoodTilOneof:       &types.Order_GoodTilBlock{GoodTilBlock: 25},
-						RouterSubaccountId: &constants.Carl_Num0,
-						RouterFeePpm:       1000,
+						OrderId:        types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
+						Side:           types.Order_SIDE_SELL,
+						Quantums:       100_000_000, // 1 BTC
+						Subticks:       50_000_000,
+						GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+						RouterFeeOwner: constants.Carl_Num0.Owner,
+						RouterFeePpm:   1000,
 					},
 				),
 				clobtest.NewMatchOperationRaw(
@@ -2469,22 +2486,22 @@ func TestProcessProposerOperations(t *testing.T) {
 				{
 					MatchWithOrders: types.MatchWithOrders{
 						TakerOrder: &types.Order{
-							OrderId:            types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
-							Side:               types.Order_SIDE_SELL,
-							Quantums:           100_000_000,
-							Subticks:           50_000_000,
-							GoodTilOneof:       &types.Order_GoodTilBlock{GoodTilBlock: 25},
-							RouterSubaccountId: &constants.Carl_Num0,
-							RouterFeePpm:       1000,
+							OrderId:        types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
+							Side:           types.Order_SIDE_SELL,
+							Quantums:       100_000_000,
+							Subticks:       50_000_000,
+							GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+							RouterFeeOwner: constants.Carl_Num0.Owner,
+							RouterFeePpm:   1000,
 						},
 						MakerOrder: &types.Order{
-							OrderId:            types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
-							Side:               types.Order_SIDE_BUY,
-							Quantums:           100_000_000,
-							Subticks:           50_000_000,
-							GoodTilOneof:       &types.Order_GoodTilBlock{GoodTilBlock: 25},
-							RouterSubaccountId: &constants.Carl_Num0,
-							RouterFeePpm:       1000,
+							OrderId:        types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
+							Side:           types.Order_SIDE_BUY,
+							Quantums:       100_000_000,
+							Subticks:       50_000_000,
+							GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+							RouterFeeOwner: constants.Carl_Num0.Owner,
+							RouterFeePpm:   1000,
 						},
 						FillAmount: 100_000_000,
 						MakerFee:   60_000,
@@ -2505,7 +2522,6 @@ func TestProcessProposerOperations(t *testing.T) {
 			expectedQuoteBalances: map[satypes.SubaccountId]int64{
 				constants.Alice_Num0: constants.TDai_Asset_100_000.GetBigQuantums().Int64() - 50_000_000 - 60_000,
 				constants.Bob_Num0:   constants.TDai_Asset_100_000.GetBigQuantums().Int64() + 50_000_000 - 75_000,
-				constants.Carl_Num0:  100_000,
 			},
 			expectedPerpetualPositions: map[satypes.SubaccountId][]*satypes.PerpetualPosition{
 				constants.Bob_Num0: {
@@ -2564,24 +2580,24 @@ func TestProcessProposerOperations(t *testing.T) {
 			rawOperations: []types.OperationRaw{
 				clobtest.NewShortTermOrderPlacementOperationRaw(
 					types.Order{
-						OrderId:            types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
-						Side:               types.Order_SIDE_BUY,
-						Quantums:           100_000_000, // 1 BTC
-						Subticks:           50_000_000,
-						GoodTilOneof:       &types.Order_GoodTilBlock{GoodTilBlock: 25},
-						RouterSubaccountId: &constants.Carl_Num0,
-						RouterFeePpm:       1000,
+						OrderId:        types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
+						Side:           types.Order_SIDE_BUY,
+						Quantums:       100_000_000, // 1 BTC
+						Subticks:       50_000_000,
+						GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+						RouterFeeOwner: constants.Carl_Num0.Owner,
+						RouterFeePpm:   1000,
 					},
 				),
 				clobtest.NewShortTermOrderPlacementOperationRaw(
 					types.Order{
-						OrderId:            types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
-						Side:               types.Order_SIDE_SELL,
-						Quantums:           100_000_000, // 1 BTC
-						Subticks:           50_000_000,
-						GoodTilOneof:       &types.Order_GoodTilBlock{GoodTilBlock: 25},
-						RouterSubaccountId: &constants.Carl_Num0,
-						RouterFeePpm:       2000,
+						OrderId:        types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
+						Side:           types.Order_SIDE_SELL,
+						Quantums:       100_000_000, // 1 BTC
+						Subticks:       50_000_000,
+						GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+						RouterFeeOwner: constants.Carl_Num0.Owner,
+						RouterFeePpm:   2000,
 					},
 				),
 				clobtest.NewMatchOperationRaw(
@@ -2604,22 +2620,22 @@ func TestProcessProposerOperations(t *testing.T) {
 				{
 					MatchWithOrders: types.MatchWithOrders{
 						TakerOrder: &types.Order{
-							OrderId:            types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
-							Side:               types.Order_SIDE_SELL,
-							Quantums:           100_000_000,
-							Subticks:           50_000_000,
-							GoodTilOneof:       &types.Order_GoodTilBlock{GoodTilBlock: 25},
-							RouterSubaccountId: &constants.Carl_Num0,
-							RouterFeePpm:       2000,
+							OrderId:        types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
+							Side:           types.Order_SIDE_SELL,
+							Quantums:       100_000_000,
+							Subticks:       50_000_000,
+							GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+							RouterFeeOwner: constants.Carl_Num0.Owner,
+							RouterFeePpm:   2000,
 						},
 						MakerOrder: &types.Order{
-							OrderId:            types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
-							Side:               types.Order_SIDE_BUY,
-							Quantums:           100_000_000,
-							Subticks:           50_000_000,
-							GoodTilOneof:       &types.Order_GoodTilBlock{GoodTilBlock: 25},
-							RouterSubaccountId: &constants.Carl_Num0,
-							RouterFeePpm:       1000,
+							OrderId:        types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
+							Side:           types.Order_SIDE_BUY,
+							Quantums:       100_000_000,
+							Subticks:       50_000_000,
+							GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+							RouterFeeOwner: constants.Carl_Num0.Owner,
+							RouterFeePpm:   1000,
 						},
 						FillAmount: 100_000_000,
 						MakerFee:   60_000,
@@ -2640,7 +2656,6 @@ func TestProcessProposerOperations(t *testing.T) {
 			expectedQuoteBalances: map[satypes.SubaccountId]int64{
 				constants.Alice_Num0: constants.TDai_Asset_100_000.GetBigQuantums().Int64() - 50_000_000 - 60_000,
 				constants.Bob_Num0:   constants.TDai_Asset_100_000.GetBigQuantums().Int64() + 50_000_000 - 125_000,
-				constants.Carl_Num0:  150_000,
 			},
 			expectedPerpetualPositions: map[satypes.SubaccountId][]*satypes.PerpetualPosition{
 				constants.Bob_Num0: {
@@ -2699,24 +2714,24 @@ func TestProcessProposerOperations(t *testing.T) {
 			rawOperations: []types.OperationRaw{
 				clobtest.NewShortTermOrderPlacementOperationRaw(
 					types.Order{
-						OrderId:            types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
-						Side:               types.Order_SIDE_BUY,
-						Quantums:           100_000_000, // 1 BTC
-						Subticks:           50_000_000,
-						GoodTilOneof:       &types.Order_GoodTilBlock{GoodTilBlock: 25},
-						RouterSubaccountId: &constants.Dave_Num0,
-						RouterFeePpm:       1000,
+						OrderId:        types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
+						Side:           types.Order_SIDE_BUY,
+						Quantums:       100_000_000, // 1 BTC
+						Subticks:       50_000_000,
+						GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+						RouterFeeOwner: constants.Dave_Num0.Owner,
+						RouterFeePpm:   1000,
 					},
 				),
 				clobtest.NewShortTermOrderPlacementOperationRaw(
 					types.Order{
-						OrderId:            types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
-						Side:               types.Order_SIDE_SELL,
-						Quantums:           100_000_000, // 1 BTC
-						Subticks:           50_000_000,
-						GoodTilOneof:       &types.Order_GoodTilBlock{GoodTilBlock: 25},
-						RouterSubaccountId: &constants.Carl_Num0,
-						RouterFeePpm:       1000,
+						OrderId:        types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
+						Side:           types.Order_SIDE_SELL,
+						Quantums:       100_000_000, // 1 BTC
+						Subticks:       50_000_000,
+						GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+						RouterFeeOwner: constants.Carl_Num0.Owner,
+						RouterFeePpm:   1000,
 					},
 				),
 				clobtest.NewMatchOperationRaw(
@@ -2739,22 +2754,22 @@ func TestProcessProposerOperations(t *testing.T) {
 				{
 					MatchWithOrders: types.MatchWithOrders{
 						TakerOrder: &types.Order{
-							OrderId:            types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
-							Side:               types.Order_SIDE_SELL,
-							Quantums:           100_000_000,
-							Subticks:           50_000_000,
-							GoodTilOneof:       &types.Order_GoodTilBlock{GoodTilBlock: 25},
-							RouterSubaccountId: &constants.Carl_Num0,
-							RouterFeePpm:       1000,
+							OrderId:        types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
+							Side:           types.Order_SIDE_SELL,
+							Quantums:       100_000_000,
+							Subticks:       50_000_000,
+							GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+							RouterFeeOwner: constants.Carl_Num0.Owner,
+							RouterFeePpm:   1000,
 						},
 						MakerOrder: &types.Order{
-							OrderId:            types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
-							Side:               types.Order_SIDE_BUY,
-							Quantums:           100_000_000,
-							Subticks:           50_000_000,
-							GoodTilOneof:       &types.Order_GoodTilBlock{GoodTilBlock: 25},
-							RouterSubaccountId: &constants.Dave_Num0,
-							RouterFeePpm:       1000,
+							OrderId:        types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
+							Side:           types.Order_SIDE_BUY,
+							Quantums:       100_000_000,
+							Subticks:       50_000_000,
+							GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+							RouterFeeOwner: constants.Dave_Num0.Owner,
+							RouterFeePpm:   1000,
 						},
 						FillAmount: 100_000_000,
 						MakerFee:   60_000,
@@ -2775,8 +2790,6 @@ func TestProcessProposerOperations(t *testing.T) {
 			expectedQuoteBalances: map[satypes.SubaccountId]int64{
 				constants.Alice_Num0: constants.TDai_Asset_100_000.GetBigQuantums().Int64() - 50_000_000 - 60_000,
 				constants.Bob_Num0:   constants.TDai_Asset_100_000.GetBigQuantums().Int64() + 50_000_000 - 75_000,
-				constants.Carl_Num0:  50_000,
-				constants.Dave_Num0:  50_000,
 			},
 			expectedPerpetualPositions: map[satypes.SubaccountId][]*satypes.PerpetualPosition{
 				constants.Bob_Num0: {
@@ -2835,24 +2848,24 @@ func TestProcessProposerOperations(t *testing.T) {
 			rawOperations: []types.OperationRaw{
 				clobtest.NewShortTermOrderPlacementOperationRaw(
 					types.Order{
-						OrderId:            types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
-						Side:               types.Order_SIDE_BUY,
-						Quantums:           100_000_000, // 1 BTC
-						Subticks:           50_000_000,
-						GoodTilOneof:       &types.Order_GoodTilBlock{GoodTilBlock: 25},
-						RouterSubaccountId: &constants.Dave_Num0,
-						RouterFeePpm:       1000,
+						OrderId:        types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
+						Side:           types.Order_SIDE_BUY,
+						Quantums:       100_000_000, // 1 BTC
+						Subticks:       50_000_000,
+						GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+						RouterFeeOwner: constants.Dave_Num0.Owner,
+						RouterFeePpm:   1000,
 					},
 				),
 				clobtest.NewShortTermOrderPlacementOperationRaw(
 					types.Order{
-						OrderId:            types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
-						Side:               types.Order_SIDE_SELL,
-						Quantums:           100_000_000, // 1 BTC
-						Subticks:           50_000_000,
-						GoodTilOneof:       &types.Order_GoodTilBlock{GoodTilBlock: 25},
-						RouterSubaccountId: &constants.Carl_Num0,
-						RouterFeePpm:       2000,
+						OrderId:        types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
+						Side:           types.Order_SIDE_SELL,
+						Quantums:       100_000_000, // 1 BTC
+						Subticks:       50_000_000,
+						GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+						RouterFeeOwner: constants.Carl_Num0.Owner,
+						RouterFeePpm:   2000,
 					},
 				),
 				clobtest.NewMatchOperationRaw(
@@ -2875,22 +2888,22 @@ func TestProcessProposerOperations(t *testing.T) {
 				{
 					MatchWithOrders: types.MatchWithOrders{
 						TakerOrder: &types.Order{
-							OrderId:            types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
-							Side:               types.Order_SIDE_SELL,
-							Quantums:           100_000_000,
-							Subticks:           50_000_000,
-							GoodTilOneof:       &types.Order_GoodTilBlock{GoodTilBlock: 25},
-							RouterSubaccountId: &constants.Carl_Num0,
-							RouterFeePpm:       2000,
+							OrderId:        types.OrderId{SubaccountId: constants.Bob_Num0, ClientId: 14, ClobPairId: 0},
+							Side:           types.Order_SIDE_SELL,
+							Quantums:       100_000_000,
+							Subticks:       50_000_000,
+							GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+							RouterFeeOwner: constants.Carl_Num0.Owner,
+							RouterFeePpm:   2000,
 						},
 						MakerOrder: &types.Order{
-							OrderId:            types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
-							Side:               types.Order_SIDE_BUY,
-							Quantums:           100_000_000,
-							Subticks:           50_000_000,
-							GoodTilOneof:       &types.Order_GoodTilBlock{GoodTilBlock: 25},
-							RouterSubaccountId: &constants.Dave_Num0,
-							RouterFeePpm:       1000,
+							OrderId:        types.OrderId{SubaccountId: constants.Alice_Num0, ClientId: 14, ClobPairId: 0},
+							Side:           types.Order_SIDE_BUY,
+							Quantums:       100_000_000,
+							Subticks:       50_000_000,
+							GoodTilOneof:   &types.Order_GoodTilBlock{GoodTilBlock: 25},
+							RouterFeeOwner: constants.Dave_Num0.Owner,
+							RouterFeePpm:   1000,
 						},
 						FillAmount: 100_000_000,
 						MakerFee:   60_000,
@@ -2911,8 +2924,6 @@ func TestProcessProposerOperations(t *testing.T) {
 			expectedQuoteBalances: map[satypes.SubaccountId]int64{
 				constants.Alice_Num0: constants.TDai_Asset_100_000.GetBigQuantums().Int64() - 50_000_000 - 60_000,
 				constants.Bob_Num0:   constants.TDai_Asset_100_000.GetBigQuantums().Int64() + 50_000_000 - 125_000,
-				constants.Carl_Num0:  100_000,
-				constants.Dave_Num0:  50_000,
 			},
 			expectedPerpetualPositions: map[satypes.SubaccountId][]*satypes.PerpetualPosition{
 				constants.Bob_Num0: {
@@ -3184,16 +3195,25 @@ func setupProcessProposerOperationsTestCase(
 	}
 
 	// Create the default markets.
-	keepertest.CreateTestMarkets(t, ctx, ks.PricesKeeper)
+	keepertest.CreateNonDefaultTestMarkets(t, ctx, ks.PricesKeeper)
 
 	// Create liquidity tiers.
 	keepertest.CreateTestLiquidityTiers(t, ctx, ks.PerpetualsKeeper)
+	keepertest.CreateTestCollateralPools(t, ctx, ks.PerpetualsKeeper)
+
+	if tc.maxCumulativeInsuranceFundDeltaPerBlock != 0 {
+		_, err := ks.PerpetualsKeeper.UpsertCollateralPool(
+			ctx,
+			constants.CollateralPools[0].CollateralPoolId,
+			tc.maxCumulativeInsuranceFundDeltaPerBlock,
+			constants.CollateralPools[0].MultiCollateralAssets,
+			constants.CollateralPools[0].QuoteAssetId,
+		)
+		require.NoError(t, err)
+	}
 
 	require.NotNil(t, tc.perpetualFeeParams)
 	require.NoError(t, ks.FeeTiersKeeper.SetPerpetualFeeParams(ctx, *tc.perpetualFeeParams))
-
-	err := keepertest.CreateTDaiAsset(ctx, ks.AssetsKeeper)
-	require.NoError(t, err)
 
 	// Create all perpetuals.
 	for _, p := range tc.perpetuals {
@@ -3205,9 +3225,8 @@ func setupProcessProposerOperationsTestCase(
 			p.Params.AtomicResolution,
 			p.Params.DefaultFundingPpm,
 			p.Params.LiquidityTier,
-			p.Params.MarketType,
 			p.Params.DangerIndexPpm,
-			p.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
+			p.Params.CollateralPoolId,
 			p.YieldIndex,
 		)
 		require.NoError(t, err)
@@ -3247,15 +3266,14 @@ func setupProcessProposerOperationsTestCase(
 						clobPair.SubticksPerTick,
 						clobPair.StepBaseQuantums,
 						tc.perpetuals[perpetualId].Params.LiquidityTier,
-						tc.perpetuals[perpetualId].Params.MarketType,
 						tc.perpetuals[perpetualId].Params.DangerIndexPpm,
-						fmt.Sprintf("%d", tc.perpetuals[perpetualId].Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock),
+						tc.perpetuals[perpetualId].Params.CollateralPoolId,
 					),
 				),
 			).Once().Return()
 		}
 
-		_, err = ks.ClobKeeper.CreatePerpetualClobPair(
+		_, err := ks.ClobKeeper.CreatePerpetualClobPair(
 			ctx,
 			clobPair.Id,
 			clobtest.MustPerpetualId(clobPair),

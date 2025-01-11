@@ -2,7 +2,6 @@ package keeper_test
 
 import (
 	"errors"
-	"fmt"
 	"math/big"
 	"testing"
 
@@ -18,7 +17,6 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
-	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices"
 	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
 	"github.com/stretchr/testify/mock"
@@ -162,7 +160,6 @@ func TestGetPricePremiumForPerpetual(t *testing.T) {
 			mockIndexerEventManager := &mocks.IndexerEventManager{}
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, nil, mockIndexerEventManager, nil)
 
-			prices.InitGenesis(ks.Ctx, *ks.PricesKeeper, constants.Prices_DefaultGenesisState)
 			perpetuals.InitGenesis(ks.Ctx, *ks.PerpetualsKeeper, constants.Perpetuals_DefaultGenesisState)
 
 			perpetualId := clobtest.MustPerpetualId(tc.args.clobPair)
@@ -186,9 +183,8 @@ func TestGetPricePremiumForPerpetual(t *testing.T) {
 						tc.args.clobPair.SubticksPerTick,
 						tc.args.clobPair.StepBaseQuantums,
 						perpetual.Params.LiquidityTier,
-						perpetual.Params.MarketType,
 						perpetual.Params.DangerIndexPpm,
-						fmt.Sprintf("%d", perpetual.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock),
+						perpetual.Params.CollateralPoolId,
 					),
 				),
 			).Return()

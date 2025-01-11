@@ -1,11 +1,7 @@
 import { CandleResolution } from './candle-types';
 import { FillType, Liquidity } from './fill-types';
-import {
-  OrderSide,
-  OrderStatus,
-  OrderType,
-} from './order-types';
-import { PerpetualMarketStatus, PerpetualMarketType } from './perpetual-market-types';
+import { OrderSide, OrderStatus, OrderType } from './order-types';
+import { PerpetualMarketStatus } from './perpetual-market-types';
 import { PerpetualPositionStatus } from './perpetual-position-types';
 import { PositionSide } from './position-types';
 import { TradeType } from './trade-types';
@@ -21,8 +17,8 @@ import { IsoString } from './utility-types';
 /* ------- OrderbookMessageContents ------- */
 
 export interface OrderbookMessageContents {
-  bids?: PriceLevel[],
-  asks?: PriceLevel[],
+  bids?: PriceLevel[];
+  asks?: PriceLevel[];
 }
 
 // The first string indicates the price, the second string indicates the size
@@ -31,39 +27,39 @@ export type PriceLevel = [string, string];
 /* ------- SubaccountMessageContents ------- */
 
 export interface SubaccountMessageContents {
-  perpetualPositions?: PerpetualPositionSubaccountMessageContents[],
-  assetPositions?: AssetPositionSubaccountMessageContents[],
-  orders?: OrderSubaccountMessageContents[],
-  fills?: FillSubaccountMessageContents[],
-  transfers?: TransferSubaccountMessageContents,
+  perpetualPositions?: PerpetualPositionSubaccountMessageContents[];
+  assetPositions?: AssetPositionSubaccountMessageContents[];
+  orders?: OrderSubaccountMessageContents[];
+  fills?: FillSubaccountMessageContents[];
+  transfers?: TransferSubaccountMessageContents;
 }
 
 export interface PerpetualPositionSubaccountMessageContents {
-  address: string,
-  subaccountNumber: number,
-  positionId: string,
-  market: string,
-  side: PositionSide,
-  status: PerpetualPositionStatus,
-  size: string,
-  maxSize: string,
-  netFunding: string,
-  entryPrice: string,
-  exitPrice?: string,
-  sumOpen: string,
-  sumClose: string,
-  realizedPnl?: string,
-  unrealizedPnl?: string,
+  address: string;
+  subaccountNumber: number;
+  positionId: string;
+  market: string;
+  side: PositionSide;
+  status: PerpetualPositionStatus;
+  size: string;
+  maxSize: string;
+  netFunding: string;
+  entryPrice: string;
+  exitPrice?: string;
+  sumOpen: string;
+  sumClose: string;
+  realizedPnl?: string;
+  unrealizedPnl?: string;
 }
 
 export interface AssetPositionSubaccountMessageContents {
-  address: string,
-  subaccountNumber: number,
-  positionId: string,
-  assetId: string,
-  symbol: string,
-  side: PositionSide,
-  size: string,
+  address: string;
+  subaccountNumber: number;
+  positionId: string;
+  assetId: string;
+  symbol: string;
+  side: PositionSide;
+  size: string;
 }
 
 // TODO(DEC-1659): Change this to match API specification devised by Product team.
@@ -103,7 +99,7 @@ export interface OrderSubaccountMessageContents {
   clobPairId: string;
   side: OrderSide;
   size: string;
-  ticker: string,
+  ticker: string;
   price: string;
   type: OrderType;
   timeInForce: APITimeInForce;
@@ -126,8 +122,7 @@ export interface OrderSubaccountMessageContents {
   createdAtHeight?: string;
   clientMetadata: string;
   routerFeePpm: string;
-  routerFeeSubaccountOwner?: string;
-  routerFeeSubaccountNumber?: string;
+  routerFeeOwner?: string;
 }
 
 export interface FillSubaccountMessageContents {
@@ -140,7 +135,7 @@ export interface FillSubaccountMessageContents {
   size: string;
   price: string;
   quoteAmount: string;
-  eventId: string,
+  eventId: string;
   transactionHash: string;
   createdAt: IsoString;
   createdAtHeight: string;
@@ -151,17 +146,17 @@ export interface FillSubaccountMessageContents {
 
 export interface TransferSubaccountMessageContents {
   sender: {
-    address: string,
-    subaccountNumber?: number,
-  },
+    address: string;
+    subaccountNumber?: number;
+  };
   recipient: {
-    address: string,
-    subaccountNumber?: number,
-  },
-  symbol: string,
-  size: string,
-  type: TransferType,
-  transactionHash: string,
+    address: string;
+    subaccountNumber?: number;
+  };
+  symbol: string;
+  size: string;
+  type: TransferType;
+  transactionHash: string;
   createdAt: IsoString;
   createdAtHeight: string;
 }
@@ -169,28 +164,28 @@ export interface TransferSubaccountMessageContents {
 /* ------- TradeMessageContents ------- */
 
 export interface TradeMessageContents {
-  trades: TradeContent[],
+  trades: TradeContent[];
 }
 
 export interface TradeContent {
-// Unique id of the trade, which is the taker fill id.
-  id: string,
-  size: string,
-  price: string,
-  side: string,
-  createdAt: IsoString,
-  type: TradeType,
+  // Unique id of the trade, which is the taker fill id.
+  id: string;
+  size: string;
+  price: string;
+  side: string;
+  createdAt: IsoString;
+  type: TradeType;
 }
 
 /* ------- MarketMessageContents ------- */
 
 export interface MarketMessageContents {
-  trading?: TradingMarketMessageContents,
-  oraclePrices?: OraclePriceMarketMessageContentsMapping,
+  trading?: TradingMarketMessageContents;
+  oraclePrices?: OraclePriceMarketMessageContentsMapping;
 }
 
 export type TradingMarketMessageContents = {
-  [ticker: string]: TradingPerpetualMarketMessage
+  [ticker: string]: TradingPerpetualMarketMessage;
 };
 
 // All the fields in PerpetualMarketFromDatabase, but optional
@@ -207,10 +202,9 @@ export interface TradingPerpetualMarketMessage {
   quantumConversionExponent?: number;
   atomicResolution?: number;
   dangerIndexPpm?: number;
-  isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock?: string;
+  collateralPoolId?: number;
   subticksPerTick?: number;
   stepBaseQuantums?: number;
-  marketType?: PerpetualMarketType;
   openInterestLowerCap?: string;
   openInterestUpperCap?: string;
   baseOpenInterest?: string;
@@ -222,30 +216,41 @@ export interface TradingPerpetualMarketMessage {
   nextFundingRate?: string;
 }
 
+export interface CollateralPoolContents {
+  [id: string]: CollateralPoolMessage;
+}
+
+export interface CollateralPoolMessage {
+  id?: number;
+  maxCumulativeInsuranceFundDeltaPerBlock?: number;
+  multiCollateralAssets?: string;
+  quoteAssetId: number;
+}
+
 export type OraclePriceMarketMessageContentsMapping = {
-  [ticker: string]: OraclePriceMarket,
+  [ticker: string]: OraclePriceMarket;
 };
 
 export interface OraclePriceMarket {
-  spotPrice: string,
-  pnlPrice: string,
-  effectiveAt: IsoString,
-  effectiveAtHeight: string,
-  marketId: number,
+  spotPrice: string;
+  pnlPrice: string;
+  effectiveAt: IsoString;
+  effectiveAtHeight: string;
+  marketId: number;
 }
 
 /* ------- CandleMessageContents ------- */
 
 export interface CandleMessageContents {
-  resolution: CandleResolution,
-  startedAt: IsoString,
-  ticker: string,
-  low: string,
-  high: string,
-  open: string,
-  close: string,
-  baseTokenVolume: string,
-  trades: number,
-  usdVolume: string
-  startingOpenInterest: string,
+  resolution: CandleResolution;
+  startedAt: IsoString;
+  ticker: string;
+  low: string;
+  high: string;
+  open: string;
+  close: string;
+  baseTokenVolume: string;
+  trades: number;
+  usdVolume: string;
+  startingOpenInterest: string;
 }

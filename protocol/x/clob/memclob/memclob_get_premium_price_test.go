@@ -680,7 +680,7 @@ func TestGetPremiumPrice(t *testing.T) {
 			pricePremiumParams := perptypes.GetPricePremiumParams{
 				DaemonPrice:                 tc.daemonPrice,
 				BaseAtomicResolution:        tc.baseAtomicResolution,
-				QuoteAtomicResolution:       lib.QuoteCurrencyAtomicResolution,
+				QuoteAtomicResolution:       lib.TDAIAtomicResolution,
 				ImpactNotionalQuoteQuantums: tc.impactNotionalQuoteQuantums,
 				MaxAbsPremiumVotePpm:        tc.maxAbsPremiumVotePpm,
 			}

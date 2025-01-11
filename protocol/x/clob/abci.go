@@ -126,12 +126,6 @@ func EndBlocker(
 
 	// Prune any rate limiting information that is no longer relevant.
 	keeper.PruneRateLimits(ctx)
-
-	// Emit relevant metrics at the end of every block.
-	metrics.SetGauge(
-		metrics.InsuranceFundBalance,
-		metrics.GetMetricValueFromBigInt(keeper.GetCrossInsuranceFundBalance(ctx)),
-	)
 }
 
 // PrepareCheckState executes all ABCI PrepareCheckState logic respective to the clob module.

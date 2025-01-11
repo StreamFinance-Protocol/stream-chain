@@ -21,9 +21,6 @@ message LiquidationsConfig {
   // increases based on the adjusted bankruptcy rating of the subaccount.
   FillablePriceConfig fillable_price_config = 4
       [ (gogoproto.nullable) = false ];
-
-  // The maximum value that the cumulative insurance fund delta can take.
-  uint64 max_cumulative_insurance_fund_delta = 5;
 }
 
 // FillablePriceConfig stores all configurable fields related to calculating

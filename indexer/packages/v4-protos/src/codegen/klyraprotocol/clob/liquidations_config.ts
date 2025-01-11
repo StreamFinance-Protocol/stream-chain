@@ -1,5 +1,5 @@
 import * as _m0 from "protobufjs/minimal";
-import { Long, DeepPartial } from "../../helpers";
+import { DeepPartial } from "../../helpers";
 /** LiquidationsConfig stores all configurable fields related to liquidations. */
 
 export interface LiquidationsConfig {
@@ -20,9 +20,6 @@ export interface LiquidationsConfig {
    */
 
   fillablePriceConfig?: FillablePriceConfig;
-  /** The maximum value that the cumulative insurance fund delta can take. */
-
-  maxCumulativeInsuranceFundDelta: Long;
 }
 /** LiquidationsConfig stores all configurable fields related to liquidations. */
 
@@ -44,9 +41,6 @@ export interface LiquidationsConfigSDKType {
    */
 
   fillable_price_config?: FillablePriceConfigSDKType;
-  /** The maximum value that the cumulative insurance fund delta can take. */
-
-  max_cumulative_insurance_fund_delta: Long;
 }
 /**
  * FillablePriceConfig stores all configurable fields related to calculating
@@ -84,8 +78,7 @@ function createBaseLiquidationsConfig(): LiquidationsConfig {
     insuranceFundFeePpm: 0,
     validatorFeePpm: 0,
     liquidityFeePpm: 0,
-    fillablePriceConfig: undefined,
-    maxCumulativeInsuranceFundDelta: Long.UZERO
+    fillablePriceConfig: undefined
   };
 }
 
@@ -105,10 +98,6 @@ export const LiquidationsConfig = {
 
     if (message.fillablePriceConfig !== undefined) {
       FillablePriceConfig.encode(message.fillablePriceConfig, writer.uint32(34).fork()).ldelim();
-    }
-
-    if (!message.maxCumulativeInsuranceFundDelta.isZero()) {
-      writer.uint32(40).uint64(message.maxCumulativeInsuranceFundDelta);
     }
 
     return writer;
@@ -139,10 +128,6 @@ export const LiquidationsConfig = {
           message.fillablePriceConfig = FillablePriceConfig.decode(reader, reader.uint32());
           break;
 
-        case 5:
-          message.maxCumulativeInsuranceFundDelta = (reader.uint64() as Long);
-          break;
-
         default:
           reader.skipType(tag & 7);
           break;
@@ -158,7 +143,6 @@ export const LiquidationsConfig = {
     message.validatorFeePpm = object.validatorFeePpm ?? 0;
     message.liquidityFeePpm = object.liquidityFeePpm ?? 0;
     message.fillablePriceConfig = object.fillablePriceConfig !== undefined && object.fillablePriceConfig !== null ? FillablePriceConfig.fromPartial(object.fillablePriceConfig) : undefined;
-    message.maxCumulativeInsuranceFundDelta = object.maxCumulativeInsuranceFundDelta !== undefined && object.maxCumulativeInsuranceFundDelta !== null ? Long.fromValue(object.maxCumulativeInsuranceFundDelta) : Long.UZERO;
     return message;
   }
 

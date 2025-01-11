@@ -120,7 +120,7 @@ func TestGetAllOrderFillStates(t *testing.T) {
 				nil,
 			)
 
-			tc.setup(ks.Ctx, *ks.ClobKeeper)
+			tc.setup(ks.Ctx, ks.ClobKeeper)
 
 			fillStates := ks.ClobKeeper.GetAllOrderFillStates(ks.Ctx)
 			require.ElementsMatch(t, fillStates, tc.expectedFillStates)
@@ -196,7 +196,7 @@ func TestSetGetOrderFillAmount(t *testing.T) {
 				nil,
 			)
 
-			tc.setup(ks.Ctx, *ks.ClobKeeper, tc.orderId)
+			tc.setup(ks.Ctx, ks.ClobKeeper, tc.orderId)
 
 			exists, fillAmount, prunableBlockHeight := ks.ClobKeeper.GetOrderFillAmount(ks.Ctx, tc.orderId)
 
@@ -469,7 +469,7 @@ func TestPruning(t *testing.T) {
 				nil,
 			)
 
-			tc.setup(t, ks.Ctx, *ks.ClobKeeper, tc.orderId)
+			tc.setup(t, ks.Ctx, ks.ClobKeeper, tc.orderId)
 
 			exists, fillAmount, prunableBlockHeight := ks.ClobKeeper.GetOrderFillAmount(ks.Ctx, tc.orderId)
 
@@ -677,7 +677,7 @@ func TestRemoveOrderFillAmount(t *testing.T) {
 			traceDecoder := &tracer.TraceDecoder{}
 			ks.Ctx.MultiStore().SetTracer(traceDecoder)
 
-			tc.setup(ks.Ctx, *ks.ClobKeeper, tc.orderId)
+			tc.setup(ks.Ctx, ks.ClobKeeper, tc.orderId)
 
 			exists, fillAmount, prunableBlockHeight := ks.ClobKeeper.GetOrderFillAmount(ks.Ctx, tc.orderId)
 

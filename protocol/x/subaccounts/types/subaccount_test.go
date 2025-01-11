@@ -371,7 +371,7 @@ func TestGetTDaiPosition(t *testing.T) {
 			},
 			expectedQuoteBalance: big.NewInt(1_000_000_000),
 		},
-		"returns zero when TDai is not the first asset": {
+		"works when TDai is not the first asset": {
 			subaccount: &types.Subaccount{
 				AssetPositions: []*types.AssetPosition{
 					&constants.Long_Asset_1BTC,
@@ -381,7 +381,7 @@ func TestGetTDaiPosition(t *testing.T) {
 					},
 				},
 			},
-			expectedQuoteBalance: new(big.Int),
+			expectedQuoteBalance: big.NewInt(1_000_000_000),
 		},
 	}
 

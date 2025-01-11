@@ -29,6 +29,10 @@ var (
 	DaveAddressBz         = DavePrivateKey.PubKey().Address().Bytes()
 
 	// Collateral pool addresses for isolated perpetuals.
-	IsoCollateralPoolAddress  = authtypes.NewModuleAddress(satypes.ModuleName + ":3")
-	Iso2CollateralPoolAddress = authtypes.NewModuleAddress(satypes.ModuleName + ":4")
+	DummyCollateralPoolAddress = authtypes.NewModuleAddress(satypes.ModuleName)
+	CollateralPoolAddress0     = authtypes.NewModuleAddress(satypes.ModuleName + ":0")
+	CollateralPoolAddress1     = authtypes.NewModuleAddress(satypes.ModuleName + ":1")
+	CollateralPoolAddress2     = authtypes.NewModuleAddress(satypes.ModuleName + ":2")
+	IsoCollateralPoolAddress   = authtypes.NewModuleAddress(satypes.ModuleName + ":3")
+	Iso2CollateralPoolAddress  = authtypes.NewModuleAddress(satypes.ModuleName + ":4")
 )

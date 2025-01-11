@@ -18,6 +18,7 @@ type (
 		storeKey            storetypes.StoreKey
 		pricesKeeper        types.PricesKeeper
 		epochsKeeper        types.EpochsKeeper
+		assetsKeeper        types.AssetsKeeper
 		clobKeeper          types.PerpetualsClobKeeper
 		indexerEventManager indexer_manager.IndexerEventManager
 		authorities         map[string]struct{}
@@ -30,6 +31,7 @@ func NewKeeper(
 	storeKey storetypes.StoreKey,
 	pricesKeeper types.PricesKeeper,
 	epochsKeeper types.EpochsKeeper,
+	assetsKeeper types.AssetsKeeper,
 	indexerEventsManager indexer_manager.IndexerEventManager,
 	authorities []string,
 	transientStoreKey storetypes.StoreKey,
@@ -39,6 +41,7 @@ func NewKeeper(
 		storeKey:            storeKey,
 		pricesKeeper:        pricesKeeper,
 		epochsKeeper:        epochsKeeper,
+		assetsKeeper:        assetsKeeper,
 		indexerEventManager: indexerEventsManager,
 		authorities:         lib.UniqueSliceToSet(authorities),
 		transientStoreKey:   transientStoreKey,

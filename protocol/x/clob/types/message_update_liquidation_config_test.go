@@ -29,7 +29,6 @@ func TestMsgUpdateLiquidationsConfig_ValidateBasic(t *testing.T) {
 					FillablePriceConfig: types.FillablePriceConfig{
 						BankruptcyAdjustmentPpm: 0,
 					},
-					MaxCumulativeInsuranceFundDelta: uint64(1_000_000_000_000),
 				},
 			},
 			expectedError: "0 is not a valid BankruptcyAdjustmentPpm",

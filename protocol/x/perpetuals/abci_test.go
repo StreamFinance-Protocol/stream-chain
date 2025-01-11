@@ -8,6 +8,7 @@ import (
 	keepertest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
 
@@ -68,19 +69,24 @@ func TestEndBlocker(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// Initialize Mocks and Context.
 			mockKeeper := &mocks.PerpetualsKeeper{}
-			pc := keepertest.PerpetualsKeepers(t)
+			memClob := &mocks.MemClob{}
+			memClob.On("SetClobKeeper", mock.Anything).Return()
+
+			mockIndexerEventManager := &mocks.IndexerEventManager{}
+
+			ks := keepertest.NewClobKeepersTestContext(t, memClob, &mocks.BankKeeper{}, mockIndexerEventManager, nil)
 
 			// Setup mocks.
-			tc.setupMocks(pc.Ctx, mockKeeper)
+			tc.setupMocks(ks.Ctx, mockKeeper)
 
 			if tc.expectedErr != nil {
 				// Call EndBlocker.
 				require.PanicsWithValue(t, tc.expectedErr.Error(), func() {
 					//nolint:errcheck
-					perpetuals.EndBlocker(pc.Ctx, mockKeeper)
+					perpetuals.EndBlocker(ks.Ctx, mockKeeper)
 				})
 			} else {
-				perpetuals.EndBlocker(pc.Ctx, mockKeeper)
+				perpetuals.EndBlocker(ks.Ctx, mockKeeper)
 
 				// Assert mock expectations if no error was expected.
 				result := mockKeeper.AssertExpectations(t)

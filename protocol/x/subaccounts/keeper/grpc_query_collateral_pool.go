@@ -21,7 +21,7 @@ func (k Keeper) CollateralPoolAddress(
 	}
 	ctx := lib.UnwrapSDKContext(c, types.ModuleName)
 
-	collateralPool, err := k.GetCollateralPoolFromPerpetualId(
+	collateralPool, err := k.GetCollateralPoolAddressFromPerpetualId(
 		ctx,
 		req.PerpetualId,
 	)

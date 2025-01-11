@@ -37,13 +37,17 @@ import (
 )
 
 var (
-	liqTestMakerOrderQuantums                = satypes.BaseQuantums(100_000_000) // 1 BTC.
-	liqTestInitialSubaccountModuleAccBalance = int64(
-		10_000 * constants.QuoteBalance_OneDollar, // $10,000.
-	)
-	liqTestSubaccountNumberZero = uint32(0)
-	liqTestSubaccountNumberOne  = uint32(1)
-	liqTestUnixSocketAddress    = "/tmp/liquidations_cli_test.sock"
+	liqTestMakerOrderQuantums                   = satypes.BaseQuantums(100_000_000) // 1 BTC.
+	liqTestInitialSubaccountModuleAccBalance    = int64(1_000_000_000_000)
+	liqTestInitialSubaccountModuleAccBalanceBTC = int64(1_000_000_000_000_000)
+
+	liqTestSubaccountZeroInitialBalance = int64(100_000_000_000)
+	liqTestSubaccountTwoInitialBalance  = int64(10_000_000_000_000)
+	liqTestSubaccountNumberZero         = uint32(0)
+	liqTestSubaccountNumberOne          = uint32(1)
+	liqTestSubaccountNumberTwo          = uint32(2)
+	liqTestSubaccountNumberThree        = uint32(3)
+	liqTestUnixSocketAddress            = "/tmp/liquidations_cli_test.sock"
 )
 
 type LiquidationsIntegrationTestSuite struct {
@@ -108,17 +112,18 @@ func (s *LiquidationsIntegrationTestSuite) SetupSuite() {
 
 	s.cfg.MinGasPrices = fmt.Sprintf("0%s", sdk.DefaultBondDenom)
 
-	clobPair := constants.ClobPair_Btc
 	state := types.GenesisState{}
 
-	state.ClobPairs = append(state.ClobPairs, clobPair)
+	state.ClobPairs = append(state.ClobPairs, constants.ClobPair_Btc)
+	state.ClobPairs = append(state.ClobPairs, constants.ClobPair_BtcBtc)
 	state.LiquidationsConfig = types.LiquidationsConfig_NoFee
 
 	perpstate := perptypes.GenesisState{}
 	perpstate.LiquidityTiers = constants.LiquidityTiers
+	perpstate.CollateralPools = constants.CollateralPools
 	perpstate.Params = constants.PerpetualsGenesisParams
-	perpetual := constants.BtcUsd_20PercentInitial_10PercentMaintenance
-	perpstate.Perpetuals = append(perpstate.Perpetuals, perpetual)
+	perpstate.Perpetuals = append(perpstate.Perpetuals, constants.BtcUsd_20PercentInitial_10PercentMaintenance)
+	perpstate.Perpetuals = append(perpstate.Perpetuals, constants.BtcBtc_10_20MarginRequirement_CollatPool1_Id10)
 
 	pricesstate := constants.Prices_DefaultGenesisState
 
@@ -127,7 +132,7 @@ func (s *LiquidationsIntegrationTestSuite) SetupSuite() {
 	s.cfg.GenesisState[types.ModuleName] = buf
 
 	// Set the balances in the genesis state.
-	s.cfg.GenesisState[banktypes.ModuleName] = cli_testutil.CreateBankGenesisState(
+	s.cfg.GenesisState[banktypes.ModuleName] = cli_testutil.CreateBankGenesisStateForLiquidationTest(
 		s.T(),
 		s.cfg,
 	)
@@ -156,6 +161,31 @@ func (s *LiquidationsIntegrationTestSuite) SetupSuite() {
 			PerpetualPositions: []*satypes.PerpetualPosition{
 				{
 					PerpetualId: 0,
+					Quantums:    dtypes.NewInt(100_000_000),
+				},
+			},
+		},
+		satypes.Subaccount{
+			Id: &satypes.SubaccountId{Owner: s.validatorAddress.String(), Number: liqTestSubaccountNumberTwo},
+			AssetPositions: []*satypes.AssetPosition{
+				{
+					AssetId:  1,
+					Quantums: dtypes.NewInt(10_000_000_000_000),
+				},
+			},
+			PerpetualPositions: []*satypes.PerpetualPosition{},
+		},
+		satypes.Subaccount{
+			Id: &satypes.SubaccountId{Owner: s.validatorAddress.String(), Number: liqTestSubaccountNumberThree},
+			AssetPositions: []*satypes.AssetPosition{
+				{
+					AssetId:  1,
+					Quantums: dtypes.NewInt(-4_500_100_000_000),
+				},
+			},
+			PerpetualPositions: []*satypes.PerpetualPosition{
+				{
+					PerpetualId: 10,
 					Quantums:    dtypes.NewInt(100_000_000),
 				},
 			},
@@ -192,7 +222,6 @@ func (s *LiquidationsIntegrationTestSuite) SetupSuite() {
 
 	_, err = s.network.WaitForHeight(1)
 	s.Require().NoError(err)
-
 }
 
 // TestCLILiquidations creates two subaccounts (where one is undercollateralized), and places a
@@ -280,22 +309,40 @@ func (s *LiquidationsIntegrationTestSuite) TestCLILiquidations() {
 	s.Require().Empty(subaccountOne.PerpetualPositions)
 
 	// Check that the `subaccounts` module account has expected remaining TDai balance.
-	saModuleTDaiBalance, err := testutil_bank.GetModuleAccTDaiBalance(
+	collateralPoolAddress := satypes.ModuleName + ":0"
+
+	saModuleTDaiBalance, err := testutil_bank.GetModuleAccAssetBalance(
 		val,
 		s.network.Config.Codec,
 		satypes.ModuleName,
+		"utdai",
 	)
+
 	s.Require().NoError(err)
 	s.Require().Equal(
-		initialSubaccountModuleAccBalance-makerFee-liquidationFee,
+		liqTestInitialSubaccountModuleAccBalance-liqTestSubaccountZeroInitialBalance+subaccountOne.GetTDaiPosition().Int64(),
 		saModuleTDaiBalance,
 	)
 
-	// Check that the insurance fund has expected TDai balance.
-	insuranceFundBalance, err := testutil_bank.GetModuleAccTDaiBalance(
+	collateralPoolModuleTDaiBalance, err := testutil_bank.GetModuleAccAssetBalance(
 		val,
 		s.network.Config.Codec,
-		perptypes.InsuranceFundName,
+		collateralPoolAddress,
+		"utdai",
+	)
+
+	s.Require().NoError(err)
+	s.Require().Equal(
+		liqTestInitialSubaccountModuleAccBalance+liqTestSubaccountZeroInitialBalance-subaccountOne.GetTDaiPosition().Int64()-liquidationFee-makerFee,
+		collateralPoolModuleTDaiBalance,
+	)
+
+	// Check that the insurance fund has expected TDai balance.
+	insuranceFundBalance, err := testutil_bank.GetModuleAccAssetBalance(
+		val,
+		s.network.Config.Codec,
+		perptypes.InsuranceFundName+":0",
+		"utdai",
 	)
 
 	s.Require().NoError(err)
@@ -306,12 +353,146 @@ func (s *LiquidationsIntegrationTestSuite) TestCLILiquidations() {
 	// to the `distribution` module account, and the fees will stay in `distribution`
 	// until withdrawn. More details at:
 	// https://docs.cosmos.network/v0.45/modules/distribution/03_begin_block.html#the-distribution-scheme
-	distrModuleTDaiBalance, err := testutil_bank.GetModuleAccTDaiBalance(
+	distrModuleTDaiBalance, err := testutil_bank.GetModuleAccAssetBalance(
 		val,
 		s.network.Config.Codec,
 		distrtypes.ModuleName,
+		"utdai",
 	)
 
 	s.Require().NoError(err)
 	s.Require().Equal(makerFee, distrModuleTDaiBalance)
+}
+
+func (s *LiquidationsIntegrationTestSuite) TestCLILiquidationsBTCCollat() {
+	val := s.network.Validators[0]
+	ctx := val.ClientCtx
+
+	currentHeight, err := s.network.LatestHeight()
+	s.Require().NoError(err)
+
+	goodTilBlock := uint32(currentHeight) + types.ShortBlockWindow
+	clientId := uint64(1)
+	subticks := types.Subticks(5_000_000_000_000)
+
+	// Place the maker order that should be filled by the liquidation order.
+	_, err = cli_testutil.MsgPlaceOrderExec(
+		ctx,
+		s.validatorAddress,
+		liqTestSubaccountNumberTwo,
+		clientId,
+		constants.ClobPair_BtcBtc.Id,
+		types.Order_SIDE_BUY,
+		liqTestMakerOrderQuantums,
+		subticks.ToUint64(),
+		goodTilBlock,
+	)
+	s.Require().NoError(err)
+
+	currentHeight, err = s.network.LatestHeight()
+	s.Require().NoError(err)
+
+	// Wait for a few blocks to ensure the liquidation order was placed, matched, and included
+	// in a block.
+	_, err = s.network.WaitForHeight(currentHeight + 3)
+	s.Require().NoError(err)
+
+	// Query both subaccounts.
+	resp, err := sa_testutil.MsgQuerySubaccountExec(ctx, s.validatorAddress, liqTestSubaccountNumberTwo)
+	s.Require().NoError(err)
+
+	var subaccountResp satypes.QuerySubaccountResponse
+	s.Require().NoError(s.network.Config.Codec.UnmarshalJSON(resp.Bytes(), &subaccountResp))
+	subaccountTwo := subaccountResp.Subaccount
+
+	resp, err = sa_testutil.MsgQuerySubaccountExec(ctx, s.validatorAddress, liqTestSubaccountNumberThree)
+	s.Require().NoError(err)
+
+	s.Require().NoError(s.network.Config.Codec.UnmarshalJSON(resp.Bytes(), &subaccountResp))
+	subaccountThree := subaccountResp.Subaccount
+
+	// Compute the fill price so as to know how much QuoteBalance should be remaining.
+	fillSizeQuoteQuantums := types.FillAmountToQuoteQuantums(
+		subticks,
+		liqTestMakerOrderQuantums,
+		constants.ClobPair_BtcBtc.QuantumConversionExponent,
+	).Int64()
+
+	// Assert that both Subaccounts have the appropriate state.
+	takerFee := fillSizeQuoteQuantums * int64(constants.PerpetualFeeParams.Tiers[0].TakerFeePpm) / int64(lib.OneMillion)
+	makerFee := fillSizeQuoteQuantums * int64(constants.PerpetualFeeParams.Tiers[0].MakerFeePpm) / int64(lib.OneMillion)
+	s.Require().Contains(
+		[]*big.Int{
+			new(big.Int).SetInt64(liqTestSubaccountTwoInitialBalance - fillSizeQuoteQuantums - takerFee),
+			new(big.Int).SetInt64(liqTestSubaccountTwoInitialBalance - fillSizeQuoteQuantums - makerFee),
+		},
+		subaccountTwo.GetAssetPosition(1),
+	)
+	s.Require().Len(subaccountTwo.PerpetualPositions, 1)
+	s.Require().Equal(liqTestMakerOrderQuantums.ToBigInt(), subaccountTwo.PerpetualPositions[0].GetBigQuantums())
+
+	subaccountThreeInitialQuoteBalance := int64(-4_500_100_000_000)
+	liquidationFee := fillSizeQuoteQuantums *
+		int64(types.LiquidationsConfig_Default.InsuranceFundFeePpm) /
+		int64(lib.OneMillion)
+	s.Require().Equal(
+		new(big.Int).SetInt64(subaccountThreeInitialQuoteBalance+fillSizeQuoteQuantums-liquidationFee),
+		subaccountThree.GetAssetPosition(1),
+	)
+	s.Require().Empty(subaccountThree.PerpetualPositions)
+
+	// Check that the `subaccounts` module account has expected remaining TDai balance.
+	collateralPoolAddress := satypes.ModuleName + ":1"
+
+	saModuleBtcBalance, err := testutil_bank.GetModuleAccAssetBalance(
+		val,
+		s.network.Config.Codec,
+		satypes.ModuleName,
+		"btc-denom",
+	)
+
+	s.Require().NoError(err)
+	s.Require().Equal(
+		liqTestInitialSubaccountModuleAccBalanceBTC-liqTestSubaccountTwoInitialBalance+subaccountThree.GetAssetPosition(1).Int64(),
+		saModuleBtcBalance,
+	)
+
+	collateralPoolModuleBtcBalance, err := testutil_bank.GetModuleAccAssetBalance(
+		val,
+		s.network.Config.Codec,
+		collateralPoolAddress,
+		"btc-denom",
+	)
+
+	s.Require().NoError(err)
+	s.Require().Equal(
+		liqTestInitialSubaccountModuleAccBalanceBTC+liqTestSubaccountTwoInitialBalance-subaccountThree.GetAssetPosition(1).Int64()-liquidationFee-makerFee,
+		collateralPoolModuleBtcBalance,
+	)
+
+	// Check that the insurance fund has expected TDai balance.
+	insuranceFundBalance, err := testutil_bank.GetModuleAccAssetBalance(
+		val,
+		s.network.Config.Codec,
+		perptypes.InsuranceFundName+":1",
+		"btc-denom",
+	)
+
+	s.Require().NoError(err)
+	s.Require().Equal(liquidationFee, insuranceFundBalance)
+
+	// Check that the `distribution` module account has expected remaining TDai balance.
+	// During `BeginBlock()`, the `fee-collector` module account will send all fees
+	// to the `distribution` module account, and the fees will stay in `distribution`
+	// until withdrawn. More details at:
+	// https://docs.cosmos.network/v0.45/modules/distribution/03_begin_block.html#the-distribution-scheme
+	distrModuleBtcBalance, err := testutil_bank.GetModuleAccAssetBalance(
+		val,
+		s.network.Config.Codec,
+		distrtypes.ModuleName,
+		"btc-denom",
+	)
+
+	s.Require().NoError(err)
+	s.Require().Equal(makerFee, distrModuleBtcBalance)
 }

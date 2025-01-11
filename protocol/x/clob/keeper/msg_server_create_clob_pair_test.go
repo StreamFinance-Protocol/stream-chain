@@ -1,7 +1,6 @@
 package keeper_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib"
@@ -12,12 +11,10 @@ import (
 	clobtest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/clob"
 	keepertest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/keeper"
 	perptest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/perpetuals"
-	pricestest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/prices"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/memclob"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
-	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
@@ -31,7 +28,6 @@ func TestCreateClobPair(t *testing.T) {
 		perptest.WithId(1),
 		perptest.WithMarketId(1),
 	)
-	testMarket1 := *pricestest.GenerateMarketParamPrice(pricestest.WithId(1))
 	testCases := map[string]struct {
 		setup             func(t *testing.T, ks keepertest.ClobKeepersTestContext, manager *mocks.IndexerEventManager)
 		msg               *types.MsgCreateClobPair
@@ -40,13 +36,11 @@ func TestCreateClobPair(t *testing.T) {
 	}{
 		"Succeeds: create new clob pair": {
 			setup: func(t *testing.T, ks keepertest.ClobKeepersTestContext, mockIndexerEventManager *mocks.IndexerEventManager) {
-				keepertest.CreateTestPricesAndPerpetualMarkets(
+				keepertest.CreatePerpetualMarkets(
 					t,
 					ks.Ctx,
 					ks.PerpetualsKeeper,
-					ks.PricesKeeper,
 					[]perptypes.Perpetual{testPerp1},
-					[]pricestypes.MarketParamPrice{testMarket1},
 				)
 				mockIndexerEventManager.On("AddTxnEvent",
 					ks.Ctx,
@@ -64,9 +58,8 @@ func TestCreateClobPair(t *testing.T) {
 							testClobPair1.SubticksPerTick,
 							testClobPair1.StepBaseQuantums,
 							testPerp1.Params.LiquidityTier,
-							testPerp1.Params.MarketType,
 							testPerp1.Params.DangerIndexPpm,
-							fmt.Sprintf("%d", testPerp1.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock),
+							testPerp1.Params.CollateralPoolId,
 						),
 					),
 				).Return()
@@ -79,13 +72,11 @@ func TestCreateClobPair(t *testing.T) {
 		},
 		"Failure: clob pair already exists": {
 			setup: func(t *testing.T, ks keepertest.ClobKeepersTestContext, mockIndexerEventManager *mocks.IndexerEventManager) {
-				keepertest.CreateTestPricesAndPerpetualMarkets(
+				keepertest.CreatePerpetualMarkets(
 					t,
 					ks.Ctx,
 					ks.PerpetualsKeeper,
-					ks.PricesKeeper,
 					[]perptypes.Perpetual{testPerp1},
-					[]pricestypes.MarketParamPrice{testMarket1},
 				)
 				// set up mock indexer event manager to accept anything.
 				mockIndexerEventManager.On("AddTxnEvent",
@@ -95,7 +86,7 @@ func TestCreateClobPair(t *testing.T) {
 					mock.Anything,
 					mock.Anything,
 				).Return()
-				keepertest.CreateTestClobPairs(t, ks.Ctx, ks.ClobKeeper, []types.ClobPair{testClobPair1})
+				keepertest.CreateTestClobPairs(t, ks.Ctx, &ks.ClobKeeper, []types.ClobPair{testClobPair1})
 			},
 			msg: &types.MsgCreateClobPair{
 				Authority: lib.GovModuleAddress.String(),
@@ -106,13 +97,11 @@ func TestCreateClobPair(t *testing.T) {
 		},
 		"Failure: perpetual already associated with existing clob pair": {
 			setup: func(t *testing.T, ks keepertest.ClobKeepersTestContext, mockIndexerEventManager *mocks.IndexerEventManager) {
-				keepertest.CreateTestPricesAndPerpetualMarkets(
+				keepertest.CreatePerpetualMarkets(
 					t,
 					ks.Ctx,
 					ks.PerpetualsKeeper,
-					ks.PricesKeeper,
 					[]perptypes.Perpetual{testPerp1},
-					[]pricestypes.MarketParamPrice{testMarket1},
 				)
 				// set up mock indexer event manager to accept anything.
 				mockIndexerEventManager.On("AddTxnEvent",
@@ -122,7 +111,7 @@ func TestCreateClobPair(t *testing.T) {
 					mock.Anything,
 					mock.Anything,
 				).Return()
-				keepertest.CreateTestClobPairs(t, ks.Ctx, ks.ClobKeeper, []types.ClobPair{testClobPair1})
+				keepertest.CreateTestClobPairs(t, ks.Ctx, &ks.ClobKeeper, []types.ClobPair{testClobPair1})
 			},
 			msg: &types.MsgCreateClobPair{
 				Authority: lib.GovModuleAddress.String(),
@@ -160,7 +149,7 @@ func TestCreateClobPair(t *testing.T) {
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, &mocks.BankKeeper{}, mockIndexerEventManager, nil)
 			tc.setup(t, ks, mockIndexerEventManager)
 
-			msgServer := keeper.NewMsgServerImpl(ks.ClobKeeper)
+			msgServer := keeper.NewMsgServerImpl(&ks.ClobKeeper)
 
 			_, err := msgServer.CreateClobPair(ks.Ctx, tc.msg)
 			if tc.expectedErr != "" {

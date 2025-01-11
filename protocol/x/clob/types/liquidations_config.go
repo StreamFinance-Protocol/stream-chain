@@ -69,14 +69,5 @@ func (lc *LiquidationsConfig) Validate() error {
 		)
 	}
 
-	// Validate the MaxCumulativeInsuranceFundDelta.
-	if lc.MaxCumulativeInsuranceFundDelta == 0 {
-		return errorsmod.Wrapf(
-			ErrInvalidLiquidationsConfig,
-			"%v is not a valid MaxCumulativeInsuranceFundDelta, it must be greater than 0",
-			lc.MaxCumulativeInsuranceFundDelta,
-		)
-	}
-
 	return nil
 }

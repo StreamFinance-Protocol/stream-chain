@@ -151,7 +151,7 @@ func TestEndBlocker_Failure(t *testing.T) {
 				func() {
 					clob.EndBlocker(
 						ctx,
-						*ks.ClobKeeper,
+						ks.ClobKeeper,
 					)
 				},
 			)
@@ -169,6 +169,8 @@ func TestEndBlocker_Success(t *testing.T) {
 		// Setup.
 		setupState func(ctx sdk.Context, k keepertest.ClobKeepersTestContext, m *mocks.MemClob)
 		blockTime  time.Time
+
+		untriggeredConditionalOrders map[types.ClobPairId]*keeper.UntriggeredConditionalOrders
 
 		// Expectations.
 		expectedFillAmounts                  map[types.OrderId]satypes.BaseQuantums
@@ -238,18 +240,11 @@ func TestEndBlocker_Success(t *testing.T) {
 		"Prunes expired and cancelled untriggered conditional orders from UntriggeredConditionalorders": {
 			blockTime: unixTimeFifteen,
 			setupState: func(ctx sdk.Context, ks keepertest.ClobKeepersTestContext, m *mocks.MemClob) {
-				// expired orders
-				orderToPrune1 := constants.ConditionalOrder_Alice_Num0_Id0_Clob0_Buy5_Price10_GTBT15_StopLoss20
-				orderToPrune2 := constants.ConditionalOrder_Alice_Num0_Id1_Clob0_Buy15_Price25_GTBT15_StopLoss25
-				orderToPrune3 := constants.ConditionalOrder_Alice_Num0_Id0_Clob1_Buy5_Price10_GTBT15_TakeProfit20
-				// cancelled order
-				orderToPrune4 := constants.ConditionalOrder_Alice_Num1_Id1_Clob0_Sell50_Price5_GTB30_TakeProfit20
-
 				// add expired orders to state, cancelled orders already removed in DeliverTx
 				orders := []types.Order{
-					orderToPrune1,
-					orderToPrune2,
-					orderToPrune3,
+					constants.ConditionalOrder_Alice_Num0_Id0_Clob0_Buy5_Price10_GTBT15_StopLoss20,
+					constants.ConditionalOrder_Alice_Num0_Id1_Clob0_Buy15_Price25_GTBT15_StopLoss25,
+					constants.ConditionalOrder_Alice_Num0_Id0_Clob1_Buy5_Price10_GTBT15_TakeProfit20,
 				}
 				for _, order := range orders {
 					ks.ClobKeeper.SetLongTermOrderPlacement(ctx, order, 0)
@@ -260,27 +255,28 @@ func TestEndBlocker_Success(t *testing.T) {
 					)
 				}
 
-				ks.ClobKeeper.UntriggeredConditionalOrders = map[types.ClobPairId]*keeper.UntriggeredConditionalOrders{
-					constants.ClobPair_Btc.GetClobPairId(): {
-						OrdersToTriggerWhenOraclePriceLTETriggerPrice: []types.Order{orderToPrune1, orderToPrune2, orderToPrune4},
-						OrdersToTriggerWhenOraclePriceGTETriggerPrice: []types.Order{},
-					},
-					constants.ClobPair_Eth.GetClobPairId(): {
-						OrdersToTriggerWhenOraclePriceLTETriggerPrice: []types.Order{},
-						OrdersToTriggerWhenOraclePriceGTETriggerPrice: []types.Order{orderToPrune3},
-					},
-				}
-
 				ks.ClobKeeper.MustSetProcessProposerMatchesEvents(
 					ctx,
 					types.ProcessProposerMatchesEvents{
 						PlacedStatefulCancellationOrderIds: []types.OrderId{
-							orderToPrune4.OrderId,
+							constants.ConditionalOrder_Alice_Num1_Id1_Clob0_Sell50_Price5_GTB30_TakeProfit20.OrderId,
 						},
 						BlockHeight: blockHeight,
 					},
 				)
 			},
+
+			untriggeredConditionalOrders: map[types.ClobPairId]*keeper.UntriggeredConditionalOrders{
+				constants.ClobPair_Btc.GetClobPairId(): {
+					OrdersToTriggerWhenOraclePriceLTETriggerPrice: []types.Order{constants.ConditionalOrder_Alice_Num0_Id0_Clob0_Buy5_Price10_GTBT15_StopLoss20, constants.ConditionalOrder_Alice_Num0_Id1_Clob0_Buy15_Price25_GTBT15_StopLoss25, constants.ConditionalOrder_Alice_Num1_Id1_Clob0_Sell50_Price5_GTB30_TakeProfit20},
+					OrdersToTriggerWhenOraclePriceGTETriggerPrice: []types.Order{},
+				},
+				constants.ClobPair_Eth.GetClobPairId(): {
+					OrdersToTriggerWhenOraclePriceLTETriggerPrice: []types.Order{},
+					OrdersToTriggerWhenOraclePriceGTETriggerPrice: []types.Order{constants.ConditionalOrder_Alice_Num0_Id0_Clob1_Buy5_Price10_GTBT15_TakeProfit20},
+				},
+			},
+
 			expectedUntriggeredConditionalOrders: map[types.ClobPairId]*keeper.UntriggeredConditionalOrders{},
 			expectedStatefulPlacementInState: map[types.OrderId]bool{
 				constants.ConditionalOrder_Alice_Num0_Id0_Clob0_Buy5_Price10_GTBT15_StopLoss20.OrderId:   false,
@@ -358,14 +354,14 @@ func TestEndBlocker_Success(t *testing.T) {
 						constants.BtcUsdExponent,
 						constants.ClobPair_Btc,
 						constants.BtcUsd_20PercentInitial_10PercentMaintenance.Params.AtomicResolution,
-						lib.QuoteCurrencyAtomicResolution,
+						lib.TDAIAtomicResolution,
 					),
 					PnlPrice: types.SubticksToPrice(
 						types.Subticks(10),
 						constants.BtcUsdExponent,
 						constants.ClobPair_Btc,
 						constants.BtcUsd_20PercentInitial_10PercentMaintenance.Params.AtomicResolution,
-						lib.QuoteCurrencyAtomicResolution,
+						lib.TDAIAtomicResolution,
 					),
 				})
 
@@ -378,47 +374,18 @@ func TestEndBlocker_Success(t *testing.T) {
 						constants.EthUsdExponent,
 						constants.ClobPair_Eth,
 						constants.EthUsd_20PercentInitial_10PercentMaintenance.Params.AtomicResolution,
-						lib.QuoteCurrencyAtomicResolution,
+						lib.TDAIAtomicResolution,
 					),
 					PnlPrice: types.SubticksToPrice(
 						types.Subticks(35),
 						constants.EthUsdExponent,
 						constants.ClobPair_Eth,
 						constants.EthUsd_20PercentInitial_10PercentMaintenance.Params.AtomicResolution,
-						lib.QuoteCurrencyAtomicResolution,
+						lib.TDAIAtomicResolution,
 					),
 				})
 
 				require.NoError(t, err)
-
-				ks.ClobKeeper.UntriggeredConditionalOrders = map[types.ClobPairId]*keeper.UntriggeredConditionalOrders{
-					constants.ClobPair_Btc.GetClobPairId(): {
-						// 10 oracle price subticks triggers 3 orders here.
-						OrdersToTriggerWhenOraclePriceLTETriggerPrice: []types.Order{
-							constants.ConditionalOrder_Alice_Num0_Id0_Clob0_Buy5_Price10_GTBT15_TakeProfit10,
-							constants.ConditionalOrder_Alice_Num0_Id1_Clob0_Buy15_Price10_GTBT15_TakeProfit5,
-							constants.ConditionalOrder_Alice_Num0_Id2_Clob0_Buy20_Price10_GTBT15_TakeProfit10,
-							constants.ConditionalOrder_Alice_Num0_Id3_Clob0_Sell25_Price10_GTBT15_StopLoss10,
-						},
-						// 10 oracle price subticks triggers no orders here.
-						OrdersToTriggerWhenOraclePriceGTETriggerPrice: []types.Order{
-							constants.ConditionalOrder_Alice_Num0_Id0_Clob0_Buy5_Price20_GTBT15_StopLoss20,
-							constants.ConditionalOrder_Alice_Num0_Id1_Clob0_Buy15_Price25_GTBT15_StopLoss25,
-							constants.ConditionalOrder_Alice_Num0_Id2_Clob0_Sell20_Price20_GTBT15_TakeProfit20,
-							constants.ConditionalOrder_Alice_Num0_Id3_Clob0_Buy25_Price25_GTBT15_StopLoss25,
-						},
-					},
-					constants.ClobPair_Eth.GetClobPairId(): {
-						// 35 oracle price subticks triggers no orders here.
-						OrdersToTriggerWhenOraclePriceLTETriggerPrice: []types.Order{
-							constants.ConditionalOrder_Alice_Num0_Id0_Clob1_Buy5_Price10_GTBT15_TakeProfit30,
-						},
-						// 35 oracle price subticks triggers one order here.
-						OrdersToTriggerWhenOraclePriceGTETriggerPrice: []types.Order{
-							constants.ConditionalOrder_Alice_Num0_Id3_Clob1_Buy25_Price10_GTBT15_StopLoss20,
-						},
-					},
-				}
 
 				for _, untrigCondOrders := range ks.ClobKeeper.UntriggeredConditionalOrders {
 					for _, conditionalOrder := range untrigCondOrders.OrdersToTriggerWhenOraclePriceGTETriggerPrice {
@@ -435,6 +402,35 @@ func TestEndBlocker_Success(t *testing.T) {
 						BlockHeight: blockHeight,
 					},
 				)
+			},
+
+			untriggeredConditionalOrders: map[types.ClobPairId]*keeper.UntriggeredConditionalOrders{
+				constants.ClobPair_Btc.GetClobPairId(): {
+					// 10 oracle price subticks triggers 3 orders here.
+					OrdersToTriggerWhenOraclePriceLTETriggerPrice: []types.Order{
+						constants.ConditionalOrder_Alice_Num0_Id0_Clob0_Buy5_Price10_GTBT15_TakeProfit10,
+						constants.ConditionalOrder_Alice_Num0_Id1_Clob0_Buy15_Price10_GTBT15_TakeProfit5,
+						constants.ConditionalOrder_Alice_Num0_Id2_Clob0_Buy20_Price10_GTBT15_TakeProfit10,
+						constants.ConditionalOrder_Alice_Num0_Id3_Clob0_Sell25_Price10_GTBT15_StopLoss10,
+					},
+					// 10 oracle price subticks triggers no orders here.
+					OrdersToTriggerWhenOraclePriceGTETriggerPrice: []types.Order{
+						constants.ConditionalOrder_Alice_Num0_Id0_Clob0_Buy5_Price20_GTBT15_StopLoss20,
+						constants.ConditionalOrder_Alice_Num0_Id1_Clob0_Buy15_Price25_GTBT15_StopLoss25,
+						constants.ConditionalOrder_Alice_Num0_Id2_Clob0_Sell20_Price20_GTBT15_TakeProfit20,
+						constants.ConditionalOrder_Alice_Num0_Id3_Clob0_Buy25_Price25_GTBT15_StopLoss25,
+					},
+				},
+				constants.ClobPair_Eth.GetClobPairId(): {
+					// 35 oracle price subticks triggers no orders here.
+					OrdersToTriggerWhenOraclePriceLTETriggerPrice: []types.Order{
+						constants.ConditionalOrder_Alice_Num0_Id0_Clob1_Buy5_Price10_GTBT15_TakeProfit30,
+					},
+					// 35 oracle price subticks triggers one order here.
+					OrdersToTriggerWhenOraclePriceGTETriggerPrice: []types.Order{
+						constants.ConditionalOrder_Alice_Num0_Id3_Clob1_Buy25_Price10_GTBT15_StopLoss20,
+					},
+				},
 			},
 
 			expectedTriggeredConditionalOrderIds: []types.OrderId{
@@ -656,7 +652,7 @@ func TestEndBlocker_Success(t *testing.T) {
 			mockBankKeeper.On(
 				"GetBalance",
 				mock.Anything,
-				perptypes.InsuranceFundModuleAddress,
+				perptypes.BaseCollateralPoolInsuranceFundModuleAddress,
 				constants.TDai.Denom,
 			).Return(
 				sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int))),
@@ -665,11 +661,9 @@ func TestEndBlocker_Success(t *testing.T) {
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, mockBankKeeper, mockIndexerEventManager, nil)
 			ctx := ks.Ctx.WithBlockHeight(int64(blockHeight)).WithBlockTime(tc.blockTime)
 
-			// Set up prices keeper markets with default prices.
-			keepertest.CreateTestMarkets(t, ctx, ks.PricesKeeper)
-
 			// Create liquidity tiers on perpetuals keeper.
 			keepertest.CreateTestLiquidityTiers(t, ctx, ks.PerpetualsKeeper)
+			keepertest.CreateTestCollateralPools(t, ctx, ks.PerpetualsKeeper)
 
 			// Set up clob keeper perpetuals and clob pairs.
 			for _, p := range []perptypes.Perpetual{
@@ -684,15 +678,12 @@ func TestEndBlocker_Success(t *testing.T) {
 					p.Params.AtomicResolution,
 					p.Params.DefaultFundingPpm,
 					p.Params.LiquidityTier,
-					p.Params.MarketType,
 					p.Params.DangerIndexPpm,
-					p.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
+					p.Params.CollateralPoolId,
 					p.YieldIndex,
 				)
 				require.NoError(t, err)
 			}
-			err := keepertest.CreateTDaiAsset(ctx, ks.AssetsKeeper)
-			require.NoError(t, err)
 
 			memClob.On("CreateOrderbook", ctx, constants.ClobPair_Btc).Return()
 
@@ -714,13 +705,12 @@ func TestEndBlocker_Success(t *testing.T) {
 						constants.ClobPair_Btc.SubticksPerTick,
 						constants.ClobPair_Btc.StepBaseQuantums,
 						constants.BtcUsd_20PercentInitial_10PercentMaintenance.Params.LiquidityTier,
-						constants.BtcUsd_20PercentInitial_10PercentMaintenance.Params.MarketType,
 						constants.BtcUsd_20PercentInitial_10PercentMaintenance.Params.DangerIndexPpm,
-						fmt.Sprintf("%d", constants.BtcUsd_20PercentInitial_10PercentMaintenance.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock),
+						constants.BtcUsd_20PercentInitial_10PercentMaintenance.Params.CollateralPoolId,
 					),
 				),
 			).Once().Return()
-			_, err = ks.ClobKeeper.CreatePerpetualClobPair(
+			_, err := ks.ClobKeeper.CreatePerpetualClobPair(
 				ctx,
 				constants.ClobPair_Btc.Id,
 				clobtest.MustPerpetualId(constants.ClobPair_Btc),
@@ -749,9 +739,8 @@ func TestEndBlocker_Success(t *testing.T) {
 						constants.ClobPair_Eth.SubticksPerTick,
 						constants.ClobPair_Eth.StepBaseQuantums,
 						constants.EthUsd_20PercentInitial_10PercentMaintenance.Params.LiquidityTier,
-						constants.EthUsd_20PercentInitial_10PercentMaintenance.Params.MarketType,
 						constants.EthUsd_20PercentInitial_10PercentMaintenance.Params.DangerIndexPpm,
-						fmt.Sprintf("%d", constants.BtcUsd_20PercentInitial_10PercentMaintenance.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock),
+						constants.EthUsd_20PercentInitial_10PercentMaintenance.Params.CollateralPoolId,
 					),
 				),
 			).Once().Return()
@@ -765,6 +754,10 @@ func TestEndBlocker_Success(t *testing.T) {
 				constants.ClobPair_Eth.Status,
 			)
 			require.NoError(t, err)
+
+			if tc.untriggeredConditionalOrders != nil {
+				ks.ClobKeeper.UntriggeredConditionalOrders = tc.untriggeredConditionalOrders
+			}
 
 			if tc.setupState != nil {
 				tc.setupState(ctx, ks, memClob)
@@ -802,12 +795,12 @@ func TestEndBlocker_Success(t *testing.T) {
 
 			clob.EndBlocker(
 				ctx,
-				*ks.ClobKeeper,
+				ks.ClobKeeper,
 			)
 
 			assertFillAmountAndPruneState(
 				t,
-				ks.ClobKeeper,
+				&ks.ClobKeeper,
 				ctx,
 				tc.expectedFillAmounts,
 				tc.expectedPrunedOrders,
@@ -1039,6 +1032,7 @@ func TestLiquidateSubaccounts(t *testing.T) {
 						genesisState.Params = constants.PerpetualsGenesisParams
 						genesisState.LiquidityTiers = constants.LiquidityTiers
 						genesisState.Perpetuals = tc.perpetuals
+						genesisState.CollateralPools = constants.CollateralPools
 					},
 				)
 				testapp.UpdateGenesisDocWithAppStateForModule(
@@ -1117,7 +1111,7 @@ func TestPrepareCheckState_WithProcessProposerMatchesEventsWithBadBlockHeight(t 
 	require.Panics(t, func() {
 		clob.PrepareCheckState(
 			ks.Ctx.WithBlockHeight(int64(blockHeight+1)),
-			ks.ClobKeeper,
+			&ks.ClobKeeper,
 			&cometabci.RequestCommit{},
 		)
 	})
@@ -1144,7 +1138,7 @@ func TestCommitBlocker_WithProcessProposerMatchesEventsWithBadBlockHeight(t *tes
 	require.Panics(t, func() {
 		clob.PrepareCheckState(
 			ks.Ctx.WithBlockHeight(int64(blockHeight+1)),
-			ks.ClobKeeper,
+			&ks.ClobKeeper,
 			&cometabci.RequestCommit{},
 		)
 	})
@@ -1225,12 +1219,12 @@ func TestBeginBlocker_Success(t *testing.T) {
 			ctx := ks.Ctx.WithBlockHeight(int64(20)).WithBlockTime(unixTimeTen)
 
 			if tc.setupState != nil {
-				tc.setupState(ks.Ctx, ks.ClobKeeper)
+				tc.setupState(ks.Ctx, &ks.ClobKeeper)
 			}
 
 			clob.BeginBlocker(
 				ctx,
-				ks.ClobKeeper,
+				&ks.ClobKeeper,
 			)
 
 			// Assert expecations.
@@ -1387,7 +1381,7 @@ func TestPrepareCheckState(t *testing.T) {
 			mockBankKeeper.On(
 				"GetBalance",
 				mock.Anything,
-				perptypes.InsuranceFundModuleAddress,
+				perptypes.BaseCollateralPoolInsuranceFundModuleAddress,
 				constants.TDai.Denom,
 			).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int))))
 			mockBankKeeper.On(
@@ -1438,16 +1432,11 @@ func TestPrepareCheckState(t *testing.T) {
 			ks.RatelimitKeeper.SetSDAIPrice(ctx, rate)
 			ks.RatelimitKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
 
-			// Create the default markets.
-			keepertest.CreateTestMarkets(t, ctx, ks.PricesKeeper)
-
 			// Create liquidity tiers.
 			keepertest.CreateTestLiquidityTiers(t, ctx, ks.PerpetualsKeeper)
+			keepertest.CreateTestCollateralPools(t, ctx, ks.PerpetualsKeeper)
 
 			require.NoError(t, ks.FeeTiersKeeper.SetPerpetualFeeParams(ctx, constants.PerpetualFeeParams))
-
-			err := keepertest.CreateTDaiAsset(ctx, ks.AssetsKeeper)
-			require.NoError(t, err)
 
 			// Create all perpetuals.
 			for _, p := range tc.perpetuals {
@@ -1459,9 +1448,8 @@ func TestPrepareCheckState(t *testing.T) {
 					p.Params.AtomicResolution,
 					p.Params.DefaultFundingPpm,
 					p.Params.LiquidityTier,
-					p.Params.MarketType,
 					p.Params.DangerIndexPpm,
-					p.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
+					p.Params.CollateralPoolId,
 					p.YieldIndex,
 				)
 				require.NoError(t, err)
@@ -1474,7 +1462,7 @@ func TestPrepareCheckState(t *testing.T) {
 
 			// Create all CLOBs.
 			for _, clobPair := range tc.clobs {
-				_, err = ks.ClobKeeper.CreatePerpetualClobPair(
+				_, err := ks.ClobKeeper.CreatePerpetualClobPair(
 					ctx,
 					clobPair.Id,
 					clobtest.MustPerpetualId(clobPair),
@@ -1487,7 +1475,7 @@ func TestPrepareCheckState(t *testing.T) {
 			}
 
 			// Initialize the liquidations config.
-			err = ks.ClobKeeper.InitializeLiquidationsConfig(ctx, types.LiquidationsConfig_Default)
+			err := ks.ClobKeeper.InitializeLiquidationsConfig(ctx, types.LiquidationsConfig_Default)
 			require.NoError(t, err)
 
 			// Create all pre-existing stateful orders in state.
@@ -1578,7 +1566,7 @@ func TestPrepareCheckState(t *testing.T) {
 
 			clob.PrepareCheckState(
 				ctx,
-				ks.ClobKeeper,
+				&ks.ClobKeeper,
 				defaultExtendCommitInfo,
 			)
 

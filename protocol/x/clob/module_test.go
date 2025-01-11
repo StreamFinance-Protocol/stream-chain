@@ -3,7 +3,6 @@ package clob_test
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"math/big"
 	"net/http"
 	"net/http/httptest"
@@ -21,14 +20,13 @@ import (
 
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/mocks"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/constants"
-	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/keeper"
+	keepertest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob"
 	clob_keeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/memclob"
 	clob_types "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals"
 	perp_keeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/keeper"
-	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices"
 	prices_keeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/keeper"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -43,7 +41,7 @@ func getValidGenesisStr() string {
 	gs := `{"clob_pairs":[{"id":0,"perpetual_clob_metadata":{"perpetual_id":0},"subticks_per_tick":100,`
 	gs += `"step_base_quantums":5,"status":"STATUS_ACTIVE"}],`
 	gs += `"liquidations_config":{`
-	gs += `"insurance_fund_fee_ppm":5000,"validator_fee_ppm":200000,"liquidity_fee_ppm":800000,"max_cumulative_insurance_fund_delta":"1000000000000",`
+	gs += `"insurance_fund_fee_ppm":5000,"validator_fee_ppm":200000,"liquidity_fee_ppm":800000,`
 	gs += `"fillable_price_config":{"bankruptcy_adjustment_ppm":1000000,`
 	gs += `"spread_to_maintenance_margin_ratio_ppm":100000}},`
 	gs += `"block_rate_limit_config":`
@@ -84,23 +82,22 @@ func createAppModuleWithKeeper(t *testing.T) (
 	mockBankKeeper.On(
 		"GetBalance",
 		mock.Anything,
-		perptypes.InsuranceFundModuleAddress,
+		perptypes.BaseCollateralPoolInsuranceFundModuleAddress,
 		constants.TDai.Denom,
 	).Return(
 		sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int))),
 	)
-	ks := keeper.NewClobKeepersTestContext(t, memClob, mockBankKeeper, mockIndexerEventManager, nil)
+	ks := keepertest.NewClobKeepersTestContext(t, memClob, mockBankKeeper, mockIndexerEventManager, nil)
 
-	err := keeper.CreateTDaiAsset(ks.Ctx, ks.AssetsKeeper)
-	require.NoError(t, err)
+	keepertest.CreateNonDefaultTestMarkets(t, ks.Ctx, ks.PricesKeeper)
 
 	return clob.NewAppModule(
 		appCodec,
-		ks.ClobKeeper,
+		&ks.ClobKeeper,
 		nil,
 		nil,
 		nil,
-	), ks.ClobKeeper, ks.PricesKeeper, ks.PerpetualsKeeper, ks.Ctx, mockIndexerEventManager
+	), &ks.ClobKeeper, ks.PricesKeeper, ks.PerpetualsKeeper, ks.Ctx, mockIndexerEventManager
 }
 
 func createAppModuleBasic(t *testing.T) clob.AppModuleBasic {
@@ -162,7 +159,7 @@ func TestAppModuleBasic_DefaultGenesis(t *testing.T) {
 	require.NoError(t, err)
 
 	expected := `{"clob_pairs":[],"liquidations_config":{`
-	expected += `"insurance_fund_fee_ppm":5000,"validator_fee_ppm":200000,"liquidity_fee_ppm":800000,"max_cumulative_insurance_fund_delta":"1000000000000",`
+	expected += `"insurance_fund_fee_ppm":5000,"validator_fee_ppm":200000,"liquidity_fee_ppm":800000,`
 	expected += `"fillable_price_config":{"bankruptcy_adjustment_ppm":1000000,`
 	expected += `"spread_to_maintenance_margin_ratio_ppm":100000}},`
 	expected += `"block_rate_limit_config":`
@@ -283,7 +280,7 @@ func TestAppModule_RegisterServices(t *testing.T) {
 }
 
 func TestAppModule_InitExportGenesis(t *testing.T) {
-	am, keeper, pricesKeeper, perpetualsKeeper, ctx, mockIndexerEventManager := createAppModuleWithKeeper(t)
+	am, keeper, _, perpetualsKeeper, ctx, mockIndexerEventManager := createAppModuleWithKeeper(t)
 	ctx = ctx.WithBlockTime(constants.TimeT)
 	cdc := codec.NewProtoCodec(module.InterfaceRegistry)
 	gs := json.RawMessage(getValidGenesisStr())
@@ -306,14 +303,12 @@ func TestAppModule_InitExportGenesis(t *testing.T) {
 				uint32(100),
 				uint64(5),
 				constants.Perpetuals_DefaultGenesisState.Perpetuals[0].Params.LiquidityTier,
-				constants.Perpetuals_DefaultGenesisState.Perpetuals[0].Params.MarketType,
 				constants.Perpetuals_DefaultGenesisState.Perpetuals[0].Params.DangerIndexPpm,
-				fmt.Sprintf("%d", constants.Perpetuals_DefaultGenesisState.Perpetuals[0].Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock),
+				constants.Perpetuals_DefaultGenesisState.Perpetuals[0].Params.CollateralPoolId,
 			),
 		),
 	).Once().Return()
 
-	prices.InitGenesis(ctx, *pricesKeeper, constants.Prices_DefaultGenesisState)
 	perpetuals.InitGenesis(ctx, *perpetualsKeeper, constants.Perpetuals_DefaultGenesisState)
 
 	result := am.InitGenesis(ctx, cdc, gs)
@@ -333,7 +328,6 @@ func TestAppModule_InitExportGenesis(t *testing.T) {
 	require.Equal(t, uint32(800_000), liquidationsConfig.LiquidityFeePpm)
 	require.Equal(t, uint32(1_000_000), liquidationsConfig.FillablePriceConfig.BankruptcyAdjustmentPpm)
 	require.Equal(t, uint32(100_000), liquidationsConfig.FillablePriceConfig.SpreadToMaintenanceMarginRatioPpm)
-	require.Equal(t, uint64(1_000_000_000_000), liquidationsConfig.MaxCumulativeInsuranceFundDelta)
 
 	blockRateLimitConfig := keeper.GetBlockRateLimitConfiguration(ctx)
 	require.Equal(
@@ -424,7 +418,7 @@ func TestAppModule_InitExportGenesis(t *testing.T) {
 	expected += `"step_base_quantums":"5","subticks_per_tick":100,`
 	expected += `"quantum_conversion_exponent":0,"status":"STATUS_ACTIVE"}],`
 	expected += `"liquidations_config":{`
-	expected += `"insurance_fund_fee_ppm":5000,"validator_fee_ppm":200000,"liquidity_fee_ppm":800000,"max_cumulative_insurance_fund_delta":"1000000000000",`
+	expected += `"insurance_fund_fee_ppm":5000,"validator_fee_ppm":200000,"liquidity_fee_ppm":800000,`
 	expected += `"fillable_price_config":{"bankruptcy_adjustment_ppm":1000000,`
 	expected += `"spread_to_maintenance_margin_ratio_ppm":100000}},`
 	expected += `"block_rate_limit_config":`

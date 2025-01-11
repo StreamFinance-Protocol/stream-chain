@@ -86,14 +86,12 @@ describe('request-transformer', () => {
         openInterest: perpetualMarket.openInterest,
         atomicResolution: perpetualMarket.atomicResolution,
         dangerIndexPpm: perpetualMarket.dangerIndexPpm,
-        isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock:
-          perpetualMarket.isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
+        collateralPoolId: perpetualMarket.collateralPoolId,
         quantumConversionExponent: perpetualMarket.quantumConversionExponent,
         tickSize: Big(10).pow(-2).toFixed(), // 100 * 1e-8 * 1e-6 / 10e-10 = 1e-2
         stepSize: Big(10).pow(-9).toFixed(), // 10 * 1e-10 = 1e-9
         stepBaseQuantums: perpetualMarket.stepBaseQuantums,
         subticksPerTick: perpetualMarket.subticksPerTick,
-        marketType: perpetualMarket.marketType,
         openInterestLowerCap: liquidityTier.openInterestLowerCap,
         openInterestUpperCap: liquidityTier.openInterestUpperCap,
         baseOpenInterest: perpetualMarket.baseOpenInterest,
@@ -211,12 +209,7 @@ describe('request-transformer', () => {
           testConstants.defaultSubaccount.subaccountNumber,
       };
 
-      const responseObject: OrderResponseObject | undefined = (
-        postgresAndRedisOrderToResponseObject(
-          order,
-          subaccountMap,
-        )
-      );
+      const responseObject = postgresAndRedisOrderToResponseObject(order, subaccountMap);
 
       expect(responseObject).not.toBeUndefined();
       expect(responseObject).not.toEqual(
@@ -410,8 +403,7 @@ describe('request-transformer', () => {
           clientMetadata: redisOrder.order!.clientMetadata.toString(),
           subaccountNumber: redisOrder.order!.orderId!.subaccountId!.number,
           routerFeePpm: '0',
-          routerFeeSubaccountNumber: '0',
-          routerFeeSubaccountOwner: 'klyra1xxxxxx',
+          routerFeeOwner: 'klyra1xxxxxx',
         });
       },
     );

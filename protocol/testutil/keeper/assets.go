@@ -34,11 +34,12 @@ func CreateTDaiAsset(ctx sdk.Context, assetsKeeper *keeper.Keeper) error {
 		constants.TDai.MarketId,
 		constants.TDai.AtomicResolution,
 		constants.TDai.AssetYieldIndex,
+		constants.TDai.MaxSlippagePpm,
 	)
 	return err
 }
 
-func CreateNonTDaiAsset(ctx sdk.Context, assetsKeeper *keeper.Keeper) error {
+func CreateBTCAsset(ctx sdk.Context, assetsKeeper *keeper.Keeper) error {
 	_, err := assetsKeeper.CreateAsset(
 		ctx,
 		constants.BtcUsd.Id,
@@ -49,6 +50,7 @@ func CreateNonTDaiAsset(ctx sdk.Context, assetsKeeper *keeper.Keeper) error {
 		constants.BtcUsd.MarketId,
 		constants.BtcUsd.AtomicResolution,
 		constants.BtcUsd.AssetYieldIndex,
+		constants.BtcUsd.MaxSlippagePpm,
 	)
 	return err
 }

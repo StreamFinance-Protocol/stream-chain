@@ -1237,6 +1237,179 @@ func main() {
 This operation does not require authentication
 </aside>
 
+## GetCollateralPools
+
+<a id="opIdGetCollateralPools"></a>
+
+> Code samples
+
+```shell
+# You can also use wget
+curl -X GET https://klyra-testnet.imperator.co/v4/collateralPools \
+  -H 'Accept: application/json'
+
+```
+
+```http
+GET https://klyra-testnet.imperator.co/v4/collateralPools HTTP/1.1
+Host: klyra-testnet.imperator.co
+Accept: application/json
+
+```
+
+```javascript
+const headers = {
+  'Accept':'application/json'
+};
+const baseURL = 'https://klyra-testnet.imperator.co/v4';
+fetch(`${baseURL}/collateralPools`,
+{
+  method: 'GET',
+  headers: headers
+})
+.then(function(res) {
+    return res.json();
+}).then(function(body) {
+    console.log(body);
+});
+```
+
+```ruby
+require 'rest-client'
+require 'json'
+
+headers = {
+  'Accept' => 'application/json'
+}
+
+result = RestClient.get 'https://klyra-testnet.imperator.co/v4/collateralPools',
+  params: {
+  }, headers: headers
+
+p JSON.parse(result)
+
+```
+
+```python
+import requests
+headers = {
+  'Accept': 'application/json'
+}
+baseURL = 'https://klyra-testnet.imperator.co/v4'
+r = requests.get(f'{baseURL}/collateralPools', headers = headers)
+print(r.json())
+```
+
+```php
+<?php
+
+require 'vendor/autoload.php';
+
+$headers = array(
+    'Accept' => 'application/json',
+);
+
+$client = new \GuzzleHttp\Client();
+
+// Define array of request body.
+$request_body = array();
+
+try {
+    $response = $client->request('GET','https://klyra-testnet.imperator.co/v4/collateralPools', array(
+        'headers' => $headers,
+        'json' => $request_body,
+       )
+    );
+    print_r($response->getBody()->getContents());
+ }
+ catch (\GuzzleHttp\Exception\BadResponseException $e) {
+    // handle exception or api errors.
+    print_r($e->getMessage());
+ }
+
+ // ...
+
+```
+
+```java
+URL obj = new URL("https://klyra-testnet.imperator.co/v4/collateralPools");
+HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+con.setRequestMethod("GET");
+int responseCode = con.getResponseCode();
+BufferedReader in = new BufferedReader(
+    new InputStreamReader(con.getInputStream()));
+String inputLine;
+StringBuffer response = new StringBuffer();
+while ((inputLine = in.readLine()) != null) {
+    response.append(inputLine);
+}
+in.close();
+System.out.println(response.toString());
+
+```
+
+```go
+package main
+
+import (
+       "bytes"
+       "net/http"
+)
+
+func main() {
+
+    headers := map[string][]string{
+        "Accept": []string{"application/json"},
+    }
+
+    data := bytes.NewBuffer([]byte{jsonReq})
+    req, err := http.NewRequest("GET", "https://klyra-testnet.imperator.co/v4/collateralPools", data)
+    req.Header = headers
+
+    client := &http.Client{}
+    resp, err := client.Do(req)
+    // ...
+}
+
+```
+
+`GET /collateralPools`
+
+### Parameters
+
+|Name|In|Type|Required|Description|
+|---|---|---|---|---|
+|id|query|string|false|none|
+
+> Example responses
+
+> 200 Response
+
+```json
+{
+  "collateralPools": [
+    {
+      "id": "string",
+      "maxCumulativeInsuranceFundDeltaPerBlock": "string",
+      "multiCollateralAssets": [
+        0.1
+      ],
+      "quoteAssetId": "string"
+    }
+  ]
+}
+```
+
+### Responses
+
+|Status|Meaning|Description|Schema|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Ok|[CollateralPoolsResponse](#schemacollateralpoolsresponse)|
+
+<aside class="success">
+This operation does not require authentication
+</aside>
+
 ## Screen
 
 <a id="opIdScreen"></a>
@@ -1550,17 +1723,9 @@ func main() {
 |address|query|string|true|none|
 |subaccountNumber|query|number(double)|true|none|
 |market|query|string|false|none|
-|marketType|query|[MarketType](#schemamarkettype)|false|none|
 |limit|query|number(double)|false|none|
 |createdBeforeOrAtHeight|query|number(double)|false|none|
 |createdBeforeOrAt|query|[IsoString](#schemaisostring)|false|none|
-
-#### Enumerated Values
-
-|Parameter|Value|
-|---|---|
-|marketType|PERPETUAL|
-|marketType|SPOT|
 
 > Example responses
 
@@ -1575,7 +1740,6 @@ func main() {
       "liquidity": "TAKER",
       "type": "LIMIT",
       "market": "string",
-      "marketType": "PERPETUAL",
       "price": "string",
       "size": "string",
       "fee": "string",
@@ -1746,17 +1910,9 @@ func main() {
 |address|query|string|true|none|
 |parentSubaccountNumber|query|number(double)|true|none|
 |market|query|string|false|none|
-|marketType|query|[MarketType](#schemamarkettype)|false|none|
 |limit|query|number(double)|false|none|
 |createdBeforeOrAtHeight|query|number(double)|false|none|
 |createdBeforeOrAt|query|[IsoString](#schemaisostring)|false|none|
-
-#### Enumerated Values
-
-|Parameter|Value|
-|---|---|
-|marketType|PERPETUAL|
-|marketType|SPOT|
 
 > Example responses
 
@@ -1771,7 +1927,6 @@ func main() {
       "liquidity": "TAKER",
       "type": "LIMIT",
       "market": "string",
-      "marketType": "PERPETUAL",
       "price": "string",
       "size": "string",
       "fee": "string",
@@ -2866,8 +3021,7 @@ func main() {
     "clientMetadata": "string",
     "triggerPrice": "string",
     "routerFeePpm": "string",
-    "routerFeeSubaccountOwner": "string",
-    "routerFeeSubaccountNumber": "string",
+    "routerFeeOwner": "string",
     "timeInForce": "GTT",
     "status": "OPEN",
     "postOnly": true,
@@ -2909,8 +3063,7 @@ Status Code **200**
 |» clientMetadata|string|true|none|none|
 |» triggerPrice|string|false|none|none|
 |» routerFeePpm|string|true|none|none|
-|» routerFeeSubaccountOwner|string|false|none|none|
-|» routerFeeSubaccountNumber|string|false|none|none|
+|» routerFeeOwner|string|false|none|none|
 |» timeInForce|[APITimeInForce](#schemaapitimeinforce)|true|none|none|
 |» status|any|true|none|none|
 
@@ -3162,8 +3315,7 @@ func main() {
     "clientMetadata": "string",
     "triggerPrice": "string",
     "routerFeePpm": "string",
-    "routerFeeSubaccountOwner": "string",
-    "routerFeeSubaccountNumber": "string",
+    "routerFeeOwner": "string",
     "timeInForce": "GTT",
     "status": "OPEN",
     "postOnly": true,
@@ -3205,8 +3357,7 @@ Status Code **200**
 |» clientMetadata|string|true|none|none|
 |» triggerPrice|string|false|none|none|
 |» routerFeePpm|string|true|none|none|
-|» routerFeeSubaccountOwner|string|false|none|none|
-|» routerFeeSubaccountNumber|string|false|none|none|
+|» routerFeeOwner|string|false|none|none|
 |» timeInForce|[APITimeInForce](#schemaapitimeinforce)|true|none|none|
 |» status|any|true|none|none|
 
@@ -3429,8 +3580,7 @@ func main() {
   "clientMetadata": "string",
   "triggerPrice": "string",
   "routerFeePpm": "string",
-  "routerFeeSubaccountOwner": "string",
-  "routerFeeSubaccountNumber": "string",
+  "routerFeeOwner": "string",
   "timeInForce": "GTT",
   "status": "OPEN",
   "postOnly": true,
@@ -3618,13 +3768,12 @@ func main() {
       "openInterest": "string",
       "atomicResolution": 0.1,
       "dangerIndexPpm": 0.1,
-      "isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock": "string",
+      "collateralPoolId": 0.1,
       "quantumConversionExponent": 0.1,
       "tickSize": "string",
       "stepSize": "string",
       "stepBaseQuantums": 0.1,
       "subticksPerTick": 0.1,
-      "marketType": "CROSS",
       "openInterestLowerCap": "string",
       "openInterestUpperCap": "string",
       "baseOpenInterest": "string",
@@ -3645,13 +3794,12 @@ func main() {
       "openInterest": "string",
       "atomicResolution": 0.1,
       "dangerIndexPpm": 0.1,
-      "isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock": "string",
+      "collateralPoolId": 0.1,
       "quantumConversionExponent": 0.1,
       "tickSize": "string",
       "stepSize": "string",
       "stepBaseQuantums": 0.1,
       "subticksPerTick": 0.1,
-      "marketType": "CROSS",
       "openInterestLowerCap": "string",
       "openInterestUpperCap": "string",
       "baseOpenInterest": "string",
@@ -5728,6 +5876,63 @@ This operation does not require authentication
 |---|---|---|---|---|
 |candles|[[CandleResponseObject](#schemacandleresponseobject)]|true|none|none|
 
+## CollateralPoolsResponseObject
+
+<a id="schemacollateralpoolsresponseobject"></a>
+<a id="schema_CollateralPoolsResponseObject"></a>
+<a id="tocScollateralpoolsresponseobject"></a>
+<a id="tocscollateralpoolsresponseobject"></a>
+
+```json
+{
+  "id": "string",
+  "maxCumulativeInsuranceFundDeltaPerBlock": "string",
+  "multiCollateralAssets": [
+    0.1
+  ],
+  "quoteAssetId": "string"
+}
+
+```
+
+### Properties
+
+|Name|Type|Required|Restrictions|Description|
+|---|---|---|---|---|
+|id|string|true|none|none|
+|maxCumulativeInsuranceFundDeltaPerBlock|string|true|none|none|
+|multiCollateralAssets|[number]|true|none|none|
+|quoteAssetId|string|true|none|none|
+
+## CollateralPoolsResponse
+
+<a id="schemacollateralpoolsresponse"></a>
+<a id="schema_CollateralPoolsResponse"></a>
+<a id="tocScollateralpoolsresponse"></a>
+<a id="tocscollateralpoolsresponse"></a>
+
+```json
+{
+  "collateralPools": [
+    {
+      "id": "string",
+      "maxCumulativeInsuranceFundDeltaPerBlock": "string",
+      "multiCollateralAssets": [
+        0.1
+      ],
+      "quoteAssetId": "string"
+    }
+  ]
+}
+
+```
+
+### Properties
+
+|Name|Type|Required|Restrictions|Description|
+|---|---|---|---|---|
+|collateralPools|[[CollateralPoolsResponseObject](#schemacollateralpoolsresponseobject)]|true|none|none|
+
 ## ComplianceResponse
 
 <a id="schemacomplianceresponse"></a>
@@ -5828,31 +6033,6 @@ This operation does not require authentication
 |*anonymous*|DELEVERAGED|
 |*anonymous*|OFFSETTING|
 
-## MarketType
-
-<a id="schemamarkettype"></a>
-<a id="schema_MarketType"></a>
-<a id="tocSmarkettype"></a>
-<a id="tocsmarkettype"></a>
-
-```json
-"PERPETUAL"
-
-```
-
-### Properties
-
-|Name|Type|Required|Restrictions|Description|
-|---|---|---|---|---|
-|*anonymous*|string|false|none|none|
-
-#### Enumerated Values
-
-|Property|Value|
-|---|---|
-|*anonymous*|PERPETUAL|
-|*anonymous*|SPOT|
-
 ## FillResponseObject
 
 <a id="schemafillresponseobject"></a>
@@ -5867,7 +6047,6 @@ This operation does not require authentication
   "liquidity": "TAKER",
   "type": "LIMIT",
   "market": "string",
-  "marketType": "PERPETUAL",
   "price": "string",
   "size": "string",
   "fee": "string",
@@ -5889,7 +6068,6 @@ This operation does not require authentication
 |liquidity|[Liquidity](#schemaliquidity)|true|none|none|
 |type|[FillType](#schemafilltype)|true|none|none|
 |market|string|true|none|none|
-|marketType|[MarketType](#schemamarkettype)|true|none|none|
 |price|string|true|none|none|
 |size|string|true|none|none|
 |fee|string|true|none|none|
@@ -5915,7 +6093,6 @@ This operation does not require authentication
       "liquidity": "TAKER",
       "type": "LIMIT",
       "market": "string",
-      "marketType": "PERPETUAL",
       "price": "string",
       "size": "string",
       "fee": "string",
@@ -6296,8 +6473,7 @@ or
   "clientMetadata": "string",
   "triggerPrice": "string",
   "routerFeePpm": "string",
-  "routerFeeSubaccountOwner": "string",
-  "routerFeeSubaccountNumber": "string",
+  "routerFeeOwner": "string",
   "timeInForce": "GTT",
   "status": "OPEN",
   "postOnly": true,
@@ -6330,8 +6506,7 @@ or
 |clientMetadata|string|true|none|none|
 |triggerPrice|string|false|none|none|
 |routerFeePpm|string|true|none|none|
-|routerFeeSubaccountOwner|string|false|none|none|
-|routerFeeSubaccountNumber|string|false|none|none|
+|routerFeeOwner|string|false|none|none|
 |timeInForce|[APITimeInForce](#schemaapitimeinforce)|true|none|none|
 |status|[APIOrderStatus](#schemaapiorderstatus)|true|none|none|
 |postOnly|boolean|true|none|none|
@@ -6369,31 +6544,6 @@ or
 |*anonymous*|INITIALIZING|
 |*anonymous*|FINAL_SETTLEMENT|
 
-## PerpetualMarketType
-
-<a id="schemaperpetualmarkettype"></a>
-<a id="schema_PerpetualMarketType"></a>
-<a id="tocSperpetualmarkettype"></a>
-<a id="tocsperpetualmarkettype"></a>
-
-```json
-"CROSS"
-
-```
-
-### Properties
-
-|Name|Type|Required|Restrictions|Description|
-|---|---|---|---|---|
-|*anonymous*|string|false|none|none|
-
-#### Enumerated Values
-
-|Property|Value|
-|---|---|
-|*anonymous*|CROSS|
-|*anonymous*|ISOLATED|
-
 ## PerpetualMarketResponseObject
 
 <a id="schemaperpetualmarketresponseobject"></a>
@@ -6417,13 +6567,12 @@ or
   "openInterest": "string",
   "atomicResolution": 0.1,
   "dangerIndexPpm": 0.1,
-  "isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock": "string",
+  "collateralPoolId": 0.1,
   "quantumConversionExponent": 0.1,
   "tickSize": "string",
   "stepSize": "string",
   "stepBaseQuantums": 0.1,
   "subticksPerTick": 0.1,
-  "marketType": "CROSS",
   "openInterestLowerCap": "string",
   "openInterestUpperCap": "string",
   "baseOpenInterest": "string",
@@ -6450,13 +6599,12 @@ or
 |openInterest|string|true|none|none|
 |atomicResolution|number(double)|true|none|none|
 |dangerIndexPpm|number(double)|true|none|none|
-|isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock|string|true|none|none|
+|collateralPoolId|number(double)|true|none|none|
 |quantumConversionExponent|number(double)|true|none|none|
 |tickSize|string|true|none|none|
 |stepSize|string|true|none|none|
 |stepBaseQuantums|number(double)|true|none|none|
 |subticksPerTick|number(double)|true|none|none|
-|marketType|[PerpetualMarketType](#schemaperpetualmarkettype)|true|none|none|
 |openInterestLowerCap|string|false|none|none|
 |openInterestUpperCap|string|false|none|none|
 |baseOpenInterest|string|true|none|none|
@@ -6487,13 +6635,12 @@ or
       "openInterest": "string",
       "atomicResolution": 0.1,
       "dangerIndexPpm": 0.1,
-      "isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock": "string",
+      "collateralPoolId": 0.1,
       "quantumConversionExponent": 0.1,
       "tickSize": "string",
       "stepSize": "string",
       "stepBaseQuantums": 0.1,
       "subticksPerTick": 0.1,
-      "marketType": "CROSS",
       "openInterestLowerCap": "string",
       "openInterestUpperCap": "string",
       "baseOpenInterest": "string",
@@ -6514,13 +6661,12 @@ or
       "openInterest": "string",
       "atomicResolution": 0.1,
       "dangerIndexPpm": 0.1,
-      "isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock": "string",
+      "collateralPoolId": 0.1,
       "quantumConversionExponent": 0.1,
       "tickSize": "string",
       "stepSize": "string",
       "stepBaseQuantums": 0.1,
       "subticksPerTick": 0.1,
-      "marketType": "CROSS",
       "openInterestLowerCap": "string",
       "openInterestUpperCap": "string",
       "baseOpenInterest": "string",

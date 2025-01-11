@@ -550,7 +550,9 @@ func TestReduceOnlyOrders(t *testing.T) {
 							genesisState.Perpetuals = []perptypes.Perpetual{
 								constants.BtcUsd_20PercentInitial_10PercentMaintenance,
 								constants.EthUsd_20PercentInitial_10PercentMaintenance,
+								constants.BtcEth_20PercentInitial_10PercentMaintenance,
 							}
+							genesisState.CollateralPools = constants.CollateralPools
 						},
 					)
 					return genesis
@@ -835,6 +837,7 @@ func TestReduceOnlyOrderReplacement(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(60), // 60 quantums of BTC long
+							YieldIndex:  big.NewRat(0, 1).String(),
 						},
 					},
 				},
@@ -882,6 +885,7 @@ func TestReduceOnlyOrderReplacement(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(60), // 60 quantums of BTC long
+							YieldIndex:  big.NewRat(0, 1).String(),
 						},
 					},
 				},
@@ -931,6 +935,7 @@ func TestReduceOnlyOrderReplacement(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(60), // 60 quantums of BTC long
+							YieldIndex:  big.NewRat(0, 1).String(),
 						},
 					},
 				},
@@ -979,6 +984,7 @@ func TestReduceOnlyOrderReplacement(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(110), // 110 quantums of BTC long
+							YieldIndex:  big.NewRat(0, 1).String(),
 						},
 					},
 				},
@@ -1026,6 +1032,7 @@ func TestReduceOnlyOrderReplacement(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(60), // 60 quantums of BTC long
+							YieldIndex:  big.NewRat(0, 1).String(),
 						},
 					},
 				},

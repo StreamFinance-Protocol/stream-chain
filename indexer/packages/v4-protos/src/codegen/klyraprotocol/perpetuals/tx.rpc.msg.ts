@@ -1,6 +1,6 @@
 import { Rpc } from "../../helpers";
 import * as _m0 from "protobufjs/minimal";
-import { MsgAddPremiumVotes, MsgAddPremiumVotesResponse, MsgCreatePerpetual, MsgCreatePerpetualResponse, MsgSetLiquidityTier, MsgSetLiquidityTierResponse, MsgUpdatePerpetualParams, MsgUpdatePerpetualParamsResponse, MsgUpdateParams, MsgUpdateParamsResponse } from "./tx";
+import { MsgAddPremiumVotes, MsgAddPremiumVotesResponse, MsgCreatePerpetual, MsgCreatePerpetualResponse, MsgSetLiquidityTier, MsgSetLiquidityTierResponse, MsgSetCollateralPool, MsgSetCollateralPoolResponse, MsgUpdatePerpetualParams, MsgUpdatePerpetualParamsResponse, MsgUpdateParams, MsgUpdateParamsResponse } from "./tx";
 /** Msg defines the Msg service. */
 
 export interface Msg {
@@ -18,6 +18,12 @@ export interface Msg {
    */
 
   setLiquidityTier(request: MsgSetLiquidityTier): Promise<MsgSetLiquidityTierResponse>;
+  /**
+   * SetCollateralPool creates an collateral pool if the ID doesn't exist, and
+   * updates the existing collateral pool otherwise.
+   */
+
+  setCollateralPool(request: MsgSetCollateralPool): Promise<MsgSetCollateralPoolResponse>;
   /** UpdatePerpetualParams updates the parameters of a perpetual market. */
 
   updatePerpetualParams(request: MsgUpdatePerpetualParams): Promise<MsgUpdatePerpetualParamsResponse>;
@@ -33,6 +39,7 @@ export class MsgClientImpl implements Msg {
     this.addPremiumVotes = this.addPremiumVotes.bind(this);
     this.createPerpetual = this.createPerpetual.bind(this);
     this.setLiquidityTier = this.setLiquidityTier.bind(this);
+    this.setCollateralPool = this.setCollateralPool.bind(this);
     this.updatePerpetualParams = this.updatePerpetualParams.bind(this);
     this.updateParams = this.updateParams.bind(this);
   }
@@ -53,6 +60,12 @@ export class MsgClientImpl implements Msg {
     const data = MsgSetLiquidityTier.encode(request).finish();
     const promise = this.rpc.request("klyraprotocol.perpetuals.Msg", "SetLiquidityTier", data);
     return promise.then(data => MsgSetLiquidityTierResponse.decode(new _m0.Reader(data)));
+  }
+
+  setCollateralPool(request: MsgSetCollateralPool): Promise<MsgSetCollateralPoolResponse> {
+    const data = MsgSetCollateralPool.encode(request).finish();
+    const promise = this.rpc.request("klyraprotocol.perpetuals.Msg", "SetCollateralPool", data);
+    return promise.then(data => MsgSetCollateralPoolResponse.decode(new _m0.Reader(data)));
   }
 
   updatePerpetualParams(request: MsgUpdatePerpetualParams): Promise<MsgUpdatePerpetualParamsResponse> {

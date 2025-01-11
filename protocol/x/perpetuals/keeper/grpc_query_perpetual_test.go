@@ -5,18 +5,26 @@ import (
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/types/query"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/StreamFinance-Protocol/stream-chain/protocol/mocks"
 	keepertest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/nullify"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 )
 
 func TestPerpetualQuerySingle(t *testing.T) {
-	pc := keepertest.PerpetualsKeepers(t)
-	msgs := keepertest.CreateLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 2)
+	memClob := &mocks.MemClob{}
+	memClob.On("SetClobKeeper", mock.Anything).Return()
+
+	mockIndexerEventManager := &mocks.IndexerEventManager{}
+
+	pc := keepertest.NewClobKeepersTestContext(t, memClob, &mocks.BankKeeper{}, mockIndexerEventManager, nil)
+
+	msgs := keepertest.CreateCollateralPoolsAndLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 2)
 	for _, tc := range []struct {
 		desc     string
 		request  *types.QueryPerpetualRequest
@@ -68,8 +76,13 @@ func TestPerpetualQuerySingle(t *testing.T) {
 }
 
 func TestPerpetualQueryPaginated(t *testing.T) {
-	pc := keepertest.PerpetualsKeepers(t)
-	msgs := keepertest.CreateLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 5)
+	memClob := &mocks.MemClob{}
+	memClob.On("SetClobKeeper", mock.Anything).Return()
+
+	mockIndexerEventManager := &mocks.IndexerEventManager{}
+
+	pc := keepertest.NewClobKeepersTestContext(t, memClob, &mocks.BankKeeper{}, mockIndexerEventManager, nil)
+	msgs := keepertest.CreateCollateralPoolsAndLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, 5)
 
 	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllPerpetualsRequest {
 		return &types.QueryAllPerpetualsRequest{

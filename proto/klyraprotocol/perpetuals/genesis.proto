@@ -4,6 +4,7 @@ package klyraprotocol.perpetuals;
 import "gogoproto/gogo.proto";
 import "klyraprotocol/perpetuals/perpetual.proto";
 import "klyraprotocol/perpetuals/params.proto";
+import "klyraprotocol/perpetuals/collateral.proto";
 
 option go_package = "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types";
 
@@ -12,4 +13,5 @@ message GenesisState {
   repeated Perpetual perpetuals = 1 [ (gogoproto.nullable) = false ];
   repeated LiquidityTier liquidity_tiers = 2 [ (gogoproto.nullable) = false ];
   Params params = 3 [ (gogoproto.nullable) = false ];
+  repeated CollateralPool collateral_pools = 4 [ (gogoproto.nullable) = false ];
 }

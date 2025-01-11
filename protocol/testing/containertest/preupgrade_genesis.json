@@ -33,7 +33,8 @@
             "id": 0,
             "market_id": 0,
             "symbol": "TDAI",
-            "asset_yield_index": "0/1"
+            "asset_yield_index": "0/1",
+            "max_slippage_ppm": 0
           }
         ]
       },
@@ -134,6 +135,33 @@
             ]
           },
           {
+            "address": "klyra1qt3f40penefk5eyemv8s2zznpzpmklkffr4czn",
+            "coins": [
+              {
+                "denom": "utdai",
+                "amount": "1300000000000000000"
+              }
+            ]
+          },
+          {
+            "address": "klyra1xs5088vrxmawlyuesrn73vye988ltm6mcxecpd",
+            "coins": [
+              {
+                "denom": "utdai",
+                "amount": "1300000000000000000"
+              }
+            ]
+          },
+          {
+            "address": "klyra1daqtvgfdcsgne505p4cltcwq5cfum94a7par8n",
+            "coins": [
+              {
+                "denom": "btc-denom",
+                "amount": "100000000000000000"
+              }
+            ]
+          },
+          {
             "address": "klyra1wau5mja7j7zdavtfq9lu7ejef05hm6ffxz2hcc",
             "coins": [
               {
@@ -186,7 +214,7 @@
             "coins": [
               {
                 "denom": "ibc/DEEFE2DEFDC8EA8879923C4CCA42BB888C3CD03FF7ECFEFB1C2FEC27A732ACC8",
-                "amount": "2600000000000000000000000000000"
+                "amount": "5200000000000000000000000000000"
               }
             ]
           }
@@ -657,8 +685,7 @@
           },
           "insurance_fund_fee_ppm": 15000,
           "validator_fee_ppm": 200000,
-          "liquidity_fee_ppm": 800000,
-          "max_cumulative_insurance_fund_delta": 1000000000000
+          "liquidity_fee_ppm": 800000
         }
       },
       "crisis": {
@@ -1210,6 +1237,32 @@
         }
       },
       "perpetuals": {
+        "collateral_pools": [
+          {
+            "collateral_pool_id": 0,
+            "max_cumulative_insurance_fund_delta_per_block": "1000000000000",
+            "multi_collateral_assets": {
+              "multi_collateral_assets": [0]
+            },
+            "quote_asset_id": 0
+          },
+          {
+            "collateral_pool_id": 1,
+            "max_cumulative_insurance_fund_delta_per_block": "1000000000000",
+            "multi_collateral_assets": {
+              "multi_collateral_assets": [1]
+            },
+            "quote_asset_id": 1
+          },
+          {
+            "collateral_pool_id": 2,
+            "max_cumulative_insurance_fund_delta_per_block": "1000000000000",
+            "multi_collateral_assets": {
+              "multi_collateral_assets": [0]
+            },
+            "quote_asset_id": 0
+          }
+        ],
         "liquidity_tiers": [
           {
             "base_position_notional": 1000000000000,
@@ -1274,8 +1327,7 @@
               "liquidity_tier": 0,
               "market_id": 0,
               "ticker": "BTC-USD"
-            },
-            "yield_index": "0/1"
+            }
           },
           {
             "params": {

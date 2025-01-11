@@ -88,7 +88,7 @@ func TestMsgCreateTransfer_ValidateBasic(t *testing.T) {
 			err: types.ErrSenderSameAsRecipient,
 		},
 		{
-			name: "Non-TDai asset transfer not supported",
+			name: "Non-TDai asset transfer supported",
 			msg: types.MsgCreateTransfer{
 				Transfer: &types.Transfer{
 					Sender:    constants.Carl_Num0,
@@ -97,7 +97,7 @@ func TestMsgCreateTransfer_ValidateBasic(t *testing.T) {
 					Amount:    uint64(100),
 				},
 			},
-			err: types.ErrNonTDaiAssetTransferNotImplemented,
+			err: nil,
 		},
 		{
 			name: "Invalid amount",

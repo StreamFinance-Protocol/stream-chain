@@ -4,12 +4,12 @@ import (
 	"container/heap"
 	"math/big"
 
-	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
+	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
 )
 
 // LiquidationPriority represents an item in our priority queue
 type LiquidationPriority struct {
-	SubaccountId types.SubaccountId
+	SubaccountId satypes.SubaccountId
 	Priority     *big.Float
 	Index        int // The index of the item in the heap
 }
@@ -59,7 +59,7 @@ func NewLiquidationPriorityHeap() *LiquidationPriorityHeap {
 }
 
 // AddSubaccount adds a new subaccount to the heap
-func (h *LiquidationPriorityHeap) AddSubaccount(subaccountId types.SubaccountId, priority *big.Float) {
+func (h *LiquidationPriorityHeap) AddSubaccount(subaccountId satypes.SubaccountId, priority *big.Float) {
 	heap.Push(h, &LiquidationPriority{
 		SubaccountId: subaccountId,
 		Priority:     priority,

@@ -140,6 +140,31 @@ func TestDeliverTxMatchValidation(t *testing.T) {
 				},
 			},
 		},
+		"Success: BTC collat IOC order is taker with multiple maker fills": {
+			subaccounts: []satypes.Subaccount{
+				constants.Alice_Num11_10_000BTC,
+				constants.Bob_Num11_10_000BTC,
+			},
+			blockAdvancements: []testapp.BlockAdvancementWithErrors{
+				{
+					BlockAdvancement: testapp.BlockAdvancement{
+						ShortTermOrdersAndOperations: []interface{}{
+							testapp.MustScaleOrder(constants.Order_Bob_Num11_Id11_Clob2_Buy5_Price40_GTB20, testapp.DefaultGenesis()),
+							testapp.MustScaleOrder(constants.Order_Alice_Num11_Id1_Clob2_Sell10_Price15_GTB20_IOC, testapp.DefaultGenesis()),
+							clobtestutils.NewMatchOperationRaw(
+								&constants.Order_Alice_Num11_Id1_Clob2_Sell10_Price15_GTB20_IOC,
+								[]clobtypes.MakerFill{
+									{
+										FillAmount:   50,
+										MakerOrderId: constants.Order_Bob_Num11_Id11_Clob2_Buy5_Price40_GTB20.OrderId,
+									},
+								},
+							),
+						},
+					},
+				},
+			},
+		},
 		"Error: IOC order is taker in multiple matches": {
 			subaccounts: []satypes.Subaccount{
 				constants.Alice_Num1_10_000USD,
@@ -256,14 +281,14 @@ func TestDeliverTxMatchValidation(t *testing.T) {
 			tApp.App.RatelimitKeeper.SetSDAIPrice(tApp.App.NewUncachedContext(false, tmproto.Header{}), rate)
 			tApp.App.RatelimitKeeper.SetAssetYieldIndex(tApp.App.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
-			tApp.ParallelApp.RatelimitKeeper.SetSDAIPrice(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), rate)
-			tApp.ParallelApp.RatelimitKeeper.SetAssetYieldIndex(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+			tApp.CrashingApp.RatelimitKeeper.SetSDAIPrice(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.CrashingApp.RatelimitKeeper.SetAssetYieldIndex(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
 			tApp.NoCheckTxApp.RatelimitKeeper.SetSDAIPrice(tApp.NoCheckTxApp.NewUncachedContext(false, tmproto.Header{}), rate)
 			tApp.NoCheckTxApp.RatelimitKeeper.SetAssetYieldIndex(tApp.NoCheckTxApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
-			tApp.CrashingApp.RatelimitKeeper.SetSDAIPrice(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), rate)
-			tApp.CrashingApp.RatelimitKeeper.SetAssetYieldIndex(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+			tApp.ParallelApp.RatelimitKeeper.SetSDAIPrice(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.ParallelApp.RatelimitKeeper.SetAssetYieldIndex(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
 			ctx := tApp.InitChain()
 

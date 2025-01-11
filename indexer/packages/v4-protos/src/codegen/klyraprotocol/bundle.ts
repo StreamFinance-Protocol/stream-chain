@@ -43,11 +43,11 @@ import * as _53 from "./indexer/events/events";
 import * as _54 from "./indexer/indexer_manager/event";
 import * as _55 from "./indexer/off_chain_updates/off_chain_updates";
 import * as _56 from "./indexer/protocol/v1/clob";
-import * as _57 from "./indexer/protocol/v1/perpetual";
-import * as _58 from "./indexer/protocol/v1/subaccount";
-import * as _59 from "./indexer/redis/redis_order";
-import * as _60 from "./indexer/shared/removal_reason";
-import * as _61 from "./indexer/socks/messages";
+import * as _57 from "./indexer/protocol/v1/subaccount";
+import * as _58 from "./indexer/redis/redis_order";
+import * as _59 from "./indexer/shared/removal_reason";
+import * as _60 from "./indexer/socks/messages";
+import * as _61 from "./perpetuals/collateral";
 import * as _62 from "./perpetuals/genesis";
 import * as _63 from "./perpetuals/params";
 import * as _64 from "./perpetuals/perpetual";
@@ -199,18 +199,18 @@ export namespace klyraprotocol {
     };
     export namespace protocol {
       export const v1 = { ..._56,
-        ..._57,
-        ..._58
+        ..._57
       };
     }
-    export const redis = { ..._59
+    export const redis = { ..._58
     };
-    export const shared = { ..._60
+    export const shared = { ..._59
     };
-    export const socks = { ..._61
+    export const socks = { ..._60
     };
   }
-  export const perpetuals = { ..._62,
+  export const perpetuals = { ..._61,
+    ..._62,
     ..._63,
     ..._64,
     ..._65,

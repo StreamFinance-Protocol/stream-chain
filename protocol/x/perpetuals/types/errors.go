@@ -107,11 +107,6 @@ var (
 		22,
 		"MinNumVotesPerSample is zero",
 	)
-	ErrInvalidMarketType = errorsmod.Register(
-		ModuleName,
-		23,
-		"Market type is invalid",
-	)
 	ErrOpenInterestLowerCapLargerThanUpperCap = errorsmod.Register(
 		ModuleName,
 		24,
@@ -157,10 +152,45 @@ var (
 		32,
 		"total tDAI pre mint was 0, but total tDAI minted was not 0",
 	)
-	ErrIsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlockZero = errorsmod.Register(
+	ErrMaxCumulativeInsuranceFundDeltaPerBlockZero = errorsmod.Register(
 		ModuleName,
 		33,
-		"isolated market max cumulative insurance fund delta per block is zero",
+		"max cumulative insurance fund delta per block is zero",
+	)
+	ErrMultiCollateralAssetsEmpty = errorsmod.Register(
+		ModuleName,
+		34,
+		"collateral asssets is empty",
+	)
+	ErrIsolatedMarketMultiCollateralAssetDoesNotContainQuoteAsset = errorsmod.Register(
+		ModuleName,
+		36,
+		"multi collateral asset does not contain quote asset",
+	)
+	ErrMultiCollateralAssetDoesNotExist = errorsmod.Register(
+		ModuleName,
+		37,
+		"multi collateral asset does not exist",
+	)
+	ErrCollateralPoolDoesNotExist = errorsmod.Register(
+		ModuleName,
+		38,
+		"collateral pool does not exist",
+	)
+	ErrCannotModifyCollateralPoolQuoteAsset = errorsmod.Register(
+		ModuleName,
+		39,
+		"cannot modify collateral pool quote asset",
+	)
+	ErrCannotRemoveMultiCollateralAssetFromCollateralPool = errorsmod.Register(
+		ModuleName,
+		40,
+		"cannot remove multi collateral asset from collateral pool",
+	)
+	ErrCollateralPoolMustHaveOnlyOneAsset = errorsmod.Register(
+		ModuleName,
+		41,
+		"collateral pool can only have 1 asset",
 	)
 
 	// Miscallaneous errors

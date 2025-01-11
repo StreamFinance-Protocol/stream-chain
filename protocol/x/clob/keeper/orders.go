@@ -22,6 +22,11 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+type perpetualInfo struct {
+	perpetualId  uint32
+	quoteAssetId uint32
+}
+
 func (k Keeper) GetOperations(ctx sdk.Context) *types.MsgProposedOperations {
 	operationsQueueRaw := k.MemClob.GetOperationsRaw(ctx)
 
@@ -387,8 +392,11 @@ func (k Keeper) PlaceStatefulOrder(
 
 		if updateResult := successPerSubaccountUpdate[order.OrderId.SubaccountId]; !updateResult.IsSuccess() {
 			err := types.ErrStatefulOrderCollateralizationCheckFailed
-			if updateResult.IsIsolatedSubaccountError() {
-				err = types.ErrWouldViolateIsolatedSubaccountConstraints
+			if updateResult.IsCollateralPoolError() {
+				err = types.ErrWouldViolateCollateralPoolConstraints
+			}
+			if updateResult.IsMultiCollateralError() {
+				err = types.ErrWouldViolateMultiCollateralConstraints
 			}
 			return errorsmod.Wrapf(
 				err,
@@ -1029,87 +1037,25 @@ func (k Keeper) AddOrderToOrderbookSubaccountUpdatesCheck(
 		metrics.Count,
 	)
 
-	clobPair, found := k.GetClobPair(ctx, clobPairId)
-	if !found {
-		panic(types.ErrInvalidClob)
-	}
+	clobPair, perpetualInfo := k.getClobPairAndPerpetualInfo(ctx, clobPairId)
 
-	pendingUpdates := types.NewPendingUpdates()
-
-	// Retrieve the associated `PerpetualId` for the `ClobPair`.
-	perpetualId := clobPair.MustGetPerpetualId()
-
-	iterateOverOpenOrdersStart := time.Now()
-	for subaccountId, openOrders := range subaccountOpenOrders {
-		telemetry.SetGauge(
-			float32(len(openOrders)),
-			types.ModuleName,
-			metrics.SubaccountPendingMatches,
-			metrics.Count,
-		)
-
-		makerFeePpm := k.feeTiersKeeper.GetPerpetualFeePpm(ctx, subaccountId.Owner, false)
-		// For each subaccount ID, create the update from all of its existing open orders for the clob and side.
-		for _, openOrder := range openOrders {
-			if openOrder.ClobPairId != clobPairId {
-				panic(fmt.Sprintf("Order `ClobPairId` must equal `clobPairId` for order %+v", openOrder))
-			}
-
-			collatCheckPriceSubticks := openOrder.Subticks
-
-			bigFillQuoteQuantums, err := getFillQuoteQuantums(
-				clobPair,
-				collatCheckPriceSubticks,
-				openOrder.RemainingQuantums,
-			)
-
-			// If an error is returned, this implies stateful order validation was not performed properly, therefore panic.
-			if err != nil {
-				panic(err)
-			}
-
-			bigFillAmount := openOrder.RemainingQuantums.ToBigInt()
-			addPerpetualFillAmountStart := time.Now()
-			pendingUpdates.AddPerpetualFill(
-				subaccountId,
-				perpetualId,
-				openOrder.IsBuy,
-				makerFeePpm,
-				bigFillAmount,
-				bigFillQuoteQuantums,
-			)
-			telemetry.ModuleMeasureSince(
-				types.ModuleName,
-				addPerpetualFillAmountStart,
-				metrics.AddPerpetualFillAmount,
-				metrics.Latency,
-			)
-		}
-	}
-	telemetry.ModuleMeasureSince(
-		types.ModuleName,
-		iterateOverOpenOrdersStart,
-		metrics.IterateOverPendingMatches,
-		metrics.Latency,
+	pendingUpdates := k.calculatePendingUpdatesFromOpenOrders(
+		ctx,
+		subaccountOpenOrders,
+		perpetualInfo,
+		clobPair,
 	)
 
-	covertToUpdatesStart := time.Now()
-	updates := pendingUpdates.ConvertToUpdates()
-	telemetry.ModuleMeasureSince(
-		types.ModuleName,
-		covertToUpdatesStart,
-		metrics.ConvertToUpdates,
-		metrics.Latency,
-	)
+	updates := k.fetchUpdatesFromPendingUpdates(pendingUpdates)
 
 	success, successPerSubaccountUpdate, err := k.subaccountsKeeper.CanUpdateSubaccounts(
 		ctx,
 		updates,
 		satypes.CollatCheck,
 	)
-	// TODO(DEC-191): Remove the error case from `CanUpdateSubaccounts`, which can only occur on overflow and specifying
-	// duplicate accounts.
 	if err != nil {
+		// TODO(DEC-191): Remove the error case from `CanUpdateSubaccounts`, which can only occur on overflow and specifying
+		// duplicate accounts.
 		panic(err)
 	}
 
@@ -1119,6 +1065,131 @@ func (k Keeper) AddOrderToOrderbookSubaccountUpdatesCheck(
 	}
 
 	return success, result
+}
+
+func (k Keeper) fetchUpdatesFromPendingUpdates(
+	pendingUpdates *types.PendingUpdates,
+) []satypes.Update {
+	covertToUpdatesStart := time.Now()
+
+	updates := pendingUpdates.ConvertToUpdates()
+
+	telemetry.ModuleMeasureSince(
+		types.ModuleName,
+		covertToUpdatesStart,
+		metrics.ConvertToUpdates,
+		metrics.Latency,
+	)
+	return updates
+}
+func (k Keeper) calculatePendingUpdatesFromOpenOrders(
+	ctx sdk.Context,
+	subaccountOpenOrders map[satypes.SubaccountId][]types.PendingOpenOrder,
+	perpetualInfo perpetualInfo,
+	clobPair types.ClobPair,
+) *types.PendingUpdates {
+	pendingUpdates := types.NewPendingUpdates()
+	iterateOverOpenOrdersStart := time.Now()
+
+	for subaccountId, openOrders := range subaccountOpenOrders {
+		telemetry.SetGauge(
+			float32(len(openOrders)),
+			types.ModuleName,
+			metrics.SubaccountPendingMatches,
+			metrics.Count,
+		)
+
+		makerFeePpm := k.feeTiersKeeper.GetPerpetualFeePpm(ctx, subaccountId.Owner, false)
+
+		k.appendPendingUpdateFromOpenOrders(
+			pendingUpdates,
+			perpetualInfo,
+			clobPair,
+			makerFeePpm,
+			subaccountId,
+			openOrders,
+		)
+	}
+
+	telemetry.ModuleMeasureSince(
+		types.ModuleName,
+		iterateOverOpenOrdersStart,
+		metrics.IterateOverPendingMatches,
+		metrics.Latency,
+	)
+
+	return pendingUpdates
+}
+
+func (k Keeper) appendPendingUpdateFromOpenOrders(
+	pendingUpdates *types.PendingUpdates,
+	perpetualInfo perpetualInfo,
+	clobPair types.ClobPair,
+	makerFeePpm int32,
+	subaccountId satypes.SubaccountId,
+	openOrders []types.PendingOpenOrder,
+) {
+	for _, openOrder := range openOrders {
+		if openOrder.ClobPairId != clobPair.GetClobPairId() {
+			panic(fmt.Sprintf("Order `ClobPairId` must equal `clobPairId` for order %+v", openOrder))
+		}
+
+		collatCheckPriceSubticks := openOrder.Subticks
+
+		bigFillQuoteQuantums, err := getFillQuoteQuantums(
+			clobPair,
+			collatCheckPriceSubticks,
+			openOrder.RemainingQuantums,
+		)
+
+		// If an error is returned, this implies stateful order validation was not performed properly, therefore panic.
+		if err != nil {
+			panic(err)
+		}
+
+		bigFillAmount := openOrder.RemainingQuantums.ToBigInt()
+		addPerpetualFillAmountStart := time.Now()
+		pendingUpdates.AddPerpetualFill(
+			subaccountId,
+			perpetualInfo.perpetualId,
+			perpetualInfo.quoteAssetId,
+			openOrder.IsBuy,
+			makerFeePpm,
+			bigFillAmount,
+			bigFillQuoteQuantums,
+		)
+
+		telemetry.ModuleMeasureSince(
+			types.ModuleName,
+			addPerpetualFillAmountStart,
+			metrics.AddPerpetualFillAmount,
+			metrics.Latency,
+		)
+	}
+}
+
+func (k Keeper) getClobPairAndPerpetualInfo(
+	ctx sdk.Context,
+	clobPairId types.ClobPairId,
+) (
+	clobPair types.ClobPair,
+	perpInfo perpetualInfo,
+) {
+	clobPair, found := k.GetClobPair(ctx, clobPairId)
+	if !found {
+		panic(types.ErrInvalidClob)
+	}
+
+	perpetualId := clobPair.MustGetPerpetualId()
+	collateralPool, err := k.perpetualsKeeper.GetCollateralPoolFromPerpetualId(ctx, perpetualId)
+	if err != nil {
+		panic(fmt.Sprintf("AddOrderToOrderbookSubaccountUpdatesCheck: failed to get collateral pool %v", err))
+	}
+
+	return clobPair, perpetualInfo{
+		perpetualId:  perpetualId,
+		quoteAssetId: collateralPool.QuoteAssetId,
+	}
 }
 
 // GetOraclePriceSubticksRat returns the oracle price in subticks for the given `ClobPair`.
@@ -1133,12 +1204,17 @@ func (k Keeper) GetOraclePriceSubticksRat(ctx sdk.Context, clobPair types.ClobPa
 		panic(errorsmod.Wrapf(err, "perpetual ID = (%d)", perpetualId))
 	}
 
+	quoteCurrencyAtomicResolution, err := k.perpetualsKeeper.GetQuoteCurrencyAtomicResolutionFromPerpetualId(ctx, perpetualId)
+	if err != nil {
+		panic(err)
+	}
+
 	// Get the oracle price for the market.
 	oraclePriceSubticksRat := types.PnlPriceToSubticks(
 		marketPrice,
 		clobPair,
 		perpetual.Params.AtomicResolution,
-		lib.QuoteCurrencyAtomicResolution,
+		quoteCurrencyAtomicResolution,
 	)
 	if oraclePriceSubticksRat.Cmp(big.NewRat(0, 1)) == 0 {
 		panic(

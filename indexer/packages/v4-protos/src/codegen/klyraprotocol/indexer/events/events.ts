@@ -1,7 +1,6 @@
 import { IndexerSubaccountId, IndexerSubaccountIdSDKType, IndexerPerpetualPosition, IndexerPerpetualPositionSDKType, IndexerAssetPosition, IndexerAssetPositionSDKType } from "../protocol/v1/subaccount";
 import { IndexerOrder, IndexerOrderSDKType, IndexerOrderId, IndexerOrderIdSDKType, ClobPairStatus, ClobPairStatusSDKType } from "../protocol/v1/clob";
 import { OrderRemovalReason, OrderRemovalReasonSDKType } from "../shared/removal_reason";
-import { PerpetualMarketType, PerpetualMarketTypeSDKType } from "../protocol/v1/perpetual";
 import * as _m0 from "protobufjs/minimal";
 import { DeepPartial, Long } from "../../../helpers";
 /** Type is the type for funding values. */
@@ -938,6 +937,42 @@ export interface PerpetualMarketCreateEventV1SDKType {
   liquidity_tier: number;
 }
 /**
+ * CollateralPoolUpsertEvent indicates any contains information about
+ * a new collateral pool or updates to an existing collateral pool.
+ */
+
+export interface CollateralPoolUpsertEvent {
+  /** The id of the collateral pool. */
+  id: number;
+  /** The maximum insurance fund delta per block for isolated perpetual markets. */
+
+  maxCumulativeInsuranceFundDeltaPerBlock: Long;
+  /** The multi collateral assets for the collateral pool. */
+
+  multiCollateralAssets: number[];
+  /** The id of the quote asset. */
+
+  quoteAssetId: number;
+}
+/**
+ * CollateralPoolUpsertEvent indicates any contains information about
+ * a new collateral pool or updates to an existing collateral pool.
+ */
+
+export interface CollateralPoolUpsertEventSDKType {
+  /** The id of the collateral pool. */
+  id: number;
+  /** The maximum insurance fund delta per block for isolated perpetual markets. */
+
+  max_cumulative_insurance_fund_delta_per_block: Long;
+  /** The multi collateral assets for the collateral pool. */
+
+  multi_collateral_assets: number[];
+  /** The id of the quote asset. */
+
+  quote_asset_id: number;
+}
+/**
  * PerpetualMarketCreateEventV2 message contains all the information about a
  * new Perpetual Market on the Klyra chain.
  */
@@ -1006,18 +1041,18 @@ export interface PerpetualMarketCreateEventV2 {
    */
 
   liquidityTier: number;
-  /** Market type of the perpetual. */
-
-  marketType: PerpetualMarketType;
   /**
    * The danger index is used to prioritze certain accounts and positions in
    * liquidations
    */
 
   dangerIndexPpm: number;
-  /** The maximum cumulative insurance fund delta per block for isolated markets. */
+  /**
+   * The collateral pool id is used to signify which collateral pool this
+   * perpetual belongs to
+   */
 
-  isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: string;
+  collateralPoolId: number;
 }
 /**
  * PerpetualMarketCreateEventV2 message contains all the information about a
@@ -1088,18 +1123,18 @@ export interface PerpetualMarketCreateEventV2SDKType {
    */
 
   liquidity_tier: number;
-  /** Market type of the perpetual. */
-
-  market_type: PerpetualMarketTypeSDKType;
   /**
    * The danger index is used to prioritze certain accounts and positions in
    * liquidations
    */
 
   danger_index_ppm: number;
-  /** The maximum cumulative insurance fund delta per block for isolated markets. */
+  /**
+   * The collateral pool id is used to signify which collateral pool this
+   * perpetual belongs to
+   */
 
-  isolated_market_max_cumulative_insurance_fund_delta_per_block: string;
+  collateral_pool_id: number;
 }
 /**
  * LiquidityTierUpsertEventV1 message contains all the information to
@@ -1403,9 +1438,6 @@ export interface UpdatePerpetualEventV1 {
    */
 
   dangerIndexPpm: number;
-  /** The maximum cumulative insurance fund delta per block for isolated markets. */
-
-  isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: string;
   /** The perp yield index of this perpetual market */
 
   perpYieldIndex: string;
@@ -1454,9 +1486,6 @@ export interface UpdatePerpetualEventV1SDKType {
    */
 
   danger_index_ppm: number;
-  /** The maximum cumulative insurance fund delta per block for isolated markets. */
-
-  isolated_market_max_cumulative_insurance_fund_delta_per_block: string;
   /** The perp yield index of this perpetual market */
 
   perp_yield_index: string;
@@ -2971,6 +3000,94 @@ export const PerpetualMarketCreateEventV1 = {
 
 };
 
+function createBaseCollateralPoolUpsertEvent(): CollateralPoolUpsertEvent {
+  return {
+    id: 0,
+    maxCumulativeInsuranceFundDeltaPerBlock: Long.UZERO,
+    multiCollateralAssets: [],
+    quoteAssetId: 0
+  };
+}
+
+export const CollateralPoolUpsertEvent = {
+  encode(message: CollateralPoolUpsertEvent, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.id !== 0) {
+      writer.uint32(8).uint32(message.id);
+    }
+
+    if (!message.maxCumulativeInsuranceFundDeltaPerBlock.isZero()) {
+      writer.uint32(16).uint64(message.maxCumulativeInsuranceFundDeltaPerBlock);
+    }
+
+    writer.uint32(26).fork();
+
+    for (const v of message.multiCollateralAssets) {
+      writer.uint32(v);
+    }
+
+    writer.ldelim();
+
+    if (message.quoteAssetId !== 0) {
+      writer.uint32(32).uint32(message.quoteAssetId);
+    }
+
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): CollateralPoolUpsertEvent {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCollateralPoolUpsertEvent();
+
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+
+      switch (tag >>> 3) {
+        case 1:
+          message.id = reader.uint32();
+          break;
+
+        case 2:
+          message.maxCumulativeInsuranceFundDeltaPerBlock = (reader.uint64() as Long);
+          break;
+
+        case 3:
+          if ((tag & 7) === 2) {
+            const end2 = reader.uint32() + reader.pos;
+
+            while (reader.pos < end2) {
+              message.multiCollateralAssets.push(reader.uint32());
+            }
+          } else {
+            message.multiCollateralAssets.push(reader.uint32());
+          }
+
+          break;
+
+        case 4:
+          message.quoteAssetId = reader.uint32();
+          break;
+
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+
+    return message;
+  },
+
+  fromPartial(object: DeepPartial<CollateralPoolUpsertEvent>): CollateralPoolUpsertEvent {
+    const message = createBaseCollateralPoolUpsertEvent();
+    message.id = object.id ?? 0;
+    message.maxCumulativeInsuranceFundDeltaPerBlock = object.maxCumulativeInsuranceFundDeltaPerBlock !== undefined && object.maxCumulativeInsuranceFundDeltaPerBlock !== null ? Long.fromValue(object.maxCumulativeInsuranceFundDeltaPerBlock) : Long.UZERO;
+    message.multiCollateralAssets = object.multiCollateralAssets?.map(e => e) || [];
+    message.quoteAssetId = object.quoteAssetId ?? 0;
+    return message;
+  }
+
+};
+
 function createBasePerpetualMarketCreateEventV2(): PerpetualMarketCreateEventV2 {
   return {
     id: 0,
@@ -2983,9 +3100,8 @@ function createBasePerpetualMarketCreateEventV2(): PerpetualMarketCreateEventV2 
     subticksPerTick: 0,
     stepBaseQuantums: Long.UZERO,
     liquidityTier: 0,
-    marketType: 0,
     dangerIndexPpm: 0,
-    isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: ""
+    collateralPoolId: 0
   };
 }
 
@@ -3031,16 +3147,12 @@ export const PerpetualMarketCreateEventV2 = {
       writer.uint32(80).uint32(message.liquidityTier);
     }
 
-    if (message.marketType !== 0) {
-      writer.uint32(88).int32(message.marketType);
-    }
-
     if (message.dangerIndexPpm !== 0) {
-      writer.uint32(96).uint32(message.dangerIndexPpm);
+      writer.uint32(88).uint32(message.dangerIndexPpm);
     }
 
-    if (message.isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock !== "") {
-      writer.uint32(106).string(message.isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock);
+    if (message.collateralPoolId !== 0) {
+      writer.uint32(96).uint32(message.collateralPoolId);
     }
 
     return writer;
@@ -3096,15 +3208,11 @@ export const PerpetualMarketCreateEventV2 = {
           break;
 
         case 11:
-          message.marketType = (reader.int32() as any);
-          break;
-
-        case 12:
           message.dangerIndexPpm = reader.uint32();
           break;
 
-        case 13:
-          message.isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock = reader.string();
+        case 12:
+          message.collateralPoolId = reader.uint32();
           break;
 
         default:
@@ -3128,9 +3236,8 @@ export const PerpetualMarketCreateEventV2 = {
     message.subticksPerTick = object.subticksPerTick ?? 0;
     message.stepBaseQuantums = object.stepBaseQuantums !== undefined && object.stepBaseQuantums !== null ? Long.fromValue(object.stepBaseQuantums) : Long.UZERO;
     message.liquidityTier = object.liquidityTier ?? 0;
-    message.marketType = object.marketType ?? 0;
     message.dangerIndexPpm = object.dangerIndexPpm ?? 0;
-    message.isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock = object.isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock ?? "";
+    message.collateralPoolId = object.collateralPoolId ?? 0;
     return message;
   }
 
@@ -3519,7 +3626,6 @@ function createBaseUpdatePerpetualEventV1(): UpdatePerpetualEventV1 {
     atomicResolution: 0,
     liquidityTier: 0,
     dangerIndexPpm: 0,
-    isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: "",
     perpYieldIndex: ""
   };
 }
@@ -3550,12 +3656,8 @@ export const UpdatePerpetualEventV1 = {
       writer.uint32(48).uint32(message.dangerIndexPpm);
     }
 
-    if (message.isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock !== "") {
-      writer.uint32(58).string(message.isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock);
-    }
-
     if (message.perpYieldIndex !== "") {
-      writer.uint32(66).string(message.perpYieldIndex);
+      writer.uint32(58).string(message.perpYieldIndex);
     }
 
     return writer;
@@ -3595,10 +3697,6 @@ export const UpdatePerpetualEventV1 = {
           break;
 
         case 7:
-          message.isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock = reader.string();
-          break;
-
-        case 8:
           message.perpYieldIndex = reader.string();
           break;
 
@@ -3619,7 +3717,6 @@ export const UpdatePerpetualEventV1 = {
     message.atomicResolution = object.atomicResolution ?? 0;
     message.liquidityTier = object.liquidityTier ?? 0;
     message.dangerIndexPpm = object.dangerIndexPpm ?? 0;
-    message.isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock = object.isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock ?? "";
     message.perpYieldIndex = object.perpYieldIndex ?? "";
     return message;
   }

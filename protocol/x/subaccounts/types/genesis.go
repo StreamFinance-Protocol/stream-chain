@@ -42,19 +42,8 @@ func (gs GenesisState) Validate() error {
 		}
 
 		// Validate AssetPositions.
-		// TODO(DEC-582): once we support different assets, remove this validation.
-		if len(sa.GetAssetPositions()) > 1 {
-			return ErrMultAssetPositionsNotSupported
-		}
 		for i := 0; i < len(sa.GetAssetPositions()); i++ {
 			assetP := sa.GetAssetPositions()[i]
-			if i > 0 && assetP.AssetId <= sa.GetAssetPositions()[i-1].AssetId {
-				return ErrAssetPositionsOutOfOrder
-			}
-			// TODO(DEC-582): once we support different assets, remove this validation.
-			if assetP.AssetId != 0 {
-				return ErrAssetPositionNotSupported
-			}
 			if assetP.GetBigQuantums().Sign() == 0 {
 				return ErrAssetPositionZeroQuantum
 			}

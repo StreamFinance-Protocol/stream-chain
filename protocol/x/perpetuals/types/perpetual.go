@@ -1,7 +1,6 @@
 package types
 
 import (
-	"fmt"
 	"math/big"
 
 	errorsmod "cosmossdk.io/errors"
@@ -35,14 +34,6 @@ func (p *Perpetual) GetYieldIndexAsRat() (*big.Rat, error) {
 
 // Stateless validation on Perpetual params.
 func (p *PerpetualParams) Validate() error {
-	// Check if market type is valid
-	if p.MarketType != PerpetualMarketType_PERPETUAL_MARKET_TYPE_CROSS &&
-		p.MarketType != PerpetualMarketType_PERPETUAL_MARKET_TYPE_ISOLATED {
-		return errorsmod.Wrap(
-			ErrInvalidMarketType,
-			fmt.Sprintf("market type %v", p.MarketType),
-		)
-	}
 	// Validate `ticker`.
 	if len(p.Ticker) == 0 {
 		return errors.WithStack(ErrTickerEmptyString)
@@ -54,14 +45,6 @@ func (p *PerpetualParams) Validate() error {
 		return errorsmod.Wrap(
 			ErrDefaultFundingPpmMagnitudeExceedsMax,
 			lib.IntToString(p.DefaultFundingPpm))
-	}
-
-	if p.MarketType == PerpetualMarketType_PERPETUAL_MARKET_TYPE_ISOLATED &&
-		p.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock == 0 {
-		return errorsmod.Wrap(
-			ErrIsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlockZero,
-			lib.UintToString(p.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock),
-		)
 	}
 
 	return nil

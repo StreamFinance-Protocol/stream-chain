@@ -27,7 +27,6 @@ func setupNetwork(
 	*network.Network,
 	client.Context,
 ) {
-
 	// Gock setup.
 	defer gock.Off()         // Flush pending mocks after test execution.
 	gock.DisableNetworking() // Disables real networking.xw

@@ -1,7 +1,6 @@
 package clob_test
 
 import (
-	"fmt"
 	"testing"
 
 	errorsmod "cosmossdk.io/errors"
@@ -20,7 +19,6 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/memclob"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals"
-	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices"
 	"github.com/stretchr/testify/require"
 )
 
@@ -139,7 +137,6 @@ func TestGenesis(t *testing.T) {
 						BankruptcyAdjustmentPpm:           lib.OneMillion,
 						SpreadToMaintenanceMarginRatioPpm: 100_000,
 					},
-					MaxCumulativeInsuranceFundDelta: uint64(1_000_000_000_000),
 				},
 			},
 		},
@@ -153,18 +150,16 @@ func TestGenesis(t *testing.T) {
 						BankruptcyAdjustmentPpm:           lib.OneMillion * 10,
 						SpreadToMaintenanceMarginRatioPpm: 1,
 					},
-					MaxCumulativeInsuranceFundDelta: uint64(1_000_000_000_000),
 				},
 			},
 		},
 		"Genesis state is valid when min position liquidated is 0": {
 			genesis: types.GenesisState{
 				LiquidationsConfig: types.LiquidationsConfig{
-					InsuranceFundFeePpm:             lib.OneMillion,
-					ValidatorFeePpm:                 200_000,
-					LiquidityFeePpm:                 800_000,
-					FillablePriceConfig:             constants.FillablePriceConfig_Default,
-					MaxCumulativeInsuranceFundDelta: uint64(1_000_000_000_000),
+					InsuranceFundFeePpm: lib.OneMillion,
+					ValidatorFeePpm:     200_000,
+					LiquidityFeePpm:     800_000,
+					FillablePriceConfig: constants.FillablePriceConfig_Default,
 				},
 			},
 		},
@@ -198,7 +193,6 @@ func TestGenesis(t *testing.T) {
 						BankruptcyAdjustmentPpm:           lib.OneMillion,
 						SpreadToMaintenanceMarginRatioPpm: 100_000,
 					},
-					MaxCumulativeInsuranceFundDelta: uint64(1_000_000_000_000),
 				},
 			},
 			expectedErr:     "Asset orders are not implemented",
@@ -239,7 +233,6 @@ func TestGenesis(t *testing.T) {
 						BankruptcyAdjustmentPpm:           lib.OneMillion,
 						SpreadToMaintenanceMarginRatioPpm: 100_000,
 					},
-					MaxCumulativeInsuranceFundDelta: uint64(1_000_000_000_000),
 				},
 			},
 			expectedErr:     "Asset orders are not implemented",
@@ -255,7 +248,6 @@ func TestGenesis(t *testing.T) {
 						BankruptcyAdjustmentPpm:           lib.OneMillion,
 						SpreadToMaintenanceMarginRatioPpm: 0,
 					},
-					MaxCumulativeInsuranceFundDelta: uint64(1_000_000_000_000),
 				},
 			},
 			expectedErr:     "0 is not a valid SpreadToMaintenanceMarginRatioPpm",
@@ -271,7 +263,6 @@ func TestGenesis(t *testing.T) {
 						BankruptcyAdjustmentPpm:           lib.OneMillion,
 						SpreadToMaintenanceMarginRatioPpm: lib.OneMillion + 1,
 					},
-					MaxCumulativeInsuranceFundDelta: uint64(1_000_000_000_000),
 				},
 			},
 		},
@@ -285,7 +276,6 @@ func TestGenesis(t *testing.T) {
 						BankruptcyAdjustmentPpm:           lib.OneMillion - 1,
 						SpreadToMaintenanceMarginRatioPpm: 1,
 					},
-					MaxCumulativeInsuranceFundDelta: uint64(1_000_000_000_000),
 				},
 			},
 			expectedErr:     "999999 is not a valid BankruptcyAdjustmentPpm",
@@ -294,11 +284,10 @@ func TestGenesis(t *testing.T) {
 		"Genesis state is invalid when max liquidation fee ppm is 0": {
 			genesis: types.GenesisState{
 				LiquidationsConfig: types.LiquidationsConfig{
-					InsuranceFundFeePpm:             0,
-					ValidatorFeePpm:                 200_000,
-					LiquidityFeePpm:                 800_000,
-					FillablePriceConfig:             constants.FillablePriceConfig_Default,
-					MaxCumulativeInsuranceFundDelta: uint64(1_000_000_000_000),
+					InsuranceFundFeePpm: 0,
+					ValidatorFeePpm:     200_000,
+					LiquidityFeePpm:     800_000,
+					FillablePriceConfig: constants.FillablePriceConfig_Default,
 				},
 			},
 			expectedErr:     "0 is not a valid InsuranceFundFeePpm",
@@ -307,11 +296,10 @@ func TestGenesis(t *testing.T) {
 		"Genesis state is invalid when max liquidation fee ppm is greater than one million": {
 			genesis: types.GenesisState{
 				LiquidationsConfig: types.LiquidationsConfig{
-					InsuranceFundFeePpm:             lib.OneMillion + 1,
-					ValidatorFeePpm:                 200_000,
-					LiquidityFeePpm:                 800_000,
-					FillablePriceConfig:             constants.FillablePriceConfig_Default,
-					MaxCumulativeInsuranceFundDelta: uint64(1_000_000_000_000),
+					InsuranceFundFeePpm: lib.OneMillion + 1,
+					ValidatorFeePpm:     200_000,
+					LiquidityFeePpm:     800_000,
+					FillablePriceConfig: constants.FillablePriceConfig_Default,
 				},
 			},
 			expectedErr:     "1000001 is not a valid InsuranceFundFeePpm",
@@ -335,7 +323,6 @@ func TestGenesis(t *testing.T) {
 						BankruptcyAdjustmentPpm:           lib.OneMillion,
 						SpreadToMaintenanceMarginRatioPpm: 100_000,
 					},
-					MaxCumulativeInsuranceFundDelta: uint64(1_000_000_000_000),
 				},
 			},
 			expectedErr: "0 is not a valid NumBlocks for MaxShortTermOrdersAndCancelsPerNBlocks rate limit " +
@@ -360,7 +347,6 @@ func TestGenesis(t *testing.T) {
 						BankruptcyAdjustmentPpm:           lib.OneMillion,
 						SpreadToMaintenanceMarginRatioPpm: 100_000,
 					},
-					MaxCumulativeInsuranceFundDelta: uint64(1_000_000_000_000),
 				},
 			},
 			expectedErr: "-1 is not a valid UsdTncRequired for ShortTermOrderEquityTiers equity tier limit " +
@@ -376,7 +362,6 @@ func TestGenesis(t *testing.T) {
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, &mocks.BankKeeper{}, mockIndexerEventManager, nil)
 			ctx := ks.Ctx.WithBlockTime(constants.TimeT)
 
-			prices.InitGenesis(ctx, *ks.PricesKeeper, constants.Prices_DefaultGenesisState)
 			perpetuals.InitGenesis(ctx, *ks.PerpetualsKeeper, constants.Perpetuals_DefaultGenesisState)
 
 			// PerpetualMarketCreateEvents are emitted when initializing the genesis state, so we need to mock
@@ -401,9 +386,8 @@ func TestGenesis(t *testing.T) {
 								clobPair.SubticksPerTick,
 								clobPair.StepBaseQuantums,
 								perpetual.Params.LiquidityTier,
-								perpetual.Params.MarketType,
 								perpetual.Params.DangerIndexPpm,
-								fmt.Sprintf("%d", perpetual.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock),
+								perpetual.Params.CollateralPoolId,
 							),
 						),
 					).Once().Return()
@@ -418,16 +402,16 @@ func TestGenesis(t *testing.T) {
 						tc.expectedErrType,
 						tc.expectedErr,
 					).Error(),
-					func() { clob.InitGenesis(ctx, ks.ClobKeeper, tc.genesis) },
+					func() { clob.InitGenesis(ctx, &ks.ClobKeeper, tc.genesis) },
 				)
 				return
 			}
 
 			// Initialize the CLOB genesis state.
-			clob.InitGenesis(ctx, ks.ClobKeeper, tc.genesis)
+			clob.InitGenesis(ctx, &ks.ClobKeeper, tc.genesis)
 
 			// Export the CLOB genesis state and verify expectations.
-			got := clob.ExportGenesis(ctx, *ks.ClobKeeper)
+			got := clob.ExportGenesis(ctx, ks.ClobKeeper)
 			require.NotNil(t, got)
 			require.Equal(t, tc.genesis.ClobPairs, got.ClobPairs)
 			require.Equal(t, tc.genesis.LiquidationsConfig, got.LiquidationsConfig)

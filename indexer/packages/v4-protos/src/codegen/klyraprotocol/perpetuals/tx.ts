@@ -1,4 +1,5 @@
 import { PerpetualParams, PerpetualParamsSDKType, LiquidityTier, LiquidityTierSDKType } from "./perpetual";
+import { CollateralPool, CollateralPoolSDKType } from "./collateral";
 import { Params, ParamsSDKType } from "./params";
 import * as _m0 from "protobufjs/minimal";
 import { DeepPartial } from "../../helpers";
@@ -62,6 +63,36 @@ export interface MsgSetLiquidityTierResponse {}
 /** MsgSetLiquidityTierResponse defines the SetLiquidityTier response type. */
 
 export interface MsgSetLiquidityTierResponseSDKType {}
+/**
+ * MsgSetCollateralPool is a message used by x/gov to create or update a
+ * collateral pool.
+ */
+
+export interface MsgSetCollateralPool {
+  /** The address that controls the module. */
+  authority: string;
+  /** The collateral pool to create or update. */
+
+  collateralPool?: CollateralPool;
+}
+/**
+ * MsgSetCollateralPool is a message used by x/gov to create or update a
+ * collateral pool.
+ */
+
+export interface MsgSetCollateralPoolSDKType {
+  /** The address that controls the module. */
+  authority: string;
+  /** The collateral pool to create or update. */
+
+  collateral_pool?: CollateralPoolSDKType;
+}
+/** MsgSetCollateralPoolResponse defines the SetCollateralPool response type. */
+
+export interface MsgSetCollateralPoolResponse {}
+/** MsgSetCollateralPoolResponse defines the SetCollateralPool response type. */
+
+export interface MsgSetCollateralPoolResponseSDKType {}
 /**
  * MsgUpdatePerpetualParams is a message used by x/gov to update the parameters
  * of a perpetual.
@@ -344,6 +375,95 @@ export const MsgSetLiquidityTierResponse = {
 
   fromPartial(_: DeepPartial<MsgSetLiquidityTierResponse>): MsgSetLiquidityTierResponse {
     const message = createBaseMsgSetLiquidityTierResponse();
+    return message;
+  }
+
+};
+
+function createBaseMsgSetCollateralPool(): MsgSetCollateralPool {
+  return {
+    authority: "",
+    collateralPool: undefined
+  };
+}
+
+export const MsgSetCollateralPool = {
+  encode(message: MsgSetCollateralPool, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.authority !== "") {
+      writer.uint32(10).string(message.authority);
+    }
+
+    if (message.collateralPool !== undefined) {
+      CollateralPool.encode(message.collateralPool, writer.uint32(18).fork()).ldelim();
+    }
+
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgSetCollateralPool {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgSetCollateralPool();
+
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+
+      switch (tag >>> 3) {
+        case 1:
+          message.authority = reader.string();
+          break;
+
+        case 2:
+          message.collateralPool = CollateralPool.decode(reader, reader.uint32());
+          break;
+
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+
+    return message;
+  },
+
+  fromPartial(object: DeepPartial<MsgSetCollateralPool>): MsgSetCollateralPool {
+    const message = createBaseMsgSetCollateralPool();
+    message.authority = object.authority ?? "";
+    message.collateralPool = object.collateralPool !== undefined && object.collateralPool !== null ? CollateralPool.fromPartial(object.collateralPool) : undefined;
+    return message;
+  }
+
+};
+
+function createBaseMsgSetCollateralPoolResponse(): MsgSetCollateralPoolResponse {
+  return {};
+}
+
+export const MsgSetCollateralPoolResponse = {
+  encode(_: MsgSetCollateralPoolResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgSetCollateralPoolResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgSetCollateralPoolResponse();
+
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+
+    return message;
+  },
+
+  fromPartial(_: DeepPartial<MsgSetCollateralPoolResponse>): MsgSetCollateralPoolResponse {
+    const message = createBaseMsgSetCollateralPoolResponse();
     return message;
   }
 

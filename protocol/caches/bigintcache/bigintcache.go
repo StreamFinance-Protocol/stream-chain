@@ -33,7 +33,6 @@ func (veCache *BigIntCacheImpl) SetValue(
 ) {
 	veCache.value = value
 	veCache.txHash = txHash
-
 }
 
 func (veCache *BigIntCacheImpl) GetValue() *big.Int {

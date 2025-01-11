@@ -195,7 +195,6 @@ const (
 	AddPremiumVotes              = "add_premium_votes"
 	GetMarginRequirements        = "get_margin_requirements"
 	GetNetNotional               = "get_net_notional"
-	GetNotionalInBaseQuantums    = "get_notional_in_base_quantums"
 	GetPerpetualAndMarketPrice   = "get_perpetual_and_market_price"
 	GetAllPerpetualPricePremiums = "get_all_perpetual_price_premiums"
 	NewPremiumVotes              = "new_premium_votes"

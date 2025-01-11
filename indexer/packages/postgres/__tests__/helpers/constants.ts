@@ -36,7 +36,6 @@ import {
   OrderType,
   PerpetualMarketCreateObject,
   PerpetualMarketStatus,
-  PerpetualMarketType,
   PerpetualPositionCreateObject,
   PerpetualPositionStatus,
   PnlTicksCreateObject,
@@ -47,6 +46,7 @@ import {
   TransactionCreateObject,
   TransferCreateObject,
   YieldParamsCreateObject,
+  CollateralPoolsCreateObject,
 } from '../../src/types';
 
 export const createdDateTime: DateTime = DateTime.utc();
@@ -197,13 +197,12 @@ export const defaultPerpetualMarket: PerpetualMarketCreateObject = {
   quantumConversionExponent: -8,
   atomicResolution: -10,
   dangerIndexPpm: 1000000,
-  isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: '0',
+  collateralPoolId: 0,
   subticksPerTick: 100,
   stepBaseQuantums: 10,
   liquidityTierId: 0,
-  marketType: PerpetualMarketType.CROSS,
   baseOpenInterest: '100000',
-  perpYieldIndex: '0/1',
+  perpYieldIndex: defaultZeroPerpYieldIndex,
 };
 export const defaultPerpetualMarket2: PerpetualMarketCreateObject = {
   id: '1',
@@ -219,13 +218,12 @@ export const defaultPerpetualMarket2: PerpetualMarketCreateObject = {
   quantumConversionExponent: -6,
   atomicResolution: -18,
   dangerIndexPpm: 1000000,
-  isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: '0',
+  collateralPoolId: 0,
   subticksPerTick: 10,
   stepBaseQuantums: 1,
   liquidityTierId: 0,
-  marketType: PerpetualMarketType.CROSS,
   baseOpenInterest: '100000',
-  perpYieldIndex: '0/1',
+  perpYieldIndex: defaultZeroPerpYieldIndex,
 };
 export const defaultPerpetualMarket3: PerpetualMarketCreateObject = {
   id: '2',
@@ -241,13 +239,13 @@ export const defaultPerpetualMarket3: PerpetualMarketCreateObject = {
   quantumConversionExponent: -16,
   atomicResolution: -2,
   dangerIndexPpm: 1000000,
-  isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: '0',
+  collateralPoolId: 0,
+
   subticksPerTick: 10,
   stepBaseQuantums: 1,
   liquidityTierId: 0,
-  marketType: PerpetualMarketType.CROSS,
   baseOpenInterest: '100000',
-  perpYieldIndex: '0/1',
+  perpYieldIndex: defaultZeroPerpYieldIndex,
 };
 
 export const isolatedPerpetualMarket: PerpetualMarketCreateObject = {
@@ -264,13 +262,12 @@ export const isolatedPerpetualMarket: PerpetualMarketCreateObject = {
   quantumConversionExponent: -16,
   atomicResolution: -2,
   dangerIndexPpm: 1000000,
-  isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: '1000000',
+  collateralPoolId: 1,
   subticksPerTick: 10,
   stepBaseQuantums: 1,
   liquidityTierId: 0,
-  marketType: PerpetualMarketType.ISOLATED,
   baseOpenInterest: '100000',
-  perpYieldIndex: '0/1',
+  perpYieldIndex: defaultZeroPerpYieldIndex,
 };
 
 export const isolatedPerpetualMarket2: PerpetualMarketCreateObject = {
@@ -287,13 +284,12 @@ export const isolatedPerpetualMarket2: PerpetualMarketCreateObject = {
   quantumConversionExponent: -16,
   atomicResolution: -2,
   dangerIndexPpm: 1000000,
-  isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: '1000000',
+  collateralPoolId: 2,
   subticksPerTick: 10,
   stepBaseQuantums: 1,
   liquidityTierId: 0,
-  marketType: PerpetualMarketType.ISOLATED,
   baseOpenInterest: '100000',
-  perpYieldIndex: '0/1',
+  perpYieldIndex: defaultZeroPerpYieldIndex,
 };
 
 // ============== Orders ==============
@@ -345,8 +341,7 @@ export const defaultOrderGoodTilBlockTime: OrderCreateObject = {
   goodTilBlockTime: '2023-01-22T00:00:00.000Z',
   createdAtHeight: '1',
   orderFlags: ORDER_FLAG_LONG_TERM.toString(),
-  routerFeeSubaccountOwner: 'klyra1xxxxxx',
-  routerFeeSubaccountNumber: '0',
+  routerFeeOwner: 'klyra1xxxxxx',
 };
 
 export const defaultConditionalOrder: OrderCreateObject = {
@@ -355,8 +350,7 @@ export const defaultConditionalOrder: OrderCreateObject = {
   clientId: '3',
   orderFlags: ORDER_FLAG_CONDITIONAL.toString(),
   triggerPrice: '19000',
-  routerFeeSubaccountOwner: 'klyra1xxxxxx',
-  routerFeeSubaccountNumber: '0',
+  routerFeeOwner: 'klyra1xxxxxx',
 };
 
 export const defaultOrderId: string = OrderTable.uuid(
@@ -693,6 +687,22 @@ export const defaultLiquidityTier2: LiquidityTiersCreateObject = {
   maintenanceFractionPpm: '500000', // 50%
   openInterestLowerCap: '0',
   openInterestUpperCap: '5000000',
+};
+
+// ============== CollateralPools ==============
+
+export const defaultCollateralPool: CollateralPoolsCreateObject = {
+  id: 0,
+  maxCumulativeInsuranceFundDeltaPerBlock: 100000,
+  multiCollateralAssets: '{0}',
+  quoteAssetId: 0,
+};
+
+export const defaultCollateralPool2: CollateralPoolsCreateObject = {
+  id: 1,
+  maxCumulativeInsuranceFundDeltaPerBlock: 100000,
+  multiCollateralAssets: '{1}',
+  quoteAssetId: 1,
 };
 
 // ============== OraclePrices ==============

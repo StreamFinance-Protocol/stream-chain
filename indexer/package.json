@@ -10,8 +10,8 @@
     "build:all": "pnpm recursive run build",
     "build:prod:all": "pnpm recursive run build:prod",
     "build:watch:all": "pnpm run --parallel build:watch",
-    "lint:all": "pnpm run --parallel lint",
-    "lint:fix:all": "pnpm run --parallel lint:fix",
+    "lint:all": "pnpm run --parallel --no-bail lint",
+    "lint:all:fix": "pnpm run --parallel --no-bail lint:fix",
     "coverage:all": "pnpm recursive run --workspace-concurrency=1 coverage",
     "test:all": "pnpm recursive run --workspace-concurrency=1 test"
   },

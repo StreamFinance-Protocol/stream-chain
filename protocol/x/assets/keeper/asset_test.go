@@ -31,10 +31,24 @@ func createNAssets(
 	keeper *keeper.Keeper,
 	pricesKeeper *priceskeeper.Keeper,
 	n int,
-) ([]types.Asset, error) {
+) (nonTdaiAssets []types.Asset, tDaiAsset types.Asset, err error) {
 	items := make([]types.Asset, n)
 
 	keepertest.CreateNMarkets(t, ctx, pricesKeeper, n)
+
+	tDaiAsset, err = keeper.CreateAsset(
+		ctx,
+		constants.TDai.Id,
+		constants.TDai.Symbol,
+		constants.TDai.Denom,
+		constants.TDai.DenomExponent,
+		false,
+		constants.TDai.MarketId,
+		constants.TDai.AtomicResolution,
+		"1/1",
+		constants.TDai.MaxSlippagePpm,
+	)
+	require.NoError(t, err)
 
 	for i := range items {
 		hasMarket := i%2 == 0
@@ -52,15 +66,16 @@ func createNAssets(
 			marketId,                    // MarketId
 			int32(i),                    // AtomicResolution
 			"1/1",                       // AssetYieldIndex
+			uint32(0),                   // MaxSlippagePpm
 		)
 		if err != nil {
-			return items, err
+			return items, tDaiAsset, err
 		}
 
 		items[i] = asset
 	}
 
-	return items, nil
+	return items, tDaiAsset, nil
 }
 
 func TestCreateAsset_MarketNotFound(t *testing.T) {
@@ -76,7 +91,8 @@ func TestCreateAsset_MarketNotFound(t *testing.T) {
 		true,
 		uint32(999),
 		int32(-1),
-		"1/1", // AssetYieldIndex
+		"1/1",     // AssetYieldIndex
+		uint32(0), // MaxSlippagePpm
 	)
 	require.EqualError(t, err, errorsmod.Wrap(pricestypes.ErrMarketPriceDoesNotExist, "999").Error())
 
@@ -97,7 +113,8 @@ func TestCreateAsset_InvalidTDaiAsset(t *testing.T) {
 		true,
 		uint32(999),
 		int32(-1),
-		"1/1", // AssetYieldIndex
+		"1/1",     // AssetYieldIndex
+		uint32(0), // MaxSlippagePpm
 	)
 	require.ErrorIs(t, err, types.ErrTDaiMustBeAssetZero)
 
@@ -114,7 +131,8 @@ func TestCreateAsset_InvalidTDaiAsset(t *testing.T) {
 		true,
 		uint32(999),
 		int32(-1),
-		"1/1", // AssetYieldIndex
+		"1/1",     // AssetYieldIndex
+		uint32(0), // MaxSlippagePpm
 	)
 	require.ErrorIs(t, err, types.ErrTDaiMustBeAssetZero)
 
@@ -131,7 +149,8 @@ func TestCreateAsset_InvalidTDaiAsset(t *testing.T) {
 		true,
 		uint32(999),
 		int32(-1),
-		"1/1", // AssetYieldIndex
+		"1/1",     // AssetYieldIndex
+		uint32(0), // MaxSlippagePpm
 	)
 	require.ErrorIs(t, err, types.ErrUnexpectedTDaiDenomExponent)
 
@@ -152,7 +171,8 @@ func TestCreateAsset_MarketIdInvalid(t *testing.T) {
 		false,
 		uint32(1),
 		int32(-1),
-		"1/1", // AssetYieldIndex
+		"1/1",     // AssetYieldIndex
+		uint32(0), // MaxSlippagePpm
 	)
 	require.EqualError(t, err, errorsmod.Wrap(types.ErrInvalidMarketId, "Market ID: 1").Error())
 
@@ -175,6 +195,7 @@ func TestCreateAsset_AssetAlreadyExists(t *testing.T) {
 		0,           // marketId
 		10,          // atomicResolution
 		"1/1",       // AssetYieldIndex
+		uint32(0),   // MaxSlippagePpm
 	)
 	require.NoError(t, err)
 
@@ -189,6 +210,7 @@ func TestCreateAsset_AssetAlreadyExists(t *testing.T) {
 		0,           // marketId
 		10,          // atomicResolution
 		"1/1",       // AssetYieldIndex
+		uint32(0),   // MaxSlippagePpm
 	)
 	require.EqualError(t, err, errorsmod.Wrap(types.ErrAssetDenomAlreadyExists, "btc-denom").Error())
 
@@ -203,13 +225,14 @@ func TestCreateAsset_AssetAlreadyExists(t *testing.T) {
 		0,                // marketId
 		10,               // atomicResolution
 		"1/1",            // AssetYieldIndex
+		uint32(0),        // MaxSlippagePpm
 	)
 	require.ErrorIs(t, err, types.ErrAssetIdAlreadyExists)
 }
 
 func TestModifyAsset_Success(t *testing.T) {
 	ctx, keeper, pricesKeeper, _, _, _ := keepertest.AssetsKeepers(t, true)
-	items, err := createNAssets(t, ctx, keeper, pricesKeeper, 10)
+	items, _, err := createNAssets(t, ctx, keeper, pricesKeeper, 10)
 	require.NoError(t, err)
 
 	numMarkets := keepertest.GetNumMarkets(t, ctx, pricesKeeper)
@@ -264,7 +287,7 @@ func TestModifyAsset_NotFound(t *testing.T) {
 	require.ErrorIs(t, err, types.ErrAssetDoesNotExist)
 
 	// Actually create the asset
-	_, err = createNAssets(t, ctx, keeper, pricesKeeper, 1)
+	_, _, err = createNAssets(t, ctx, keeper, pricesKeeper, 1)
 	require.NoError(t, err)
 
 	// Expect no issue with modifying the asset now
@@ -279,7 +302,7 @@ func TestModifyAsset_NotFound(t *testing.T) {
 
 func TestModifyAsset_MarketNotFound(t *testing.T) {
 	ctx, keeper, pricesKeeper, _, _, _ := keepertest.AssetsKeepers(t, true)
-	_, err := createNAssets(t, ctx, keeper, pricesKeeper, 1)
+	_, _, err := createNAssets(t, ctx, keeper, pricesKeeper, 1)
 	require.NoError(t, err)
 
 	_, err = keeper.ModifyAsset(
@@ -293,7 +316,7 @@ func TestModifyAsset_MarketNotFound(t *testing.T) {
 
 func TestGetAsset_Success(t *testing.T) {
 	ctx, keeper, pricesKeeper, _, _, _ := keepertest.AssetsKeepers(t, true)
-	items, err := createNAssets(t, ctx, keeper, pricesKeeper, 10)
+	items, _, err := createNAssets(t, ctx, keeper, pricesKeeper, 10)
 	require.NoError(t, err)
 
 	for _, item := range items {
@@ -318,52 +341,49 @@ func TestGetAsset_NotFound(t *testing.T) {
 
 func TestGetAllAssets_Success(t *testing.T) {
 	ctx, keeper, pricesKeeper, _, _, _ := keepertest.AssetsKeepers(t, true)
-	items, err := createNAssets(t, ctx, keeper, pricesKeeper, 10)
+	items, tdai, err := createNAssets(t, ctx, keeper, pricesKeeper, 10)
 	require.NoError(t, err)
 
 	require.ElementsMatch(t,
-		nullify.Fill(items),                    //nolint:staticcheck
-		nullify.Fill(keeper.GetAllAssets(ctx)), //nolint:staticcheck
+		nullify.Fill(append([]types.Asset{tdai}, items...)), //nolint:staticcheck
+		nullify.Fill(keeper.GetAllAssets(ctx)),              //nolint:staticcheck
 	)
 }
 
 func TestGetNetCollateral(t *testing.T) {
 	ctx, keeper, pricesKeeper, _, _, _ := keepertest.AssetsKeepers(t, true)
-	_, err := createNAssets(t, ctx, keeper, pricesKeeper, 2)
+	_, _, err := createNAssets(t, ctx, keeper, pricesKeeper, 2)
 	require.NoError(t, err)
 
 	netCollateral, err := keeper.GetNetCollateral(
 		ctx,
 		types.AssetTDai.Id,
 		new(big.Int).SetInt64(100),
+		types.AssetTDai.AtomicResolution,
 	)
 	require.NoError(t, err)
 	require.Equal(t, new(big.Int).SetInt64(100), netCollateral)
 
-	_, err = keeper.GetNetCollateral(
+	netCollateral, err = keeper.GetNetCollateral(
 		ctx,
-		uint32(1),
-		new(big.Int).SetInt64(100),
-	)
-	require.EqualError(t, types.ErrNotImplementedMulticollateral, err.Error())
-
-	_, err = keeper.GetNetCollateral(
-		ctx,
-		uint32(1),
+		types.AssetTDai.Id,
 		new(big.Int).SetInt64(-100),
+		types.AssetTDai.AtomicResolution,
 	)
-	require.EqualError(t, types.ErrNotImplementedMargin, err.Error())
+	require.NoError(t, err)
+	require.Equal(t, new(big.Int).SetInt64(-100), netCollateral)
 }
 
 func TestGetMarginRequirements(t *testing.T) {
 	ctx, keeper, pricesKeeper, _, _, _ := keepertest.AssetsKeepers(t, true)
-	_, err := createNAssets(t, ctx, keeper, pricesKeeper, 2)
+	_, _, err := createNAssets(t, ctx, keeper, pricesKeeper, 2)
 	require.NoError(t, err)
 
 	initial, maintenance, err := keeper.GetMarginRequirements(
 		ctx,
 		types.AssetTDai.Id,
 		new(big.Int).SetInt64(100),
+		types.AssetTDai.AtomicResolution,
 	)
 	require.NoError(t, err)
 	require.Equal(t, new(big.Int), initial)
@@ -373,17 +393,11 @@ func TestGetMarginRequirements(t *testing.T) {
 		ctx,
 		uint32(1),
 		new(big.Int).SetInt64(100),
+		types.AssetTDai.AtomicResolution,
 	)
 	require.NoError(t, err)
 	require.Equal(t, new(big.Int), initial)
 	require.Equal(t, new(big.Int), maintenance)
-
-	_, _, err = keeper.GetMarginRequirements(
-		ctx,
-		uint32(1),
-		new(big.Int).SetInt64(-100),
-	)
-	require.EqualError(t, types.ErrNotImplementedMargin, err.Error())
 }
 
 func TestConvertAssetToCoin_Success(t *testing.T) {
@@ -476,7 +490,8 @@ func TestConvertAssetToCoin_Success(t *testing.T) {
 				false,
 				0,
 				tc.atomicResolution,
-				"1/1", // AssetYieldIndex
+				"1/1",     // AssetYieldIndex
+				uint32(0), // MaxSlippagePpm
 			)
 			require.NoError(t, err)
 
@@ -532,7 +547,8 @@ func TestConvertAssetToCoin_Failure(t *testing.T) {
 		false,
 		0,
 		-6,
-		"1/1", // AssetYieldIndex
+		"1/1",     // AssetYieldIndex
+		uint32(0), // MaxSlippagePpm
 	)
 	require.NoError(t, err)
 
@@ -552,8 +568,9 @@ func TestConvertAssetToCoin_Failure(t *testing.T) {
 		-6,
 		false,
 		0,
-		-50,   /* invalid asset atomic resolution */
-		"1/1", // AssetYieldIndex
+		-50,       /* invalid asset atomic resolution */
+		"1/1",     // AssetYieldIndex
+		uint32(0), // MaxSlippagePpm
 	)
 	require.NoError(t, err)
 	_, _, err = keeper.ConvertAssetToCoin(ctx, 2, big.NewInt(100))
@@ -654,7 +671,8 @@ func TestConvertCoinToAsset_Success(t *testing.T) {
 				false,
 				0,
 				tc.atomicResolution,
-				"1/1", // AssetYieldIndex
+				"1/1",     // AssetYieldIndex
+				uint32(0), // MaxSlippagePpm
 			)
 			require.NoError(t, err)
 
@@ -716,7 +734,8 @@ func TestConvertCoinToAsset_Failure(t *testing.T) {
 		false,
 		0,
 		-6,
-		"1/1", // AssetYieldIndex
+		"1/1",     // AssetYieldIndex
+		uint32(0), // MaxSlippagePpm
 	)
 	require.NoError(t, err)
 
@@ -739,8 +758,9 @@ func TestConvertCoinToAsset_Failure(t *testing.T) {
 		-6,
 		false,
 		0,
-		-50,   /* invalid asset atomic resolution */
-		"1/1", // AssetYieldIndex
+		-50,       /* invalid asset atomic resolution */
+		"1/1",     // AssetYieldIndex
+		uint32(0), // MaxSlippagePpm
 	)
 	require.NoError(t, err)
 	quantums, convertedDenom, err = keeper.ConvertCoinToAsset(ctx, 2, sdk.NewCoin("test-denom-2", sdkmath.NewInt(100)))
@@ -755,8 +775,12 @@ func TestConvertCoinToAsset_Failure(t *testing.T) {
 }
 
 func TestIsPositionUpdatable(t *testing.T) {
-	ctx, keeper, _, _, _, _ := keepertest.AssetsKeepers(t, true)
+	ctx, keeper, pricesKeeper, _, _, _ := keepertest.AssetsKeepers(t, true)
+
+	keepertest.CreateTestMarkets(t, ctx, pricesKeeper)
+
 	require.NoError(t, keepertest.CreateTDaiAsset(ctx, keeper))
+	require.NoError(t, keepertest.CreateBTCAsset(ctx, keeper))
 
 	// Check TDai asset is updatable.
 	updatable, err := keeper.IsPositionUpdatable(ctx, types.AssetTDai.Id)
@@ -766,4 +790,117 @@ func TestIsPositionUpdatable(t *testing.T) {
 	// Return error for non-existent asset
 	_, err = keeper.IsPositionUpdatable(ctx, 100)
 	require.ErrorContains(t, err, "Asset does not exist")
+}
+
+func TestGetNetCollateralWithSlippage(t *testing.T) {
+	tests := map[string]struct {
+		asset          types.Asset
+		bigQuantums    *big.Int
+		expectedResult *big.Int
+		expectedError  error
+	}{
+		"success - tdai no slippage adjustment": {
+			asset: types.Asset{
+				Id:               constants.TDai.Id,
+				Symbol:           constants.TDai.Symbol,
+				Denom:            constants.TDai.Denom,
+				DenomExponent:    constants.TDai.DenomExponent,
+				HasMarket:        constants.TDai.HasMarket,
+				MarketId:         constants.TDai.MarketId,
+				AtomicResolution: constants.TDai.AtomicResolution,
+				MaxSlippagePpm:   constants.TDai.MaxSlippagePpm,
+			},
+			bigQuantums:    big.NewInt(1_000_000),
+			expectedResult: big.NewInt(1_000_000),
+		},
+		"success - tdai with slippage adjustment": {
+			asset: types.Asset{
+				Id:               constants.TDai.Id,
+				Symbol:           constants.TDai.Symbol,
+				Denom:            constants.TDai.Denom,
+				DenomExponent:    constants.TDai.DenomExponent,
+				HasMarket:        constants.TDai.HasMarket,
+				MarketId:         constants.TDai.MarketId,
+				AtomicResolution: constants.TDai.AtomicResolution,
+				MaxSlippagePpm:   uint32(10_000), // 1%
+			},
+			bigQuantums:    big.NewInt(1_000_000),
+			expectedResult: big.NewInt(990_000),
+		},
+		"success - BTC with no slippage": {
+			asset: types.Asset{
+				Id:               constants.BtcUsd.Id,
+				Symbol:           constants.BtcUsd.Symbol,
+				Denom:            constants.BtcUsd.Denom,
+				DenomExponent:    constants.BtcUsd.DenomExponent,
+				HasMarket:        constants.BtcUsd.HasMarket,
+				MarketId:         constants.BtcUsd.MarketId,
+				AtomicResolution: constants.BtcUsd.AtomicResolution,
+				MaxSlippagePpm:   constants.BtcUsd.MaxSlippagePpm,
+			},
+			bigQuantums:    big.NewInt(1_000_000),
+			expectedResult: big.NewInt(10_000),
+		},
+		"success - BTC with slippage": {
+			asset: types.Asset{
+				Id:               constants.BtcUsd.Id,
+				Symbol:           constants.BtcUsd.Symbol,
+				Denom:            constants.BtcUsd.Denom,
+				DenomExponent:    constants.BtcUsd.DenomExponent,
+				HasMarket:        constants.BtcUsd.HasMarket,
+				MarketId:         constants.BtcUsd.MarketId,
+				AtomicResolution: constants.BtcUsd.AtomicResolution,
+				MaxSlippagePpm:   uint32(10_000), // 1%
+			},
+			bigQuantums:    big.NewInt(1_000_000),
+			expectedResult: big.NewInt(9900),
+		},
+		"success - BTC with large slippage": {
+			asset: types.Asset{
+				Id:               constants.BtcUsd.Id,
+				Symbol:           constants.BtcUsd.Symbol,
+				Denom:            constants.BtcUsd.Denom,
+				DenomExponent:    constants.BtcUsd.DenomExponent,
+				HasMarket:        constants.BtcUsd.HasMarket,
+				MarketId:         constants.BtcUsd.MarketId,
+				AtomicResolution: constants.BtcUsd.AtomicResolution,
+				MaxSlippagePpm:   uint32(500_000), // 50%
+			},
+			bigQuantums:    big.NewInt(1_000_000),
+			expectedResult: big.NewInt(5_000),
+		},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			ctx, keeper, pricesKeeper, _, _, _ := keepertest.AssetsKeepers(t, true)
+
+			// Set up test markets
+			keepertest.CreateTestMarkets(t, ctx, pricesKeeper)
+
+			// Create the asset
+			_, err := keeper.CreateAsset(
+				ctx,
+				tc.asset.Id,
+				tc.asset.Symbol,
+				tc.asset.Denom,
+				tc.asset.DenomExponent,
+				tc.asset.HasMarket,
+				tc.asset.MarketId,
+				tc.asset.AtomicResolution,
+				tc.asset.AssetYieldIndex,
+				tc.asset.MaxSlippagePpm,
+			)
+			require.NoError(t, err)
+
+			result, err := keeper.GetNetCollateral(ctx, tc.asset.Id, tc.bigQuantums, types.AssetTDai.DenomExponent)
+
+			if tc.expectedError != nil {
+				require.ErrorIs(t, err, tc.expectedError)
+			} else {
+				require.NoError(t, err)
+				require.Equal(t, tc.expectedResult, result)
+			}
+		})
+	}
 }

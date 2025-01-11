@@ -56,14 +56,15 @@ func SubaccountsKeepers(
 		// Define necessary keepers here for unit tests
 		pricesKeeper, _, _, _, mockTimeProvider = createPricesKeeper(stateStore, db, cdc, transientStoreKey)
 		epochsKeeper, _ := createEpochsKeeper(stateStore, db, cdc)
-		perpetualsKeeper, _ = createPerpetualsKeeper(stateStore, db, cdc, pricesKeeper, epochsKeeper, transientStoreKey)
 		assetsKeeper, _ = createAssetsKeeper(stateStore, db, cdc, pricesKeeper, transientStoreKey, msgSenderEnabled)
+		perpetualsKeeper, _ = createPerpetualsKeeper(stateStore, db, cdc, pricesKeeper, epochsKeeper, assetsKeeper, nil, transientStoreKey)
 
 		accountKeeper, _ = createAccountKeeper(stateStore, db, cdc, registry)
 		blocktimeKeeper, _ = createBlockTimeKeeper(stateStore, db, cdc)
 
 		bankKeeper, _ = createBankKeeper(stateStore, db, cdc, accountKeeper)
 		ratelimitKeeper, _ = createRatelimitKeeper(stateStore, db, cdc, blocktimeKeeper, bankKeeper, perpetualsKeeper, assetsKeeper, transientStoreKey, msgSenderEnabled)
+
 		keeper, storeKey = createSubaccountsKeeper(
 			stateStore,
 			db,
@@ -131,12 +132,33 @@ func CreateTDaiAssetPosition(
 	}
 }
 
+func CreateBtcAssetPosition(
+	quoteBalance *big.Int,
+) []*types.AssetPosition {
+	return []*types.AssetPosition{
+		{
+			AssetId:  assettypes.AssetBtc.Id,
+			Quantums: dtypes.NewIntFromBigInt(quoteBalance),
+		},
+	}
+}
 func CreateTDaiAssetUpdate(
 	deltaQuoteBalance *big.Int,
 ) []types.AssetUpdate {
 	return []types.AssetUpdate{
 		{
 			AssetId:          assettypes.AssetTDai.Id,
+			BigQuantumsDelta: deltaQuoteBalance,
+		},
+	}
+}
+
+func CreateBTCAssetUpdate(
+	deltaQuoteBalance *big.Int,
+) []types.AssetUpdate {
+	return []types.AssetUpdate{
+		{
+			AssetId:          assettypes.AssetBtc.Id,
 			BigQuantumsDelta: deltaQuoteBalance,
 		},
 	}

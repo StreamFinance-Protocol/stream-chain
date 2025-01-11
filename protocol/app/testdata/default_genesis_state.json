@@ -9,7 +9,19 @@
         "has_market": false,
         "market_id": 0,
         "atomic_resolution": -6,
-        "asset_yield_index": "1/1"
+        "asset_yield_index": "1/1",
+        "max_slippage_ppm": 0
+      },
+      {
+        "id": 1,
+        "symbol": "BTC",
+        "denom": "btc-denom",
+        "denom_exponent": -8,
+        "has_market": false,
+        "market_id": 0,
+        "atomic_resolution": -8,
+        "asset_yield_index": "",
+        "max_slippage_ppm": 0
       }
     ]
   },
@@ -57,8 +69,7 @@
       "fillable_price_config": {
         "bankruptcy_adjustment_ppm": 1000000,
         "spread_to_maintenance_margin_ratio_ppm": 100000
-      },
-      "max_cumulative_insurance_fund_delta": "1000000000000"
+      }
     },
     "block_rate_limit_config": {
       "max_short_term_order_cancellations_per_n_blocks": [],
@@ -322,6 +333,32 @@
   },
   "params": null,
   "perpetuals": {
+    "collateral_pools": [
+      {
+        "collateral_pool_id": 0,
+        "max_cumulative_insurance_fund_delta_per_block": "1000000000000",
+        "multi_collateral_assets": {
+          "multi_collateral_assets": [0]
+        },
+        "quote_asset_id": 0
+      },
+      {
+        "collateral_pool_id": 1,
+        "max_cumulative_insurance_fund_delta_per_block": "1000000000000",
+        "multi_collateral_assets": {
+          "multi_collateral_assets": [1]
+        },
+        "quote_asset_id": 1
+      },
+      {
+        "collateral_pool_id": 2,
+        "max_cumulative_insurance_fund_delta_per_block": "1000000000000",
+        "multi_collateral_assets": {
+          "multi_collateral_assets": [0]
+        },
+        "quote_asset_id": 0
+      }
+    ],
     "perpetuals": [],
     "liquidity_tiers": [],
     "params": {

@@ -5,13 +5,10 @@ import (
 	"fmt"
 	"log"
 
-	"crypto/ed25519"
-
 	cometbfted25519 "github.com/cometbft/cometbft/crypto/ed25519"
 	"github.com/cosmos/cosmos-sdk/crypto"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
-	cosmosed25519 "github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -88,15 +85,6 @@ func loadPrivKeyFromBase64(encodedKey string) cometbfted25519.PrivKey {
 	return cometbfted25519.PrivKey(privKeyBytes)
 }
 
-func buildPrivKeyFromKeyString(privKey string) cryptotypes.PrivKey {
-	privKeyBytes, err := base64.StdEncoding.DecodeString(privKey)
-	if err != nil {
-		panic(fmt.Errorf("failed to decode private key: %w", err))
-	}
-	key := &cosmosed25519.PrivKey{Key: privKeyBytes[:ed25519.PrivateKeySize]}
-	return key
-}
-
 func privateKeyFromMnenomic(mnenomic string) cryptotypes.PrivKey {
 	kb := keyring.NewInMemory(TestEncodingCfg.Codec)
 	_, err := kb.NewAccount("uid", mnenomic, "", sdk.GetConfig().GetFullBIP44Path(), hd.Secp256k1)
@@ -137,7 +125,6 @@ func GetPrivateKeyFromAddress(accAddress string) cryptotypes.PrivKey {
 }
 
 func GetPrivKeyFromConsAddress(consAddr sdk.ConsAddress) cometbfted25519.PrivKey {
-
 	privKey, exists := privateConsMap[consAddr.String()]
 	if !exists {
 		panic(fmt.Errorf(
@@ -158,7 +145,6 @@ func GetPrivKeyFromValidatorAddress(validatorAddr sdk.ValAddress) cryptotypes.Pr
 }
 
 func GetPrivKeyFromValidatorAddressString(validatorAddrString string) cryptotypes.PrivKey {
-
 	privKey, exists := privateKeyValidatorMap[validatorAddrString]
 	if !exists {
 		panic(fmt.Errorf(
@@ -169,7 +155,6 @@ func GetPrivKeyFromValidatorAddressString(validatorAddrString string) cryptotype
 }
 
 func GetEddsaPrivKeyFromValidatorAddressString(validatorAddrString string) cometbfted25519.PrivKey {
-
 	privKey, exists := eddsaPrivateKeyValidatorMap[validatorAddrString]
 	if !exists {
 		panic(fmt.Errorf(

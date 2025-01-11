@@ -24,13 +24,14 @@ func (k Keeper) ClaimYieldForSubaccountFromIdAndSetNewState(
 	}
 
 	subaccount := k.GetSubaccount(ctx, *subaccountId)
-	if len(subaccount.AssetPositions) == 0 && len(subaccount.PerpetualPositions) == 0 {
-		return types.ErrNoYieldToClaim
-	}
 
-	perpIdToPerp, assetYieldIndex, availableYield, err := k.fetchParamsToSettleSubaccount(ctx, subaccount)
+	perpIdToPerp, assetYieldIndex, availableYield, earnsTdaiYield, _, err := k.fetchParamsToSettleSubaccount(ctx, subaccount)
 	if err != nil {
 		return err
+	}
+
+	if !earnsTdaiYield {
+		return types.ErrNoYieldToClaim
 	}
 
 	settledSubaccount, totalYieldInQuantums, err := AddYieldToSubaccount(subaccount, perpIdToPerp, assetYieldIndex, availableYield)
@@ -48,6 +49,25 @@ func (k Keeper) ClaimYieldForSubaccountFromIdAndSetNewState(
 	return nil
 }
 
+func (k Keeper) DoesSubaccountEarnTDaiYield(
+	ctx sdk.Context,
+	subaccount types.Subaccount,
+) (
+	earnsTdaiYield bool,
+	err error,
+) {
+	if len(subaccount.PerpetualPositions) == 0 {
+		return subaccount.GetTDaiPosition().Cmp(big.NewInt(0)) != 0, nil
+	}
+
+	quoteAssetId, err := k.getQuoteAssetId(ctx, subaccount)
+	if err != nil {
+		return false, err
+	}
+
+	return quoteAssetId == assettypes.AssetTDai.Id, nil
+}
+
 func AddYieldToSubaccount(
 	subaccount types.Subaccount,
 	perpIdToPerp map[uint32]perptypes.Perpetual,
@@ -63,7 +83,7 @@ func AddYieldToSubaccount(
 		return types.Subaccount{}, nil, err
 	}
 
-	totalNewPerpYield, newPerpetualPositions, err := getYieldFromPerpPositions(subaccount, perpIdToPerp)
+	totalNewPerpYield, updatedYieldIndexPerpPosition, err := getYieldFromPerpPositions(subaccount, perpIdToPerp)
 	if err != nil {
 		return types.Subaccount{}, nil, err
 	}
@@ -76,7 +96,7 @@ func AddYieldToSubaccount(
 	newSubaccount := types.Subaccount{
 		Id:                 subaccount.Id,
 		AssetPositions:     subaccount.AssetPositions,
-		PerpetualPositions: newPerpetualPositions,
+		PerpetualPositions: updatedYieldIndexPerpPosition,
 		MarginEnabled:      subaccount.MarginEnabled,
 		AssetYieldIndex:    assetYieldIndexString,
 	}
@@ -117,7 +137,7 @@ func getYieldFromAssetPositions(
 ) {
 	for _, assetPosition := range subaccount.AssetPositions {
 		if assetPosition.AssetId != assettypes.AssetTDai.Id {
-			return nil, assettypes.ErrNotImplementedMulticollateral
+			continue
 		}
 
 		newAssetYield, err := calculateAssetYieldInQuoteQuantums(subaccount, assetYieldIndex, assetPosition)
@@ -332,7 +352,7 @@ func (k Keeper) DepositYieldToSubaccount(
 		return err
 	}
 
-	collateralPoolAddr, err := k.GetCollateralPoolForSubaccount(ctx, subaccountId)
+	collateralPoolAddr, err := k.GetCollateralPoolAddressFromSubaccountId(ctx, subaccountId)
 	if err != nil {
 		return err
 	}

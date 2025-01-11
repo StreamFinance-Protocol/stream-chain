@@ -3,6 +3,7 @@ package klyraprotocol.clob;
 
 import "gogoproto/gogo.proto";
 import "klyraprotocol/subaccounts/subaccount.proto";
+import "cosmos_proto/cosmos.proto";
 
 option go_package = "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types";
 
@@ -219,7 +220,8 @@ message Order {
   // Router fee ppm for the order.
   int32 router_fee_ppm = 12;
 
-  klyraprotocol.subaccounts.SubaccountId router_subaccount_id = 13;
+  // Router fee owner.
+  string router_fee_owner = 13 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
 }
 
 // TransactionOrdering represents a unique location in the block where a

@@ -19,7 +19,7 @@ const RAW_TABLE_COLUMNS: string = `
   \`quantumConversionExponent\` int,
   \`atomicResolution\` int,
   \`dangerIndexPpm\` int,
-  \`isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock\` bigint,
+  \`collateralPoolId\` int,
   \`subticksPerTick\` int,
   \`stepBaseQuantums\` int,
   \`liquidityTierId\` int
@@ -38,13 +38,16 @@ const TABLE_COLUMNS: string = `
   "quantumConversionExponent",
   "atomicResolution",
   "dangerIndexPpm",
-  "isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock",
+  "collateralPoolId",
   "subticksPerTick",
   "stepBaseQuantums",
   "liquidityTierId"
 `;
 
-export function generateRawTable(tablePrefix: string, rdsExportIdentifier: string): string {
+export function generateRawTable(
+  tablePrefix: string,
+  rdsExportIdentifier: string,
+): string {
   return getExternalAthenaTableCreationStatement(
     tablePrefix,
     rdsExportIdentifier,

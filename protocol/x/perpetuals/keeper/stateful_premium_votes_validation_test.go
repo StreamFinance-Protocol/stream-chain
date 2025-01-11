@@ -176,7 +176,7 @@ func TestPerformStatefulPremiumVotesValidation(t *testing.T) {
 				)
 			}
 
-			_ = keepertest.CreateLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, tc.numPerpetuals)
+			_ = keepertest.CreateCollateralPoolsAndLiquidityTiersAndNPerpetuals(t, pc.Ctx, pc.PerpetualsKeeper, pc.PricesKeeper, tc.numPerpetuals)
 
 			// Run.
 			msg := &types.MsgAddPremiumVotes{

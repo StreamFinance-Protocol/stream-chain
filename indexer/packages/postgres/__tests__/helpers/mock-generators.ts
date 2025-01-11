@@ -4,6 +4,8 @@ import {
   defaultAsset3,
   defaultBlock,
   defaultBlock2,
+  defaultCollateralPool,
+  defaultCollateralPool2,
   defaultLiquidityTier,
   defaultLiquidityTier2,
   defaultMarket,
@@ -27,6 +29,7 @@ import {
 } from './constants';
 import * as AssetTable from '../../src/stores/asset-table';
 import * as BlockTable from '../../src/stores/block-table';
+import * as CollateralPoolsTable from '../../src/stores/collateral-pools-table';
 import * as LiquidityTiersTable from '../../src/stores/liquidity-tiers-table';
 import * as MarketTable from '../../src/stores/market-table';
 import * as PerpetualMarketTable from '../../src/stores/perpetual-market-table';
@@ -72,5 +75,10 @@ export async function seedData() {
     AssetTable.create(defaultAsset),
     AssetTable.create(defaultAsset2),
     AssetTable.create(defaultAsset3),
+  ]);
+
+  await Promise.all([
+    CollateralPoolsTable.create(defaultCollateralPool),
+    CollateralPoolsTable.create(defaultCollateralPool2),
   ]);
 }

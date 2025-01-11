@@ -50,8 +50,7 @@ export interface IPlaceOrder extends IBasicOrder {
   conditionType?: Order_ConditionType,
   conditionalOrderTriggerSubticks?: Long,
   routerFeePpm?: number,
-  routerFeeSubaccountOwner?: string,
-  routerFeeSubaccountNumber?: number,
+  routerFeeOwner?: string,
 }
 
 export interface ICancelOrder extends IBasicOrder {

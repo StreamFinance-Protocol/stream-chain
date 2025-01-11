@@ -42,11 +42,33 @@ func TestProcessProposerMatches_LongTerm_Success(t *testing.T) {
 				bk.On(
 					"SendCoins",
 					mock.Anything,
-					satypes.ModuleAddress,
+					satypes.CollateralPoolZeroAddress,
 					authtypes.NewModuleAddress(authtypes.FeeCollectorName),
 					mock.MatchedBy(
 						testutil_bank.MatchTDaiOfAmount(
 							25_000_000+10_000_000,
+						),
+					),
+				).Return(nil).Once()
+				bk.On(
+					"SendCoins",
+					mock.Anything,
+					satypes.CollateralPoolZeroAddress,
+					satypes.ModuleAddress,
+					mock.MatchedBy(
+						testutil_bank.MatchTDaiOfAmount(
+							100_000_000_000-25_000_000,
+						),
+					),
+				).Return(nil).Once()
+				bk.On(
+					"SendCoins",
+					mock.Anything,
+					satypes.CollateralPoolZeroAddress,
+					satypes.ModuleAddress,
+					mock.MatchedBy(
+						testutil_bank.MatchTDaiOfAmount(
+							50_000_000_000-10_000_000,
 						),
 					),
 				).Return(nil).Once()
@@ -117,11 +139,33 @@ func TestProcessProposerMatches_LongTerm_Success(t *testing.T) {
 				bk.On(
 					"SendCoins",
 					mock.Anything,
-					satypes.ModuleAddress,
+					satypes.CollateralPoolZeroAddress,
 					authtypes.NewModuleAddress(authtypes.FeeCollectorName),
 					mock.MatchedBy(
 						testutil_bank.MatchTDaiOfAmount(
 							25_000_000+10_000_000,
+						),
+					),
+				).Return(nil).Once()
+				bk.On(
+					"SendCoins",
+					mock.Anything,
+					satypes.CollateralPoolZeroAddress,
+					satypes.ModuleAddress,
+					mock.MatchedBy(
+						testutil_bank.MatchTDaiOfAmount(
+							100_000_000_000-10_000_000,
+						),
+					),
+				).Return(nil).Once()
+				bk.On(
+					"SendCoins",
+					mock.Anything,
+					satypes.CollateralPoolZeroAddress,
+					satypes.ModuleAddress,
+					mock.MatchedBy(
+						testutil_bank.MatchTDaiOfAmount(
+							50_000_000_000-25_000_000,
 						),
 					),
 				).Return(nil).Once()
@@ -203,11 +247,33 @@ func TestProcessProposerMatches_LongTerm_Success(t *testing.T) {
 				bk.On(
 					"SendCoins",
 					mock.Anything,
-					satypes.ModuleAddress,
+					satypes.CollateralPoolZeroAddress,
 					authtypes.NewModuleAddress(authtypes.FeeCollectorName),
 					mock.MatchedBy(
 						testutil_bank.MatchTDaiOfAmount(
 							25_000_000+10_000_000,
+						),
+					),
+				).Return(nil).Once()
+				bk.On(
+					"SendCoins",
+					mock.Anything,
+					satypes.CollateralPoolZeroAddress,
+					satypes.ModuleAddress,
+					mock.MatchedBy(
+						testutil_bank.MatchTDaiOfAmount(
+							100_000_000_000-25_000_000,
+						),
+					),
+				).Return(nil).Once()
+				bk.On(
+					"SendCoins",
+					mock.Anything,
+					satypes.CollateralPoolZeroAddress,
+					satypes.ModuleAddress,
+					mock.MatchedBy(
+						testutil_bank.MatchTDaiOfAmount(
+							50_000_000_000-10_000_000,
 						),
 					),
 				).Return(nil).Once()
@@ -282,11 +348,33 @@ func TestProcessProposerMatches_LongTerm_Success(t *testing.T) {
 				bk.On(
 					"SendCoins",
 					mock.Anything,
-					satypes.ModuleAddress,
+					satypes.CollateralPoolZeroAddress,
 					authtypes.NewModuleAddress(authtypes.FeeCollectorName),
 					mock.MatchedBy(
 						testutil_bank.MatchTDaiOfAmount(
 							25_000_000+10_000_000,
+						),
+					),
+				).Return(nil).Once()
+				bk.On(
+					"SendCoins",
+					mock.Anything,
+					satypes.CollateralPoolZeroAddress,
+					satypes.ModuleAddress,
+					mock.MatchedBy(
+						testutil_bank.MatchTDaiOfAmount(
+							100_000_000_000-10_000_000,
+						),
+					),
+				).Return(nil).Once()
+				bk.On(
+					"SendCoins",
+					mock.Anything,
+					satypes.CollateralPoolZeroAddress,
+					satypes.ModuleAddress,
+					mock.MatchedBy(
+						testutil_bank.MatchTDaiOfAmount(
+							50_000_000_000-25_000_000,
 						),
 					),
 				).Return(nil).Once()
@@ -362,11 +450,33 @@ func TestProcessProposerMatches_LongTerm_Success(t *testing.T) {
 				bk.On(
 					"SendCoins",
 					mock.Anything,
-					satypes.ModuleAddress,
+					satypes.CollateralPoolZeroAddress,
 					authtypes.NewModuleAddress(authtypes.FeeCollectorName),
 					mock.MatchedBy(
 						testutil_bank.MatchTDaiOfAmount(
 							25_000_000+10_000_000,
+						),
+					),
+				).Return(nil).Once()
+				bk.On(
+					"SendCoins",
+					mock.Anything,
+					satypes.CollateralPoolZeroAddress,
+					satypes.ModuleAddress,
+					mock.MatchedBy(
+						testutil_bank.MatchTDaiOfAmount(
+							100_000_000_000-25_000_000,
+						),
+					),
+				).Return(nil).Once()
+				bk.On(
+					"SendCoins",
+					mock.Anything,
+					satypes.CollateralPoolZeroAddress,
+					satypes.ModuleAddress,
+					mock.MatchedBy(
+						testutil_bank.MatchTDaiOfAmount(
+							50_000_000_000-10_000_000,
 						),
 					),
 				).Return(nil).Once()
@@ -441,7 +551,7 @@ func TestProcessProposerMatches_LongTerm_Success(t *testing.T) {
 				bk.On(
 					"SendCoins",
 					mock.Anything,
-					satypes.ModuleAddress,
+					satypes.CollateralPoolZeroAddress,
 					authtypes.NewModuleAddress(authtypes.FeeCollectorName),
 					mock.MatchedBy(
 						testutil_bank.MatchTDaiOfAmount(
@@ -527,7 +637,7 @@ func TestProcessProposerMatches_LongTerm_Success(t *testing.T) {
 				bk.On(
 					"SendCoins",
 					mock.Anything,
-					satypes.ModuleAddress,
+					satypes.CollateralPoolZeroAddress,
 					authtypes.NewModuleAddress(authtypes.FeeCollectorName),
 					mock.MatchedBy(
 						testutil_bank.MatchTDaiOfAmount(
@@ -535,6 +645,28 @@ func TestProcessProposerMatches_LongTerm_Success(t *testing.T) {
 						),
 					),
 				).Return(nil).Twice()
+				bk.On(
+					"SendCoins",
+					mock.Anything,
+					satypes.CollateralPoolZeroAddress,
+					satypes.ModuleAddress,
+					mock.MatchedBy(
+						testutil_bank.MatchTDaiOfAmount(
+							100_000_000_000-10_000_000,
+						),
+					),
+				).Return(nil).Once()
+				bk.On(
+					"SendCoins",
+					mock.Anything,
+					satypes.CollateralPoolZeroAddress,
+					satypes.ModuleAddress,
+					mock.MatchedBy(
+						testutil_bank.MatchTDaiOfAmount(
+							50_000_000_000-25_000_000,
+						),
+					),
+				).Return(nil).Once()
 				bk.On(
 					"GetBalance",
 					mock.Anything,
@@ -620,17 +752,39 @@ func TestProcessProposerMatches_LongTerm_Success(t *testing.T) {
 				bk.On(
 					"SendCoins",
 					mock.Anything,
-					satypes.ModuleAddress,
+					satypes.CollateralPoolZeroAddress,
 					authtypes.NewModuleAddress(authtypes.FeeCollectorName),
 					mock.MatchedBy(testutil_bank.MatchTDaiOfAmount(10_000_000)),
 				).Return(nil)
 				bk.On(
 					"SendCoins",
 					mock.Anything,
-					satypes.ModuleAddress,
-					perptypes.InsuranceFundModuleAddress,
+					satypes.CollateralPoolZeroAddress,
+					perptypes.BaseCollateralPoolInsuranceFundModuleAddress,
 					// Subaccount pays $250 to insurance fund for liquidating 1 BTC.
 					mock.MatchedBy(testutil_bank.MatchTDaiOfAmount(250_000_000)),
+				).Return(nil).Once()
+				bk.On(
+					"SendCoins",
+					mock.Anything,
+					satypes.CollateralPoolZeroAddress,
+					satypes.ModuleAddress,
+					mock.MatchedBy(
+						testutil_bank.MatchTDaiOfAmount(
+							4_999_000_000-250_000_000,
+						),
+					),
+				).Return(nil).Once()
+				bk.On(
+					"SendCoins",
+					mock.Anything,
+					satypes.CollateralPoolZeroAddress,
+					satypes.ModuleAddress,
+					mock.MatchedBy(
+						testutil_bank.MatchTDaiOfAmount(
+							100_000_000_000-10_000_000,
+						),
+					),
 				).Return(nil).Once()
 				bk.On(
 					"GetBalance",
@@ -713,17 +867,39 @@ func TestProcessProposerMatches_LongTerm_Success(t *testing.T) {
 				bk.On(
 					"SendCoins",
 					mock.Anything,
-					satypes.ModuleAddress,
+					satypes.CollateralPoolZeroAddress,
 					authtypes.NewModuleAddress(authtypes.FeeCollectorName),
 					mock.MatchedBy(testutil_bank.MatchTDaiOfAmount(10_000_000)),
 				).Return(nil)
 				bk.On(
 					"SendCoins",
 					mock.Anything,
-					satypes.ModuleAddress,
-					perptypes.InsuranceFundModuleAddress,
+					satypes.CollateralPoolZeroAddress,
+					perptypes.BaseCollateralPoolInsuranceFundModuleAddress,
 					// Subaccount pays $250 to insurance fund for liquidating 1 BTC.
 					mock.MatchedBy(testutil_bank.MatchTDaiOfAmount(250_000_000)),
+				).Return(nil).Once()
+				bk.On(
+					"SendCoins",
+					mock.Anything,
+					satypes.CollateralPoolZeroAddress,
+					satypes.ModuleAddress,
+					mock.MatchedBy(
+						testutil_bank.MatchTDaiOfAmount(
+							4_999_000_000-250_000_000,
+						),
+					),
+				).Return(nil).Once()
+				bk.On(
+					"SendCoins",
+					mock.Anything,
+					satypes.CollateralPoolZeroAddress,
+					satypes.ModuleAddress,
+					mock.MatchedBy(
+						testutil_bank.MatchTDaiOfAmount(
+							100_000_000_000-10_000_000,
+						),
+					),
 				).Return(nil).Once()
 				bk.On(
 					"GetBalance",
@@ -806,7 +982,7 @@ func TestProcessProposerMatches_LongTerm_Success(t *testing.T) {
 				bk.On(
 					"SendCoins",
 					mock.Anything,
-					satypes.ModuleAddress,
+					satypes.CollateralPoolZeroAddress,
 					authtypes.NewModuleAddress(authtypes.FeeCollectorName),
 					mock.MatchedBy(
 						testutil_bank.MatchTDaiOfAmount(
@@ -905,7 +1081,7 @@ func TestProcessProposerMatches_LongTerm_Success(t *testing.T) {
 				bk.On(
 					"SendCoins",
 					mock.Anything,
-					satypes.ModuleAddress,
+					satypes.CollateralPoolZeroAddress,
 					authtypes.NewModuleAddress(authtypes.FeeCollectorName),
 					mock.MatchedBy(
 						testutil_bank.MatchTDaiOfAmount(

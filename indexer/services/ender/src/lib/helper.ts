@@ -26,6 +26,7 @@ import {
   OpenInterestUpdateEventV1,
   DeleveragingEventV1,
   UpdateYieldParamsEventV1,
+  CollateralPoolUpsertEvent,
 } from '@klyraprotocol-indexer/v4-protos';
 import Big from 'big.js';
 import _ from 'lodash';
@@ -49,7 +50,9 @@ export function indexerTendermintEventToTransactionIndex(
       case IndexerTendermintEvent_BlockEvent.BLOCK_EVENT_END_BLOCK:
         return -1;
       default:
-        throw new ParseMessageError(`Received V4 event with invalid block event type: ${event.blockEvent}`);
+        throw new ParseMessageError(
+          `Received V4 event with invalid block event type: ${event.blockEvent}`,
+        );
     }
   }
 
@@ -61,16 +64,15 @@ export function indexerTendermintEventToTransactionIndex(
 export function convertToSubaccountMessage(
   annotatedMessage: AnnotatedSubaccountMessage,
 ): SubaccountMessage {
-  const subaccountMessage: SubaccountMessage = _.omit(
-    annotatedMessage,
-    ['orderId', 'isFill', 'subaccountMessageContents'],
-  );
+  const subaccountMessage: SubaccountMessage = _.omit(annotatedMessage, [
+    'orderId',
+    'isFill',
+    'subaccountMessageContents',
+  ]);
   return subaccountMessage;
 }
 
-export function dateToDateTime(
-  protoTime: Date,
-): DateTime {
+export function dateToDateTime(protoTime: Date): DateTime {
   return DateTime.fromJSDate(protoTime);
 }
 
@@ -89,7 +91,7 @@ export function indexerTendermintEventToEventProtoWithType(
   // set the default version to 1
   const version: number = event.version === 0 ? 1 : event.version;
   switch (event.subtype) {
-    case (KlyraIndexerSubtypes.ORDER_FILL.toString()): {
+    case KlyraIndexerSubtypes.ORDER_FILL.toString(): {
       return {
         type: KlyraIndexerSubtypes.ORDER_FILL,
         eventProto: OrderFillEventV1.decode(eventDataBinary),
@@ -98,7 +100,7 @@ export function indexerTendermintEventToEventProtoWithType(
         blockEventIndex,
       };
     }
-    case (KlyraIndexerSubtypes.SUBACCOUNT_UPDATE.toString()): {
+    case KlyraIndexerSubtypes.SUBACCOUNT_UPDATE.toString(): {
       return {
         type: KlyraIndexerSubtypes.SUBACCOUNT_UPDATE,
         eventProto: SubaccountUpdateEventV1.decode(eventDataBinary),
@@ -107,7 +109,7 @@ export function indexerTendermintEventToEventProtoWithType(
         blockEventIndex,
       };
     }
-    case (KlyraIndexerSubtypes.TRANSFER.toString()): {
+    case KlyraIndexerSubtypes.TRANSFER.toString(): {
       return {
         type: KlyraIndexerSubtypes.TRANSFER,
         eventProto: TransferEventV1.decode(eventDataBinary),
@@ -116,7 +118,7 @@ export function indexerTendermintEventToEventProtoWithType(
         blockEventIndex,
       };
     }
-    case (KlyraIndexerSubtypes.MARKET.toString()): {
+    case KlyraIndexerSubtypes.MARKET.toString(): {
       return {
         type: KlyraIndexerSubtypes.MARKET,
         eventProto: MarketEventV1.decode(eventDataBinary),
@@ -125,7 +127,7 @@ export function indexerTendermintEventToEventProtoWithType(
         blockEventIndex,
       };
     }
-    case (KlyraIndexerSubtypes.STATEFUL_ORDER.toString()): {
+    case KlyraIndexerSubtypes.STATEFUL_ORDER.toString(): {
       return {
         type: KlyraIndexerSubtypes.STATEFUL_ORDER,
         eventProto: StatefulOrderEventV1.decode(eventDataBinary),
@@ -134,7 +136,7 @@ export function indexerTendermintEventToEventProtoWithType(
         blockEventIndex,
       };
     }
-    case (KlyraIndexerSubtypes.FUNDING.toString()): {
+    case KlyraIndexerSubtypes.FUNDING.toString(): {
       return {
         type: KlyraIndexerSubtypes.FUNDING,
         eventProto: FundingEventV1.decode(eventDataBinary),
@@ -143,7 +145,7 @@ export function indexerTendermintEventToEventProtoWithType(
         blockEventIndex,
       };
     }
-    case (KlyraIndexerSubtypes.ASSET.toString()): {
+    case KlyraIndexerSubtypes.ASSET.toString(): {
       return {
         type: KlyraIndexerSubtypes.ASSET,
         eventProto: AssetCreateEventV1.decode(eventDataBinary),
@@ -152,7 +154,7 @@ export function indexerTendermintEventToEventProtoWithType(
         blockEventIndex,
       };
     }
-    case (KlyraIndexerSubtypes.PERPETUAL_MARKET.toString()): {
+    case KlyraIndexerSubtypes.PERPETUAL_MARKET.toString(): {
       if (version === 1) {
         return {
           type: KlyraIndexerSubtypes.PERPETUAL_MARKET,
@@ -178,7 +180,7 @@ export function indexerTendermintEventToEventProtoWithType(
         return undefined;
       }
     }
-    case (KlyraIndexerSubtypes.LIQUIDITY_TIER.toString()): {
+    case KlyraIndexerSubtypes.LIQUIDITY_TIER.toString(): {
       if (version === 1) {
         return {
           type: KlyraIndexerSubtypes.LIQUIDITY_TIER,
@@ -196,7 +198,16 @@ export function indexerTendermintEventToEventProtoWithType(
         blockEventIndex,
       };
     }
-    case (KlyraIndexerSubtypes.UPDATE_PERPETUAL.toString()): {
+    case KlyraIndexerSubtypes.COLLATERAL_POOL.toString(): {
+      return {
+        type: KlyraIndexerSubtypes.COLLATERAL_POOL,
+        eventProto: CollateralPoolUpsertEvent.decode(eventDataBinary),
+        indexerTendermintEvent: event,
+        version,
+        blockEventIndex,
+      };
+    }
+    case KlyraIndexerSubtypes.UPDATE_PERPETUAL.toString(): {
       return {
         type: KlyraIndexerSubtypes.UPDATE_PERPETUAL,
         eventProto: UpdatePerpetualEventV1.decode(eventDataBinary),
@@ -205,7 +216,7 @@ export function indexerTendermintEventToEventProtoWithType(
         blockEventIndex,
       };
     }
-    case (KlyraIndexerSubtypes.UPDATE_CLOB_PAIR.toString()): {
+    case KlyraIndexerSubtypes.UPDATE_CLOB_PAIR.toString(): {
       return {
         type: KlyraIndexerSubtypes.UPDATE_CLOB_PAIR,
         eventProto: UpdateClobPairEventV1.decode(eventDataBinary),
@@ -214,7 +225,7 @@ export function indexerTendermintEventToEventProtoWithType(
         blockEventIndex,
       };
     }
-    case (KlyraIndexerSubtypes.DELEVERAGING.toString()): {
+    case KlyraIndexerSubtypes.DELEVERAGING.toString(): {
       return {
         type: KlyraIndexerSubtypes.DELEVERAGING,
         eventProto: DeleveragingEventV1.decode(eventDataBinary),
@@ -223,7 +234,7 @@ export function indexerTendermintEventToEventProtoWithType(
         blockEventIndex,
       };
     }
-    case (KlyraIndexerSubtypes.OPEN_INTEREST_UPDATE.toString()): {
+    case KlyraIndexerSubtypes.OPEN_INTEREST_UPDATE.toString(): {
       return {
         type: KlyraIndexerSubtypes.OPEN_INTEREST_UPDATE,
         eventProto: OpenInterestUpdateEventV1.decode(eventDataBinary),
@@ -232,7 +243,7 @@ export function indexerTendermintEventToEventProtoWithType(
         blockEventIndex,
       };
     }
-    case (KlyraIndexerSubtypes.YIELD_PARAMS.toString()): {
+    case KlyraIndexerSubtypes.YIELD_PARAMS.toString(): {
       return {
         type: KlyraIndexerSubtypes.YIELD_PARAMS,
         eventProto: UpdateYieldParamsEventV1.decode(eventDataBinary),
@@ -314,9 +325,9 @@ export function getWeightedAverage(
   secondPrice: string,
   secondWeight: string,
 ): string {
-  return Big(firstPrice).times(firstWeight).plus(
-    Big(secondPrice).times(secondWeight),
-  )
+  return Big(firstPrice)
+    .times(firstWeight)
+    .plus(Big(secondPrice).times(secondWeight))
     .div(Big(firstWeight).plus(secondWeight))
     .toFixed();
 }
@@ -331,6 +342,10 @@ export function perpetualPositionAndOrderSideMatching(
   perpetualPositionSide: PositionSide,
   orderSide: OrderSide,
 ): boolean {
-  return (perpetualPositionSide === PositionSide.LONG && orderSide === OrderSide.BUY) ||
-    (perpetualPositionSide === PositionSide.SHORT && orderSide === OrderSide.SELL);
+  return (
+    (perpetualPositionSide === PositionSide.LONG &&
+      orderSide === OrderSide.BUY) ||
+    (perpetualPositionSide === PositionSide.SHORT &&
+      orderSide === OrderSide.SELL)
+  );
 }

@@ -70,8 +70,7 @@ export enum QueryableField {
   ORDER_FLAGS = 'orderFlags',
   CLIENT_METADATA = 'clientMetadata',
   ROUTER_FEE_PPM = 'routerFeePpm',
-  ROUTER_FEE_SUBACCOUNT_OWNER = 'routerFeeSubaccountOwner',
-  ROUTER_FEE_SUBACCOUNT_NUMBER = 'routerFeeSubaccountNumber',
+  ROUTER_FEE_OWNER = 'routerFeeOwner',
   LIQUIDITY_TIER_ID = 'liquidityTierId',
   FEE = 'fee',
   TRIGGER_PRICE = 'triggerPrice',
@@ -151,8 +150,7 @@ export interface OrderQueryConfig extends QueryConfig {
   [QueryableField.CLIENT_METADATA]?: string;
   [QueryableField.TRIGGER_PRICE]?: string;
   [QueryableField.ROUTER_FEE_PPM]?: string;
-  [QueryableField.ROUTER_FEE_SUBACCOUNT_OWNER]?: string;
-  [QueryableField.ROUTER_FEE_SUBACCOUNT_NUMBER]?: string;
+  [QueryableField.ROUTER_FEE_OWNER]?: string;
 }
 
 export interface PerpetualMarketQueryConfig extends QueryConfig {
@@ -293,6 +291,10 @@ export interface FundingIndexUpdatesQueryConfig extends QueryConfig {
 }
 
 export interface LiquidityTiersQueryConfig extends QueryConfig {
+  [QueryableField.ID]?: string[];
+}
+
+export interface CollateralPoolsQueryConfig extends QueryConfig {
   [QueryableField.ID]?: string[];
 }
 

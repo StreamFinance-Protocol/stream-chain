@@ -60,14 +60,6 @@ func SendingKeepersWithSubaccountsKeeper(t testing.TB, saKeeper types.Subaccount
 		epochsKeeper, _ := createEpochsKeeper(stateStore, db, cdc)
 		blockTimeKeeper, _ := createBlockTimeKeeper(stateStore, db, cdc)
 		ks.PricesKeeper, _, _, _, mockTimeProvider = createPricesKeeper(stateStore, db, cdc, transientStoreKey)
-		ks.PerpetualsKeeper, _ = createPerpetualsKeeper(
-			stateStore,
-			db,
-			cdc,
-			ks.PricesKeeper,
-			epochsKeeper,
-			transientStoreKey,
-		)
 		ks.AssetsKeeper, _ = createAssetsKeeper(
 			stateStore,
 			db,
@@ -75,6 +67,16 @@ func SendingKeepersWithSubaccountsKeeper(t testing.TB, saKeeper types.Subaccount
 			ks.PricesKeeper,
 			transientStoreKey,
 			true,
+		)
+		ks.PerpetualsKeeper, _ = createPerpetualsKeeper(
+			stateStore,
+			db,
+			cdc,
+			ks.PricesKeeper,
+			epochsKeeper,
+			ks.AssetsKeeper,
+			nil,
+			transientStoreKey,
 		)
 		ks.AccountKeeper, _ = createAccountKeeper(stateStore, db, cdc, registry)
 		ks.BankKeeper, _ = createBankKeeper(stateStore, db, cdc, ks.AccountKeeper)
@@ -89,6 +91,7 @@ func SendingKeepersWithSubaccountsKeeper(t testing.TB, saKeeper types.Subaccount
 			transientStoreKey,
 			true,
 		)
+
 		if saKeeper == nil {
 			ks.SubaccountsKeeper, _ = createSubaccountsKeeper(
 				stateStore,
@@ -105,6 +108,7 @@ func SendingKeepersWithSubaccountsKeeper(t testing.TB, saKeeper types.Subaccount
 		} else {
 			ks.SubaccountsKeeper = saKeeper
 		}
+
 		ks.SendingKeeper, ks.StoreKey = createSendingKeeper(
 			stateStore,
 			db,

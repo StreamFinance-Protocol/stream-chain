@@ -1,0 +1,21 @@
+syntax = "proto3";
+package klyraprotocol.perpetuals;
+
+import "klyraprotocol/perpetuals/perpetual.proto";
+
+option go_package = "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types";
+
+// CollateralPool defines the parameters for a collateral pool.
+message CollateralPool {
+    // The id of the collateral pool.
+    uint32 collateral_pool_id = 1;
+
+    // The maximum insurance fund delta per block for isolated perpetual markets.
+    uint64 max_cumulative_insurance_fund_delta_per_block = 2;
+
+    // The multi collateral assets for the collateral pool.
+    MultiCollateralAssetsArray multi_collateral_assets = 3;
+
+    // The id of the quote asset.
+    uint32 quote_asset_id = 4;
+}

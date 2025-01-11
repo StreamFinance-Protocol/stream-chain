@@ -1,7 +1,6 @@
 package keeper_test
 
 import (
-	"errors"
 	"fmt"
 	"math"
 	"math/big"
@@ -46,25 +45,16 @@ func TestGetInsuranceFundBalanceInQuoteQuantums(t *testing.T) {
 		expectedError                error
 	}{
 		"can get zero balance": {
-			assets: []assettypes.Asset{
-				*constants.TDai,
-			},
 			perpetualId:                  0,
 			insuranceFundBalance:         new(big.Int),
 			expectedInsuranceFundBalance: big.NewInt(0),
 		},
 		"can get positive balance": {
-			assets: []assettypes.Asset{
-				*constants.TDai,
-			},
 			perpetualId:                  0,
 			insuranceFundBalance:         big.NewInt(100),
 			expectedInsuranceFundBalance: big.NewInt(100),
 		},
 		"can get greater than MaxUint64 balance": {
-			assets: []assettypes.Asset{
-				*constants.TDai,
-			},
 			perpetualId: 0,
 			insuranceFundBalance: new(big.Int).Add(
 				new(big.Int).SetUint64(math.MaxUint64),
@@ -76,25 +66,14 @@ func TestGetInsuranceFundBalanceInQuoteQuantums(t *testing.T) {
 			),
 		},
 		"can get zero balance - isolated market": {
-			assets: []assettypes.Asset{
-				*constants.TDai,
-			},
 			perpetualId:                  3, // Isolated market.
 			insuranceFundBalance:         new(big.Int),
 			expectedInsuranceFundBalance: big.NewInt(0),
 		},
 		"can get positive balance - isolated market": {
-			assets: []assettypes.Asset{
-				*constants.TDai,
-			},
 			perpetualId:                  3, // Isolated market.
 			insuranceFundBalance:         big.NewInt(100),
 			expectedInsuranceFundBalance: big.NewInt(100),
-		},
-		"panics when asset not found in state": {
-			assets:        []assettypes.Asset{},
-			perpetualId:   0,
-			expectedError: errors.New("GetInsuranceFundBalanceInQuoteQuantums: TDai asset not found in state"),
 		},
 	}
 
@@ -107,10 +86,11 @@ func TestGetInsuranceFundBalanceInQuoteQuantums(t *testing.T) {
 
 			ctx := ks.Ctx.WithIsCheckTx(true)
 			// Create the default markets.
-			keepertest.CreateTestMarkets(t, ctx, ks.PricesKeeper)
+			keepertest.CreateNonDefaultTestMarkets(t, ctx, ks.PricesKeeper)
 
 			// Create liquidity tiers.
 			keepertest.CreateTestLiquidityTiers(t, ctx, ks.PerpetualsKeeper)
+			keepertest.CreateTestCollateralPools(t, ctx, ks.PerpetualsKeeper)
 
 			keepertest.CreateTestPerpetuals(t, ctx, ks.PerpetualsKeeper)
 
@@ -125,6 +105,7 @@ func TestGetInsuranceFundBalanceInQuoteQuantums(t *testing.T) {
 					a.MarketId,
 					a.AtomicResolution,
 					a.AssetYieldIndex,
+					a.MaxSlippagePpm,
 				)
 				require.NoError(t, err)
 			}
@@ -228,21 +209,19 @@ func TestIsValidInsuranceFundDelta(t *testing.T) {
 			bankMock := &mocks.BankKeeper{}
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, bankMock, &mocks.IndexerEventManager{}, nil)
 
-			err := keepertest.CreateTDaiAsset(ks.Ctx, ks.AssetsKeeper)
-			require.NoError(t, err)
-
 			ctx := ks.Ctx.WithIsCheckTx(true)
-			keepertest.CreateTestMarkets(t, ctx, ks.PricesKeeper)
+			keepertest.CreateNonDefaultTestMarkets(t, ctx, ks.PricesKeeper)
 
 			// Create liquidity tiers.
 			keepertest.CreateTestLiquidityTiers(t, ctx, ks.PerpetualsKeeper)
+			keepertest.CreateTestCollateralPools(t, ctx, ks.PerpetualsKeeper)
 
 			keepertest.CreateTestPerpetuals(t, ctx, ks.PerpetualsKeeper)
 
 			bankMock.On(
 				"GetBalance",
 				mock.Anything,
-				perptypes.InsuranceFundModuleAddress,
+				perptypes.BaseCollateralPoolInsuranceFundModuleAddress,
 				constants.TDai.Denom,
 			).Return(
 				sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(tc.insuranceFundBalance)),
@@ -355,17 +334,14 @@ func TestCanDeleverageSubaccount(t *testing.T) {
 
 			ks.RatelimitKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
 
-			err := keepertest.CreateTDaiAsset(ks.Ctx, ks.AssetsKeeper)
-			require.NoError(t, err)
-
 			// Initialize the liquidations config.
-			err = ks.ClobKeeper.InitializeLiquidationsConfig(ks.Ctx, tc.liquidationConfig)
+			err := ks.ClobKeeper.InitializeLiquidationsConfig(ks.Ctx, tc.liquidationConfig)
 			require.NoError(t, err)
 
 			bankMock.On(
 				"GetBalance",
 				mock.Anything,
-				perptypes.InsuranceFundModuleAddress,
+				perptypes.BaseCollateralPoolInsuranceFundModuleAddress,
 				constants.TDai.Denom,
 			).Return(
 				sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(tc.insuranceFundBalance)),
@@ -377,11 +353,9 @@ func TestCanDeleverageSubaccount(t *testing.T) {
 				constants.TDai.Denom,
 			).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 
-			// Create test markets.
-			keepertest.CreateTestMarkets(t, ks.Ctx, ks.PricesKeeper)
-
 			// Create liquidity tiers.
 			keepertest.CreateTestLiquidityTiers(t, ks.Ctx, ks.PerpetualsKeeper)
+			keepertest.CreateTestCollateralPools(t, ks.Ctx, ks.PerpetualsKeeper)
 
 			// Update the prices on the test markets.
 			for marketId, oraclePrice := range tc.marketIdToOraclePriceOverride {
@@ -408,9 +382,8 @@ func TestCanDeleverageSubaccount(t *testing.T) {
 					perpetual.Params.AtomicResolution,
 					perpetual.Params.DefaultFundingPpm,
 					perpetual.Params.LiquidityTier,
-					perpetual.Params.MarketType,
 					perpetual.Params.DangerIndexPpm,
-					perpetual.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
+					perpetual.Params.CollateralPoolId,
 					perpetual.YieldIndex,
 				)
 				require.NoError(t, err)
@@ -433,9 +406,8 @@ func TestCanDeleverageSubaccount(t *testing.T) {
 							clobPair.SubticksPerTick,
 							clobPair.StepBaseQuantums,
 							perpetuals[i].Params.LiquidityTier,
-							perpetuals[i].Params.MarketType,
 							perpetuals[i].Params.DangerIndexPpm,
-							fmt.Sprintf("%d", perpetuals[i].Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock),
+							perpetuals[i].Params.CollateralPoolId,
 						),
 					),
 				).Once().Return()
@@ -566,6 +538,7 @@ func TestOffsetSubaccountPerpetualPosition(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(50_000_000), // 0.5 BTC
+							YieldIndex:  big.NewRat(0, 1).String(),
 						},
 					},
 					AssetYieldIndex: big.NewRat(1, 1).String(),
@@ -579,6 +552,7 @@ func TestOffsetSubaccountPerpetualPosition(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(50_000_000), // 0.5 BTC
+							YieldIndex:  big.NewRat(0, 1).String(),
 						},
 					},
 					AssetYieldIndex: big.NewRat(1, 1).String(),
@@ -817,14 +791,17 @@ func TestOffsetSubaccountPerpetualPosition(t *testing.T) {
 				constants.TDai.Denom,
 			).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 
-			// Create the default markets.
-			keepertest.CreateTestMarkets(t, ks.Ctx, ks.PricesKeeper)
+			bankMock.On(
+				"SendCoins",
+				mock.Anything,
+				constants.CollateralPoolAddress0,
+				constants.DummyCollateralPoolAddress,
+				mock.Anything,
+			).Return(nil)
 
 			// Create liquidity tiers.
 			keepertest.CreateTestLiquidityTiers(t, ks.Ctx, ks.PerpetualsKeeper)
-
-			err := keepertest.CreateTDaiAsset(ks.Ctx, ks.AssetsKeeper)
-			require.NoError(t, err)
+			keepertest.CreateTestCollateralPools(t, ks.Ctx, ks.PerpetualsKeeper)
 
 			perps := []perptypes.Perpetual{
 				constants.BtcUsd_100PercentMarginRequirement,
@@ -839,9 +816,8 @@ func TestOffsetSubaccountPerpetualPosition(t *testing.T) {
 					p.Params.AtomicResolution,
 					p.Params.DefaultFundingPpm,
 					p.Params.LiquidityTier,
-					p.Params.MarketType,
 					p.Params.DangerIndexPpm,
-					p.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
+					p.Params.CollateralPoolId,
 					p.YieldIndex,
 				)
 				require.NoError(t, err)
@@ -875,14 +851,13 @@ func TestOffsetSubaccountPerpetualPosition(t *testing.T) {
 							clobPair.SubticksPerTick,
 							clobPair.StepBaseQuantums,
 							perps[i].Params.LiquidityTier,
-							perps[i].Params.MarketType,
 							perps[i].Params.DangerIndexPpm,
-							fmt.Sprintf("%d", perps[i].Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock),
+							perps[i].Params.CollateralPoolId,
 						),
 					),
 				).Once().Return()
 
-				_, err = ks.ClobKeeper.CreatePerpetualClobPair(
+				_, err := ks.ClobKeeper.CreatePerpetualClobPair(
 					ks.Ctx,
 					clobPair.Id,
 					clobPair.MustGetPerpetualId(),
@@ -1260,10 +1235,12 @@ func TestProcessDeleveraging(t *testing.T) {
 					{
 						PerpetualId: 0,
 						Quantums:    dtypes.NewInt(-100_000_000), // -1 BTC
+						YieldIndex:  big.NewRat(0, 1).String(),
 					},
 					{
 						PerpetualId: 1,
 						Quantums:    dtypes.NewInt(-10_000_000_000), // -10 ETH
+						YieldIndex:  big.NewRat(0, 1).String(),
 					},
 				},
 				AssetYieldIndex: big.NewRat(1, 1).String(),
@@ -1342,14 +1319,17 @@ func TestProcessDeleveraging(t *testing.T) {
 				constants.TDai.Denom,
 			).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 
-			// Create the default markets.
-			keepertest.CreateTestMarkets(t, ks.Ctx, ks.PricesKeeper)
+			bankMock.On(
+				"SendCoins",
+				mock.Anything,
+				constants.CollateralPoolAddress0,
+				constants.DummyCollateralPoolAddress,
+				mock.Anything,
+			).Return(nil)
 
 			// Create liquidity tiers.
 			keepertest.CreateTestLiquidityTiers(t, ks.Ctx, ks.PerpetualsKeeper)
-
-			err := keepertest.CreateTDaiAsset(ks.Ctx, ks.AssetsKeeper)
-			require.NoError(t, err)
+			keepertest.CreateTestCollateralPools(t, ks.Ctx, ks.PerpetualsKeeper)
 
 			testPerps := []perptypes.Perpetual{
 				constants.BtcUsd_20PercentInitial_10PercentMaintenance,
@@ -1364,9 +1344,8 @@ func TestProcessDeleveraging(t *testing.T) {
 					p.Params.AtomicResolution,
 					p.Params.DefaultFundingPpm,
 					p.Params.LiquidityTier,
-					p.Params.MarketType,
 					p.Params.DangerIndexPpm,
-					p.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
+					p.Params.CollateralPoolId,
 					p.YieldIndex,
 				)
 				require.NoError(t, err)
@@ -1383,6 +1362,7 @@ func TestProcessDeleveraging(t *testing.T) {
 			ks.SubaccountsKeeper.SetSubaccount(ks.Ctx, tc.offsettingSubaccount)
 
 			bankruptcyPriceQuoteQuantums := new(big.Int)
+			var err error
 			if tc.expectedErr == nil {
 				bankruptcyPriceQuoteQuantums, err = ks.ClobKeeper.GetBankruptcyPriceInQuoteQuantums(
 					ks.Ctx,
@@ -1390,6 +1370,7 @@ func TestProcessDeleveraging(t *testing.T) {
 					uint32(0),
 					tc.deltaQuantums,
 				)
+
 				require.NoError(t, err)
 
 				mockIndexerEventManager.On("AddTxnEvent",
@@ -1409,6 +1390,7 @@ func TestProcessDeleveraging(t *testing.T) {
 					),
 				).Return()
 			}
+
 			err = ks.ClobKeeper.ProcessDeleveraging(
 				ks.Ctx,
 				*tc.liquidatedSubaccount.GetId(),
@@ -1417,6 +1399,9 @@ func TestProcessDeleveraging(t *testing.T) {
 				tc.deltaQuantums,
 				bankruptcyPriceQuoteQuantums,
 			)
+
+			fmt.Println(err)
+
 			if tc.expectedErr == nil {
 				require.NoError(t, err)
 
@@ -1581,14 +1566,17 @@ func TestProcessDeleveragingAtOraclePrice(t *testing.T) {
 				constants.TDai.Denom,
 			).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 
-			// Create the default markets.
-			keepertest.CreateTestMarkets(t, ks.Ctx, ks.PricesKeeper)
+			bankMock.On(
+				"SendCoins",
+				mock.Anything,
+				constants.CollateralPoolAddress0,
+				constants.DummyCollateralPoolAddress,
+				mock.Anything,
+			).Return(nil)
 
 			// Create liquidity tiers.
 			keepertest.CreateTestLiquidityTiers(t, ks.Ctx, ks.PerpetualsKeeper)
-
-			err := keepertest.CreateTDaiAsset(ks.Ctx, ks.AssetsKeeper)
-			require.NoError(t, err)
+			keepertest.CreateTestCollateralPools(t, ks.Ctx, ks.PerpetualsKeeper)
 
 			testPerps := []perptypes.Perpetual{
 				constants.BtcUsd_20PercentInitial_10PercentMaintenance,
@@ -1603,9 +1591,8 @@ func TestProcessDeleveragingAtOraclePrice(t *testing.T) {
 					p.Params.AtomicResolution,
 					p.Params.DefaultFundingPpm,
 					p.Params.LiquidityTier,
-					p.Params.MarketType,
 					p.Params.DangerIndexPpm,
-					p.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
+					p.Params.CollateralPoolId,
 					p.YieldIndex,
 				)
 				require.NoError(t, err)
@@ -1625,6 +1612,7 @@ func TestProcessDeleveragingAtOraclePrice(t *testing.T) {
 				ks.Ctx,
 				uint32(0),
 				tc.deltaQuantums,
+				assettypes.AssetTDai.AtomicResolution,
 			)
 			fillPriceQuoteQuantums.Neg(fillPriceQuoteQuantums)
 			require.NoError(t, err)
@@ -1712,6 +1700,7 @@ func TestProcessDeleveraging_Rounding(t *testing.T) {
 					{
 						PerpetualId: 0,
 						Quantums:    dtypes.NewInt(-100_000_000), // -1 BTC
+						YieldIndex:  big.NewRat(0, 1).String(),
 					},
 				},
 				AssetYieldIndex: "1/1",
@@ -1732,6 +1721,7 @@ func TestProcessDeleveraging_Rounding(t *testing.T) {
 					{
 						PerpetualId: 0,
 						Quantums:    dtypes.NewInt(100_000_000),
+						YieldIndex:  big.NewRat(0, 1).String(),
 					},
 				},
 				AssetYieldIndex: "1/1",
@@ -1757,7 +1747,6 @@ func TestProcessDeleveraging_Rounding(t *testing.T) {
 			).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 
 			// Create the default markets.
-			keepertest.CreateTestMarkets(t, ks.Ctx, ks.PricesKeeper)
 			require.NoError(
 				t,
 				ks.PricesKeeper.UpdateSpotAndPnlMarketPrices(ks.Ctx, &pricestypes.MarketPriceUpdate{
@@ -1769,9 +1758,7 @@ func TestProcessDeleveraging_Rounding(t *testing.T) {
 
 			// Create liquidity tiers.
 			keepertest.CreateTestLiquidityTiers(t, ks.Ctx, ks.PerpetualsKeeper)
-
-			err := keepertest.CreateTDaiAsset(ks.Ctx, ks.AssetsKeeper)
-			require.NoError(t, err)
+			keepertest.CreateTestCollateralPools(t, ks.Ctx, ks.PerpetualsKeeper)
 
 			testPerps := []perptypes.Perpetual{
 				constants.BtcUsd_20PercentInitial_10PercentMaintenance,
@@ -1786,9 +1773,8 @@ func TestProcessDeleveraging_Rounding(t *testing.T) {
 					p.Params.AtomicResolution,
 					p.Params.DefaultFundingPpm,
 					p.Params.LiquidityTier,
-					p.Params.MarketType,
 					p.Params.DangerIndexPpm,
-					p.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
+					p.Params.CollateralPoolId,
 					p.YieldIndex,
 				)
 				require.NoError(t, err)

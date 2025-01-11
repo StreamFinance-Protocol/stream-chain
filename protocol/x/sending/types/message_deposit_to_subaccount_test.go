@@ -37,14 +37,14 @@ func TestMsgDepositToSubaccount_ValidateBasic(t *testing.T) {
 			},
 			err: satypes.ErrInvalidSubaccountIdOwner,
 		},
-		"Non-TDai asset transfer not supported": {
+		"Non-TDai asset transfer supported": {
 			msg: types.MsgDepositToSubaccount{
 				Sender:    constants.AliceAccAddress.String(),
 				Recipient: constants.Alice_Num0,
 				AssetId:   uint32(1),
 				Quantums:  uint64(100),
 			},
-			err: types.ErrNonTDaiAssetTransferNotImplemented,
+			err: nil,
 		},
 		"Invalid quantums": {
 			msg: types.MsgDepositToSubaccount{

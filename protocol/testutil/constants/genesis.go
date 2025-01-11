@@ -43,7 +43,19 @@ const GenesisState = `{
           "id": 0,
           "market_id": 0,
           "symbol": "TDAI",
-          "asset_yield_index": "1/1"
+          "asset_yield_index": "1/1",
+          "max_slippage_ppm": 0
+        },
+        {
+          "atomic_resolution": -8,
+          "denom": "btc-denom",
+          "denom_exponent": "-8",
+          "has_market": false,
+          "id": 1,
+          "market_id": 0,
+          "symbol": "BTC",
+          "asset_yield_index": "1/1",
+          "max_slippage_ppm": 0
         }
       ]
     },
@@ -122,6 +134,10 @@ const GenesisState = `{
             {
               "denom": "utdai",
               "amount": "100000000000000000"
+            },
+            {
+              "denom": "btc-denom",
+              "amount": "100000000000000000"
             }
           ]
         },
@@ -131,6 +147,37 @@ const GenesisState = `{
             {
               "denom": "utdai",
               "amount": "1300000000000000000"
+            },
+            {
+              "denom": "btc-denom",
+              "amount": "500000000000000000"
+            }
+          ]
+        },
+        {
+          "address": "klyra1qt3f40penefk5eyemv8s2zznpzpmklkffr4czn",
+          "coins": [
+            {
+              "denom": "utdai",
+              "amount": "1300000000000000000"
+            }
+          ]
+        },
+        {
+          "address": "klyra1xs5088vrxmawlyuesrn73vye988ltm6mcxecpd",
+          "coins": [
+            {
+              "denom": "utdai",
+              "amount": "1300000000000000000"
+            }
+          ]
+        },
+        {
+          "address": "klyra1daqtvgfdcsgne505p4cltcwq5cfum94a7par8n",
+          "coins": [
+            {
+              "denom": "btc-denom",
+              "amount": "100000000000000000"
             }
           ]
         },
@@ -187,7 +234,7 @@ const GenesisState = `{
           "coins": [
             {
               "denom": "ibc/DEEFE2DEFDC8EA8879923C4CCA42BB888C3CD03FF7ECFEFB1C2FEC27A732ACC8",
-              "amount": "2600000000000000000000000000000"
+              "amount": "5200000000000000000000000000000"
             }
           ]
         }
@@ -247,6 +294,16 @@ const GenesisState = `{
           "status": "STATUS_ACTIVE",
           "step_base_quantums": 1000,
           "subticks_per_tick": 100000
+        },
+        {
+          "id": 2,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 2
+          },
+          "quantum_conversion_exponent": -8,
+          "status": "STATUS_ACTIVE",
+          "step_base_quantums": 10,
+          "subticks_per_tick": 10000
         }
       ],
       "equity_tier_limit_config": {
@@ -310,8 +367,7 @@ const GenesisState = `{
         },
         "insurance_fund_fee_ppm": 5000,
         "validator_fee_ppm": 200000,
-        "liquidity_fee_ppm": 800000,
-        "max_cumulative_insurance_fund_delta": 1000000000000
+        "liquidity_fee_ppm": 800000
       }
     },
     "crisis": {
@@ -864,6 +920,32 @@ const GenesisState = `{
       }
     },
     "perpetuals": {
+      "collateral_pools": [
+        {
+          "collateral_pool_id": 0,
+          "max_cumulative_insurance_fund_delta_per_block": 1000000000000,
+          "multi_collateral_assets": {
+            "multi_collateral_assets": [0]
+          },
+          "quote_asset_id": 0
+        },
+        {
+          "collateral_pool_id": 1,
+          "max_cumulative_insurance_fund_delta_per_block": 1000000000000,
+          "multi_collateral_assets": {
+            "multi_collateral_assets": [1]
+          },
+          "quote_asset_id": 1
+        },
+        {
+          "collateral_pool_id": 2,
+          "max_cumulative_insurance_fund_delta_per_block": 1000000000000,
+          "multi_collateral_assets": {
+            "multi_collateral_assets": [0]
+          },
+          "quote_asset_id": 0
+        }
+      ],
       "liquidity_tiers": [
         {
           "base_position_notional": 1000000000000,
@@ -872,6 +954,46 @@ const GenesisState = `{
           "initial_margin_ppm": 50000,
           "maintenance_fraction_ppm": 600000,
           "name": "Large-Cap"
+        },
+        {
+          "base_position_notional": 250000000000,
+          "id": 1,
+          "impact_notional": 5000000000,
+          "initial_margin_ppm": 100000,
+          "maintenance_fraction_ppm": 500000,
+          "name": "Mid-Cap"
+        },
+        {
+          "base_position_notional": 100000000000,
+          "id": 2,
+          "impact_notional": 2500000000,
+          "initial_margin_ppm": 200000,
+          "maintenance_fraction_ppm": 500000,
+          "name": "Long-Tail"
+        },
+        {
+          "base_position_notional": 1000000000,
+          "id": 3,
+          "impact_notional": 2500000000,
+          "initial_margin_ppm": 1000000,
+          "maintenance_fraction_ppm": 200000,
+          "name": "Safety"
+        },
+        {
+          "base_position_notional": 1000000000039,
+          "id": 4,
+          "impact_notional": 50000000000,
+          "initial_margin_ppm": 10007,
+          "maintenance_fraction_ppm": 500009,
+          "name": "test-usd-100x-liq-tier-linear"
+        },
+        {
+          "base_position_notional": 100000007,
+          "id": 5,
+          "impact_notional": 50000000000,
+          "initial_margin_ppm": 10007,
+          "maintenance_fraction_ppm": 500009,
+          "name": "test-usd-100x-liq-tier-nonlinear"
         }
       ],
       "params": {
@@ -888,9 +1010,8 @@ const GenesisState = `{
             "liquidity_tier": 0,
             "market_id": 0,
             "ticker": "BTC-USD",
-            "market_type": 0
-          },
-          "yield_index": "0/1"
+            "collateral_pool_id": 0
+          }
         },
         {
           "params": {
@@ -900,9 +1021,19 @@ const GenesisState = `{
             "liquidity_tier": 0,
             "market_id": 1,
             "ticker": "ETH-USD",
-            "market_type": 0
-          },
-          "yield_index": "0/1"
+            "collateral_pool_id": 0
+          }
+        },
+        {
+          "params": {
+            "atomic_resolution": -8,
+            "default_funding_ppm": 0,
+            "id": 2,
+            "liquidity_tier": 0,
+            "market_id": 2,
+            "ticker": "LINK-BTC",
+            "collateral_pool_id": 1
+          }
         }
       ]
     },
@@ -929,7 +1060,7 @@ const GenesisState = `{
           "exponent": -8,
           "id": 2,
           "min_exchanges": 1,
-          "min_price_change_ppm": 2000,
+          "min_price_change_ppm": 1000,
           "pair": "LINK-USD"
         },
         {
@@ -1447,6 +1578,21 @@ const GenesisState = `{
         {
           "asset_positions": [
             {
+              "asset_id": 1,
+              "index": 0,
+              "quantums": "100000000000000000"
+            }
+          ],
+          "id": {
+            "number": 11,
+            "owner": "klyra199tqg4wdlnu4qjlxchpd7seg454937hju8xa57"
+          },
+          "margin_enabled": true,
+          "asset_yield_index": "1/1"
+        },
+        {
+          "asset_positions": [
+            {
               "asset_id": 0,
               "index": 0,
               "quantums": "100000000000000000"
@@ -1454,6 +1600,21 @@ const GenesisState = `{
           ],
           "id": {
             "number": 0,
+            "owner": "klyra10fx7sy6ywd5senxae9dwytf8jxek3t2g8gx9ym"
+          },
+          "margin_enabled": true,
+          "asset_yield_index": "1/1"
+        },
+        {
+          "asset_positions": [
+            {
+              "asset_id": 1,
+              "index": 0,
+              "quantums": "100000000000000000"
+            }
+          ],
+          "id": {
+            "number": 11,
             "owner": "klyra10fx7sy6ywd5senxae9dwytf8jxek3t2g8gx9ym"
           },
           "margin_enabled": true,
@@ -1477,6 +1638,21 @@ const GenesisState = `{
         {
           "asset_positions": [
             {
+              "asset_id": 1,
+              "index": 0,
+              "quantums": "100000000000000000"
+            }
+          ],
+          "id": {
+            "number": 11,
+            "owner": "klyra1fjg6zp6vv8t9wvy4lps03r5l4g7tkjw93awcky"
+          },
+          "margin_enabled": true,
+          "asset_yield_index": "1/1"
+        },
+        {
+          "asset_positions": [
+            {
               "asset_id": 0,
               "index": 0,
               "quantums": "100000000000000000"
@@ -1492,6 +1668,21 @@ const GenesisState = `{
         {
           "asset_positions": [
             {
+              "asset_id": 1,
+              "index": 0,
+              "quantums": "100000000000000000"
+            }
+          ],
+          "id": {
+            "number": 11,
+            "owner": "klyra1wau5mja7j7zdavtfq9lu7ejef05hm6ffxz2hcc"
+          },
+          "margin_enabled": true,
+          "asset_yield_index": "1/1"
+        },
+        {
+          "asset_positions": [
+            {
               "asset_id": 0,
               "index": 0,
               "quantums": "900000000000000000"
@@ -1499,6 +1690,21 @@ const GenesisState = `{
           ],
           "id": {
             "number": 0,
+            "owner": "klyra1nzuttarf5k2j0nug5yzhr6p74t9avehn6x2c0s"
+          },
+          "margin_enabled": true,
+          "asset_yield_index": "1/1"
+        },
+        {
+          "asset_positions": [
+            {
+              "asset_id": 1,
+              "index": 0,
+              "quantums": "100000000000000000"
+            }
+          ],
+          "id": {
+            "number": 11,
             "owner": "klyra1nzuttarf5k2j0nug5yzhr6p74t9avehn6x2c0s"
           },
           "margin_enabled": true,

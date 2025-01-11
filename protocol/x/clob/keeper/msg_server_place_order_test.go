@@ -3,7 +3,6 @@ package keeper_test
 import (
 	"context"
 	"errors"
-	"fmt"
 	"math/big"
 	"testing"
 	"time"
@@ -106,7 +105,7 @@ func TestPlaceOrder_Error(t *testing.T) {
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, bankMock, indexerEventManager, nil)
 			ks.RatelimitKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
 
-			msgServer := keeper.NewMsgServerImpl(ks.ClobKeeper)
+			msgServer := keeper.NewMsgServerImpl(&ks.ClobKeeper)
 
 			mockLogger := &mocks.Logger{}
 			mockLogger.On("With",
@@ -129,12 +128,12 @@ func TestPlaceOrder_Error(t *testing.T) {
 			}
 			ks.Ctx = ks.Ctx.WithLogger(mockLogger)
 
-			require.NoError(t, keepertest.CreateTDaiAsset(ks.Ctx, ks.AssetsKeeper))
 			// Create test markets.
-			keepertest.CreateTestMarkets(t, ks.Ctx, ks.PricesKeeper)
+			keepertest.CreateNonDefaultTestMarkets(t, ks.Ctx, ks.PricesKeeper)
 
 			// Create liquidity tiers.
 			keepertest.CreateTestLiquidityTiers(t, ks.Ctx, ks.PerpetualsKeeper)
+			keepertest.CreateTestCollateralPools(t, ks.Ctx, ks.PerpetualsKeeper)
 
 			require.NoError(t, ks.FeeTiersKeeper.SetPerpetualFeeParams(ks.Ctx, constants.PerpetualFeeParams))
 
@@ -148,9 +147,8 @@ func TestPlaceOrder_Error(t *testing.T) {
 				perpetual.Params.AtomicResolution,
 				perpetual.Params.DefaultFundingPpm,
 				perpetual.Params.LiquidityTier,
-				perpetual.Params.MarketType,
 				perpetual.Params.DangerIndexPpm,
-				perpetual.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
+				perpetual.Params.CollateralPoolId,
 				perpetual.YieldIndex,
 			)
 			require.NoError(t, err)
@@ -197,9 +195,8 @@ func TestPlaceOrder_Error(t *testing.T) {
 						clobPair.SubticksPerTick,
 						clobPair.StepBaseQuantums,
 						perpetual.Params.LiquidityTier,
-						perpetual.Params.MarketType,
 						perpetual.Params.DangerIndexPpm,
-						fmt.Sprintf("%d", perpetual.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock),
+						perpetual.Params.CollateralPoolId,
 					),
 				),
 			).Once().Return()
@@ -298,9 +295,7 @@ func TestPlaceOrder_Success(t *testing.T) {
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, bankMock, indexerEventManager, nil)
 			ks.RatelimitKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
 
-			msgServer := keeper.NewMsgServerImpl(ks.ClobKeeper)
-
-			require.NoError(t, keepertest.CreateTDaiAsset(ks.Ctx, ks.AssetsKeeper))
+			msgServer := keeper.NewMsgServerImpl(&ks.ClobKeeper)
 
 			ctx := ks.Ctx.WithBlockHeight(2)
 			ctx = ctx.WithBlockTime(time.Unix(int64(2), 0))
@@ -309,11 +304,9 @@ func TestPlaceOrder_Success(t *testing.T) {
 				Timestamp: time.Unix(int64(2), 0),
 			})
 
-			// Create test markets.
-			keepertest.CreateTestMarkets(t, ctx, ks.PricesKeeper)
-
 			// Create liquidity tiers.
 			keepertest.CreateTestLiquidityTiers(t, ctx, ks.PerpetualsKeeper)
+			keepertest.CreateTestCollateralPools(t, ctx, ks.PerpetualsKeeper)
 
 			require.NoError(t, ks.FeeTiersKeeper.SetPerpetualFeeParams(ctx, constants.PerpetualFeeParams))
 
@@ -327,9 +320,8 @@ func TestPlaceOrder_Success(t *testing.T) {
 				perpetual.Params.AtomicResolution,
 				perpetual.Params.DefaultFundingPpm,
 				perpetual.Params.LiquidityTier,
-				perpetual.Params.MarketType,
 				perpetual.Params.DangerIndexPpm,
-				perpetual.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock,
+				perpetual.Params.CollateralPoolId,
 				perpetual.YieldIndex,
 			)
 			require.NoError(t, err)
@@ -357,9 +349,8 @@ func TestPlaceOrder_Success(t *testing.T) {
 						clobPair.SubticksPerTick,
 						clobPair.StepBaseQuantums,
 						perpetual.Params.LiquidityTier,
-						perpetual.Params.MarketType,
 						perpetual.Params.DangerIndexPpm,
-						fmt.Sprintf("%d", perpetual.Params.IsolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock),
+						perpetual.Params.CollateralPoolId,
 					),
 				),
 			).Once().Return()

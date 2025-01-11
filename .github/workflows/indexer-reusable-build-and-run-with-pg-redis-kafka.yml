@@ -23,14 +23,13 @@ jobs:
           - 5432:5432
       redis:
         image: redis:5.0.6-alpine
-        ports: 
+        ports:
           - 6379:6379
       kafka:
         image: blacktop/kafka:2.6
         env:
           KAFKA_ADVERTISED_HOST_NAME: localhost
-          KAFKA_CREATE_TOPICS: 
-            "to-ender:1:1,\
+          KAFKA_CREATE_TOPICS: "to-ender:1:1,\
             to-vulcan:1:1,\
             to-websockets-orderbooks:1:1,\
             to-websockets-subaccounts:1:1,\
@@ -39,19 +38,30 @@ jobs:
             to-websockets-candles:1:1"
         ports:
           - 9092:9092
-      
+
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
-      
+
       - name: Install Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18.14.0
 
       - name: Install pnpm
-        run:
-          npm install -g pnpm@6.34.0
+        run: npm install -g pnpm@9.15.1
+
+      - name: Install specific npm version
+        run: npm install -g npm@9.3.1
+
+      - name: Print versions
+        run: |
+          echo "Node.js version:"
+          node -v
+          echo "npm version:"
+          npm -v
+          echo "pnpm version:"
+          pnpm -v
 
       - name: Build and install
         run: |

@@ -1,5 +1,9 @@
 import { SUBACCOUNTS_WEBSOCKET_MESSAGE_VERSION } from '@klyraprotocol-indexer/kafka';
-import { testConstants, TradeContent, TradeType } from '@klyraprotocol-indexer/postgres';
+import {
+  testConstants,
+  TradeContent,
+  TradeType,
+} from '@klyraprotocol-indexer/postgres';
 import {
   bigIntToBytes,
   ORDER_FLAG_CONDITIONAL,
@@ -28,7 +32,6 @@ import {
   OrderRemovalReason,
   PerpetualMarketCreateEventV1,
   PerpetualMarketCreateEventV2,
-  PerpetualMarketType,
   StatefulOrderEventV1,
   SubaccountMessage,
   SubaccountUpdateEventV1,
@@ -37,12 +40,20 @@ import {
   UpdateClobPairEventV1,
   UpdatePerpetualEventV1,
   UpdateYieldParamsEventV1,
+  CollateralPoolUpsertEvent,
 } from '@klyraprotocol-indexer/v4-protos';
 import Long from 'long';
 import { DateTime } from 'luxon';
 
-import { contentToSingleTradeMessage, createConsolidatedKafkaEventFromTrade } from './kafka-publisher-helpers';
-import { MILLIS_IN_NANOS, SECONDS_IN_MILLIS, ZERO_ASSET_YIELD_INDEX } from '../../src/constants';
+import {
+  contentToSingleTradeMessage,
+  createConsolidatedKafkaEventFromTrade,
+} from './kafka-publisher-helpers';
+import {
+  MILLIS_IN_NANOS,
+  SECONDS_IN_MILLIS,
+  ZERO_ASSET_YIELD_INDEX,
+} from '../../src/constants';
 import { SubaccountUpdate } from '../../src/lib/translated-types';
 import {
   ConsolidatedKafkaEvent,
@@ -54,6 +65,7 @@ import {
 
 export const defaultZeroPerpYieldIndex: string = '0/1';
 export const onePerpYieldIndex: string = '1/1';
+
 export const defaultMarketPriceUpdate: MarketEventV1 = {
   marketId: 0,
   priceUpdate: {
@@ -160,17 +172,16 @@ export const defaultPerpetualMarketCreateEventV2: PerpetualMarketCreateEventV2 =
   subticksPerTick: 100,
   stepBaseQuantums: Long.fromValue(10, true),
   liquidityTier: 0,
-  marketType: PerpetualMarketType.PERPETUAL_MARKET_TYPE_ISOLATED,
   dangerIndexPpm: 1000000,
-  isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: '1000000',
+  collateralPoolId: 0,
 };
 
 export const defaultLiquidityTierUpsertEventV2: LiquidityTierUpsertEventV2 = {
   id: 0,
   name: 'Large-Cap',
-  initialMarginPpm: 50000,  // 5%
-  maintenanceFractionPpm: 600000,  // 60% of IM = 3%
-  basePositionNotional: Long.fromValue(1_000_000_000_000, true),  // 1_000_000 TDAI
+  initialMarginPpm: 50000, // 5%
+  maintenanceFractionPpm: 600000, // 60% of IM = 3%
+  basePositionNotional: Long.fromValue(1_000_000_000_000, true), // 1_000_000 TDAI
   openInterestLowerCap: Long.fromValue(0, true),
   openInterestUpperCap: Long.fromValue(1_000_000_000_000, true),
 };
@@ -178,9 +189,16 @@ export const defaultLiquidityTierUpsertEventV2: LiquidityTierUpsertEventV2 = {
 export const defaultLiquidityTierUpsertEventV1: LiquidityTierUpsertEventV1 = {
   id: 0,
   name: 'Large-Cap',
-  initialMarginPpm: 50000,  // 5%
-  maintenanceFractionPpm: 600000,  // 60% of IM = 3%
-  basePositionNotional: Long.fromValue(1_000_000_000_000, true),  // 1_000_000 TDAI
+  initialMarginPpm: 50000, // 5%
+  maintenanceFractionPpm: 600000, // 60% of IM = 3%
+  basePositionNotional: Long.fromValue(1_000_000_000_000, true), // 1_000_000 TDAI
+};
+
+export const defaultCreateCollateralPoolEvent: CollateralPoolUpsertEvent = {
+  id: 0,
+  maxCumulativeInsuranceFundDeltaPerBlock: Long.fromValue(1000000, true),
+  multiCollateralAssets: [0],
+  quoteAssetId: 0,
 };
 
 const defaultOpenInterestUpdate1: OpenInterestUpdate = {
@@ -204,7 +222,6 @@ export const defaultUpdatePerpetualEvent: UpdatePerpetualEventV1 = {
   atomicResolution: -8,
   liquidityTier: 1,
   dangerIndexPpm: 1000000,
-  isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: '0',
   perpYieldIndex: '0/1',
 };
 
@@ -264,8 +281,7 @@ export const defaultMakerOrder: IndexerOrder = {
   conditionType: IndexerOrder_ConditionType.CONDITION_TYPE_UNSPECIFIED,
   conditionalOrderTriggerSubticks: Long.fromValue(0, true),
   routerFeePpm: 0,
-  routerFeeSubaccountOwner: 'klyra1xxxxxx',
-  routerFeeSubaccountNumber: 0,
+  routerFeeOwner: 'klyra1xxxxxx',
 };
 export const defaultTakerOrder: IndexerOrder = {
   orderId: defaultOrderId2,
@@ -279,8 +295,7 @@ export const defaultTakerOrder: IndexerOrder = {
   conditionType: IndexerOrder_ConditionType.CONDITION_TYPE_UNSPECIFIED,
   conditionalOrderTriggerSubticks: Long.fromValue(0, true),
   routerFeePpm: 0,
-  routerFeeSubaccountOwner: 'klyra1xxxxxx',
-  routerFeeSubaccountNumber: 0,
+  routerFeeOwner: 'klyra1xxxxxx',
 };
 export const defaultLiquidationOrder: LiquidationOrderV1 = {
   liquidated: defaultSubaccountId,
@@ -411,8 +426,9 @@ export const defaultTradeMessage: SingleTradeMessage = contentToSingleTradeMessa
   defaultTradeContent,
   testConstants.defaultPerpetualMarket.clobPairId,
 );
-export const defaultTradeKafkaEvent:
-ConsolidatedKafkaEvent = createConsolidatedKafkaEventFromTrade(defaultTradeMessage);
+export const defaultTradeKafkaEvent: ConsolidatedKafkaEvent = createConsolidatedKafkaEventFromTrade(
+  defaultTradeMessage,
+);
 
 export const defaultStatefulOrderPlacementEvent: StatefulOrderEventV1 = {
   orderPlace: {

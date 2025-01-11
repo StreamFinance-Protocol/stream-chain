@@ -1,7 +1,6 @@
 package clob_test
 
 import (
-	"fmt"
 	"math/big"
 	"testing"
 
@@ -315,6 +314,7 @@ func TestConditionalOrderRemoval(t *testing.T) {
 						genesisState.Perpetuals = []perptypes.Perpetual{
 							constants.BtcUsd_20PercentInitial_10PercentMaintenance,
 						}
+						genesisState.CollateralPools = constants.CollateralPools
 					},
 				)
 				testapp.UpdateGenesisDocWithAppStateForModule(
@@ -410,7 +410,7 @@ func TestConditionalOrderRemoval(t *testing.T) {
 					tApp.App,
 					testapp.MustMakeCheckTxOptions{
 						AccAddressForSigning: tc.withdrawal.Sender.Owner,
-						Gas:                  130_000,
+						Gas:                  230_000,
 						FeeAmt:               constants.TestFeeCoins_5Cents,
 					},
 					tc.withdrawal,
@@ -420,14 +420,6 @@ func TestConditionalOrderRemoval(t *testing.T) {
 			}
 			// Advance to the next block, persisting removals in operations queue to state.
 			ctx = tApp.AdvanceToBlock(4, testapp.AdvanceToBlockOptions{})
-
-			subaccounts := tApp.App.SubaccountsKeeper.GetAllSubaccount(ctx)
-			for _, subaccount := range subaccounts {
-				fmt.Println("subaccount", subaccount.Id)
-				for _, assetPosition := range subaccount.AssetPositions {
-					fmt.Println("asset position", assetPosition.AssetId, assetPosition.Quantums.String())
-				}
-			}
 
 			if tc.subsequentOrder != nil {
 				for _, checkTx := range testapp.MustMakeCheckTxsWithClobMsg(
@@ -748,6 +740,7 @@ func TestOrderRemoval_Invalid(t *testing.T) {
 						genesisState.Perpetuals = []perptypes.Perpetual{
 							constants.BtcUsd_20PercentInitial_10PercentMaintenance,
 						}
+						genesisState.CollateralPools = constants.CollateralPools
 					},
 				)
 				testapp.UpdateGenesisDocWithAppStateForModule(
@@ -1009,6 +1002,7 @@ func TestOrderRemoval(t *testing.T) {
 						genesisState.Perpetuals = []perptypes.Perpetual{
 							constants.BtcUsd_20PercentInitial_10PercentMaintenance,
 						}
+						genesisState.CollateralPools = constants.CollateralPools
 					},
 				)
 				testapp.UpdateGenesisDocWithAppStateForModule(
@@ -1134,6 +1128,7 @@ func TestOrderRemoval_MultipleReplayOperationsDuringPrepareCheckState(t *testing
 				genesisState.Perpetuals = []perptypes.Perpetual{
 					constants.BtcUsd_20PercentInitial_10PercentMaintenance,
 				}
+				genesisState.CollateralPools = constants.CollateralPools
 			},
 		)
 		testapp.UpdateGenesisDocWithAppStateForModule(
@@ -1156,14 +1151,14 @@ func TestOrderRemoval_MultipleReplayOperationsDuringPrepareCheckState(t *testing
 	tApp.App.RatelimitKeeper.SetSDAIPrice(tApp.App.NewUncachedContext(false, tmproto.Header{}), rate)
 	tApp.App.RatelimitKeeper.SetAssetYieldIndex(tApp.App.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
-	tApp.CrashingApp.RatelimitKeeper.SetSDAIPrice(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), rate)
-	tApp.CrashingApp.RatelimitKeeper.SetAssetYieldIndex(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+	tApp.ParallelApp.RatelimitKeeper.SetSDAIPrice(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), rate)
+	tApp.ParallelApp.RatelimitKeeper.SetAssetYieldIndex(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
 	tApp.NoCheckTxApp.RatelimitKeeper.SetSDAIPrice(tApp.NoCheckTxApp.NewUncachedContext(false, tmproto.Header{}), rate)
 	tApp.NoCheckTxApp.RatelimitKeeper.SetAssetYieldIndex(tApp.NoCheckTxApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
-	tApp.ParallelApp.RatelimitKeeper.SetSDAIPrice(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), rate)
-	tApp.ParallelApp.RatelimitKeeper.SetAssetYieldIndex(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+	tApp.CrashingApp.RatelimitKeeper.SetSDAIPrice(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), rate)
+	tApp.CrashingApp.RatelimitKeeper.SetAssetYieldIndex(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
 	ctx := tApp.InitChain()
 

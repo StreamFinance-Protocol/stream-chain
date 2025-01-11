@@ -7,9 +7,7 @@ import {
   NonNegativeNumericPattern,
   NumericPattern,
 } from '../lib/validators';
-import {
-  PerpetualMarketStatus, PerpetualMarketType,
-} from '../types';
+import { PerpetualMarketStatus } from '../types';
 
 export default class PerpetualMarketModel extends Model {
   static get tableName() {
@@ -64,11 +62,10 @@ export default class PerpetualMarketModel extends Model {
         'quantumConversionExponent',
         'atomicResolution',
         'dangerIndexPpm',
-        'isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock',
+        'collateralPoolId',
         'subticksPerTick',
         'stepBaseQuantums',
         'liquidityTierId',
-        'marketType',
         'perpYieldIndex',
       ],
       properties: {
@@ -76,7 +73,10 @@ export default class PerpetualMarketModel extends Model {
         clobPairId: { type: 'string', pattern: IntegerPattern },
         ticker: { type: 'string' },
         marketId: { type: 'integer' },
-        status: { type: 'string', enum: [...Object.values(PerpetualMarketStatus)] },
+        status: {
+          type: 'string',
+          enum: [...Object.values(PerpetualMarketStatus)],
+        },
         priceChange24H: { type: 'string', pattern: NumericPattern },
         volume24H: { type: 'string', pattern: NonNegativeNumericPattern },
         trades24H: { type: 'integer' },
@@ -85,11 +85,10 @@ export default class PerpetualMarketModel extends Model {
         quantumConversionExponent: { type: 'integer' },
         atomicResolution: { type: 'integer' },
         dangerIndexPpm: { type: 'integer' },
-        isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: { type: 'string', pattern: IntegerPattern },
+        collateralPoolId: { type: 'integer' },
         subticksPerTick: { type: 'integer' },
         stepBaseQuantums: { type: 'integer' },
         liquidityTierId: { type: 'integer' },
-        marketType: { type: 'string' },
         baseOpenInterest: { type: 'string', pattern: NumericPattern },
         perpYieldIndex: { type: 'string' },
       },
@@ -117,11 +116,10 @@ export default class PerpetualMarketModel extends Model {
       quantumConversionExponent: 'integer',
       atomicResolution: 'integer',
       dangerIndexPpm: 'integer',
-      isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock: 'string',
+      collateralPoolId: 'integer',
       subticksPerTick: 'integer',
       stepBaseQuantums: 'integer',
       liquidityTierId: 'integer',
-      marketType: 'string',
       baseOpenInterest: 'string',
       perpYieldIndex: 'string',
     };
@@ -153,15 +151,13 @@ export default class PerpetualMarketModel extends Model {
 
   dangerIndexPpm!: number;
 
-  isolatedMarketMaxCumulativeInsuranceFundDeltaPerBlock!: string;
+  collateralPoolId!: number;
 
   subticksPerTick!: number;
 
   stepBaseQuantums!: number;
 
   liquidityTierId!: number;
-
-  marketType!: PerpetualMarketType;
 
   baseOpenInterest!: string;
 

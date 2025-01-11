@@ -192,7 +192,7 @@ func TestNotionalToCoinAmount(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			bigRatCoinAmount := types.NotionalToCoinAmount(
 				tc.notionalQuoteQuantums,
-				lib.QuoteCurrencyAtomicResolution,
+				lib.TDAIAtomicResolution,
 				tc.denomExp,
 				tc.marketPrice,
 			)

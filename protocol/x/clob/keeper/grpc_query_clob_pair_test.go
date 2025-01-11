@@ -24,9 +24,10 @@ func TestClobPairQuerySingle(t *testing.T) {
 	mockIndexerEventManager := &mocks.IndexerEventManager{}
 	ks := keepertest.NewClobKeepersTestContext(t, memClob, &mocks.BankKeeper{}, mockIndexerEventManager, nil)
 	msgs := keepertest.CreateNClobPair(t,
-		ks.ClobKeeper,
+		&ks.ClobKeeper,
 		ks.PerpetualsKeeper,
 		ks.PricesKeeper,
+		ks.AssetsKeeper,
 		ks.Ctx,
 		2,
 		mockIndexerEventManager,
@@ -83,9 +84,10 @@ func TestClobPairQueryPaginated(t *testing.T) {
 	mockIndexerEventManager := &mocks.IndexerEventManager{}
 	ks := keepertest.NewClobKeepersTestContext(t, memClob, &mocks.BankKeeper{}, mockIndexerEventManager, nil)
 	msgs := keepertest.CreateNClobPair(t,
-		ks.ClobKeeper,
+		&ks.ClobKeeper,
 		ks.PerpetualsKeeper,
 		ks.PricesKeeper,
+		ks.AssetsKeeper,
 		ks.Ctx,
 		10,
 		mockIndexerEventManager,

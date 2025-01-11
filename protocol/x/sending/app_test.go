@@ -11,6 +11,7 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib"
 	testapp "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/app"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/rand"
+	sample_testutil "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/sample"
 	abcitypes "github.com/cometbft/cometbft/abci/types"
 	"github.com/cometbft/cometbft/types"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
@@ -25,7 +26,6 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/indexer/indexer_manager"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/indexer/msgsender"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/constants"
-	sample_testutil "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/sample"
 	assetstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	prices "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
@@ -36,7 +36,7 @@ import (
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 )
 
-func TestMsgCreateTransfer(t *testing.T) {
+func TestMsgCreateTransferWithinDummyPool(t *testing.T) {
 	tests := map[string]struct {
 		/* Setup */
 		// Initial balance of sender subaccount.
@@ -101,13 +101,12 @@ func TestMsgCreateTransfer(t *testing.T) {
 			amount:                600_000_001,
 			deliverTxFails:        true,
 		},
-		"Failure: transfer a non-TDai asset": {
-			senderSubaccountId:      constants.Alice_Num0,
-			recipientSubaccountId:   constants.Alice_Num1,
-			asset:                   *constants.BtcUsd, // non-TDai asset
-			amount:                  7_000_000,
-			checkTxResponseContains: "Non-TDai asset transfer not implemented",
-			checkTxFails:            true,
+		"Success: transfer a non-TDai asset": {
+			senderInitialBalance:  100_000_000_000,
+			senderSubaccountId:    constants.Carl_BTC,
+			recipientSubaccountId: constants.Alice_Num1,
+			asset:                 *constants.BtcUsd, // non-TDai asset
+			amount:                7_000_000,
 		},
 		"Failure: transfer zero amount": {
 			senderSubaccountId:      constants.Alice_Num0,
@@ -144,7 +143,7 @@ func TestMsgCreateTransfer(t *testing.T) {
 								Id: &(tc.senderSubaccountId),
 								AssetPositions: []*satypes.AssetPosition{
 									{
-										AssetId: constants.TDai.Id,
+										AssetId: tc.asset.Id,
 										Index:   0,
 										Quantums: dtypes.NewIntFromUint64(
 											tc.senderInitialBalance,
@@ -160,7 +159,7 @@ func TestMsgCreateTransfer(t *testing.T) {
 									Id: &(tc.recipientSubaccountId),
 									AssetPositions: []*satypes.AssetPosition{
 										{
-											AssetId: constants.TDai.Id,
+											AssetId: tc.asset.Id,
 											Index:   0,
 											Quantums: dtypes.NewIntFromUint64(
 												rand.NewRand().Uint64(),
@@ -220,7 +219,7 @@ func TestMsgCreateTransfer(t *testing.T) {
 				tApp.App,
 				testapp.MustMakeCheckTxOptions{
 					AccAddressForSigning: msgCreateTransfer.Transfer.Sender.Owner,
-					Gas:                  125_000,
+					Gas:                  225_000,
 					FeeAmt:               constants.TestFeeCoins_5Cents,
 				},
 				&msgCreateTransfer,
@@ -310,7 +309,7 @@ func TestMsgCreateTransfer(t *testing.T) {
 									[]*satypes.PerpetualPosition{},
 									[]*satypes.AssetPosition{
 										{
-											AssetId:  assetstypes.AssetTDai.Id,
+											AssetId:  tc.asset.Id,
 											Quantums: dtypes.NewIntFromBigInt(senderQuantumsAfterTransfer),
 										},
 									},
@@ -330,7 +329,7 @@ func TestMsgCreateTransfer(t *testing.T) {
 									[]*satypes.PerpetualPosition{},
 									[]*satypes.AssetPosition{
 										{
-											AssetId:  assetstypes.AssetTDai.Id,
+											AssetId:  tc.asset.Id,
 											Quantums: dtypes.NewIntFromBigInt(recipientQuantumsAfterTransfer),
 										},
 									},
@@ -362,7 +361,7 @@ func TestMsgCreateTransfer(t *testing.T) {
 	}
 }
 
-func TestMsgDepositToSubaccount(t *testing.T) {
+func TestMsgDepositToSubaccountWithinDummyPoolAndAccounts(t *testing.T) {
 	tests := map[string]struct {
 		// Account address.
 		accountAccAddress sdktypes.AccAddress
@@ -382,6 +381,8 @@ func TestMsgDepositToSubaccount(t *testing.T) {
 
 		// Whether CheckTx errors.
 		checkTxIsError bool
+
+		deliverTxFails bool
 	}{
 		"Deposit from Alice account to Alice subaccount": {
 			accountAccAddress: constants.AliceAccAddress,
@@ -406,12 +407,10 @@ func TestMsgDepositToSubaccount(t *testing.T) {
 			asset:    *constants.TDai,
 		},
 		"Deposit a non-TDai asset": {
-			accountAccAddress:       constants.AliceAccAddress,
-			subaccountId:            constants.Carl_Num0,
-			quantums:                big.NewInt(7_000_000),
-			asset:                   *constants.BtcUsd, // non-TDai asset
-			checkTxResponseContains: "Non-TDai asset transfer not implemented",
-			checkTxIsError:          true,
+			accountAccAddress: constants.CarlAccAddress,
+			subaccountId:      constants.Carl_BTC,
+			quantums:          big.NewInt(7_000_000),
+			asset:             *constants.BtcUsd, // non-TDai asset
 		},
 		"Deposit zero amount": {
 			accountAccAddress:       constants.AliceAccAddress,
@@ -430,7 +429,10 @@ func TestMsgDepositToSubaccount(t *testing.T) {
 			appOpts := map[string]interface{}{
 				indexer.MsgSenderInstanceForTest: msgSender,
 			}
-			tApp := testapp.NewTestAppBuilder(t).WithNonDeterminismChecksEnabled(false).WithAppOptions(appOpts).Build()
+			tApp := testapp.NewTestAppBuilder(t).WithAppOptions(appOpts).WithGenesisDocFn(func() (genesis types.GenesisDoc) {
+				genesis = testapp.DefaultGenesis()
+				return genesis
+			}).WithNonDeterminismChecksEnabled(false).Build()
 
 			rateString := sdaiservertypes.TestSDAIEventRequest.ConversionRate
 			rate, conversionErr := ratelimitkeeper.ConvertStringToBigInt(rateString)
@@ -485,15 +487,47 @@ func TestMsgDepositToSubaccount(t *testing.T) {
 			// Check that no indexer events are emitted so far.
 			require.Empty(t, msgSender.GetOnchainMessages())
 			// Advance to block 3 for transactions to be delivered.
-			ctx = tApp.AdvanceToBlock(3, testapp.AdvanceToBlockOptions{})
+
+			// Advance to block 3 for transactions to be delivered.
+			if tc.deliverTxFails {
+				// Check that DeliverTx fails on MsgCreateTransfer.
+				tApp.AdvanceToBlock(3, testapp.AdvanceToBlockOptions{
+					ValidateFinalizeBlock: func(
+						context sdktypes.Context,
+						request abcitypes.RequestFinalizeBlock,
+						response abcitypes.ResponseFinalizeBlock,
+					) (haltChain bool) {
+						for i, tx := range request.Txs {
+							if i == 0 {
+								// tx is empty extInfoBz
+								continue
+							}
+							if bytes.Equal(tx, CheckTx_MsgDepositToSubaccount.Tx) {
+								require.True(t, response.TxResults[i].IsErr())
+							} else {
+								require.True(t, response.TxResults[i].IsOK())
+							}
+						}
+						return false
+					},
+				})
+				return
+			} else {
+				// Advance to block 3.
+				ctx = tApp.AdvanceToBlock(3, testapp.AdvanceToBlockOptions{})
+			}
 
 			// Check expected account balance.
 			accountBalanceAfterDeposit := tApp.App.BankKeeper.GetBalance(ctx, tc.accountAccAddress, tc.asset.Denom)
-			require.Equal(
-				t,
-				accountBalanceBeforeDeposit.Sub(transferredCoin).Sub(constants.TestFeeCoins_5Cents[0]),
-				accountBalanceAfterDeposit,
-			)
+			if tc.asset.Id == assetstypes.AssetTDai.Id {
+				require.Equal(
+					t,
+					accountBalanceBeforeDeposit.Sub(transferredCoin).Sub(constants.TestFeeCoins_5Cents[0]),
+					accountBalanceAfterDeposit,
+				)
+			} else {
+				require.Equal(t, accountBalanceBeforeDeposit.Sub(transferredCoin), accountBalanceAfterDeposit)
+			}
 			// Check expected subaccount asset position.
 			subaccountQuantumsAfterDeposit :=
 				getSubaccountAssetQuantums(tApp.App.SubaccountsKeeper, ctx, tc.subaccountId, tc.asset)
@@ -520,7 +554,7 @@ func TestMsgDepositToSubaccount(t *testing.T) {
 									[]*satypes.PerpetualPosition{},
 									[]*satypes.AssetPosition{
 										{
-											AssetId:  assetstypes.AssetTDai.Id,
+											AssetId:  tc.asset.Id,
 											Quantums: dtypes.NewIntFromBigInt(subaccountQuantumsAfterDeposit),
 										},
 									},
@@ -570,7 +604,7 @@ func TestMsgDepositToSubaccount_NonExistentAccount(t *testing.T) {
 	testNonExistentSender(t, tApp, ctx, &msgDepositToSubaccount, randomAccount.PrivKey)
 }
 
-func TestMsgWithdrawFromSubaccount(t *testing.T) {
+func TestMsgWithdrawFromSubaccountWithinDummyPoolAndAccounts(t *testing.T) {
 	tests := map[string]struct {
 		// Account address.
 		accountAccAddress sdktypes.AccAddress
@@ -590,6 +624,9 @@ func TestMsgWithdrawFromSubaccount(t *testing.T) {
 
 		// Whether CheckTx errors.
 		checkTxIsError bool
+
+		// Whether DeliverTx fails.
+		deliverTxFails bool
 	}{
 		"Withdraw from Alice subaccount to Alice account": {
 			accountAccAddress: constants.AliceAccAddress,
@@ -611,12 +648,10 @@ func TestMsgWithdrawFromSubaccount(t *testing.T) {
 			asset:             *constants.TDai,
 		},
 		"Withdraw a non-TDai asset": {
-			accountAccAddress:       constants.AliceAccAddress,
-			subaccountId:            constants.Carl_Num0,
-			quantums:                big.NewInt(7_000_000),
-			asset:                   *constants.BtcUsd, // non-TDai asset
-			checkTxResponseContains: "Non-TDai asset transfer not implemented",
-			checkTxIsError:          true,
+			accountAccAddress: constants.AliceAccAddress,
+			subaccountId:      constants.Carl_BTC,
+			quantums:          big.NewInt(7_000_000),
+			asset:             *constants.BtcUsd, // non-TDai asset
 		},
 		"Withdraw zero amount": {
 			accountAccAddress:       constants.AliceAccAddress,
@@ -635,7 +670,11 @@ func TestMsgWithdrawFromSubaccount(t *testing.T) {
 			appOpts := map[string]interface{}{
 				indexer.MsgSenderInstanceForTest: msgSender,
 			}
-			tApp := testapp.NewTestAppBuilder(t).WithAppOptions(appOpts).Build()
+
+			tApp := testapp.NewTestAppBuilder(t).WithAppOptions(appOpts).WithGenesisDocFn(func() (genesis types.GenesisDoc) {
+				genesis = testapp.DefaultGenesis()
+				return genesis
+			}).Build()
 
 			rateString := sdaiservertypes.TestSDAIEventRequest.ConversionRate
 			rate, conversionErr := ratelimitkeeper.ConvertStringToBigInt(rateString)
@@ -653,7 +692,6 @@ func TestMsgWithdrawFromSubaccount(t *testing.T) {
 
 			tApp.ParallelApp.RatelimitKeeper.SetSDAIPrice(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), rate)
 			tApp.ParallelApp.RatelimitKeeper.SetAssetYieldIndex(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
-
 			_ = tApp.AdvanceToBlock(2, testapp.AdvanceToBlockOptions{})
 
 			ctx := tApp.AdvanceToBlock(3, testapp.AdvanceToBlockOptions{})
@@ -700,8 +738,35 @@ func TestMsgWithdrawFromSubaccount(t *testing.T) {
 
 			// Check that no indexer events are emitted so far.
 			require.Empty(t, msgSender.GetOnchainMessages())
+
 			// Advance to block 3 for transactions to be delivered.
-			ctx = tApp.AdvanceToBlock(4, testapp.AdvanceToBlockOptions{})
+			if tc.deliverTxFails {
+				// Check that DeliverTx fails on MsgCreateTransfer.
+				tApp.AdvanceToBlock(4, testapp.AdvanceToBlockOptions{
+					ValidateFinalizeBlock: func(
+						context sdktypes.Context,
+						request abcitypes.RequestFinalizeBlock,
+						response abcitypes.ResponseFinalizeBlock,
+					) (haltChain bool) {
+						for i, tx := range request.Txs {
+							if i == 0 {
+								// tx is empty extInfoBz
+								continue
+							}
+							if bytes.Equal(tx, CheckTx_MsgWithdrawFromSubaccount.Tx) {
+								require.True(t, response.TxResults[i].IsErr())
+							} else {
+								require.True(t, response.TxResults[i].IsOK())
+							}
+						}
+						return false
+					},
+				})
+				return
+			} else {
+				// Advance to block 3.
+				ctx = tApp.AdvanceToBlock(4, testapp.AdvanceToBlockOptions{})
+			}
 
 			// Check expected account balance.
 			accountBalanceAfterWithdraw := tApp.App.BankKeeper.GetBalance(ctx, tc.accountAccAddress, tc.asset.Denom)
@@ -736,7 +801,7 @@ func TestMsgWithdrawFromSubaccount(t *testing.T) {
 									[]*satypes.PerpetualPosition{},
 									[]*satypes.AssetPosition{
 										{
-											AssetId:  assetstypes.AssetTDai.Id,
+											AssetId:  tc.asset.Id,
 											Quantums: dtypes.NewIntFromBigInt(subaccountQuantumsAfterWithdraw),
 										},
 									},
@@ -900,14 +965,6 @@ func TestWithdrawalGating_ChainOutage(t *testing.T) {
 				genesis = testapp.DefaultGenesis()
 				testapp.UpdateGenesisDocWithAppStateForModule(
 					&genesis,
-					func(genesisState *assetstypes.GenesisState) {
-						genesisState.Assets = []assetstypes.Asset{
-							*constants.TDai,
-						}
-					},
-				)
-				testapp.UpdateGenesisDocWithAppStateForModule(
-					&genesis,
 					func(genesisState *prices.GenesisState) {
 						// Set oracle prices in the genesis.
 						pricesGenesis := constants.TestPricesGenesisState
@@ -919,6 +976,7 @@ func TestWithdrawalGating_ChainOutage(t *testing.T) {
 					func(genesisState *perptypes.GenesisState) {
 						genesisState.Params = constants.PerpetualsGenesisParams
 						genesisState.LiquidityTiers = constants.LiquidityTiers
+						genesisState.CollateralPools = constants.CollateralPools
 					},
 				)
 				testapp.UpdateGenesisDocWithAppStateForModule(

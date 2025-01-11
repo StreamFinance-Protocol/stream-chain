@@ -277,8 +277,10 @@ func (k Keeper) PersistOrderRemovalToState(
 	// 			orderRemoval,
 	// 		)
 	// 	}
-	case types.OrderRemoval_REMOVAL_REASON_VIOLATES_ISOLATED_SUBACCOUNT_CONSTRAINTS:
+	case types.OrderRemoval_REMOVAL_REASON_VIOLATES_COLLATERAL_POOL_CONSTRAINTS:
 		// TODO (CLOB-877)
+		k.statUnverifiedOrderRemoval(ctx, orderRemoval, orderToRemove)
+	case types.OrderRemoval_REMOVAL_REASON_VIOLATES_MULTI_COLLATERAL_CONSTRAINTS:
 		k.statUnverifiedOrderRemoval(ctx, orderRemoval, orderToRemove)
 	default:
 		return errorsmod.Wrapf(
@@ -299,7 +301,6 @@ func (k Keeper) PersistMatchOrdersToState(
 	matchOrders *types.MatchOrders,
 	ordersMap map[types.OrderId]types.Order,
 ) error {
-
 	takerOrder, err := k.fetchAndValidateTakerOrder(ctx, matchOrders, ordersMap)
 	if err != nil {
 		return err
@@ -975,7 +976,6 @@ func (k Keeper) setNegativeTNCSubaccountSeenIfZeroFillDeleverage(
 	position *satypes.PerpetualPosition,
 	shouldDeleverageAtBankruptcyPrice bool,
 ) error {
-
 	if !shouldDeleverageAtBankruptcyPrice {
 		return errorsmod.Wrapf(
 			types.ErrZeroFillDeleveragingForNonNegativeTncSubaccount,

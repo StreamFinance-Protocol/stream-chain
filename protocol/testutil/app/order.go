@@ -48,7 +48,7 @@ func MustMakeOrderFromHumanInput(
 		},
 		clobPair,
 		perp.Params.AtomicResolution,
-		lib.QuoteCurrencyAtomicResolution,
+		lib.TDAIAtomicResolution,
 	)
 	order.Subticks = subticks.Num().Uint64()
 	return order

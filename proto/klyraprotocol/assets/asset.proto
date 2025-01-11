@@ -46,4 +46,7 @@ message Asset {
   // all-time history of the yield mechanism for assets.
   // Starts at 0. This string should always be converted big.Rat.
   string asset_yield_index = 8;
+
+  // The max slippage in ppm for the asset.
+  uint32 max_slippage_ppm = 9;
 }

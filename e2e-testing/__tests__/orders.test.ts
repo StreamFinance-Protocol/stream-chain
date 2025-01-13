@@ -177,7 +177,7 @@ describe('orders', () => {
         limit: 10,
       }),
     ]);
-    expect(ordersResponse.orders[0]).toEqual(
+    expect(ordersResponse[0]).toEqual(
       expect.objectContaining({
         subaccountId: SubaccountTable.uuid(KLYRA_LOCAL_ADDRESS, 0),
         clobPairId: '0',
@@ -193,7 +193,7 @@ describe('orders', () => {
         ticker: 'BTC-USD',
       }),
     );
-    expect(ordersResponse2.orders[0]).toEqual(
+    expect(ordersResponse2[0]).toEqual(
       expect.objectContaining({
         subaccountId: SubaccountTable.uuid(KLYRA_LOCAL_ADDRESS_2, 0),
         clobPairId: '0',

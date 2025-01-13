@@ -26,21 +26,8 @@ export function connectAndValidateSocketClient(
   validateMessage: Function,
   klyra: Klyra,
 ): void {
-  // TODO: Implement this
   klyra.enableWebsocket();
   klyra.onWebsocketMessage((message: WebSocketMessage<unknown>) => {
-    validateMessage(message.contents, klyra);
+    validateMessage(message, klyra);
   });
-  // const mySocket = new SocketClient(
-  //   Network.local().indexerConfig,
-  //   () => {},
-  //   () => {},
-  //   (message) => {
-  //     if (typeof message.data === "string") {
-  //       const data = JSON.parse(message.data as string);
-  //       validateMessage(data, mySocket);
-  //     }
-  //   }
-  // );
-  // mySocket.connect();
 }

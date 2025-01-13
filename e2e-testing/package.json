@@ -20,7 +20,6 @@
   "author": "",
   "license": "AGPL-3.0",
   "dependencies": {
-    "@klyra/core": "file:../../custom-sdk",
     "@klyraprotocol-indexer/base": "file:../indexer/packages/base",
     "@klyraprotocol-indexer/kafka": "file:../indexer/packages/kafka",
     "@klyraprotocol-indexer/postgres": "file:../indexer/packages/postgres",

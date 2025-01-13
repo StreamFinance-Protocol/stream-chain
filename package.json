@@ -1,0 +1,5 @@
+{
+	"dependencies": {
+		"@klyra/core": "^3.1.3"
+	}
+}

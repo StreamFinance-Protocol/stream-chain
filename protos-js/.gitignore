@@ -1,0 +1,9 @@
+# Build outputs
+dist/
+build/
+
+# Source files (generated)
+src/
+
+# Dependencies
+node_modules/

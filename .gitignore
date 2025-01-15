@@ -5,10 +5,6 @@ v4-proto-py/build
 v4-proto-py/dist
 v4-proto-py/v4_proto.egg-info/
 v4-proto-py/v4_proto
-protos-js/build
-protos-js/dist
-protos-js/node_modules
-protos-js/src
 
 v4-client-js/build
 

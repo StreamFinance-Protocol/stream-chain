@@ -260,7 +260,7 @@ const GenesisState = `{
         "delay_blocks": 86400
       },
       "acknowledged_event_info": {
-        "next_id": 0,
+        "next_deposit_id": 0,
         "eth_block_height": 0
       }
     },

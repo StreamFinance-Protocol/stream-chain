@@ -40,41 +40,47 @@ var (
 	}
 
 	// Bridge Event.
-	BridgeEvent_Id0_Height0 = types.BridgeEvent{
-		Id:             0,
-		Address:        AliceAccAddress.String(),
-		Coin:           coin,
-		EthBlockHeight: 0,
+	BridgeDepositEvent_Id0_Height0 = types.BridgeEvent{
+		Id:          0,
+		Address:     AliceAccAddress.String(),
+		Coin:        coin,
+		BlockHeight: 0,
+		IsDeposit:   true,
 	}
-	BridgeEvent_Id1_Height0 = types.BridgeEvent{
-		Id:             1,
-		Address:        BobAccAddress.String(),
-		Coin:           coin,
-		EthBlockHeight: 0,
+	BridgeDepositEvent_Id1_Height0 = types.BridgeEvent{
+		Id:          1,
+		Address:     BobAccAddress.String(),
+		Coin:        coin,
+		BlockHeight: 0,
+		IsDeposit:   true,
 	}
-	BridgeEvent_Id2_Height1 = types.BridgeEvent{
-		Id:             2,
-		Address:        BobAccAddress.String(),
-		Coin:           coin,
-		EthBlockHeight: 1,
+	BridgeDepositEvent_Id2_Height1 = types.BridgeEvent{
+		Id:          2,
+		Address:     BobAccAddress.String(),
+		Coin:        coin,
+		BlockHeight: 1,
+		IsDeposit:   true,
 	}
-	BridgeEvent_Id3_Height3 = types.BridgeEvent{
-		Id:             3,
-		Address:        CarlAccAddress.String(),
-		Coin:           coin,
-		EthBlockHeight: 3,
+	BridgeDepositEvent_Id3_Height3 = types.BridgeEvent{
+		Id:          3,
+		Address:     CarlAccAddress.String(),
+		Coin:        coin,
+		BlockHeight: 3,
+		IsDeposit:   true,
 	}
-	BridgeEvent_Id4_Height0_EmptyCoin = types.BridgeEvent{
-		Id:             0,
-		Address:        AliceAccAddress.String(),
-		Coin:           emptyCoin,
-		EthBlockHeight: 0,
+	BridgeDepositEvent_Id4_Height0_EmptyCoin = types.BridgeEvent{
+		Id:          0,
+		Address:     AliceAccAddress.String(),
+		Coin:        emptyCoin,
+		BlockHeight: 0,
+		IsDeposit:   true,
 	}
-	BridgeEvent_Id55_Height15 = types.BridgeEvent{
-		Id:             55,
-		Address:        DaveAccAddress.String(),
-		Coin:           coin,
-		EthBlockHeight: 15,
+	BridgeDepositEvent_Id55_Height15 = types.BridgeEvent{
+		Id:          55,
+		Address:     DaveAccAddress.String(),
+		Coin:        coin,
+		BlockHeight: 15,
+		IsDeposit:   true,
 	}
 
 	// Acknowledge Bridges Tx.
@@ -85,48 +91,48 @@ var (
 
 	MsgAcknowledgeBridges_Id0_Height0 = &types.MsgAcknowledgeBridges{
 		Events: []types.BridgeEvent{
-			BridgeEvent_Id0_Height0,
+			BridgeDepositEvent_Id0_Height0,
 		},
 	}
 	MsgAcknowledgeBridges_Id0_Height0_TxBytes []byte
 
 	MsgAcknowledgeBridges_Id1_Height0 = &types.MsgAcknowledgeBridges{
 		Events: []types.BridgeEvent{
-			BridgeEvent_Id1_Height0,
+			BridgeDepositEvent_Id1_Height0,
 		},
 	}
 	MsgAcknowledgeBridges_Id1_Height0_TxBytes []byte
 
 	MsgAcknowledgeBridges_Id55_Height15 = &types.MsgAcknowledgeBridges{
 		Events: []types.BridgeEvent{
-			BridgeEvent_Id55_Height15,
+			BridgeDepositEvent_Id55_Height15,
 		},
 	}
 	MsgAcknowledgeBridges_Id55_Height15_TxBytes []byte
 
 	MsgAcknowledgeBridges_Ids0_1_Height0 = &types.MsgAcknowledgeBridges{
 		Events: []types.BridgeEvent{
-			BridgeEvent_Id0_Height0,
-			BridgeEvent_Id1_Height0,
+			BridgeDepositEvent_Id0_Height0,
+			BridgeDepositEvent_Id1_Height0,
 		},
 	}
 	MsgAcknowledgeBridges_Ids0_1_Height0_TxBytes []byte
 
 	MsgAcknowledgeBridges_Ids0_55_Height0 = &types.MsgAcknowledgeBridges{
 		Events: []types.BridgeEvent{
-			BridgeEvent_Id0_Height0,
-			BridgeEvent_Id55_Height15,
+			BridgeDepositEvent_Id0_Height0,
+			BridgeDepositEvent_Id55_Height15,
 		},
 	}
 	MsgAcknowledgeBridges_Ids0_55_Height0_TxBytes []byte
 
 	// Event Info.
 	AcknowledgedEventInfo_Id0_Height0 = types.BridgeEventInfo{
-		NextId:         0,
+		NextDepositId:  0,
 		EthBlockHeight: 0,
 	}
 	RecognizedEventInfo_Id2_Height0 = types.BridgeEventInfo{
-		NextId:         2,
+		NextDepositId:  2,
 		EthBlockHeight: 0,
 	}
 

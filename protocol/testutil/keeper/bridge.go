@@ -4,7 +4,10 @@ import (
 	"testing"
 
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib"
+	assetskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets/keeper"
 	delaymsgtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/delaymsg/types"
+	perpkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/keeper"
+	priceskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/keeper"
 	dbm "github.com/cosmos/cosmos-db"
 
 	storetypes "cosmossdk.io/store/types"
@@ -12,24 +15,34 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/mocks"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
+	ratelimitkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/keeper"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 )
 
+type BridgeKeepersTestContext struct {
+	Ctx                sdk.Context
+	AccountKeeper      *authkeeper.AccountKeeper
+	BankKeeper         *bankkeeper.BaseKeeper
+	BridgeKeeper       *keeper.Keeper
+	PricesKeeper       *priceskeeper.Keeper
+	PerpetualsKeeper   *perpkeeper.Keeper
+	AssetsKeeper       *assetskeeper.Keeper
+	RatelimitKeeper    *ratelimitkeeper.Keeper
+	BridgeEventManager *bridgeserver_types.BridgeEventManager
+	MockDelayMsgKeeper *mocks.DelayMsgKeeper
+	MockTimeProvider   *mocks.TimeProvider
+	StoreKey           storetypes.StoreKey
+}
+
 func BridgeKeepers(
 	t testing.TB,
-) (
-	ctx sdk.Context,
-	keeper *keeper.Keeper,
-	storeKey storetypes.StoreKey,
-	mockTimeProvider *mocks.TimeProvider,
-	bridgeEventManager *bridgeserver_types.BridgeEventManager,
-	bankKeeper *bankkeeper.BaseKeeper,
-	mockDelayMsgKeeper *mocks.DelayMsgKeeper,
+) (ks BridgeKeepersTestContext,
 ) {
-	ctx = initKeepers(t, func(
+	ks.Ctx = initKeepers(t, func(
 		db *dbm.MemDB,
 		registry codectypes.InterfaceRegistry,
 		cdc *codec.ProtoCodec,
@@ -37,14 +50,53 @@ func BridgeKeepers(
 		transientStoreKey storetypes.StoreKey,
 	) []GenesisInitializer {
 		// Define necessary keepers here for unit tests
-		accountKeeper, _ := createAccountKeeper(stateStore, db, cdc, registry)
-		bankKeeper, _ = createBankKeeper(stateStore, db, cdc, accountKeeper)
-		keeper, storeKey, mockTimeProvider, bridgeEventManager, mockDelayMsgKeeper =
-			createBridgeKeeper(stateStore, db, cdc, transientStoreKey, bankKeeper)
-		return []GenesisInitializer{keeper}
+		epochsKeeper, _ := createEpochsKeeper(stateStore, db, cdc)
+		blockTimeKeeper, _ := createBlockTimeKeeper(stateStore, db, cdc)
+		ks.PricesKeeper, _, _, _, _ = createPricesKeeper(stateStore, db, cdc, transientStoreKey)
+		ks.AssetsKeeper, _ = createAssetsKeeper(
+			stateStore,
+			db,
+			cdc,
+			ks.PricesKeeper,
+			transientStoreKey,
+			true,
+		)
+		ks.PerpetualsKeeper, _ = createPerpetualsKeeper(
+			stateStore,
+			db,
+			cdc,
+			ks.PricesKeeper,
+			epochsKeeper,
+			ks.AssetsKeeper,
+			nil,
+			transientStoreKey,
+		)
+		ks.AccountKeeper, _ = createAccountKeeper(stateStore, db, cdc, registry)
+		ks.BankKeeper, _ = createBankKeeper(stateStore, db, cdc, ks.AccountKeeper)
+		ks.RatelimitKeeper, _ = createRatelimitKeeper(
+			stateStore,
+			db,
+			cdc,
+			blockTimeKeeper,
+			ks.BankKeeper,
+			ks.PerpetualsKeeper,
+			ks.AssetsKeeper,
+			transientStoreKey,
+			true,
+		)
+		ks.BridgeKeeper, ks.StoreKey, ks.MockTimeProvider, ks.BridgeEventManager, ks.MockDelayMsgKeeper = createBridgeKeeper(
+			stateStore,
+			db,
+			cdc,
+			transientStoreKey,
+			ks.RatelimitKeeper,
+			ks.BankKeeper,
+		)
+
+		return []GenesisInitializer{ks.RatelimitKeeper, ks.PricesKeeper, ks.BridgeKeeper, ks.PerpetualsKeeper, ks.AssetsKeeper}
 	})
 
-	return ctx, keeper, storeKey, mockTimeProvider, bridgeEventManager, bankKeeper, mockDelayMsgKeeper
+	return ks
 }
 
 func createBridgeKeeper(
@@ -52,6 +104,7 @@ func createBridgeKeeper(
 	db *dbm.MemDB,
 	cdc *codec.ProtoCodec,
 	transientStoreKey storetypes.StoreKey,
+	ratelimitKeeper types.RateLimitKeeper,
 	bankKeeper types.BankKeeper,
 ) (
 	*keeper.Keeper,
@@ -72,6 +125,7 @@ func createBridgeKeeper(
 		cdc,
 		storeKey,
 		bridgeEventManager,
+		ratelimitKeeper,
 		bankKeeper,
 		mockDelayMsgKeeper,
 		[]string{

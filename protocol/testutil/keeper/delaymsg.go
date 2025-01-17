@@ -15,6 +15,7 @@ import (
 	perpetualskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/keeper"
 	perpetualstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	priceskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/keeper"
+	ratelimitkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/keeper"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -33,6 +34,7 @@ func DelayMsgKeepers(
 	bankKeeper bankkeeper.Keeper,
 	perpsKeeper *perpetualskeeper.Keeper,
 	pricesKeeper *priceskeeper.Keeper,
+	ratelimitKeeper *ratelimitkeeper.Keeper,
 	authorities []string,
 ) {
 	ctx = initKeepers(t, func(
@@ -51,15 +53,26 @@ func DelayMsgKeepers(
 
 		// Register perpetuals messages for encoding / decoding.
 		perpetualstypes.RegisterInterfaces(registry)
-
+		blockTimeKeeper, _ := createBlockTimeKeeper(stateStore, db, cdc)
 		epochsKeeper, _ := createEpochsKeeper(stateStore, db, cdc)
 		pricesKeeper, _, _, _, _ = createPricesKeeper(stateStore, db, cdc, transientStoreKey)
 		assetsKeeper, _ := createAssetsKeeper(stateStore, db, cdc, pricesKeeper, transientStoreKey, true)
 		perpsKeeper, _ = createPerpetualsKeeper(stateStore, db, cdc, pricesKeeper, epochsKeeper, assetsKeeper, nil, transientStoreKey)
 		accountKeeper, _ := createAccountKeeper(stateStore, db, cdc, registry)
 		bankKeeper, _ = createBankKeeper(stateStore, db, cdc, accountKeeper)
+		ratelimitKeeper, _ = createRatelimitKeeper(
+			stateStore,
+			db,
+			cdc,
+			blockTimeKeeper,
+			bankKeeper,
+			perpsKeeper,
+			assetsKeeper,
+			transientStoreKey,
+			true,
+		)
 		bridgeKeeper, _, _, _, _ =
-			createBridgeKeeper(stateStore, db, cdc, transientStoreKey, bankKeeper)
+			createBridgeKeeper(stateStore, db, cdc, transientStoreKey, ratelimitKeeper, bankKeeper)
 
 		// Register perps keeper msg server for msg routing.
 		perpetualstypes.RegisterMsgServer(router, perpetualskeeper.NewMsgServerImpl(perpsKeeper))
@@ -83,7 +96,7 @@ func DelayMsgKeepers(
 			delayMsgKeeper,
 		}
 	})
-	return ctx, delayMsgKeeper, storeKey, bridgeKeeper, bankKeeper, perpsKeeper, pricesKeeper, authorities
+	return ctx, delayMsgKeeper, storeKey, bridgeKeeper, bankKeeper, perpsKeeper, pricesKeeper, ratelimitKeeper, authorities
 }
 
 func createDelayMsgKeeper(

@@ -10,6 +10,9 @@ option go_package = "github.com/StreamFinance-Protocol/stream-chain/protocol/dae
 service BridgeService {
   // Sends a list of newly recognized bridge events.
   rpc AddBridgeEvents(AddBridgeEventsRequest) returns (AddBridgeEventsResponse);
+
+  // Updates the last confirmed withdraw
+  rpc UpdateLastConfirmedWithdrawId(UpdateLastConfirmedWithdrawIdRequest) returns (UpdateLastConfirmedWithdrawIdResponse);
 }
 
 // AddBridgeEventsRequest is a request message that contains a list of new
@@ -21,3 +24,14 @@ message AddBridgeEventsRequest {
 
 // AddBridgeEventsResponse is a response message for BridgeEventRequest.
 message AddBridgeEventsResponse {}
+
+// UpdateLastConfirmedWithdrawIdRequest is a request message that updates
+// the last confimed withdraw on ethereum.
+message UpdateLastConfirmedWithdrawIdRequest {
+  uint32 last_confirmed_withdraw_id = 1;
+}
+
+// UpdateLastConfirmedWithdrawIdResponse is a response message for 
+// UpdateLastConfirmedWithdrawIdResponse.
+message UpdateLastConfirmedWithdrawIdResponse {}
+

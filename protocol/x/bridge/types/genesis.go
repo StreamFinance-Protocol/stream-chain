@@ -23,8 +23,10 @@ func DefaultGenesis() *GenesisState {
 			DelayBlocks: 86_400, // Seconds in a day
 		},
 		AcknowledgedEventInfo: BridgeEventInfo{
-			NextId:         0,
-			EthBlockHeight: 0,
+			NextDepositId:    0,
+			EthBlockHeight:   0,
+			NextWithdrawId:   0,
+			KlyraBlockHeight: 0,
 		},
 	}
 }

@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"math/big"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -13,5 +14,16 @@ type BankKeeper interface {
 		senderModule string,
 		recipientAddr sdk.AccAddress,
 		amt sdk.Coins,
+	) error
+
+	BurnCoins(ctx context.Context, moduleName string, amt sdk.Coins) error
+}
+
+type RateLimitKeeper interface {
+	WithdrawSDaiFromTDai(
+		ctx sdk.Context,
+		userAddr sdk.AccAddress,
+		sDaiAmount *big.Int,
+		shouldSendToUser bool,
 	) error
 }

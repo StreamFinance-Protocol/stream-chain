@@ -917,6 +917,7 @@ func New(
 		appCodec,
 		keys[bridgemoduletypes.StoreKey],
 		bridgeEventManager,
+		app.RatelimitKeeper,
 		app.BankKeeper,
 		app.DelayMsgKeeper,
 		// gov module and delayMsg module accounts are allowed to send messages to the bridge module.

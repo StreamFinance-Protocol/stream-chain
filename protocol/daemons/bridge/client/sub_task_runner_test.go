@@ -133,6 +133,12 @@ func TestRunBridgeDaemonTaskLoop(t *testing.T) {
 			mockEthClient.On("ChainID", ctx).Return(big.NewInt(int64(tc.chainId)), tc.chainIdError)
 			mockEthClient.On("FilterLogs", ctx, mock.Anything).Return(tc.filterLogs, tc.filterLogsErr)
 			mockServiceClient.On("AddBridgeEvents", ctx, mock.Anything).Return(nil, tc.addBridgeEventsErr)
+			mockQueryClient.On("WithdrawEvents", ctx, mock.Anything).Return(
+				&bridgetypes.QueryWithdrawalsResponse{
+					Withdrawals: []bridgetypes.BridgeEvent{},
+				},
+				nil,
+			)
 
 			subTaskRunner := &client.SubTaskRunnerImpl{}
 			err := subTaskRunner.RunBridgeDaemonTaskLoop(

@@ -837,7 +837,7 @@ func TestWithdrawSDaiFromTDai(t *testing.T) {
 				).Amount.BigInt()
 
 				// Execute Minting
-				err := k.WithdrawSDaiFromTDai(ctx, transfer.userAddr, transfer.sDAIAmount)
+				err := k.WithdrawSDaiFromTDai(ctx, transfer.userAddr, transfer.sDAIAmount, true)
 
 				// Verify success
 				if transfer.expectErr {

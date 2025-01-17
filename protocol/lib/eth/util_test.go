@@ -124,8 +124,9 @@ func TestBridgeLogToEvent(t *testing.T) {
 					"adv4tnt",
 					sdkmath.NewInt(12345),
 				),
-				Address:        "klyra1qqgzqvzq2ps8pqys5zcvp58q7rluextx6mnchc",
-				EthBlockHeight: 3872013,
+				Address:     "klyra1qqgzqvzq2ps8pqys5zcvp58q7rluextx6mnchc",
+				BlockHeight: 3872013,
+				IsDeposit:   true,
 			},
 		},
 		"Success: event ID 1 - empty address": {
@@ -138,8 +139,9 @@ func TestBridgeLogToEvent(t *testing.T) {
 					sdkmath.NewInt(55),
 				),
 				// address shorter than 20 bytes is padded with zeros.
-				Address:        "klyra1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9tm50p",
-				EthBlockHeight: 3969937,
+				Address:     "klyra1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9tm50p",
+				BlockHeight: 3969937,
+				IsDeposit:   true,
 			},
 		},
 		"Success: event ID 2": {
@@ -152,8 +154,9 @@ func TestBridgeLogToEvent(t *testing.T) {
 					sdkmath.NewInt(777),
 				),
 				// 32 bytes * 8 bits / 5 bits = 51.2 characters ~ 52 bech32 characters
-				Address:        "klyra1qqgzqvzq2ps8pqys5zcvp58q7rluextxzy3rx3z4vemc3xgq42ascrl594",
-				EthBlockHeight: 4139345,
+				Address:     "klyra1qqgzqvzq2ps8pqys5zcvp58q7rluextxzy3rx3z4vemc3xgq42ascrl594",
+				BlockHeight: 4139345,
+				IsDeposit:   true,
 			},
 		},
 		"Success: event ID 3": {
@@ -167,8 +170,9 @@ func TestBridgeLogToEvent(t *testing.T) {
 				),
 				// address data is 62 bytes but we take the first 32 bytes only.
 				// 32 bytes * 8 bits / 5 bits ~ 52 bech32 characters
-				Address:        "klyra124n92ej4ve2kv4tx24n92ej4ve2kv4tx24n92ej4ve2kv4tx24nq60sw0w",
-				EthBlockHeight: 4139348,
+				Address:     "klyra124n92ej4ve2kv4tx24n92ej4ve2kv4tx24n92ej4ve2kv4tx24nq60sw0w",
+				BlockHeight: 4139348,
+				IsDeposit:   true,
 			},
 		},
 		"Success: event ID 4": {
@@ -181,15 +185,16 @@ func TestBridgeLogToEvent(t *testing.T) {
 					sdkmath.NewInt(1234123443214321),
 				),
 				// address shorter than 20 bytes is padded with zeros.
-				Address:        "klyra1zg6pydqqqqqqqqqqqqqqqqqqqqqqqqqqy7kmtk",
-				EthBlockHeight: 4139349,
+				Address:     "klyra1zg6pydqqqqqqqqqqqqqqqqqqqqqqqqqqy7kmtk",
+				BlockHeight: 4139349,
+				IsDeposit:   true,
 			},
 		},
 	}
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			event := libeth.BridgeLogToEvent(tc.inputLog, tc.inputDenom)
+			event := libeth.BridgeDepositLogToEvent(tc.inputLog, tc.inputDenom)
 			require.Equal(t, tc.expectedEvent, event)
 		})
 	}

@@ -40,7 +40,7 @@ func TestBridge_Success(t *testing.T) {
 	}{
 		"Success: 1 bridge event, delay 5 blocks": {
 			bridgeEvents: []bridgetypes.BridgeEvent{
-				constants.BridgeEvent_Id0_Height0,
+				constants.BridgeDepositEvent_Id0_Height0,
 			},
 			proposeParams: bridgetypes.ProposeParams{
 				MaxBridgesPerBlock:           2,
@@ -57,8 +57,8 @@ func TestBridge_Success(t *testing.T) {
 		},
 		"Success: 2 bridge events, delay 0 blocks": {
 			bridgeEvents: []bridgetypes.BridgeEvent{
-				constants.BridgeEvent_Id0_Height0,
-				constants.BridgeEvent_Id1_Height0,
+				constants.BridgeDepositEvent_Id0_Height0,
+				constants.BridgeDepositEvent_Id1_Height0,
 			},
 			proposeParams: bridgetypes.ProposeParams{
 				MaxBridgesPerBlock:           2,
@@ -75,7 +75,7 @@ func TestBridge_Success(t *testing.T) {
 		},
 		"Success: 1 bridge event with 0 coin amount, delay 5 blocks": {
 			bridgeEvents: []bridgetypes.BridgeEvent{
-				constants.BridgeEvent_Id4_Height0_EmptyCoin,
+				constants.BridgeDepositEvent_Id4_Height0_EmptyCoin,
 			},
 			proposeParams: bridgetypes.ProposeParams{
 				MaxBridgesPerBlock:           2,
@@ -92,10 +92,10 @@ func TestBridge_Success(t *testing.T) {
 		},
 		"Success: 4 bridge events, delay 27 blocks": {
 			bridgeEvents: []bridgetypes.BridgeEvent{
-				constants.BridgeEvent_Id0_Height0,
-				constants.BridgeEvent_Id1_Height0,
-				constants.BridgeEvent_Id2_Height1,
-				constants.BridgeEvent_Id3_Height3,
+				constants.BridgeDepositEvent_Id0_Height0,
+				constants.BridgeDepositEvent_Id1_Height0,
+				constants.BridgeDepositEvent_Id2_Height1,
+				constants.BridgeDepositEvent_Id3_Height3,
 			},
 			proposeParams: bridgetypes.ProposeParams{
 				MaxBridgesPerBlock:           4,
@@ -112,7 +112,7 @@ func TestBridge_Success(t *testing.T) {
 		},
 		"Skipped: wait for other validators to recognize bridge events": {
 			bridgeEvents: []bridgetypes.BridgeEvent{
-				constants.BridgeEvent_Id0_Height0,
+				constants.BridgeDepositEvent_Id0_Height0,
 			},
 			proposeParams: bridgetypes.ProposeParams{
 				MaxBridgesPerBlock: 2,
@@ -130,7 +130,7 @@ func TestBridge_Success(t *testing.T) {
 		},
 		"Skipped: block delayed by too much": {
 			bridgeEvents: []bridgetypes.BridgeEvent{
-				constants.BridgeEvent_Id0_Height0,
+				constants.BridgeDepositEvent_Id0_Height0,
 			},
 			proposeParams: bridgetypes.ProposeParams{
 				MaxBridgesPerBlock:           2,
@@ -233,8 +233,8 @@ func TestBridge_Success(t *testing.T) {
 }
 
 func TestBridge_REJECT(t *testing.T) {
-	e0 := constants.BridgeEvent_Id0_Height0
-	e1 := constants.BridgeEvent_Id1_Height0
+	e0 := constants.BridgeDepositEvent_Id0_Height0
+	e1 := constants.BridgeDepositEvent_Id1_Height0
 
 	tests := map[string]struct {
 		// bridge events to propose.
@@ -244,77 +244,81 @@ func TestBridge_REJECT(t *testing.T) {
 	}{
 		"Bad coin denom": {
 			bridgeEvents: []bridgetypes.BridgeEvent{
-				constants.BridgeEvent_Id0_Height0,
+				constants.BridgeDepositEvent_Id0_Height0,
 				{
 					Id: e1.Id,
 					Coin: sdk.NewCoin(
 						e1.Coin.Denom+"a", // bad denom.
 						e1.Coin.Amount,
 					),
-					Address:        e1.Address,
-					EthBlockHeight: e1.EthBlockHeight,
+					Address:     e1.Address,
+					BlockHeight: e1.BlockHeight,
+					IsDeposit:   e1.IsDeposit,
 				},
 			},
 		},
 		"Bad coin amount": {
 			bridgeEvents: []bridgetypes.BridgeEvent{
-				constants.BridgeEvent_Id0_Height0,
+				constants.BridgeDepositEvent_Id0_Height0,
 				{
 					Id: e1.Id,
 					Coin: sdk.NewCoin(
 						e1.Coin.Denom,
 						e1.Coin.Amount.Add(sdkmath.NewInt(1)), // bad amount.
 					),
-					Address:        e1.Address,
-					EthBlockHeight: e1.EthBlockHeight,
+					Address:     e1.Address,
+					BlockHeight: e1.BlockHeight,
+					IsDeposit:   e1.IsDeposit,
 				},
 			},
 		},
 		"Bad address": {
 			bridgeEvents: []bridgetypes.BridgeEvent{
-				constants.BridgeEvent_Id0_Height0,
+				constants.BridgeDepositEvent_Id0_Height0,
 				{
 					Id: e1.Id,
 					Coin: sdk.NewCoin(
 						e1.Coin.Denom,
 						e1.Coin.Amount,
 					),
-					Address:        e1.Address + "a", // bad address.
-					EthBlockHeight: e1.EthBlockHeight,
+					Address:     e1.Address + "a", // bad address.
+					BlockHeight: e1.BlockHeight,
+					IsDeposit:   e1.IsDeposit,
 				},
 			},
 		},
 		"Bad eth block height": {
 			bridgeEvents: []bridgetypes.BridgeEvent{
-				constants.BridgeEvent_Id0_Height0,
+				constants.BridgeDepositEvent_Id0_Height0,
 				{
 					Id: e1.Id,
 					Coin: sdk.NewCoin(
 						e1.Coin.Denom,
 						e1.Coin.Amount,
 					),
-					Address:        e1.Address,
-					EthBlockHeight: e1.EthBlockHeight + 1, // bad eth block height.
+					Address:     e1.Address,
+					BlockHeight: e1.BlockHeight + 1, // bad eth block height.
+					IsDeposit:   e1.IsDeposit,
 				},
 			},
 		},
 		"Event not recognized": {
 			bridgeEvents: []bridgetypes.BridgeEvent{
-				constants.BridgeEvent_Id0_Height0,
-				constants.BridgeEvent_Id1_Height0,
-				constants.BridgeEvent_Id2_Height1, // event not recognized.
+				constants.BridgeDepositEvent_Id0_Height0,
+				constants.BridgeDepositEvent_Id1_Height0,
+				constants.BridgeDepositEvent_Id2_Height1, // event not recognized.
 			},
 		},
 		"First event not next to be acknowledged": {
 			bridgeEvents: []bridgetypes.BridgeEvent{
-				constants.BridgeEvent_Id1_Height0,
-				constants.BridgeEvent_Id2_Height1,
+				constants.BridgeDepositEvent_Id1_Height0,
+				constants.BridgeDepositEvent_Id2_Height1,
 			},
 		},
 		"Bridging is disabled and non-empty bridge events are proposed": {
 			bridgeEvents: []bridgetypes.BridgeEvent{
-				constants.BridgeEvent_Id0_Height0,
-				constants.BridgeEvent_Id1_Height0,
+				constants.BridgeDepositEvent_Id0_Height0,
+				constants.BridgeDepositEvent_Id1_Height0,
 			},
 			bridgingDisabled: true,
 		},
@@ -385,7 +389,7 @@ func TestBridge_AcknowledgedEventIdGreaterThanRecognizedEventId(t *testing.T) {
 			&genesis,
 			func(genesisState *bridgetypes.GenesisState) {
 				genesisState.AcknowledgedEventInfo = bridgetypes.BridgeEventInfo{
-					NextId:         2,
+					NextDepositId:  2,
 					EthBlockHeight: 123,
 				}
 			},
@@ -396,11 +400,11 @@ func TestBridge_AcknowledgedEventIdGreaterThanRecognizedEventId(t *testing.T) {
 
 	// Verify that AcknowledgedEventInfo.NextId is 2.
 	aei := tApp.App.BridgeKeeper.GetAcknowledgedEventInfo(ctx)
-	require.Equal(t, uint32(2), aei.NextId)
+	require.Equal(t, uint32(2), aei.NextDepositId)
 
 	// Verify that RecognizedEventInfo.NextId is still 0.
 	rei := tApp.App.BridgeKeeper.GetRecognizedEventInfo(ctx)
-	require.Equal(t, uint32(0), rei.NextId)
+	require.Equal(t, uint32(0), rei.NextDepositId)
 
 	// Verify that bridge query `RecognizedEventInfo` returns whichever of AcknowledgedEventInfo and
 	// RecognizedEventInfo has a greater `NextId` (which is AcknowledgedEventInfo in this case).
@@ -422,10 +426,11 @@ func TestBridge_AcknowledgedEventIdGreaterThanRecognizedEventId(t *testing.T) {
 	_, err = tApp.App.Server.AddBridgeEvents(ctx, &api.AddBridgeEventsRequest{
 		BridgeEvents: []bridgetypes.BridgeEvent{
 			{
-				Id:             reiResponse.Info.NextId,
-				Coin:           sdk.NewCoin("adv4tnt", sdkmath.NewInt(1)),
-				Address:        constants.BobAccAddress.String(),
-				EthBlockHeight: 234,
+				Id:          reiResponse.Info.NextDepositId,
+				Coin:        sdk.NewCoin("adv4tnt", sdkmath.NewInt(1)),
+				Address:     constants.BobAccAddress.String(),
+				BlockHeight: 234,
+				IsDeposit:   true,
 			},
 		},
 	})

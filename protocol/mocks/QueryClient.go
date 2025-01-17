@@ -1179,6 +1179,43 @@ func (_m *QueryClient) SubaccountAll(ctx context.Context, in *subaccountstypes.Q
 	return r0, r1
 }
 
+// UpdateLastConfirmedWithdrawId provides a mock function with given fields: ctx, in, opts
+func (_m *QueryClient) UpdateLastConfirmedWithdrawId(ctx context.Context, in *api.UpdateLastConfirmedWithdrawIdRequest, opts ...grpc.CallOption) (*api.UpdateLastConfirmedWithdrawIdResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateLastConfirmedWithdrawId")
+	}
+
+	var r0 *api.UpdateLastConfirmedWithdrawIdResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *api.UpdateLastConfirmedWithdrawIdRequest, ...grpc.CallOption) (*api.UpdateLastConfirmedWithdrawIdResponse, error)); ok {
+		return rf(ctx, in, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *api.UpdateLastConfirmedWithdrawIdRequest, ...grpc.CallOption) *api.UpdateLastConfirmedWithdrawIdResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*api.UpdateLastConfirmedWithdrawIdResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *api.UpdateLastConfirmedWithdrawIdRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // UpdateMarketPrices provides a mock function with given fields: ctx, in, opts
 func (_m *QueryClient) UpdateMarketPrices(ctx context.Context, in *pricefeedapi.UpdateMarketPricesRequest, opts ...grpc.CallOption) (*pricefeedapi.UpdateMarketPricesResponse, error) {
 	_va := make([]interface{}, len(opts))

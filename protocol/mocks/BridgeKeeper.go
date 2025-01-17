@@ -140,6 +140,24 @@ func (_m *BridgeKeeper) GetSafetyParams(ctx types.Context) bridgetypes.SafetyPar
 	return r0
 }
 
+// HandleSdaiWithdraw provides a mock function with given fields: ctx, withdraw
+func (_m *BridgeKeeper) HandleSdaiWithdraw(ctx types.Context, withdraw bridgetypes.BridgeWithdraw) error {
+	ret := _m.Called(ctx, withdraw)
+
+	if len(ret) == 0 {
+		panic("no return value specified for HandleSdaiWithdraw")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(types.Context, bridgetypes.BridgeWithdraw) error); ok {
+		r0 = rf(ctx, withdraw)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // HasAuthority provides a mock function with given fields: authority
 func (_m *BridgeKeeper) HasAuthority(authority string) bool {
 	ret := _m.Called(authority)

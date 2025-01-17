@@ -54,6 +54,43 @@ func (_m *BridgeServiceClient) AddBridgeEvents(ctx context.Context, in *api.AddB
 	return r0, r1
 }
 
+// UpdateLastConfirmedWithdrawId provides a mock function with given fields: ctx, in, opts
+func (_m *BridgeServiceClient) UpdateLastConfirmedWithdrawId(ctx context.Context, in *api.UpdateLastConfirmedWithdrawIdRequest, opts ...grpc.CallOption) (*api.UpdateLastConfirmedWithdrawIdResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateLastConfirmedWithdrawId")
+	}
+
+	var r0 *api.UpdateLastConfirmedWithdrawIdResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *api.UpdateLastConfirmedWithdrawIdRequest, ...grpc.CallOption) (*api.UpdateLastConfirmedWithdrawIdResponse, error)); ok {
+		return rf(ctx, in, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *api.UpdateLastConfirmedWithdrawIdRequest, ...grpc.CallOption) *api.UpdateLastConfirmedWithdrawIdResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*api.UpdateLastConfirmedWithdrawIdResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *api.UpdateLastConfirmedWithdrawIdRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // NewBridgeServiceClient creates a new instance of BridgeServiceClient. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewBridgeServiceClient(t interface {

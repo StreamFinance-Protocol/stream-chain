@@ -135,8 +135,9 @@ func TestProcessProposalHandler_Error(t *testing.T) {
 							event.Coin.Denom,
 							event.Coin.Amount.Add(sdkmath.NewInt(10_000)), // second event has different amount.
 						),
-						Address:        event.Address,
-						EthBlockHeight: event.EthBlockHeight,
+						Address:     event.Address,
+						BlockHeight: event.BlockHeight,
+						IsDeposit:   event.IsDeposit,
 					}
 				}(validAcknowledgeBridgesMsg.Events[1]),
 			},

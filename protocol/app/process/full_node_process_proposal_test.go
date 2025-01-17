@@ -58,7 +58,7 @@ func TestFullNodeProcessProposalHandler(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 
-			_, bridgeKeeper, _, _, _, _, _ := keepertest.BridgeKeepers(t)
+			ks := keepertest.BridgeKeepers(t)
 			ctx, pricesKeeper, _, daemonPriceCache, _, mockTimeProvider := keepertest.PricesKeepers(t)
 			mockTimeProvider.On("Now").Return(constants.TimeT)
 			keepertest.CreateTestMarkets(t, ctx, pricesKeeper)
@@ -70,7 +70,7 @@ func TestFullNodeProcessProposalHandler(t *testing.T) {
 
 			handler := process.FullNodeProcessProposalHandler(
 				constants.TestEncodingCfg.TxConfig,
-				bridgeKeeper,
+				ks.BridgeKeeper,
 				mockClobKeeper,
 				&mocks.ProcessStakingKeeper{},
 				&mocks.ProcessPerpetualKeeper{},

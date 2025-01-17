@@ -68,8 +68,8 @@ func TestDecodeAcknowledgeBridgesTx(t *testing.T) {
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			ctx, k, _, _, _, _, _ := keepertest.BridgeKeepers(t)
-			abt, err := process.DecodeAcknowledgeBridgesTx(ctx, k, encodingCfg.TxConfig.TxDecoder(), tc.txBytes)
+			ks := keepertest.BridgeKeepers(t)
+			abt, err := process.DecodeAcknowledgeBridgesTx(ks.Ctx, ks.BridgeKeeper, encodingCfg.TxConfig.TxDecoder(), tc.txBytes)
 			if tc.expectedErr != nil {
 				require.ErrorContains(t, err, tc.expectedErr.Error())
 				require.Nil(t, abt)
@@ -98,7 +98,7 @@ func TestAcknowledgeBridgesTx_Validate(t *testing.T) {
 			txBytes:              constants.MsgAcknowledgeBridges_Id55_Height15_TxBytes,
 			bridgeEventsInServer: constants.MsgAcknowledgeBridges_Id55_Height15.Events,
 			acknowledgedEventInfo: types.BridgeEventInfo{
-				NextId:         54,
+				NextDepositId:  54,
 				EthBlockHeight: 12,
 			},
 			expectedErr: types.ErrBridgeIdNotNextToAcknowledge,
@@ -107,11 +107,11 @@ func TestAcknowledgeBridgesTx_Validate(t *testing.T) {
 			txBytes:              constants.MsgAcknowledgeBridges_Id55_Height15_TxBytes,
 			bridgeEventsInServer: constants.MsgAcknowledgeBridges_Id55_Height15.Events,
 			acknowledgedEventInfo: types.BridgeEventInfo{
-				NextId:         55,
+				NextDepositId:  55,
 				EthBlockHeight: 12,
 			},
 			recognizedEventInfo: types.BridgeEventInfo{
-				NextId:         55,
+				NextDepositId:  55,
 				EthBlockHeight: 14,
 			},
 			expectedErr: types.ErrBridgeIdNotRecognized,
@@ -121,7 +121,7 @@ func TestAcknowledgeBridgesTx_Validate(t *testing.T) {
 			bridgeEventsInServer:  constants.MsgAcknowledgeBridges_Ids0_55_Height0.Events,
 			acknowledgedEventInfo: constants.AcknowledgedEventInfo_Id0_Height0,
 			recognizedEventInfo: types.BridgeEventInfo{
-				NextId:         56,
+				NextDepositId:  56,
 				EthBlockHeight: 14,
 			},
 			expectedErr: types.ErrBridgeIdsNotConsecutive,
@@ -131,19 +131,20 @@ func TestAcknowledgeBridgesTx_Validate(t *testing.T) {
 			bridgeEventsInServer: []types.BridgeEvent{
 				func(event types.BridgeEvent) types.BridgeEvent {
 					return types.BridgeEvent{
-						Id:             event.Id,
-						Coin:           event.Coin,
-						Address:        event.Address,
-						EthBlockHeight: 14, // mismatched block height.
+						Id:          event.Id,
+						Coin:        event.Coin,
+						Address:     event.Address,
+						BlockHeight: 14, // mismatched block height.
+						IsDeposit:   true,
 					}
-				}(constants.BridgeEvent_Id55_Height15),
+				}(constants.BridgeDepositEvent_Id55_Height15),
 			},
 			acknowledgedEventInfo: types.BridgeEventInfo{
-				NextId:         55,
+				NextDepositId:  55,
 				EthBlockHeight: 12,
 			},
 			recognizedEventInfo: types.BridgeEventInfo{
-				NextId:         56,
+				NextDepositId:  56,
 				EthBlockHeight: 14,
 			},
 			expectedErr: types.ErrBridgeEventContentMismatch,
@@ -151,7 +152,7 @@ func TestAcknowledgeBridgesTx_Validate(t *testing.T) {
 		"Error: second bridge event has incorrect amount": {
 			txBytes: constants.MsgAcknowledgeBridges_Ids0_1_Height0_TxBytes,
 			bridgeEventsInServer: []types.BridgeEvent{
-				constants.BridgeEvent_Id0_Height0,
+				constants.BridgeDepositEvent_Id0_Height0,
 				func(event types.BridgeEvent) types.BridgeEvent {
 					return types.BridgeEvent{
 						Id: event.Id,
@@ -159,10 +160,11 @@ func TestAcknowledgeBridgesTx_Validate(t *testing.T) {
 							event.Coin.Denom,
 							sdkmath.NewInt(1000000000000000000), // incorrect amount.
 						),
-						Address:        event.Address,
-						EthBlockHeight: event.EthBlockHeight,
+						Address:     event.Address,
+						BlockHeight: event.BlockHeight,
+						IsDeposit:   event.IsDeposit,
 					}
-				}(constants.BridgeEvent_Id1_Height0),
+				}(constants.BridgeDepositEvent_Id1_Height0),
 			},
 			acknowledgedEventInfo: constants.AcknowledgedEventInfo_Id0_Height0,
 			recognizedEventInfo:   constants.RecognizedEventInfo_Id2_Height0,
@@ -206,20 +208,20 @@ func TestAcknowledgeBridgesTx_Validate(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// Setup.
-			ctx, _, _, _, _, _, _ := keepertest.BridgeKeepers(t)
+			ks := keepertest.BridgeKeepers(t)
 			mockBridgeKeeper := &mocks.ProcessBridgeKeeper{}
-			mockBridgeKeeper.On("GetSafetyParams", ctx).Return(types.SafetyParams{
+			mockBridgeKeeper.On("GetSafetyParams", ks.Ctx).Return(types.SafetyParams{
 				IsDisabled:  tc.bridgingDisabled,
 				DelayBlocks: 7, // dummy value
 			})
-			mockBridgeKeeper.On("GetAcknowledgedEventInfo", ctx).Return(tc.acknowledgedEventInfo)
-			mockBridgeKeeper.On("GetRecognizedEventInfo", ctx).Return(tc.recognizedEventInfo)
+			mockBridgeKeeper.On("GetAcknowledgedEventInfo", ks.Ctx).Return(tc.acknowledgedEventInfo)
+			mockBridgeKeeper.On("GetRecognizedEventInfo", ks.Ctx).Return(tc.recognizedEventInfo)
 			for _, event := range tc.bridgeEventsInServer {
-				mockBridgeKeeper.On("GetBridgeEventFromServer", ctx, event.Id).Return(event, true)
+				mockBridgeKeeper.On("GetBridgeEventFromServer", ks.Ctx, event.Id).Return(event, true)
 			}
 
 			abt, err := process.DecodeAcknowledgeBridgesTx(
-				ctx,
+				ks.Ctx,
 				mockBridgeKeeper,
 				constants.TestEncodingCfg.TxConfig.TxDecoder(),
 				tc.txBytes,
@@ -256,8 +258,8 @@ func TestAcknowledgeBridgesTx_GetMsg(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			var msg sdk.Msg
 			if tc.txBytes != nil {
-				ctx, k, _, _, _, _, _ := keepertest.BridgeKeepers(t)
-				abt, err := process.DecodeAcknowledgeBridgesTx(ctx, k, constants.TestEncodingCfg.TxConfig.TxDecoder(), tc.txBytes)
+				ks := keepertest.BridgeKeepers(t)
+				abt, err := process.DecodeAcknowledgeBridgesTx(ks.Ctx, ks.BridgeKeeper, constants.TestEncodingCfg.TxConfig.TxDecoder(), tc.txBytes)
 				require.NoError(t, err)
 				msg = abt.GetMsg()
 			} else {

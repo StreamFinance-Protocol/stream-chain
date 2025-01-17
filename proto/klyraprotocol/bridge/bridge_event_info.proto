@@ -8,8 +8,15 @@ option go_package = "github.com/StreamFinance-Protocol/stream-chain/protocol/x/b
 message BridgeEventInfo {
   // The next event id (the last processed id plus one) of the logs from the
   // Ethereum contract.
-  uint32 next_id = 1;
+  uint32 next_deposit_id = 1;
+
+  // The next event id (the last processed id plus one) of the withdraws on
+  // Klyra.
+  uint32 next_withdraw_id = 2;
 
   // The Ethereum block height of the most recently processed bridge event.
-  uint64 eth_block_height = 2;
+  uint64 eth_block_height = 3;
+
+  // The Klyra block height of the most recently processed bridge event.
+  uint64 klyra_block_height = 4;
 }

@@ -5,6 +5,7 @@ import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "klyraprotocol/bridge/bridge_event_info.proto";
 import "klyraprotocol/bridge/params.proto";
+import "klyraprotocol/bridge/bridge_event.proto";
 import "klyraprotocol/bridge/tx.proto";
 
 option go_package = "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types";
@@ -35,6 +36,13 @@ service Query {
       returns (QueryAcknowledgedEventInfoResponse) {
     option (google.api.http).get =
         "/klyraprotocol/v4/bridge/acknowledged_event_info";
+  }
+
+  // Queries the Withdrawals
+  rpc WithdrawEvents(QueryWithdrawalsRequest) 
+      returns (QueryWithdrawalsResponse) {
+    option (google.api.http).get = 
+        "/klyraprotocol/v4/bridge/withdrawals";
   }
 
   // Queries the RecognizedEventInfo.
@@ -88,6 +96,15 @@ message QueryAcknowledgedEventInfoRequest {}
 // AcknowledgedEventInfo RPC method.
 message QueryAcknowledgedEventInfoResponse {
   BridgeEventInfo info = 1 [ (gogoproto.nullable) = false ];
+}
+
+// QueryWithdrawalsRequest is a request type for the withdrawals RPC method.
+message QueryWithdrawalsRequest {}
+
+// QueryWithdrawalsResponse is a response type for the
+// Withdrawals RPC method.
+message QueryWithdrawalsResponse {
+  repeated BridgeEvent Withdrawals = 1 [ (gogoproto.nullable) = false ];
 }
 
 // QueryRecognizedEventInfoRequest is a request type for the

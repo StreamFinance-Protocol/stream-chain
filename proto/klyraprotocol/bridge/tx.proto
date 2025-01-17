@@ -42,6 +42,16 @@ message MsgAcknowledgeBridges {
 // type.
 message MsgAcknowledgeBridgesResponse {}
 
+// MsgBridgeWithdraw is the Msg/BridgeWithdraw request type.
+message MsgBridgeWithdraw {
+  // The events to acknowledge.
+  BridgeWithdraw withdraw = 1 [ (gogoproto.nullable) = false ];
+}
+
+// MsgBridgeWithdrawResponse is the Msg/BridgeWithdraw response
+// type.
+message MsgBridgeWithdrawResponse {}
+
 // MsgCompleteBridge is the Msg/CompleteBridgeResponse request type.
 message MsgCompleteBridge {
   // Authority is the address that controls the module.

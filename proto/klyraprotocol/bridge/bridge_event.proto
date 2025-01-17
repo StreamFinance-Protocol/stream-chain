@@ -18,6 +18,20 @@ message BridgeEvent {
   // The account address or module address to bridge to.
   string address = 3 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
 
-  // The Ethereum block height of the event.
-  uint64 eth_block_height = 4;
+  // The Ethereum or klyra block height of the event.
+  uint64 block_height = 4;
+
+  // True if the bridge event is for a deposit.bool
+  bool is_deposit = 5;
+}
+
+message BridgeWithdraw {
+  // The amount of sdai to withdraw
+  string sdai_amount = 1; 
+
+  // The klyra account that sdai is being withdrawn from
+  string account = 2;
+
+  // The eth address that the funds are being bridged to
+  string eth_recipient = 3;
 }

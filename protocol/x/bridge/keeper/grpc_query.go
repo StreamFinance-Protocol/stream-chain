@@ -87,6 +87,35 @@ func (k Keeper) AcknowledgedEventInfo(
 	}, nil
 }
 
+func (k Keeper) WithdrawEvents(
+	c context.Context,
+	req *types.QueryWithdrawalsRequest,
+) (
+	*types.QueryWithdrawalsResponse,
+	error,
+) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	ctx := lib.UnwrapSDKContext(c, types.ModuleName)
+	lastSubmittedWithdrawEventId := k.bridgeEventManager.GetLastSubmittedWithdrawEventId()
+	proposeParams := k.GetProposeParams(ctx)
+	events := make([]types.BridgeEvent, 0)
+
+	for i := uint32(0); i < proposeParams.MaxBridgesPerBlock; i++ {
+		withdrawEvent, _, found := k.bridgeEventManager.GetBridgeEventById(lastSubmittedWithdrawEventId+i, false)
+		if !found {
+			break
+		}
+		events = append(events, withdrawEvent)
+	}
+
+	return &types.QueryWithdrawalsResponse{
+		Withdrawals: events,
+	}, nil
+}
+
 // RecognizedEventInfo processes a query request/response for the following
 // that has a greater `NextId`:
 // - the `AcknowledgedEventInfo` from state
@@ -111,7 +140,7 @@ func (k Keeper) RecognizedEventInfo(
 	// If `AcknowledgedEventInfo` from state has a greater `NextId`, use that in response.
 	// This implies that the EventInfo that has a greater `NextId` also has a equal-or-higher
 	// value of `EthBlockHeight`.
-	if acknowledgedEventInfo.NextId > recognizedEventInfo.NextId {
+	if acknowledgedEventInfo.NextDepositId > recognizedEventInfo.NextDepositId {
 		recognizedEventInfo = acknowledgedEventInfo
 	}
 	return &types.QueryRecognizedEventInfoResponse{

@@ -33,7 +33,7 @@ func (k Keeper) SetAcknowledgedEventInfo(
 
 	// Emit metrics on acknowledged event info.
 	telemetry.SetGauge(
-		float32(acknowledgedEventInfo.NextId),
+		float32(acknowledgedEventInfo.NextDepositId),
 		types.ModuleName,
 		metrics.AcknowledgedEventInfo,
 		metrics.NextId,

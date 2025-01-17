@@ -52,7 +52,7 @@ func (k Keeper) GetAcknowledgeBridges(
 	for i := uint32(0); i < proposeParams.MaxBridgesPerBlock; i++ {
 		// 1. Try to retrieve recognized event with id `NextId + i` from BridgeEventManager.
 		eventToAcknowledge, eventRecognizedAt, found := k.bridgeEventManager.GetBridgeEventById(
-			acknowledgedEventInfo.NextId + i)
+			acknowledgedEventInfo.NextDepositId+i, true)
 		// Stop looking for events with higher IDs if event with current ID is not found.
 		// This assumes that recognized events are assigned IDs that increment by 1 each time.
 		if !found {
@@ -123,8 +123,8 @@ func (k Keeper) AcknowledgeBridges(
 	// - `EthBlockHeight`is set to block height of last acknowledged bridge event
 	lastBridgeEvent := bridgeEvents[len(bridgeEvents)-1]
 	if err = k.SetAcknowledgedEventInfo(ctx, types.BridgeEventInfo{
-		NextId:         lastBridgeEvent.GetId() + 1,
-		EthBlockHeight: lastBridgeEvent.GetEthBlockHeight(),
+		NextDepositId:  lastBridgeEvent.GetId() + 1,
+		EthBlockHeight: lastBridgeEvent.GetBlockHeight(),
 	}); err != nil {
 		return err
 	}

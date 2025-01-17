@@ -16,7 +16,7 @@ func TestGetAcknowledgedEventInfo(t *testing.T) {
 	require.Equal(
 		t,
 		types.BridgeEventInfo{
-			NextId:         0,
+			NextDepositId:  0,
 			EthBlockHeight: 0,
 		},
 		k.GetAcknowledgedEventInfo(ctx),
@@ -29,11 +29,11 @@ func TestSetAcknowledgedEventInfo(t *testing.T) {
 	k := tApp.App.BridgeKeeper
 
 	info1 := types.BridgeEventInfo{
-		NextId:         111,
+		NextDepositId:  111,
 		EthBlockHeight: 0,
 	}
 	info2 := types.BridgeEventInfo{
-		NextId:         222,
+		NextDepositId:  222,
 		EthBlockHeight: 111,
 	}
 

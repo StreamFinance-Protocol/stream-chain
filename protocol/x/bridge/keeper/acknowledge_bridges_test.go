@@ -31,34 +31,34 @@ func TestAcknowledgeBridges(t *testing.T) {
 		"Success: no events": {
 			bridgeEvents: []types.BridgeEvent{},
 			expectedAEI: types.BridgeEventInfo{
-				NextId:         0,
+				NextDepositId:  0,
 				EthBlockHeight: 0,
 			},
 		},
 		"Success: 1 event": {
 			bridgeEvents: []types.BridgeEvent{
-				constants.BridgeEvent_Id55_Height15,
+				constants.BridgeDepositEvent_Id55_Height15,
 			},
 			delayMsgErrors: []error{nil},
 			expectedAEI: types.BridgeEventInfo{
-				NextId:         56,
+				NextDepositId:  56,
 				EthBlockHeight: 15,
 			},
 		},
 		"Success: 2 events": {
 			bridgeEvents: []types.BridgeEvent{
-				constants.BridgeEvent_Id0_Height0,
-				constants.BridgeEvent_Id1_Height0,
+				constants.BridgeDepositEvent_Id0_Height0,
+				constants.BridgeDepositEvent_Id1_Height0,
 			},
 			delayMsgErrors: []error{nil, nil},
 			expectedAEI: types.BridgeEventInfo{
-				NextId:         2,
+				NextDepositId:  2,
 				EthBlockHeight: 0,
 			},
 		},
 		"Error: bridging disabled": {
 			bridgeEvents: []types.BridgeEvent{
-				constants.BridgeEvent_Id55_Height15,
+				constants.BridgeDepositEvent_Id55_Height15,
 			},
 			delayMsgErrors:   []error{nil},
 			bridgingDisabled: true,
@@ -66,8 +66,8 @@ func TestAcknowledgeBridges(t *testing.T) {
 		},
 		"Error: 2 events, delaying second msg returns error": {
 			bridgeEvents: []types.BridgeEvent{
-				constants.BridgeEvent_Id0_Height0,
-				constants.BridgeEvent_Id1_Height0,
+				constants.BridgeDepositEvent_Id0_Height0,
+				constants.BridgeDepositEvent_Id1_Height0,
 			},
 			delayMsgErrors: []error{nil, errors.New("failed to delay message 1")},
 			expectedError:  "failed to delay message 1",
@@ -77,46 +77,46 @@ func TestAcknowledgeBridges(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// Initialize context, keeper, and mockDelayMsgKeeper.
-			ctx, bridgeKeeper, _, _, _, _, mockDelayMsgKeeper := keepertest.BridgeKeepers(t)
-			err := bridgeKeeper.UpdateSafetyParams(ctx, types.SafetyParams{
+			ks := keepertest.BridgeKeepers(t)
+			err := ks.BridgeKeeper.UpdateSafetyParams(ks.Ctx, types.SafetyParams{
 				IsDisabled:  tc.bridgingDisabled,
-				DelayBlocks: bridgeKeeper.GetSafetyParams(ctx).DelayBlocks,
+				DelayBlocks: ks.BridgeKeeper.GetSafetyParams(ks.Ctx).DelayBlocks,
 			})
 			require.NoError(t, err)
 			for i := range tc.bridgeEvents {
-				mockDelayMsgKeeper.On(
+				ks.MockDelayMsgKeeper.On(
 					"DelayMessageByBlocks",
-					ctx,
+					ks.Ctx,
 					mock.Anything,
 					mock.Anything,
 				).Return(uint32(i), tc.delayMsgErrors[i]).Once()
 			}
-			initialAei := bridgeKeeper.GetAcknowledgedEventInfo(ctx)
+			initialAei := ks.BridgeKeeper.GetAcknowledgedEventInfo(ks.Ctx)
 
 			// Invoke AcknowledgeBridges.
-			err = bridgeKeeper.AcknowledgeBridges(ctx, tc.bridgeEvents)
+			err = ks.BridgeKeeper.AcknowledgeBridges(ks.Ctx, tc.bridgeEvents)
 
 			if tc.expectedError != "" {
 				// Verify that error is as expected.
 				require.ErrorContains(t, err, tc.expectedError)
 
 				// Verify that AcknowledgedEventInfo was not updated.
-				require.Equal(t, initialAei, bridgeKeeper.GetAcknowledgedEventInfo(ctx))
+				require.Equal(t, initialAei, ks.BridgeKeeper.GetAcknowledgedEventInfo(ks.Ctx))
 
 				if tc.bridgingDisabled {
 					// Verify that no messages were delayed.
-					mockDelayMsgKeeper.AssertNotCalled(t, "DelayMessageByBlocks")
+					ks.MockDelayMsgKeeper.AssertNotCalled(t, "DelayMessageByBlocks")
 				}
 			} else {
 				// Verify that AcknowledgeBridges returns no error.
 				require.NoError(t, err)
 
 				// Verify that AcknowledgedEventInfo is updated in state.
-				aei := bridgeKeeper.GetAcknowledgedEventInfo(ctx)
+				aei := ks.BridgeKeeper.GetAcknowledgedEventInfo(ks.Ctx)
 				require.Equal(t, tc.expectedAEI, aei)
 
 				// Assert mock expectations.
-				mockDelayMsgKeeper.AssertExpectations(t)
+				ks.MockDelayMsgKeeper.AssertExpectations(t)
 			}
 		})
 	}
@@ -147,8 +147,8 @@ func TestGetAcknowledgeBridges(t *testing.T) {
 				ProposeDelayDuration: time.Second,
 			},
 			bridgeEventsToAdd: []types.BridgeEvent{
-				constants.BridgeEvent_Id0_Height0,
-				constants.BridgeEvent_Id1_Height0,
+				constants.BridgeDepositEvent_Id0_Height0,
+				constants.BridgeDepositEvent_Id1_Height0,
 			},
 			expectedMsg: &types.MsgAcknowledgeBridges{
 				Events: []types.BridgeEvent{},
@@ -162,8 +162,8 @@ func TestGetAcknowledgeBridges(t *testing.T) {
 				SkipIfBlockDelayedByDuration: time.Second,
 			},
 			bridgeEventsToAdd: []types.BridgeEvent{
-				constants.BridgeEvent_Id0_Height0,
-				constants.BridgeEvent_Id1_Height0,
+				constants.BridgeDepositEvent_Id0_Height0,
+				constants.BridgeDepositEvent_Id1_Height0,
 			},
 			expectedMsg: &types.MsgAcknowledgeBridges{
 				Events: []types.BridgeEvent{},
@@ -179,16 +179,16 @@ func TestGetAcknowledgeBridges(t *testing.T) {
 				ProposeDelayDuration:         time.Second, // propose events recognized at least one second ago.
 			},
 			bridgeEventsToAdd: []types.BridgeEvent{
-				constants.BridgeEvent_Id0_Height0,
-				constants.BridgeEvent_Id1_Height0,
-				constants.BridgeEvent_Id2_Height1,
-				constants.BridgeEvent_Id3_Height3, // this event should not be proposed.
+				constants.BridgeDepositEvent_Id0_Height0,
+				constants.BridgeDepositEvent_Id1_Height0,
+				constants.BridgeDepositEvent_Id2_Height1,
+				constants.BridgeDepositEvent_Id3_Height3, // this event should not be proposed.
 			},
 			expectedMsg: &types.MsgAcknowledgeBridges{
 				Events: []types.BridgeEvent{
-					constants.BridgeEvent_Id0_Height0,
-					constants.BridgeEvent_Id1_Height0,
-					constants.BridgeEvent_Id2_Height1,
+					constants.BridgeDepositEvent_Id0_Height0,
+					constants.BridgeDepositEvent_Id1_Height0,
+					constants.BridgeDepositEvent_Id2_Height1,
 				},
 			},
 		},
@@ -202,15 +202,15 @@ func TestGetAcknowledgeBridges(t *testing.T) {
 				ProposeDelayDuration:         time.Second, // propose events recognized at least one second ago.
 			},
 			bridgeEventsToAdd: []types.BridgeEvent{
-				constants.BridgeEvent_Id0_Height0,
-				constants.BridgeEvent_Id1_Height0,
-				constants.BridgeEvent_Id2_Height1,
+				constants.BridgeDepositEvent_Id0_Height0,
+				constants.BridgeDepositEvent_Id1_Height0,
+				constants.BridgeDepositEvent_Id2_Height1,
 			},
 			expectedMsg: &types.MsgAcknowledgeBridges{
 				Events: []types.BridgeEvent{
-					constants.BridgeEvent_Id0_Height0,
-					constants.BridgeEvent_Id1_Height0,
-					constants.BridgeEvent_Id2_Height1,
+					constants.BridgeDepositEvent_Id0_Height0,
+					constants.BridgeDepositEvent_Id1_Height0,
+					constants.BridgeDepositEvent_Id2_Height1,
 				},
 			},
 		},
@@ -224,13 +224,13 @@ func TestGetAcknowledgeBridges(t *testing.T) {
 				ProposeDelayDuration:         time.Second, // propose events recognized at least one second ago.
 			},
 			bridgeEventsToAdd: []types.BridgeEvent{
-				constants.BridgeEvent_Id0_Height0,
-				constants.BridgeEvent_Id1_Height0,
+				constants.BridgeDepositEvent_Id0_Height0,
+				constants.BridgeDepositEvent_Id1_Height0,
 			},
 			expectedMsg: &types.MsgAcknowledgeBridges{
 				Events: []types.BridgeEvent{
-					constants.BridgeEvent_Id0_Height0,
-					constants.BridgeEvent_Id1_Height0,
+					constants.BridgeDepositEvent_Id0_Height0,
+					constants.BridgeDepositEvent_Id1_Height0,
 				},
 			},
 		},
@@ -244,18 +244,18 @@ func TestGetAcknowledgeBridges(t *testing.T) {
 				ProposeDelayDuration:         time.Second, // propose events recognized at least one second ago.
 			},
 			bridgeEventsToAdd: []types.BridgeEvent{
-				constants.BridgeEvent_Id0_Height0, // this event should not be proposed.
-				constants.BridgeEvent_Id1_Height0,
-				constants.BridgeEvent_Id2_Height1,
+				constants.BridgeDepositEvent_Id0_Height0, // this event should not be proposed.
+				constants.BridgeDepositEvent_Id1_Height0,
+				constants.BridgeDepositEvent_Id2_Height1,
 			},
 			acknowledgedEventInfo: types.BridgeEventInfo{
-				NextId:         1,
+				NextDepositId:  1,
 				EthBlockHeight: 0,
 			},
 			expectedMsg: &types.MsgAcknowledgeBridges{
 				Events: []types.BridgeEvent{
-					constants.BridgeEvent_Id1_Height0,
-					constants.BridgeEvent_Id2_Height1,
+					constants.BridgeDepositEvent_Id1_Height0,
+					constants.BridgeDepositEvent_Id2_Height1,
 				},
 			},
 		},
@@ -269,8 +269,8 @@ func TestGetAcknowledgeBridges(t *testing.T) {
 				ProposeDelayDuration:         time.Second, // propose events recognized at least one second ago.
 			},
 			bridgeEventsToAdd: []types.BridgeEvent{
-				constants.BridgeEvent_Id0_Height0,
-				constants.BridgeEvent_Id1_Height0,
+				constants.BridgeDepositEvent_Id0_Height0,
+				constants.BridgeDepositEvent_Id1_Height0,
 			},
 			expectedMsg: &types.MsgAcknowledgeBridges{
 				Events: []types.BridgeEvent{},
@@ -286,12 +286,12 @@ func TestGetAcknowledgeBridges(t *testing.T) {
 				ProposeDelayDuration:         time.Second, // propose events recognized at least one second ago.
 			},
 			bridgeEventsToAdd: []types.BridgeEvent{
-				constants.BridgeEvent_Id0_Height0,
-				constants.BridgeEvent_Id1_Height0,
-				constants.BridgeEvent_Id2_Height1,
+				constants.BridgeDepositEvent_Id0_Height0,
+				constants.BridgeDepositEvent_Id1_Height0,
+				constants.BridgeDepositEvent_Id2_Height1,
 			},
 			acknowledgedEventInfo: types.BridgeEventInfo{
-				NextId:         0,
+				NextDepositId:  0,
 				EthBlockHeight: 0,
 			},
 			bridgingDisabled: true,
@@ -304,23 +304,23 @@ func TestGetAcknowledgeBridges(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// Setup keeper, bridgeEventManager, and mockTimeProvider.
-			ctx, bridgeKeeper, _, mockTimeProvider, bridgeEventManager, _, _ := keepertest.BridgeKeepers(t)
-			err := bridgeKeeper.SetAcknowledgedEventInfo(ctx, tc.acknowledgedEventInfo)
+			ks := keepertest.BridgeKeepers(t)
+			err := ks.BridgeKeeper.SetAcknowledgedEventInfo(ks.Ctx, tc.acknowledgedEventInfo)
 			require.NoError(t, err)
-			err = bridgeKeeper.UpdateProposeParams(ctx, tc.proposeParams)
+			err = ks.BridgeKeeper.UpdateProposeParams(ks.Ctx, tc.proposeParams)
 			require.NoError(t, err)
-			err = bridgeKeeper.UpdateSafetyParams(ctx, types.SafetyParams{
+			err = ks.BridgeKeeper.UpdateSafetyParams(ks.Ctx, types.SafetyParams{
 				IsDisabled:  tc.bridgingDisabled,
-				DelayBlocks: bridgeKeeper.GetSafetyParams(ctx).DelayBlocks,
+				DelayBlocks: ks.BridgeKeeper.GetSafetyParams(ks.Ctx).DelayBlocks,
 			})
 			require.NoError(t, err)
-			mockTimeProvider.On("Now").Return(tc.eventTimestamp).Once()
-			err = bridgeEventManager.AddBridgeEvents(tc.bridgeEventsToAdd)
+			ks.MockTimeProvider.On("Now").Return(tc.eventTimestamp).Once()
+			err = ks.BridgeEventManager.AddBridgeEvents(tc.bridgeEventsToAdd)
 			require.NoError(t, err)
 
 			// Get MsgAcknowledgeBridges.
-			mockTimeProvider.On("Now").Return(timeNow).Once()
-			msg := bridgeKeeper.GetAcknowledgeBridges(ctx, tc.blockTimestamp)
+			ks.MockTimeProvider.On("Now").Return(timeNow).Once()
+			msg := ks.BridgeKeeper.GetAcknowledgeBridges(ks.Ctx, tc.blockTimestamp)
 
 			// Assert expected MsgAcknowledgeBridges.
 			require.Equal(t, tc.expectedMsg, msg)

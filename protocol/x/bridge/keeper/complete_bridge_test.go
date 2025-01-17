@@ -28,16 +28,17 @@ func TestCompleteBridge(t *testing.T) {
 	}{
 		"Success": {
 			initialModAccBalance:  sdk.NewCoin("adv4tnt", sdkmath.NewInt(1_000)),
-			bridgeEvent:           constants.BridgeEvent_Id0_Height0,           // bridges 888 tokens.
+			bridgeEvent:           constants.BridgeDepositEvent_Id0_Height0,    // bridges 888 tokens.
 			expectedModAccBalance: sdk.NewCoin("adv4tnt", sdkmath.NewInt(112)), // 1000 - 888.
 		},
 		"Success: coin amount is 0": {
 			initialModAccBalance: sdk.NewCoin("adv4tnt", sdkmath.NewInt(1_000)),
 			bridgeEvent: types.BridgeEvent{
-				Id:             7,
-				Address:        constants.BobAccAddress.String(),
-				Coin:           sdk.NewCoin("adv4tnt", sdkmath.ZeroInt()),
-				EthBlockHeight: 3,
+				Id:          7,
+				Address:     constants.BobAccAddress.String(),
+				Coin:        sdk.NewCoin("adv4tnt", sdkmath.ZeroInt()),
+				BlockHeight: 3,
+				IsDeposit:   true,
 			},
 			expectedModAccBalance: sdk.NewCoin("adv4tnt", sdkmath.NewInt(1_000)),
 		},
@@ -50,30 +51,32 @@ func TestCompleteBridge(t *testing.T) {
 					Denom:  "adv4tnt",
 					Amount: sdkmath.NewInt(-1),
 				},
-				EthBlockHeight: 3,
+				BlockHeight: 3,
+				IsDeposit:   true,
 			},
 			expectedModAccBalance: sdk.NewCoin("adv4tnt", sdkmath.NewInt(1_000)),
 		},
 		"Failure: invalid address string": {
 			initialModAccBalance: sdk.NewCoin("adv4tnt", sdkmath.NewInt(1_000)),
 			bridgeEvent: types.BridgeEvent{
-				Id:             4,
-				Address:        "not an address string",
-				Coin:           sdk.NewCoin("adv4tnt", sdkmath.NewInt(1)),
-				EthBlockHeight: 2,
+				Id:          4,
+				Address:     "not an address string",
+				Coin:        sdk.NewCoin("adv4tnt", sdkmath.NewInt(1)),
+				BlockHeight: 2,
+				IsDeposit:   true,
 			},
 			expectedError:         "decoding bech32 failed",
 			expectedModAccBalance: sdk.NewCoin("adv4tnt", sdkmath.NewInt(1_000)),
 		},
 		"Failure: bridge module account has insufficient balance": {
 			initialModAccBalance:  sdk.NewCoin("adv4tnt", sdkmath.NewInt(500)),
-			bridgeEvent:           constants.BridgeEvent_Id0_Height0, // bridges 888 tokens.
+			bridgeEvent:           constants.BridgeDepositEvent_Id0_Height0, // bridges 888 tokens.
 			expectedError:         "insufficient funds",
 			expectedModAccBalance: sdk.NewCoin("adv4tnt", sdkmath.NewInt(500)),
 		},
 		"Failure: bridging is disabled": {
 			initialModAccBalance:  sdk.NewCoin("adv4tnt", sdkmath.NewInt(1_000)),
-			bridgeEvent:           constants.BridgeEvent_Id0_Height0, // bridges 888 tokens.
+			bridgeEvent:           constants.BridgeDepositEvent_Id0_Height0, // bridges 888 tokens.
 			bridgingDisabled:      true,
 			expectedError:         types.ErrBridgingDisabled.Error(),
 			expectedModAccBalance: sdk.NewCoin("adv4tnt", sdkmath.NewInt(1_000)), // same as initial.
@@ -83,22 +86,22 @@ func TestCompleteBridge(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// Initialize context and keeper.
-			ctx, bridgeKeeper, _, _, _, bankKeeper, _ := keepertest.BridgeKeepers(t)
-			err := bridgeKeeper.UpdateSafetyParams(ctx, types.SafetyParams{
+			ks := keepertest.BridgeKeepers(t)
+			err := ks.BridgeKeeper.UpdateSafetyParams(ks.Ctx, types.SafetyParams{
 				IsDisabled:  tc.bridgingDisabled,
-				DelayBlocks: bridgeKeeper.GetSafetyParams(ctx).DelayBlocks,
+				DelayBlocks: ks.BridgeKeeper.GetSafetyParams(ks.Ctx).DelayBlocks,
 			})
 			require.NoError(t, err)
 			// Fund bridge module account with enough balance.
-			err = bankKeeper.MintCoins(
-				ctx,
+			err = ks.BankKeeper.MintCoins(
+				ks.Ctx,
 				types.ModuleName,
 				sdk.NewCoins(tc.initialModAccBalance),
 			)
 			require.NoError(t, err)
 
 			// Complete bridge.
-			err = bridgeKeeper.CompleteBridge(ctx, tc.bridgeEvent)
+			err = ks.BridgeKeeper.CompleteBridge(ks.Ctx, tc.bridgeEvent)
 
 			// Assert expectations.
 			if tc.expectedError != "" {
@@ -108,8 +111,8 @@ func TestCompleteBridge(t *testing.T) {
 				require.NoError(t, err)
 
 				// Assert that target account's balance of bridged token is as expected.
-				balance := bankKeeper.GetBalance(
-					ctx,
+				balance := ks.BankKeeper.GetBalance(
+					ks.Ctx,
 					sdk.MustAccAddressFromBech32(tc.bridgeEvent.Address),
 					tc.bridgeEvent.Coin.Denom,
 				)
@@ -121,8 +124,8 @@ func TestCompleteBridge(t *testing.T) {
 				require.Equal(t, expectedBalance.Amount, balance.Amount)
 			}
 			// Assert that bridge module account's balance is as expected.
-			modAccBalance := bankKeeper.GetBalance(
-				ctx,
+			modAccBalance := ks.BankKeeper.GetBalance(
+				ks.Ctx,
 				types.ModuleAddress,
 				tc.bridgeEvent.Coin.Denom,
 			)

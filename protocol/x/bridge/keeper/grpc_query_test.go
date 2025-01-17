@@ -177,7 +177,7 @@ func TestRecognizedEventInfo(t *testing.T) {
 			req: &types.QueryRecognizedEventInfoRequest{},
 			res: &types.QueryRecognizedEventInfoResponse{
 				Info: types.BridgeEventInfo{
-					NextId:         0,
+					NextDepositId:  0,
 					EthBlockHeight: 0,
 				},
 			},
@@ -211,17 +211,17 @@ func TestDelayedCompleteBridgeMessages(t *testing.T) {
 		},
 		"Success - two bridge events": {
 			events: []types.BridgeEvent{
-				constants.BridgeEvent_Id0_Height0,
-				constants.BridgeEvent_Id1_Height0,
+				constants.BridgeDepositEvent_Id0_Height0,
+				constants.BridgeDepositEvent_Id1_Height0,
 			},
 		},
 		"Success - five bridge events": {
 			events: []types.BridgeEvent{
-				constants.BridgeEvent_Id0_Height0,
-				constants.BridgeEvent_Id1_Height0,
-				constants.BridgeEvent_Id2_Height1,
-				constants.BridgeEvent_Id3_Height3,
-				constants.BridgeEvent_Id55_Height15,
+				constants.BridgeDepositEvent_Id0_Height0,
+				constants.BridgeDepositEvent_Id1_Height0,
+				constants.BridgeDepositEvent_Id2_Height1,
+				constants.BridgeDepositEvent_Id3_Height3,
+				constants.BridgeDepositEvent_Id55_Height15,
 			},
 		},
 	} {

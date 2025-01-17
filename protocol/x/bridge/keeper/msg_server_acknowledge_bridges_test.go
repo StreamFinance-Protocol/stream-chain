@@ -44,10 +44,10 @@ func TestMsgServerAcknowledgeBridges(t *testing.T) {
 			// Initialize Mocks and Context.
 			mockKeeper := &mocks.BridgeKeeper{}
 			msgServer := keeper.NewMsgServerImpl(mockKeeper)
-			ctx, _, _, _, _, _, _ := keepertest.BridgeKeepers(t)
-			tc.setupMocks(ctx, mockKeeper)
+			ks := keepertest.BridgeKeepers(t)
+			tc.setupMocks(ks.Ctx, mockKeeper)
 
-			resp, err := msgServer.AcknowledgeBridges(ctx, testMsg)
+			resp, err := msgServer.AcknowledgeBridges(ks.Ctx, testMsg)
 
 			// Assert msg server response.
 			require.Equal(t, tc.expectedResp, resp)

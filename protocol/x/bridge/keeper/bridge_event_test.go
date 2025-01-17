@@ -22,13 +22,13 @@ func TestGetBridgeEventFromServer(t *testing.T) {
 		expectedFound bool
 	}{
 		"Event found": {
-			bridgeEvent:   constants.BridgeEvent_Id0_Height0,
+			bridgeEvent:   constants.BridgeDepositEvent_Id0_Height0,
 			bridgeEventId: 0,
-			expectedEvent: constants.BridgeEvent_Id0_Height0,
+			expectedEvent: constants.BridgeDepositEvent_Id0_Height0,
 			expectedFound: true,
 		},
 		"Event not found": {
-			bridgeEvent:   constants.BridgeEvent_Id0_Height0,
+			bridgeEvent:   constants.BridgeDepositEvent_Id0_Height0,
 			bridgeEventId: 1,
 			expectedFound: false,
 		},
@@ -37,13 +37,13 @@ func TestGetBridgeEventFromServer(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// Initialize context, keeper, and bridgeEventManager.
-			ctx, bridgeKeeper, _, mockTimeProvider, bridgeEventManager, _, _ := keepertest.BridgeKeepers(t)
-			mockTimeProvider.On("Now").Return(time.Now())
-			err := bridgeEventManager.AddBridgeEvents([]types.BridgeEvent{tc.bridgeEvent})
+			ks := keepertest.BridgeKeepers(t)
+			ks.MockTimeProvider.On("Now").Return(time.Now())
+			err := ks.BridgeEventManager.AddBridgeEvents([]types.BridgeEvent{tc.bridgeEvent})
 			require.NoError(t, err)
 
 			// Complete bridge.
-			event, found := bridgeKeeper.GetBridgeEventFromServer(ctx, tc.bridgeEventId)
+			event, found := ks.BridgeKeeper.GetBridgeEventFromServer(ks.Ctx, tc.bridgeEventId)
 
 			// Assert expectations.
 			require.Equal(t, tc.expectedEvent, event)

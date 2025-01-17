@@ -25,7 +25,7 @@ func TestMsgServerCompleteBridge(t *testing.T) {
 		"Success": {
 			testMsg: types.MsgCompleteBridge{
 				Authority: delaymsgtypes.ModuleAddress.String(),
-				Event:     constants.BridgeEvent_Id0_Height0,
+				Event:     constants.BridgeDepositEvent_Id0_Height0,
 			},
 			expectedResp: &types.MsgCompleteBridgeResponse{},
 		},
@@ -33,10 +33,11 @@ func TestMsgServerCompleteBridge(t *testing.T) {
 			testMsg: types.MsgCompleteBridge{
 				Authority: delaymsgtypes.ModuleAddress.String(),
 				Event: types.BridgeEvent{
-					Id:             0,
-					Coin:           sdk.NewCoin("adv4tnt", sdkmath.NewInt(1)),
-					Address:        "invalid",
-					EthBlockHeight: 1,
+					Id:          0,
+					Coin:        sdk.NewCoin("adv4tnt", sdkmath.NewInt(1)),
+					Address:     "invalid",
+					BlockHeight: 1,
+					IsDeposit:   true,
 				},
 			},
 			expectedErr: "decoding bech32 failed",
@@ -44,7 +45,7 @@ func TestMsgServerCompleteBridge(t *testing.T) {
 		"Failure: invalid authority": {
 			testMsg: types.MsgCompleteBridge{
 				Authority: "12345",
-				Event:     constants.BridgeEvent_Id0_Height0,
+				Event:     constants.BridgeDepositEvent_Id0_Height0,
 			},
 			expectedErr: fmt.Sprintf(
 				"message authority %s is not valid for sending complete bridge messages",

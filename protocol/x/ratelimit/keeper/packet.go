@@ -258,7 +258,7 @@ func (k Keeper) PreprocessSendPacket(ctx sdk.Context, packet []byte) error {
 		if err != nil {
 			return err
 		}
-		err = k.WithdrawSDaiFromTDai(ctx, senderAddress, amount)
+		err = k.WithdrawSDaiFromTDai(ctx, senderAddress, amount, true)
 		if err != nil {
 			return err
 		}

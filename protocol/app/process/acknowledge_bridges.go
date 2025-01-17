@@ -89,7 +89,7 @@ func (abt *AcknowledgeBridgesTx) Validate() error {
 
 	// Validate that first bridge event ID is the one to be next acknowledged.
 	acknowledgedEventInfo := abt.bridgeKeeper.GetAcknowledgedEventInfo(abt.ctx)
-	if acknowledgedEventInfo.NextId != abt.msg.Events[0].Id {
+	if acknowledgedEventInfo.NextDepositId != abt.msg.Events[0].Id {
 		telemetry.IncrCounterWithLabels(
 			[]string{
 				ModuleName,
@@ -105,7 +105,7 @@ func (abt *AcknowledgeBridgesTx) Validate() error {
 
 	// Validate that last bridge event ID has been recognized.
 	recognizedEventInfo := abt.bridgeKeeper.GetRecognizedEventInfo(abt.ctx)
-	if recognizedEventInfo.NextId <= abt.msg.Events[len(abt.msg.Events)-1].Id {
+	if recognizedEventInfo.NextDepositId <= abt.msg.Events[len(abt.msg.Events)-1].Id {
 		telemetry.IncrCounterWithLabels(
 			[]string{
 				ModuleName,

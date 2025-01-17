@@ -33,8 +33,10 @@ type BridgeEvent struct {
 	Coin types.Coin `protobuf:"bytes,2,opt,name=coin,proto3" json:"coin"`
 	// The account address or module address to bridge to.
 	Address string `protobuf:"bytes,3,opt,name=address,proto3" json:"address,omitempty"`
-	// The Ethereum block height of the event.
-	EthBlockHeight uint64 `protobuf:"varint,4,opt,name=eth_block_height,json=ethBlockHeight,proto3" json:"eth_block_height,omitempty"`
+	// The Ethereum or klyra block height of the event.
+	BlockHeight uint64 `protobuf:"varint,4,opt,name=block_height,json=blockHeight,proto3" json:"block_height,omitempty"`
+	// True if the bridge event is for a deposit.bool
+	IsDeposit bool `protobuf:"varint,5,opt,name=is_deposit,json=isDeposit,proto3" json:"is_deposit,omitempty"`
 }
 
 func (m *BridgeEvent) Reset()         { *m = BridgeEvent{} }
@@ -91,15 +93,86 @@ func (m *BridgeEvent) GetAddress() string {
 	return ""
 }
 
-func (m *BridgeEvent) GetEthBlockHeight() uint64 {
+func (m *BridgeEvent) GetBlockHeight() uint64 {
 	if m != nil {
-		return m.EthBlockHeight
+		return m.BlockHeight
 	}
 	return 0
 }
 
+func (m *BridgeEvent) GetIsDeposit() bool {
+	if m != nil {
+		return m.IsDeposit
+	}
+	return false
+}
+
+type BridgeWithdraw struct {
+	// The amount of sdai to withdraw
+	SdaiAmount string `protobuf:"bytes,1,opt,name=sdai_amount,json=sdaiAmount,proto3" json:"sdai_amount,omitempty"`
+	// The klyra account that sdai is being withdrawn from
+	Account string `protobuf:"bytes,2,opt,name=account,proto3" json:"account,omitempty"`
+	// The eth address that the funds are being bridged to
+	EthRecipient string `protobuf:"bytes,3,opt,name=eth_recipient,json=ethRecipient,proto3" json:"eth_recipient,omitempty"`
+}
+
+func (m *BridgeWithdraw) Reset()         { *m = BridgeWithdraw{} }
+func (m *BridgeWithdraw) String() string { return proto.CompactTextString(m) }
+func (*BridgeWithdraw) ProtoMessage()    {}
+func (*BridgeWithdraw) Descriptor() ([]byte, []int) {
+	return fileDescriptor_b401a521148de216, []int{1}
+}
+func (m *BridgeWithdraw) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *BridgeWithdraw) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_BridgeWithdraw.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *BridgeWithdraw) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_BridgeWithdraw.Merge(m, src)
+}
+func (m *BridgeWithdraw) XXX_Size() int {
+	return m.Size()
+}
+func (m *BridgeWithdraw) XXX_DiscardUnknown() {
+	xxx_messageInfo_BridgeWithdraw.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_BridgeWithdraw proto.InternalMessageInfo
+
+func (m *BridgeWithdraw) GetSdaiAmount() string {
+	if m != nil {
+		return m.SdaiAmount
+	}
+	return ""
+}
+
+func (m *BridgeWithdraw) GetAccount() string {
+	if m != nil {
+		return m.Account
+	}
+	return ""
+}
+
+func (m *BridgeWithdraw) GetEthRecipient() string {
+	if m != nil {
+		return m.EthRecipient
+	}
+	return ""
+}
+
 func init() {
 	proto.RegisterType((*BridgeEvent)(nil), "klyraprotocol.bridge.BridgeEvent")
+	proto.RegisterType((*BridgeWithdraw)(nil), "klyraprotocol.bridge.BridgeWithdraw")
 }
 
 func init() {
@@ -107,28 +180,33 @@ func init() {
 }
 
 var fileDescriptor_b401a521148de216 = []byte{
-	// 324 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x54, 0x91, 0xc1, 0x4a, 0xc3, 0x30,
-	0x18, 0xc7, 0x9b, 0x59, 0x14, 0x3b, 0x1c, 0x52, 0x76, 0xe8, 0x76, 0x88, 0xc5, 0x8b, 0xbd, 0xac,
-	0x61, 0xdb, 0x13, 0x58, 0x71, 0x78, 0x94, 0xee, 0xe6, 0xa5, 0xa6, 0x69, 0x68, 0xc3, 0xb6, 0x64,
-	0x24, 0x71, 0xb8, 0xb7, 0xf0, 0x51, 0x3c, 0xf8, 0x10, 0x3b, 0x0e, 0x4f, 0x9e, 0x44, 0xb6, 0x17,
-	0x91, 0x26, 0xad, 0xe0, 0xa9, 0xfd, 0xfe, 0xbf, 0x5f, 0xfe, 0x81, 0x7c, 0xde, 0xcd, 0x62, 0xb9,
-	0x95, 0x78, 0x2d, 0x85, 0x16, 0x44, 0x2c, 0x51, 0x2e, 0x59, 0x51, 0xd2, 0xe6, 0x93, 0xd1, 0x0d,
-	0xe5, 0x3a, 0x36, 0xd0, 0xef, 0xff, 0x13, 0x63, 0x6b, 0x0c, 0xfb, 0xa5, 0x28, 0x85, 0x09, 0x51,
-	0xfd, 0x67, 0xdd, 0xe1, 0x80, 0x08, 0xb5, 0x12, 0x2a, 0xb3, 0xc0, 0x0e, 0x0d, 0x82, 0x76, 0x42,
-	0x39, 0x56, 0x14, 0x6d, 0xc6, 0x39, 0xd5, 0x78, 0x8c, 0x88, 0x60, 0xdc, 0xf2, 0xeb, 0x77, 0xe0,
-	0x75, 0x13, 0xd3, 0x7d, 0x5f, 0x5f, 0xee, 0xf7, 0xbc, 0x0e, 0x2b, 0x02, 0x10, 0x82, 0xe8, 0x22,
-	0xed, 0xb0, 0xc2, 0x9f, 0x7a, 0x6e, 0x6d, 0x07, 0x9d, 0x10, 0x44, 0xdd, 0xc9, 0x20, 0x6e, 0xca,
-	0xeb, 0xba, 0xb8, 0xa9, 0x8b, 0xef, 0x04, 0xe3, 0x89, 0xbb, 0xfb, 0xbe, 0x72, 0x52, 0x23, 0xfb,
-	0x13, 0xef, 0x0c, 0x17, 0x85, 0xa4, 0x4a, 0x05, 0x27, 0x21, 0x88, 0xce, 0x93, 0xe0, 0xf3, 0x63,
-	0xd4, 0x6f, 0x8e, 0xde, 0x5a, 0x32, 0xd7, 0x92, 0xf1, 0x32, 0x6d, 0x45, 0x3f, 0xf2, 0x2e, 0xa9,
-	0xae, 0xb2, 0x7c, 0x29, 0xc8, 0x22, 0xab, 0x28, 0x2b, 0x2b, 0x1d, 0xb8, 0x21, 0x88, 0xdc, 0xb4,
-	0x47, 0x75, 0x95, 0xd4, 0xf1, 0x83, 0x49, 0x93, 0xe7, 0xdd, 0x01, 0x82, 0xfd, 0x01, 0x82, 0x9f,
-	0x03, 0x04, 0x6f, 0x47, 0xe8, 0xec, 0x8f, 0xd0, 0xf9, 0x3a, 0x42, 0xe7, 0x69, 0x56, 0x32, 0x5d,
-	0xbd, 0xe4, 0x31, 0x11, 0x2b, 0x34, 0xd7, 0x92, 0xe2, 0xd5, 0x8c, 0x71, 0xcc, 0x09, 0x1d, 0x3d,
-	0xb6, 0x0f, 0xae, 0x4c, 0x3c, 0x22, 0x15, 0x66, 0x1c, 0xfd, 0xad, 0xe1, 0xb5, 0x5d, 0x84, 0xde,
-	0xae, 0xa9, 0xca, 0x4f, 0x0d, 0x98, 0xfe, 0x06, 0x00, 0x00, 0xff, 0xff, 0x53, 0xdf, 0x8f, 0x96,
-	0xad, 0x01, 0x00, 0x00,
+	// 405 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x54, 0x92, 0xc1, 0x6e, 0xd3, 0x30,
+	0x18, 0xc7, 0xeb, 0x52, 0x18, 0x75, 0xb7, 0x1d, 0xac, 0x1e, 0xb2, 0x49, 0x64, 0x61, 0x1c, 0xc8,
+	0xa5, 0x89, 0xb6, 0x3d, 0xc1, 0x02, 0x4c, 0x1c, 0x91, 0x77, 0x40, 0xe2, 0x12, 0x1c, 0xdb, 0x4a,
+	0x3e, 0xad, 0xb1, 0x23, 0xdb, 0x1b, 0xec, 0x2d, 0x78, 0x18, 0x1e, 0xa2, 0xc7, 0x8a, 0x13, 0x27,
+	0x84, 0xda, 0x17, 0x41, 0xb1, 0x13, 0xa4, 0x9d, 0x92, 0xef, 0xf7, 0xfb, 0xe7, 0x1f, 0x7d, 0xb2,
+	0xf1, 0xdb, 0xbb, 0xf5, 0xa3, 0x61, 0x9d, 0xd1, 0x4e, 0x73, 0xbd, 0xce, 0x2b, 0x03, 0xa2, 0x96,
+	0xc3, 0xa3, 0x94, 0x0f, 0x52, 0xb9, 0xcc, 0x4b, 0xb2, 0x7c, 0x12, 0xcc, 0x42, 0xe2, 0x74, 0x59,
+	0xeb, 0x5a, 0x7b, 0x98, 0xf7, 0x6f, 0x21, 0x7b, 0x7a, 0xc2, 0xb5, 0x6d, 0xb5, 0x2d, 0x83, 0x08,
+	0xc3, 0xa0, 0xe2, 0x30, 0xe5, 0x15, 0xb3, 0x32, 0x7f, 0xb8, 0xa8, 0xa4, 0x63, 0x17, 0x39, 0xd7,
+	0xa0, 0x82, 0x3f, 0xdf, 0x20, 0xbc, 0x28, 0x7c, 0xf7, 0x87, 0xfe, 0xe7, 0xe4, 0x18, 0x4f, 0x41,
+	0x44, 0x28, 0x41, 0xe9, 0x11, 0x9d, 0x82, 0x20, 0x57, 0x78, 0xd6, 0xa7, 0xa3, 0x69, 0x82, 0xd2,
+	0xc5, 0xe5, 0x49, 0x36, 0x94, 0xf7, 0x75, 0xd9, 0x50, 0x97, 0xbd, 0xd3, 0xa0, 0x8a, 0xd9, 0xe6,
+	0xcf, 0xd9, 0x84, 0xfa, 0x30, 0xb9, 0xc4, 0x07, 0x4c, 0x08, 0x23, 0xad, 0x8d, 0x9e, 0x25, 0x28,
+	0x9d, 0x17, 0xd1, 0xaf, 0x9f, 0xab, 0xe5, 0xf0, 0xe9, 0x75, 0x30, 0xb7, 0xce, 0x80, 0xaa, 0xe9,
+	0x18, 0x24, 0xaf, 0xf1, 0x61, 0xb5, 0xd6, 0xfc, 0xae, 0x6c, 0x24, 0xd4, 0x8d, 0x8b, 0x66, 0x09,
+	0x4a, 0x67, 0x74, 0xe1, 0xd9, 0x47, 0x8f, 0xc8, 0x2b, 0x8c, 0xc1, 0x96, 0x42, 0x76, 0xda, 0x82,
+	0x8b, 0x9e, 0x27, 0x28, 0x7d, 0x49, 0xe7, 0x60, 0xdf, 0x07, 0x70, 0xde, 0xe1, 0xe3, 0xb0, 0xc9,
+	0x67, 0x70, 0x8d, 0x30, 0xec, 0x1b, 0x39, 0xc3, 0x0b, 0x2b, 0x18, 0x94, 0xac, 0xd5, 0xf7, 0xca,
+	0xf9, 0xad, 0xe6, 0x14, 0xf7, 0xe8, 0xda, 0x13, 0x12, 0xe1, 0x03, 0xc6, 0xb9, 0x97, 0x53, 0x2f,
+	0xc7, 0x91, 0xbc, 0xc1, 0x47, 0xd2, 0x35, 0xa5, 0x91, 0x1c, 0x3a, 0x90, 0xca, 0x85, 0x45, 0xe8,
+	0xa1, 0x74, 0x0d, 0x1d, 0x59, 0xf1, 0x75, 0xb3, 0x8b, 0xd1, 0x76, 0x17, 0xa3, 0xbf, 0xbb, 0x18,
+	0xfd, 0xd8, 0xc7, 0x93, 0xed, 0x3e, 0x9e, 0xfc, 0xde, 0xc7, 0x93, 0x2f, 0x37, 0x35, 0xb8, 0xe6,
+	0xbe, 0xca, 0xb8, 0x6e, 0xf3, 0x5b, 0x67, 0x24, 0x6b, 0x6f, 0x40, 0x31, 0xc5, 0xe5, 0xea, 0xd3,
+	0x78, 0xf4, 0xd6, 0xe3, 0x15, 0x6f, 0x18, 0xa8, 0xfc, 0xff, 0x85, 0xf8, 0x3e, 0x5e, 0x09, 0xf7,
+	0xd8, 0x49, 0x5b, 0xbd, 0xf0, 0xe2, 0xea, 0x5f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x7f, 0x26, 0xf0,
+	0xd3, 0x37, 0x02, 0x00, 0x00,
 }
 
 func (m *BridgeEvent) Marshal() (dAtA []byte, err error) {
@@ -151,8 +229,18 @@ func (m *BridgeEvent) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.EthBlockHeight != 0 {
-		i = encodeVarintBridgeEvent(dAtA, i, uint64(m.EthBlockHeight))
+	if m.IsDeposit {
+		i--
+		if m.IsDeposit {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x28
+	}
+	if m.BlockHeight != 0 {
+		i = encodeVarintBridgeEvent(dAtA, i, uint64(m.BlockHeight))
 		i--
 		dAtA[i] = 0x20
 	}
@@ -177,6 +265,50 @@ func (m *BridgeEvent) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i = encodeVarintBridgeEvent(dAtA, i, uint64(m.Id))
 		i--
 		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *BridgeWithdraw) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *BridgeWithdraw) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *BridgeWithdraw) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.EthRecipient) > 0 {
+		i -= len(m.EthRecipient)
+		copy(dAtA[i:], m.EthRecipient)
+		i = encodeVarintBridgeEvent(dAtA, i, uint64(len(m.EthRecipient)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Account) > 0 {
+		i -= len(m.Account)
+		copy(dAtA[i:], m.Account)
+		i = encodeVarintBridgeEvent(dAtA, i, uint64(len(m.Account)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.SdaiAmount) > 0 {
+		i -= len(m.SdaiAmount)
+		copy(dAtA[i:], m.SdaiAmount)
+		i = encodeVarintBridgeEvent(dAtA, i, uint64(len(m.SdaiAmount)))
+		i--
+		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
@@ -207,8 +339,32 @@ func (m *BridgeEvent) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovBridgeEvent(uint64(l))
 	}
-	if m.EthBlockHeight != 0 {
-		n += 1 + sovBridgeEvent(uint64(m.EthBlockHeight))
+	if m.BlockHeight != 0 {
+		n += 1 + sovBridgeEvent(uint64(m.BlockHeight))
+	}
+	if m.IsDeposit {
+		n += 2
+	}
+	return n
+}
+
+func (m *BridgeWithdraw) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.SdaiAmount)
+	if l > 0 {
+		n += 1 + l + sovBridgeEvent(uint64(l))
+	}
+	l = len(m.Account)
+	if l > 0 {
+		n += 1 + l + sovBridgeEvent(uint64(l))
+	}
+	l = len(m.EthRecipient)
+	if l > 0 {
+		n += 1 + l + sovBridgeEvent(uint64(l))
 	}
 	return n
 }
@@ -334,9 +490,9 @@ func (m *BridgeEvent) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field EthBlockHeight", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field BlockHeight", wireType)
 			}
-			m.EthBlockHeight = 0
+			m.BlockHeight = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowBridgeEvent
@@ -346,11 +502,177 @@ func (m *BridgeEvent) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.EthBlockHeight |= uint64(b&0x7F) << shift
+				m.BlockHeight |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field IsDeposit", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowBridgeEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.IsDeposit = bool(v != 0)
+		default:
+			iNdEx = preIndex
+			skippy, err := skipBridgeEvent(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthBridgeEvent
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *BridgeWithdraw) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowBridgeEvent
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: BridgeWithdraw: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: BridgeWithdraw: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SdaiAmount", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowBridgeEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthBridgeEvent
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthBridgeEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.SdaiAmount = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Account", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowBridgeEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthBridgeEvent
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthBridgeEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Account = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EthRecipient", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowBridgeEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthBridgeEvent
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthBridgeEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.EthRecipient = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipBridgeEvent(dAtA[iNdEx:])

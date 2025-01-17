@@ -40,3 +40,14 @@ func (s *Server) AddBridgeEvents(
 
 	return &api.AddBridgeEventsResponse{}, nil
 }
+
+func (s *Server) UpdateLastConfirmedWithdrawId(
+	ctx context.Context,
+	req *api.UpdateLastConfirmedWithdrawIdRequest,
+) (
+	response *api.UpdateLastConfirmedWithdrawIdResponse,
+	err error,
+) {
+	s.bridgeEventManager.SetLastSubmittedWithdrawEventId(req.LastConfirmedWithdrawId)
+	return &api.UpdateLastConfirmedWithdrawIdResponse{}, nil
+}

@@ -20,12 +20,18 @@ type BridgeEventManager struct {
 	// Exclusive mutex taken when reading or writing
 	sync.Mutex
 
-	// Bridge events by ID
-	events map[EventId]BridgeEventWithTime
+	// Bridge deposit events by ID
+	depositEvents map[EventId]BridgeEventWithTime
+
+	// Bridge withdraw events by ID
+	withdrawEvents map[EventId]BridgeEventWithTime
+
+	// The last withdraw that was submitted to ethereum
+	lastSubmittedWithdrawEventId EventId
 
 	// Stores:
-	// - The next unused key in the bridges map (`NextId`)
-	// - The block height of the last recognized event (`EthBlockHeight`)
+	// - The next unused key in the bridges map (`NextDepositId` and `NextWithdrawId`)
+	// - The block height of the last recognized event (`EthBlockHeight` and `KlyraBlockHeight`)
 	recognizedEventInfo types.BridgeEventInfo
 
 	// Time provider than can mocked out if necessary
@@ -44,10 +50,13 @@ func NewBridgeEventManager(
 	timeProvider libtime.TimeProvider,
 ) *BridgeEventManager {
 	return &BridgeEventManager{
-		events: make(map[uint32]BridgeEventWithTime),
+		depositEvents:  make(map[uint32]BridgeEventWithTime),
+		withdrawEvents: make(map[uint32]BridgeEventWithTime),
 		recognizedEventInfo: types.BridgeEventInfo{
-			NextId:         0,
-			EthBlockHeight: 0,
+			NextDepositId:    0,
+			EthBlockHeight:   0,
+			NextWithdrawId:   0,
+			KlyraBlockHeight: 0,
 		},
 		timeProvider: timeProvider,
 	}
@@ -74,30 +83,20 @@ func (b *BridgeEventManager) AddBridgeEvents(
 			return fmt.Errorf("AddBridgeEvents: Events must be contiguous and in-order")
 		}
 	}
-
 	now := b.timeProvider.Now()
 	for _, event := range events {
 		// Ignore stale events which may be the result of a race condition.
-		if event.Id < b.recognizedEventInfo.NextId {
+		if b.isEventIdStale(event) {
 			telemetry.IncrCounter(1, metrics.BridgeServer, metrics.AddBridgeEvents, metrics.EventIdAlreadyRecognized)
 			continue
 		}
 
-		// Update BridgeEventManager with the new event.
-		b.events[event.Id] = BridgeEventWithTime{
-			event:     event,
-			timestamp: now,
-		}
-		// Update recognized event info of BridgeEventManager.
-		b.recognizedEventInfo = types.BridgeEventInfo{
-			NextId:         event.Id + 1,
-			EthBlockHeight: event.EthBlockHeight,
-		}
+		b.updateBridgeEventState(event, now)
 	}
 
 	// Emit metrics on updated recognized event info.
 	telemetry.SetGauge(
-		float32(b.recognizedEventInfo.NextId),
+		float32(b.recognizedEventInfo.NextDepositId),
 		metrics.BridgeServer,
 		metrics.RecognizedEventInfo,
 		metrics.NextId,
@@ -112,10 +111,52 @@ func (b *BridgeEventManager) AddBridgeEvents(
 	return nil
 }
 
+func (b *BridgeEventManager) isEventIdStale(
+	event types.BridgeEvent,
+) bool {
+	if event.IsDeposit {
+		return event.Id < b.recognizedEventInfo.NextDepositId
+	}
+	return event.Id < b.recognizedEventInfo.NextWithdrawId
+}
+
+func (b *BridgeEventManager) updateBridgeEventState(
+	event types.BridgeEvent,
+	currTime time.Time,
+) {
+
+	if event.IsDeposit {
+		b.depositEvents[event.Id] = BridgeEventWithTime{
+			event:     event,
+			timestamp: currTime,
+		}
+
+		b.recognizedEventInfo = types.BridgeEventInfo{
+			NextDepositId:    event.Id + 1,
+			NextWithdrawId:   b.recognizedEventInfo.NextWithdrawId,
+			EthBlockHeight:   event.BlockHeight,
+			KlyraBlockHeight: b.recognizedEventInfo.KlyraBlockHeight,
+		}
+	} else {
+		b.withdrawEvents[event.Id] = BridgeEventWithTime{
+			event:     event,
+			timestamp: currTime,
+		}
+
+		b.recognizedEventInfo = types.BridgeEventInfo{
+			NextDepositId:    b.recognizedEventInfo.NextDepositId,
+			NextWithdrawId:   event.Id + 1,
+			EthBlockHeight:   b.recognizedEventInfo.EthBlockHeight,
+			KlyraBlockHeight: event.BlockHeight,
+		}
+	}
+}
+
 // GetBridgeEventById returns a bridge event by ID.
 // Found is false if the manager does not have the event.
 func (b *BridgeEventManager) GetBridgeEventById(
 	id uint32,
+	deposits bool,
 ) (
 	event types.BridgeEvent,
 	timestamp time.Time,
@@ -125,7 +166,13 @@ func (b *BridgeEventManager) GetBridgeEventById(
 	defer b.Unlock()
 
 	// Find the event.
-	eventWithTime, found := b.events[id]
+	var eventWithTime BridgeEventWithTime
+	if deposits {
+		eventWithTime, found = b.depositEvents[id]
+	} else {
+		eventWithTime, found = b.withdrawEvents[id]
+	}
+
 	if !found {
 		return event, timestamp, found // default values
 	}
@@ -150,10 +197,10 @@ func (b *BridgeEventManager) SetRecognizedEventInfo(
 	b.Lock()
 	defer b.Unlock()
 
-	if eventInfo.NextId < b.recognizedEventInfo.NextId {
-		return fmt.Errorf("NextId cannot be set to a lower value")
-	} else if eventInfo.EthBlockHeight < b.recognizedEventInfo.EthBlockHeight {
-		return fmt.Errorf("EthBlockHeight cannot be set to a lower value")
+	if eventInfo.NextDepositId < b.recognizedEventInfo.NextDepositId || eventInfo.NextWithdrawId < b.recognizedEventInfo.NextWithdrawId {
+		return fmt.Errorf("NextDepositId or NextWithdrawId cannot be set to a lower value")
+	} else if eventInfo.EthBlockHeight < b.recognizedEventInfo.EthBlockHeight || eventInfo.KlyraBlockHeight < b.recognizedEventInfo.KlyraBlockHeight {
+		return fmt.Errorf("Eth or Klyra block height cannot be set to a lower value")
 	}
 
 	b.recognizedEventInfo = eventInfo
@@ -162,4 +209,18 @@ func (b *BridgeEventManager) SetRecognizedEventInfo(
 
 func (b *BridgeEventManager) GetNow() time.Time {
 	return b.timeProvider.Now()
+}
+
+func (b *BridgeEventManager) GetLastSubmittedWithdrawEventId() EventId {
+	b.Lock()
+	defer b.Unlock()
+
+	return b.lastSubmittedWithdrawEventId
+}
+
+func (b *BridgeEventManager) SetLastSubmittedWithdrawEventId(id EventId) {
+	b.Lock()
+	defer b.Unlock()
+
+	b.lastSubmittedWithdrawEventId = id
 }

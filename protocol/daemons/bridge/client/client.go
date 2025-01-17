@@ -62,6 +62,7 @@ func (c *Client) Start(
 		c.logger.Error("Failed to establish gRPC connection to Cosmos gRPC query services", "error", err)
 		return err
 	}
+
 	defer func() {
 		if connErr := grpcClient.CloseConnection(queryConn); connErr != nil {
 			c.logger.Error("Failed to close gRPC connection to Cosmos gRPC query services", "error", connErr)
@@ -90,6 +91,7 @@ func (c *Client) Start(
 		c.logger.Error("Failed to establish connection to Ethereum node", "error", err)
 		return err
 	}
+
 	defer func() { ethClient.Close() }()
 
 	ticker := time.NewTicker(time.Duration(flags.Bridge.LoopDelayMs) * time.Millisecond)

@@ -43,12 +43,12 @@ func createAppModuleWithKeeper(t *testing.T) (
 ) {
 	appCodec := codec.NewProtoCodec(module.InterfaceRegistry)
 
-	ctx, keeper, _, _, bridgeEventManager, bankKeeper, _ := keeper.BridgeKeepers(t)
+	ks := keeper.BridgeKeepers(t)
 
 	return bridge.NewAppModule(
 		appCodec,
-		*keeper,
-	), keeper, bridgeEventManager, bankKeeper, ctx
+		*ks.BridgeKeeper,
+	), ks.BridgeKeeper, ks.BridgeEventManager, ks.BankKeeper, ks.Ctx
 }
 
 func createAppModuleBasic(t *testing.T) bridge.AppModuleBasic {
@@ -103,7 +103,7 @@ func TestAppModuleBasic_DefaultGenesis(t *testing.T) {
 			`"eth_address":"0xEf01c3A30eB57c91c40C52E996d29c202ae72193"},"propose_params":`+
 			`{"max_bridges_per_block":10,"propose_delay_duration":"60s","skip_rate_ppm":800000,`+
 			`"skip_if_block_delayed_by_duration":"5s"},"safety_params":{"is_disabled":false,`+
-			`"delay_blocks":86400},"acknowledged_event_info":{"next_id":0,"eth_block_height":"0"}}`,
+			`"delay_blocks":86400},"acknowledged_event_info":{"next_deposit_id":0,"next_withdraw_id":0,"eth_block_height":"0","klyra_block_height":"0"}}`,
 		string(json),
 	)
 }
@@ -128,8 +128,8 @@ func TestAppModuleBasic_ValidateGenesisErrBadState(t *testing.T) {
 	h := json.RawMessage(`{{"event_params":{"denom":"bridge-token","eth_chain_id":"11155111",
 		"eth_address":"0xEf01c3A30eB57c91c40C52E996d29c202ae72193"},"propose_params":{"max_bridges_per_block":10,
 		"propose_delay_duration":"60s","skip_rate_ppm":800000,"skip_if_block_delayed_by_duration":"5s"},
-		"safety_params":{"is_disabled":false,"delay_blocks":86400},"acknowledged_event_info":{"next_id":0,
-		"eth_block_height":"0"}}`)
+		"safety_params":{"is_disabled":false,"delay_blocks":86400},"acknowledged_event_info":{"next_deposit_id":0,"next_withdraw_id":0,
+		"eth_block_height":"0","klyra_block_height":"0"}}`)
 
 	err := am.ValidateGenesis(cdc, nil, h)
 	require.EqualError(t, err, `failed to unmarshal bridge genesis state: invalid character '{' `+
@@ -144,8 +144,8 @@ func TestAppModuleBasic_ValidateGenesis(t *testing.T) {
 	h := json.RawMessage(`{"event_params":{"denom":"bridge-token","eth_chain_id":"11155111",
 		"eth_address":"0xEf01c3A30eB57c91c40C52E996d29c202ae72193"},"propose_params":{"max_bridges_per_block":10,
 		"propose_delay_duration":"60s","skip_rate_ppm":800000,"skip_if_block_delayed_by_duration":"5s"},
-		"safety_params":{"is_disabled":false,"delay_blocks":86400},"acknowledged_event_info":{"next_id":0,
-		"eth_block_height":"0"}}`)
+		"safety_params":{"is_disabled":false,"delay_blocks":86400},"acknowledged_event_info":{"next_deposit_id":0,
+		"next_withdraw_id":0,"eth_block_height":"0","klyra_block_height":"0"}}`)
 
 	err := am.ValidateGenesis(cdc, nil, h)
 	require.NoError(t, err)
@@ -246,8 +246,8 @@ func TestAppModule_InitExportGenesis(t *testing.T) {
 	msg := `{"event_params": {"denom": "bridge-token", "eth_chain_id": "77",
 	"eth_address": "0xEf01c3A30eB57c91c40C52E996d29c202ae72193"}, "propose_params": {"max_bridges_per_block": 10,
 	"propose_delay_duration": "60s","skip_rate_ppm": 800000, "skip_if_block_delayed_by_duration": "5s"},
-	"safety_params": {"is_disabled": false,"delay_blocks": 86400}, "acknowledged_event_info": {"next_id": 0,
-	"eth_block_height": "0"}}`
+	"safety_params": {"is_disabled": false,"delay_blocks": 86400}, "acknowledged_event_info": {"next_deposit_id": 0,
+	"next_withdraw_id": 0, "eth_block_height": "0", "klyra_block_height": "0"}}`
 	gs := json.RawMessage(msg)
 
 	am.InitGenesis(ctx, cdc, gs)
@@ -255,14 +255,14 @@ func TestAppModule_InitExportGenesis(t *testing.T) {
 	require.Equal(t, uint64(77), keeper.GetEventParams(ctx).EthChainId)
 	require.Equal(t, time.Second*60, keeper.GetProposeParams(ctx).ProposeDelayDuration)
 	require.Equal(t, uint32(86400), keeper.GetSafetyParams(ctx).DelayBlocks)
-	require.Equal(t, uint32(0), keeper.GetAcknowledgedEventInfo(ctx).NextId)
+	require.Equal(t, uint32(0), keeper.GetAcknowledgedEventInfo(ctx).NextDepositId)
 
 	genesisJson := am.ExportGenesis(ctx, cdc)
 	expected := `{"event_params":{"denom":"bridge-token","eth_chain_id":"77",`
 	expected += `"eth_address":"0xEf01c3A30eB57c91c40C52E996d29c202ae72193"},"propose_params":{`
 	expected += `"max_bridges_per_block":10,"propose_delay_duration":"60s","skip_rate_ppm":800000,`
 	expected += `"skip_if_block_delayed_by_duration":"5s"},"safety_params":{"is_disabled":false,"delay_blocks":86400},`
-	expected += `"acknowledged_event_info":{"next_id":0,"eth_block_height":"0"}}`
+	expected += `"acknowledged_event_info":{"next_deposit_id":0,"next_withdraw_id":0,"eth_block_height":"0","klyra_block_height":"0"}}`
 	require.Equal(t, expected, string(genesisJson))
 }
 

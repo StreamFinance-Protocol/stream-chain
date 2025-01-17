@@ -31,4 +31,9 @@ type BridgeKeeper interface {
 
 	// Authority.
 	HasAuthority(authority string) bool
+
+	HandleSdaiWithdraw(
+		ctx sdk.Context,
+		withdraw BridgeWithdraw,
+	) (err error)
 }

@@ -56,7 +56,7 @@ Note: The format of a klyra address is [prefix][separator][address][checksum], w
 An address in Ethereum logs is in hexadecimal format and in Cosmos bech32 format. For example, a
 20-byte address in hexadecimal format is 20*8=160 bits, which is 160/5=32 bech32 characters.
 */
-func BridgeLogToEvent(
+func BridgeDepositLogToEvent(
 	log ethcoretypes.Log,
 	denom string,
 ) bridgetypes.BridgeEvent {
@@ -76,9 +76,10 @@ func BridgeLogToEvent(
 	// bridgeEventData[3] is the user-supplied memo
 
 	return bridgetypes.BridgeEvent{
-		Id:             id,
-		Coin:           sdk.NewCoin(denom, sdkmath.NewIntFromBigInt(amount)),
-		Address:        sdk.MustBech32ifyAddressBytes(config.Bech32PrefixAccAddr, address),
-		EthBlockHeight: log.BlockNumber,
+		Id:          id,
+		Coin:        sdk.NewCoin(denom, sdkmath.NewIntFromBigInt(amount)),
+		Address:     sdk.MustBech32ifyAddressBytes(config.Bech32PrefixAccAddr, address),
+		BlockHeight: log.BlockNumber,
+		IsDeposit:   true,
 	}
 }

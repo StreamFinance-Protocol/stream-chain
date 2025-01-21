@@ -21,7 +21,7 @@ message BridgeEvent {
   // The Ethereum or klyra block height of the event.
   uint64 block_height = 4;
 
-  // True if the bridge event is for a deposit.bool
+  // True if the bridge event is for a deposit
   bool is_deposit = 5;
 }
 
@@ -30,7 +30,7 @@ message BridgeWithdraw {
   string sdai_amount = 1; 
 
   // The klyra account that sdai is being withdrawn from
-  string account = 2;
+  string account = 2 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
 
   // The eth address that the funds are being bridged to
   string eth_recipient = 3;

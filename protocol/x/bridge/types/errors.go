@@ -41,6 +41,16 @@ var (
 		7,
 		"Invalid Ethereum address",
 	)
+	ErrInvalidWithdrawSdaiAmount = errorsmod.Register(
+		ModuleName,
+		8,
+		"Invalid withdraw SDai amount",
+	)
+	ErrInvalidWithdrawAccount = errorsmod.Register(
+		ModuleName,
+		9,
+		"Invalid withdraw account",
+	)
 
 	ErrNegativeDuration = errorsmod.Register(
 		ModuleName,

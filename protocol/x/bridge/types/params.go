@@ -6,12 +6,24 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+type EthAddress string
+
 func (m *EventParams) Validate() error {
+	err := EthAddress(m.EthAddress).Validate()
+
+	if err != nil {
+		return err
+	}
+
+	return sdk.ValidateDenom(m.Denom)
+}
+
+func (ethAddr EthAddress) Validate() error {
 	// TODO(CORE-601): More properly validate Ethereum address.
-	if m.EthAddress == "" {
+	if ethAddr == "" {
 		return errorsmod.Wrap(ErrInvalidEthAddress, "Ethereum contract address cannot be empty")
 	}
-	return sdk.ValidateDenom(m.Denom)
+	return nil
 }
 
 func (m *ProposeParams) Validate() error {

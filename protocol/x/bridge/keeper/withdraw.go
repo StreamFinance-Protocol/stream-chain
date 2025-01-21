@@ -10,12 +10,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-type Withdrawal struct {
-	SdaiAmount   *big.Int
-	Account      string
-	EthRecipient string
-}
-
 func (k Keeper) HandleSdaiWithdraw(
 	ctx sdk.Context,
 	withdraw types.BridgeWithdraw,

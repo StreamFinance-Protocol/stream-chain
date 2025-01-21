@@ -155,6 +155,8 @@ var (
 		// bridge
 		"/klyraprotocol.bridge.MsgAcknowledgeBridges":          {},
 		"/klyraprotocol.bridge.MsgAcknowledgeBridgesResponse":  {},
+		"/klyraprotocol.bridge.MsgBridgeWithdraw":              {},
+		"/klyraprotocol.bridge.MsgBridgeWithdrawResponse":      {},
 		"/klyraprotocol.bridge.MsgCompleteBridge":              {},
 		"/klyraprotocol.bridge.MsgCompleteBridgeResponse":      {},
 		"/klyraprotocol.bridge.MsgUpdateEventParams":           {},

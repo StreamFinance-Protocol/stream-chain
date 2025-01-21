@@ -86,7 +86,7 @@ func TestAppModuleBasic_RegisterInterfaces(t *testing.T) {
 	// due to it using an unexported method on the interface thus we use reflection to access the field
 	// directly that contains the registrations.
 	fv := reflect.ValueOf(registry).Elem().FieldByName("implInterfaces")
-	require.Len(t, fv.MapKeys(), 10)
+	require.Len(t, fv.MapKeys(), 12)
 }
 
 func TestAppModuleBasic_DefaultGenesis(t *testing.T) {

@@ -1,9 +1,9 @@
 package keeper
 
 import (
-	"fmt"
 	"math/big"
 
+	errorsmod "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
 	ratelimittypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
@@ -18,11 +18,11 @@ func (k Keeper) HandleSdaiWithdraw(
 	sdaiAmount := new(big.Int)
 	_, ok := sdaiAmount.SetString(withdraw.SdaiAmount, 10)
 	if !ok {
-		return fmt.Errorf("invalid SdaiAmount: %s", withdraw.SdaiAmount)
+		return errorsmod.Wrapf(types.ErrInvalidWithdrawSdaiAmount, "Sdai amount cannot be parsed.")
 	}
 
 	if sdaiAmount.Sign() <= 0 {
-		return fmt.Errorf("invalid SdaiAmount: %s", withdraw.SdaiAmount)
+		return errorsmod.Wrapf(types.ErrInvalidWithdrawSdaiAmount, "Sdai amount must be greater than zero.")
 	}
 
 	account, err := sdk.AccAddressFromBech32(withdraw.Account)

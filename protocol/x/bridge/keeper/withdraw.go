@@ -21,6 +21,10 @@ func (k Keeper) HandleSdaiWithdraw(
 		return fmt.Errorf("invalid SdaiAmount: %s", withdraw.SdaiAmount)
 	}
 
+	if sdaiAmount.Sign() <= 0 {
+		return fmt.Errorf("invalid SdaiAmount: %s", withdraw.SdaiAmount)
+	}
+
 	account, err := sdk.AccAddressFromBech32(withdraw.Account)
 	if err != nil {
 		return err

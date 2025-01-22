@@ -32,8 +32,8 @@ func (msg *MsgBridgeWithdraw) ValidateBasic() (err error) {
 		return errorsmod.Wrapf(ErrInvalidWithdrawSdaiAmount, "Sdai amount cannot be parsed.")
 	}
 
-	if sdaiAmount.Cmp(big.NewInt(0)) == 0 {
-		return errorsmod.Wrapf(ErrInvalidWithdrawSdaiAmount, "Sdai amount cannot be 0.")
+	if sdaiAmount.Cmp(big.NewInt(0)) <= 0 {
+		return errorsmod.Wrapf(ErrInvalidWithdrawSdaiAmount, "Sdai amount must be greater than zero.")
 	}
 
 	return nil

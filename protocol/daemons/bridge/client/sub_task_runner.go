@@ -131,6 +131,10 @@ func (s *SubTaskRunnerImpl) handleWithdrawRequests(
 		return fmt.Errorf("failed to fetch withdraw events: %w", err)
 	}
 
+	if withdrawEvents.GetWithdrawals() == nil || len(withdrawEvents.GetWithdrawals()) == 0 {
+		return nil
+	}
+
 	requests, err := s.GetWithdrawContractCallParams(withdrawEvents)
 	if err != nil {
 		return fmt.Errorf("failed to get withdraw contract call params: %w", err)

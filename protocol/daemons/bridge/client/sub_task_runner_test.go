@@ -6,6 +6,7 @@ import (
 	"math/big"
 	"testing"
 
+	"github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/bridge/api"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/bridge/client"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/mocks"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/constants"
@@ -23,6 +24,21 @@ func TestRunBridgeDaemonTaskLoop(t *testing.T) {
 	errChainId := errors.New("error getting chain id")
 	errEthereumLogs := errors.New("error getting Ethereum logs")
 	errAddBridgeEvents := errors.New("error adding bridge events")
+	errGetWithdrawEvents := errors.New("error getting withdraw events")
+	errPendingNonceAt := errors.New("error getting pending nonce at")
+	errSuggestGasPrice := errors.New("error getting suggest gas price")
+	errSendTransaction := errors.New("failed to send transaction")
+	errUpdateLastConfirmedWithdrawId := errors.New("error updating last confirmed withdraw id")
+
+	t.Setenv("ETH_PRIV_KEY", "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef")
+	zeroPendingNonce := uint64(0)
+	basicSuggestedGasPrice := big.NewInt(1000000000)
+	ethReceiptStatusFailure := &ethcoretypes.Receipt{
+		Status: 0,
+	}
+	ethReceiptStatusSuccess := &ethcoretypes.Receipt{
+		Status: 1,
+	}
 
 	tests := map[string]struct {
 		eventParams            bridgetypes.EventParams
@@ -31,16 +47,56 @@ func TestRunBridgeDaemonTaskLoop(t *testing.T) {
 		proposeParamsErr       error
 		recognizedEventInfo    bridgetypes.BridgeEventInfo
 		recognizedEventInfoErr error
-		chainId                int
-		chainIdError           error
-		filterLogs             []ethcoretypes.Log
-		filterLogsErr          error
-		addBridgeEventsErr     error
+
+		// Ethereum Client Mocking
+		chainId                  int
+		chainIdError             error
+		filterLogs               []ethcoretypes.Log
+		filterLogsErr            error
+		pendingNonceAt           uint64
+		pendingNonceAtErr        error
+		suggestGasPrice          *big.Int
+		suggestGasPriceErr       error
+		sendTransactionErr       error
+		ethTransactionReceipt    *ethcoretypes.Receipt
+		ethTransactionReceiptErr error
+
+		// Service Client Mocking
+		updateLastConfirmedWithdrawIdErr error
+		addBridgeEventsErr               error
+
+		// Query Client Mocking
+		withdrawBridgeResponse  *bridgetypes.QueryWithdrawalsResponse
+		withdrawBridgeEventsErr error
 
 		expectedErrorString string
 		expectedError       error
 	}{
-		"Success": {
+		"Success: zero deposits and zero withdrawals": {
+			withdrawBridgeResponse: &bridgetypes.QueryWithdrawalsResponse{
+				Withdrawals: []bridgetypes.BridgeEvent{},
+			},
+			eventParams:           constants.EventParams,
+			proposeParams:         constants.ProposeParams,
+			recognizedEventInfo:   constants.RecognizedEventInfo_Id2_Height0,
+			chainId:               constants.EthChainId,
+			pendingNonceAt:        zeroPendingNonce,
+			suggestGasPrice:       basicSuggestedGasPrice,
+			ethTransactionReceipt: ethReceiptStatusSuccess,
+		},
+		"Success: only one deposit": {
+			eventParams:         constants.EventParams,
+			proposeParams:       constants.ProposeParams,
+			recognizedEventInfo: constants.RecognizedEventInfo_Id2_Height0,
+			chainId:             constants.EthChainId,
+			filterLogs: []ethcoretypes.Log{
+				constants.EthLog_Event0,
+			},
+			pendingNonceAt:        zeroPendingNonce,
+			suggestGasPrice:       basicSuggestedGasPrice,
+			ethTransactionReceipt: ethReceiptStatusSuccess,
+		},
+		"Success: multiple deposits": {
 			eventParams:         constants.EventParams,
 			proposeParams:       constants.ProposeParams,
 			recognizedEventInfo: constants.RecognizedEventInfo_Id2_Height0,
@@ -49,7 +105,40 @@ func TestRunBridgeDaemonTaskLoop(t *testing.T) {
 				constants.EthLog_Event0,
 				constants.EthLog_Event1,
 			},
+			pendingNonceAt:        zeroPendingNonce,
+			suggestGasPrice:       basicSuggestedGasPrice,
+			ethTransactionReceipt: ethReceiptStatusSuccess,
 		},
+		"Success: one withdrawal": {
+			withdrawBridgeResponse: &bridgetypes.QueryWithdrawalsResponse{
+				Withdrawals: []bridgetypes.BridgeEvent{
+					constants.BridgeWithdrawalEvent1,
+				},
+			},
+			eventParams:           constants.EventParams,
+			proposeParams:         constants.ProposeParams,
+			recognizedEventInfo:   constants.RecognizedEventInfo_Id2_Height0,
+			chainId:               constants.EthChainId,
+			pendingNonceAt:        zeroPendingNonce,
+			suggestGasPrice:       basicSuggestedGasPrice,
+			ethTransactionReceipt: ethReceiptStatusSuccess,
+		},
+		"Success: multiple withdrawals": {
+			withdrawBridgeResponse: &bridgetypes.QueryWithdrawalsResponse{
+				Withdrawals: []bridgetypes.BridgeEvent{
+					constants.BridgeWithdrawalEvent1,
+					constants.BridgeWithdrawalEvent2,
+				},
+			},
+			eventParams:           constants.EventParams,
+			proposeParams:         constants.ProposeParams,
+			recognizedEventInfo:   constants.RecognizedEventInfo_Id2_Height0,
+			chainId:               constants.EthChainId,
+			pendingNonceAt:        zeroPendingNonce,
+			suggestGasPrice:       basicSuggestedGasPrice,
+			ethTransactionReceipt: ethReceiptStatusSuccess,
+		},
+
 		"Error getting event params": {
 			eventParamsErr: errParams,
 			expectedError:  errParams,
@@ -102,6 +191,105 @@ func TestRunBridgeDaemonTaskLoop(t *testing.T) {
 			addBridgeEventsErr: errAddBridgeEvents,
 			expectedError:      errAddBridgeEvents,
 		},
+		"Error getting withdraw events": {
+			eventParams:             constants.EventParams,
+			proposeParams:           constants.ProposeParams,
+			recognizedEventInfo:     constants.RecognizedEventInfo_Id2_Height0,
+			chainId:                 constants.EthChainId,
+			withdrawBridgeEventsErr: errGetWithdrawEvents,
+			expectedError:           errGetWithdrawEvents,
+		},
+		"Error if denom is not sDAI": {
+			eventParams:             constants.EventParams,
+			proposeParams:           constants.ProposeParams,
+			recognizedEventInfo:     constants.RecognizedEventInfo_Id2_Height0,
+			chainId:                 constants.EthChainId,
+			withdrawBridgeEventsErr: errGetWithdrawEvents,
+			expectedError:           errGetWithdrawEvents,
+			withdrawBridgeResponse: &bridgetypes.QueryWithdrawalsResponse{
+				Withdrawals: []bridgetypes.BridgeEvent{
+					constants.BridgeWithdrawalEvent2_CoinDenomNotSDai,
+				},
+			},
+		},
+		"Error if pending nonce throws error": {
+			eventParams:         constants.EventParams,
+			proposeParams:       constants.ProposeParams,
+			recognizedEventInfo: constants.RecognizedEventInfo_Id2_Height0,
+			chainId:             constants.EthChainId,
+			pendingNonceAtErr:   errPendingNonceAt,
+			expectedError:       errPendingNonceAt,
+			withdrawBridgeResponse: &bridgetypes.QueryWithdrawalsResponse{
+				Withdrawals: []bridgetypes.BridgeEvent{
+					constants.BridgeWithdrawalEvent1,
+					constants.BridgeWithdrawalEvent2,
+				},
+			},
+		},
+		"Error if suggest gas price throws error": {
+			eventParams:         constants.EventParams,
+			proposeParams:       constants.ProposeParams,
+			recognizedEventInfo: constants.RecognizedEventInfo_Id2_Height0,
+			chainId:             constants.EthChainId,
+			pendingNonceAt:      zeroPendingNonce,
+			suggestGasPriceErr:  errSuggestGasPrice,
+			expectedError:       errSuggestGasPrice,
+			withdrawBridgeResponse: &bridgetypes.QueryWithdrawalsResponse{
+				Withdrawals: []bridgetypes.BridgeEvent{
+					constants.BridgeWithdrawalEvent1,
+					constants.BridgeWithdrawalEvent2,
+				},
+			},
+		},
+		"Error if send transaction throws error": {
+			eventParams:         constants.EventParams,
+			proposeParams:       constants.ProposeParams,
+			recognizedEventInfo: constants.RecognizedEventInfo_Id2_Height0,
+			chainId:             constants.EthChainId,
+			pendingNonceAt:      zeroPendingNonce,
+			suggestGasPrice:     basicSuggestedGasPrice,
+			sendTransactionErr:  errSendTransaction,
+			expectedError:       errSendTransaction,
+			withdrawBridgeResponse: &bridgetypes.QueryWithdrawalsResponse{
+				Withdrawals: []bridgetypes.BridgeEvent{
+					constants.BridgeWithdrawalEvent1,
+					constants.BridgeWithdrawalEvent2,
+				},
+			},
+		},
+		"Error if transaction receipt status is not success": {
+			eventParams:           constants.EventParams,
+			proposeParams:         constants.ProposeParams,
+			recognizedEventInfo:   constants.RecognizedEventInfo_Id2_Height0,
+			chainId:               constants.EthChainId,
+			pendingNonceAt:        zeroPendingNonce,
+			suggestGasPrice:       basicSuggestedGasPrice,
+			ethTransactionReceipt: ethReceiptStatusFailure,
+			expectedErrorString:   "failed to handle withdraw requests: failed to submit withdrawal requests: transaction failed: 0x0000000000000000000000000000000000000000000000000000000000000000",
+			withdrawBridgeResponse: &bridgetypes.QueryWithdrawalsResponse{
+				Withdrawals: []bridgetypes.BridgeEvent{
+					constants.BridgeWithdrawalEvent1,
+					constants.BridgeWithdrawalEvent2,
+				},
+			},
+		},
+		"Error if updating last confirmed withdraw ID throws error": {
+			eventParams:                      constants.EventParams,
+			proposeParams:                    constants.ProposeParams,
+			recognizedEventInfo:              constants.RecognizedEventInfo_Id2_Height0,
+			chainId:                          constants.EthChainId,
+			pendingNonceAt:                   zeroPendingNonce,
+			suggestGasPrice:                  basicSuggestedGasPrice,
+			ethTransactionReceipt:            ethReceiptStatusSuccess,
+			updateLastConfirmedWithdrawIdErr: errUpdateLastConfirmedWithdrawId,
+			expectedError:                    errUpdateLastConfirmedWithdrawId,
+			withdrawBridgeResponse: &bridgetypes.QueryWithdrawalsResponse{
+				Withdrawals: []bridgetypes.BridgeEvent{
+					constants.BridgeWithdrawalEvent1,
+					constants.BridgeWithdrawalEvent2,
+				},
+			},
+		},
 	}
 
 	for name, tc := range tests {
@@ -132,12 +320,22 @@ func TestRunBridgeDaemonTaskLoop(t *testing.T) {
 			)
 			mockEthClient.On("ChainID", ctx).Return(big.NewInt(int64(tc.chainId)), tc.chainIdError)
 			mockEthClient.On("FilterLogs", ctx, mock.Anything).Return(tc.filterLogs, tc.filterLogsErr)
+			mockEthClient.On("PendingNonceAt", ctx, mock.Anything).Return(tc.pendingNonceAt, tc.pendingNonceAtErr)
+			mockEthClient.On("SuggestGasPrice", ctx).Return(tc.suggestGasPrice, tc.suggestGasPriceErr)
+			mockEthClient.On("SendTransaction", ctx, mock.Anything).Return(tc.sendTransactionErr)
+			mockEthClient.On("TransactionReceipt", ctx, mock.Anything).Return(tc.ethTransactionReceipt, tc.ethTransactionReceiptErr)
+
 			mockServiceClient.On("AddBridgeEvents", ctx, mock.Anything).Return(nil, tc.addBridgeEventsErr)
+			if tc.withdrawBridgeResponse != nil && len(tc.withdrawBridgeResponse.Withdrawals) > 0 {
+				expectedLastId := tc.withdrawBridgeResponse.Withdrawals[len(tc.withdrawBridgeResponse.Withdrawals)-1].Id
+				mockServiceClient.On("UpdateLastConfirmedWithdrawId", ctx, &api.UpdateLastConfirmedWithdrawIdRequest{
+					LastConfirmedWithdrawId: expectedLastId,
+				}).Return(nil, tc.updateLastConfirmedWithdrawIdErr)
+			}
+
 			mockQueryClient.On("WithdrawEvents", ctx, mock.Anything).Return(
-				&bridgetypes.QueryWithdrawalsResponse{
-					Withdrawals: []bridgetypes.BridgeEvent{},
-				},
-				nil,
+				tc.withdrawBridgeResponse,
+				tc.withdrawBridgeEventsErr,
 			)
 
 			subTaskRunner := &client.SubTaskRunnerImpl{}
@@ -148,10 +346,16 @@ func TestRunBridgeDaemonTaskLoop(t *testing.T) {
 				&mockQueryClient,
 				&mockServiceClient,
 			)
+
+			if tc.expectedErrorString == "" && tc.expectedError == nil {
+				require.NoError(t, err)
+			}
+
 			if tc.expectedErrorString != "" {
 				require.Error(t, err)
 				require.ErrorContains(t, err, tc.expectedErrorString)
 			}
+
 			if tc.expectedError != nil {
 				require.Error(t, err)
 				require.ErrorIs(t, err, tc.expectedError)

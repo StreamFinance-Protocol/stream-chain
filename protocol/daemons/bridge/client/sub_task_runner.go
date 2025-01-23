@@ -46,6 +46,8 @@ type BridgeContractWithdrawRequest struct {
 
 var _ SubTaskRunner = (*SubTaskRunnerImpl)(nil)
 
+var ethChainId = big.NewInt(1)
+
 // RunBridgeDaemonTaskLoop does the following:
 // 1) Fetches configuration information by querying the gRPC server.
 // 2) Fetches Ethereum events from a configured Ethereum client.
@@ -218,11 +220,7 @@ func (s *SubTaskRunnerImpl) GetWithdrawContractCallParams(
 			return nil, fmt.Errorf("unsupported denom: %s", event.Coin.Denom)
 		}
 
-		amount, ok := new(big.Int).SetString(event.Coin.Amount.String(), 10)
-		if !ok {
-			return nil, fmt.Errorf("failed to parse amount: %s", event.Coin.Amount.String())
-		}
-
+		amount := event.Coin.Amount.BigInt()
 		to := ethcommon.HexToAddress(event.Address)
 
 		requests[i] = BridgeContractWithdrawRequest{
@@ -274,6 +272,7 @@ func (s *SubTaskRunnerImpl) SubmitWithdrawalRequests(
 	ethClient types.EthClient,
 	requests []BridgeContractWithdrawRequest,
 ) (err error) {
+
 	auth, err := s.createTransactor()
 	if err != nil {
 		return err
@@ -325,7 +324,7 @@ func (s *SubTaskRunnerImpl) createTransactor() (*bind.TransactOpts, error) {
 
 	auth, err := bind.NewKeyedTransactorWithChainID(
 		privateKey,
-		big.NewInt(11155111), // Replace with your chain ID
+		ethChainId,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create transactor: %w", err)
@@ -375,7 +374,7 @@ func (s *SubTaskRunnerImpl) sendTransaction(ctx context.Context, ethClient types
 	}
 
 	receipt, err := bind.WaitMined(ctx, ethClient, signedTx)
-	if err != nil {
+	if err != nil || receipt == nil {
 		return fmt.Errorf("failed waiting for transaction confirmation: %w", err)
 	}
 

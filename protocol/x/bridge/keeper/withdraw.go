@@ -30,6 +30,11 @@ func (k Keeper) HandleSdaiWithdraw(
 		return err
 	}
 
+	err = types.EthAddress(withdraw.EthRecipient).Validate()
+	if err != nil {
+		return err
+	}
+
 	err = k.ratelimitKeeper.WithdrawSDaiFromTDai(ctx, account, sdaiAmount, false)
 	if err != nil {
 		return err

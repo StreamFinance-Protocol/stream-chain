@@ -37,7 +37,11 @@ type SubTaskRunner interface {
 	) error
 }
 
-type SubTaskRunnerImpl struct{}
+type SubTaskRunnerImpl struct {
+	ethChainId            uint64
+	gasLimit              uint64
+	bridgeContractAddress string
+}
 
 type BridgeContractWithdrawRequest struct {
 	Amount *big.Int
@@ -45,8 +49,6 @@ type BridgeContractWithdrawRequest struct {
 }
 
 var _ SubTaskRunner = (*SubTaskRunnerImpl)(nil)
-
-var ethChainId = big.NewInt(1)
 
 // RunBridgeDaemonTaskLoop does the following:
 // 1) Fetches configuration information by querying the gRPC server.
@@ -86,7 +88,6 @@ func (s *SubTaskRunnerImpl) RunBridgeDaemonTaskLoop(
 		return fmt.Errorf("failed to handle withdraw requests: %w", err)
 	}
 
-	// Success.
 	return nil
 }
 
@@ -324,11 +325,12 @@ func (s *SubTaskRunnerImpl) createTransactor() (*bind.TransactOpts, error) {
 
 	auth, err := bind.NewKeyedTransactorWithChainID(
 		privateKey,
-		ethChainId,
+		new(big.Int).SetUint64(s.ethChainId),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create transactor: %w", err)
 	}
+
 	return auth, nil
 }
 
@@ -356,12 +358,12 @@ func (s *SubTaskRunnerImpl) encodeWithdrawTransactionData(requests []BridgeContr
 	return append(methodID, packed...), nil
 }
 
-func (s *SubTaskRunnerImpl) createTransaction(nonce uint64, gasPrice *big.Int, data []byte) *ethtypes.Transaction {
+func (s *SubTaskRunnerImpl) createTransaction(bridgeContractAddress ethcommon.Address, nonce uint64, gasPrice *big.Int, data []byte) *ethtypes.Transaction {
 	return ethtypes.NewTransaction(
 		nonce,
-		ethcommon.Address{},
+		bridgeContractAddress,
 		big.NewInt(0), // value - 0 ETH
-		300000,        // gas limit
+		s.gasLimit,
 		gasPrice,
 		data,
 	)

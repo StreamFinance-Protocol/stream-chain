@@ -94,6 +94,12 @@ func (c *Client) Start(
 
 	defer func() { ethClient.Close() }()
 
+	subTaskRunner := &SubTaskRunnerImpl{
+		ethChainId:            flags.Bridge.EthChainId,
+		gasLimit:              flags.Bridge.EthGasLimit,
+		bridgeContractAddress: flags.Bridge.EthBridgeContractAddress,
+	}
+
 	ticker := time.NewTicker(time.Duration(flags.Bridge.LoopDelayMs) * time.Millisecond)
 	stop := make(chan bool, 1)
 	// Run the main task loop at an interval.
@@ -102,7 +108,7 @@ func (c *Client) Start(
 		c,
 		ticker,
 		stop,
-		&SubTaskRunnerImpl{},
+		subTaskRunner,
 		ethClient,
 		queryClient,
 		serviceClient,

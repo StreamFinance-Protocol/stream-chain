@@ -22,9 +22,12 @@ const (
 	FlagPriceDaemonEnabled     = "price-daemon-enabled"
 	FlagPriceDaemonLoopDelayMs = "price-daemon-loop-delay-ms"
 
-	FlagBridgeDaemonEnabled        = "bridge-daemon-enabled"
-	FlagBridgeDaemonLoopDelayMs    = "bridge-daemon-loop-delay-ms"
-	FlagBridgeDaemonEthRpcEndpoint = "bridge-daemon-eth-rpc-endpoint"
+	FlagBridgeDaemonEnabled                  = "bridge-daemon-enabled"
+	FlagBridgeDaemonLoopDelayMs              = "bridge-daemon-loop-delay-ms"
+	FlagBridgeDaemonEthRpcEndpoint           = "bridge-daemon-eth-rpc-endpoint"
+	FlagBridgeDaemonEthChainId               = "bridge-daemon-eth-chain-id"
+	FlagBridgeDaemonEthGasLimit              = "bridge-daemon-eth-gas-limit"
+	FlagBridgeDaemonEthBridgeContractAddress = "bridge-daemon-eth-bridge-contract-address"
 
 	FlagDeleveragingDaemonEnabled        = "deleveraging-daemon-enabled"
 	FlagDeleveragingDaemonLoopDelayMs    = "deleveraging-daemon-loop-delay-ms"
@@ -63,6 +66,12 @@ type BridgeFlags struct {
 	LoopDelayMs uint32
 	// EthRpcEndpoint is the endpoint for the Ethereum node where bridge data is queried.
 	EthRpcEndpoint string
+	// EthChainId is the Id of the EVM chain on which the bridge contract is deployed.
+	EthChainId uint64
+	// EthGasLimit is the gas limit for the bridge contract.
+	EthGasLimit uint64
+	// EthBridgeContractAddress is the address of the bridge contract. Format: 0x748c6d4bC7527FDD1d3E2c52391960014a8f51D8
+	EthBridgeContractAddress string
 }
 
 // DeleveragingFlags contains configuration flags for the Deleveraging Daemon.
@@ -116,9 +125,12 @@ func GetDefaultDaemonFlags() DaemonFlags {
 				QueryPageLimit: 1_000,
 			},
 			Bridge: BridgeFlags{
-				Enabled:        true,
-				LoopDelayMs:    30_000,
-				EthRpcEndpoint: "",
+				Enabled:                  true,
+				LoopDelayMs:              30_000,
+				EthRpcEndpoint:           "",
+				EthChainId:               1,
+				EthGasLimit:              300_000,
+				EthBridgeContractAddress: "0x748c6d4bC7527FDD1d3E2c52391960014a8f51D8",
 			},
 			Price: PriceFlags{
 				Enabled:     true,
@@ -213,7 +225,22 @@ func AddDaemonFlagsToCmd(
 	cmd.Flags().String(
 		FlagBridgeDaemonEthRpcEndpoint,
 		df.Bridge.EthRpcEndpoint,
-		"Ethereum Node Rpc Endpoint",
+		"Ethereum Node Rpc Endpoint.",
+	)
+	cmd.Flags().Uint64(
+		FlagBridgeDaemonEthGasLimit,
+		df.Bridge.EthGasLimit,
+		"Ethereum Gas Limit for submitting withdrawal requests.",
+	)
+	cmd.Flags().Uint64(
+		FlagBridgeDaemonEthChainId,
+		df.Bridge.EthChainId,
+		"Ethereum Chain Id.",
+	)
+	cmd.Flags().String(
+		FlagBridgeDaemonEthBridgeContractAddress,
+		df.Bridge.EthBridgeContractAddress,
+		"Ethereum Bridge Contract Address.",
 	)
 
 	// Price Daemon.
@@ -293,6 +320,21 @@ func GetDaemonFlagValuesFromOptions(
 	if option := appOpts.Get(FlagBridgeDaemonEthRpcEndpoint); option != nil {
 		if v, err := cast.ToStringE(option); err == nil && len(v) > 0 {
 			result.Bridge.EthRpcEndpoint = v
+		}
+	}
+	if option := appOpts.Get(FlagBridgeDaemonEthChainId); option != nil {
+		if v, err := cast.ToUint64E(option); err == nil && v > 0 {
+			result.Bridge.EthChainId = v
+		}
+	}
+	if option := appOpts.Get(FlagBridgeDaemonEthGasLimit); option != nil {
+		if v, err := cast.ToUint64E(option); err == nil && v > 0 {
+			result.Bridge.EthGasLimit = v
+		}
+	}
+	if option := appOpts.Get(FlagBridgeDaemonEthBridgeContractAddress); option != nil {
+		if v, err := cast.ToStringE(option); err == nil && len(v) > 0 {
+			result.Bridge.EthBridgeContractAddress = v
 		}
 	}
 

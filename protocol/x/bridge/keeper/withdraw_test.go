@@ -35,11 +35,7 @@ var (
 func TestHandleSdaiWithdraw(t *testing.T) {
 	tests := map[string]WithdrawTestOptions{
 		"Failure: sdai amount is not an integer": {
-			withdraw: types.BridgeWithdraw{
-				SdaiAmount:   "1.1",
-				Account:      constants.BobAccAddress.String(),
-				EthRecipient: mockEthRecipient,
-			},
+			withdraw:                constants.BridgeWithdraw_NonIntegerSDaiAmount,
 			sDaiPrice:               "1000000000000000000000000000",
 			accTdaiBalance:          big.NewInt(0),
 			sDaiPoolBalance:         big.NewInt(100),
@@ -48,11 +44,7 @@ func TestHandleSdaiWithdraw(t *testing.T) {
 			expectedErr:             errorsmod.Wrapf(types.ErrInvalidWithdrawSdaiAmount, "Sdai amount cannot be parsed."),
 		},
 		"Failure: sdai amount is not greater than zero": {
-			withdraw: types.BridgeWithdraw{
-				SdaiAmount:   "-1",
-				Account:      constants.BobAccAddress.String(),
-				EthRecipient: mockEthRecipient,
-			},
+			withdraw:                constants.BridgeWithdraw_NegativeSDaiAmount,
 			accTdaiBalance:          big.NewInt(0),
 			sDaiPrice:               "1000000000000000000000000000",
 			sDaiPoolBalance:         big.NewInt(100),
@@ -61,11 +53,7 @@ func TestHandleSdaiWithdraw(t *testing.T) {
 			expectedErr:             errorsmod.Wrapf(types.ErrInvalidWithdrawSdaiAmount, "Sdai amount must be greater than zero."),
 		},
 		"Failure: sdai amount is  zero": {
-			withdraw: types.BridgeWithdraw{
-				SdaiAmount:   "0",
-				Account:      constants.BobAccAddress.String(),
-				EthRecipient: mockEthRecipient,
-			},
+			withdraw:                constants.BridgeWithdraw_ZeroSDaiAmount,
 			accTdaiBalance:          big.NewInt(0),
 			sDaiPrice:               "1000000000000000000000000000",
 			sDaiPoolBalance:         big.NewInt(100),
@@ -74,11 +62,7 @@ func TestHandleSdaiWithdraw(t *testing.T) {
 			expectedErr:             errorsmod.Wrapf(types.ErrInvalidWithdrawSdaiAmount, "Sdai amount must be greater than zero."),
 		},
 		"Failure: invalid account address": {
-			withdraw: types.BridgeWithdraw{
-				SdaiAmount:   "1",
-				Account:      "invalid",
-				EthRecipient: mockEthRecipient,
-			},
+			withdraw:                constants.BridgeWithdraw_InvalidAddress,
 			accTdaiBalance:          big.NewInt(0),
 			sDaiPrice:               "1000000000000000000000000000",
 			sDaiPoolBalance:         big.NewInt(100),
@@ -87,11 +71,7 @@ func TestHandleSdaiWithdraw(t *testing.T) {
 			expectedErr:             errors.New("decoding bech32 failed: invalid bech32 string length 7"),
 		},
 		"Failure: insufficient tdai balance": {
-			withdraw: types.BridgeWithdraw{
-				SdaiAmount:   "1",
-				Account:      constants.BobAccAddress.String(),
-				EthRecipient: mockEthRecipient,
-			},
+			withdraw:                constants.BridgeWithdraw_1SDai,
 			accTdaiBalance:          big.NewInt(0),
 			sDaiPrice:               "1000000000000000000000000000",
 			sDaiPoolBalance:         big.NewInt(100),
@@ -100,11 +80,7 @@ func TestHandleSdaiWithdraw(t *testing.T) {
 			expectedErr:             errors.New("pendable balance 0utdai is smaller than 1utdai: insufficient funds"),
 		},
 		"Success: withdrawing one sdai": {
-			withdraw: types.BridgeWithdraw{
-				SdaiAmount:   "1",
-				Account:      constants.BobAccAddress.String(),
-				EthRecipient: mockEthRecipient,
-			},
+			withdraw: constants.BridgeWithdraw_1SDai,
 			expectedBridgeWithdraws: []types.BridgeEvent{
 				{
 					Id:          0,

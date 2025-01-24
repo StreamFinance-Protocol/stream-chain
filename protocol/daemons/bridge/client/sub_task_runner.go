@@ -359,8 +359,16 @@ func (s *SubTaskRunnerImpl) encodeWithdrawTransactionData(requests []BridgeContr
 	functionSignature := "requestWithdrawals((uint256,address)[])"
 	methodID := crypto.Keccak256([]byte(functionSignature))[:4]
 
+	arrayType, err := abi.NewType("tuple[]", "", []abi.ArgumentMarshaling{
+		{Name: "amount", Type: "uint256"},
+		{Name: "to", Type: "address"},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create array type: %w", err)
+	}
+
 	arguments := abi.Arguments{
-		{Type: arrayType("tuple(uint256,address)", len(requests))},
+		{Type: arrayType},
 	}
 
 	packed, err := arguments.Pack(requests)

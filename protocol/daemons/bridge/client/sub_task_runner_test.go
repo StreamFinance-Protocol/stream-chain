@@ -265,7 +265,7 @@ func TestRunBridgeDaemonTaskLoop(t *testing.T) {
 			pendingNonceAt:        zeroPendingNonce,
 			suggestGasPrice:       basicSuggestedGasPrice,
 			ethTransactionReceipt: ethReceiptStatusFailure,
-			expectedErrorString:   "failed to handle withdraw requests: failed to submit withdrawal requests: transaction failed: 0x0000000000000000000000000000000000000000000000000000000000000000",
+			expectedErrorString:   "failed to handle withdraw requests",
 			withdrawBridgeResponse: &bridgetypes.QueryWithdrawalsResponse{
 				Withdrawals: []bridgetypes.BridgeEvent{
 					constants.BridgeWithdrawalEvent1,

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math/big"
 	"os"
+	"strings"
 	"time"
 
 	"cosmossdk.io/log"
@@ -322,6 +323,8 @@ func (s *SubTaskRunnerImpl) createTransactor() (*bind.TransactOpts, error) {
 	if privateKeyHex == "" {
 		return nil, fmt.Errorf("environment variable ETH_PRIVATE_KEY is not set")
 	}
+
+	privateKeyHex = strings.TrimPrefix(privateKeyHex, "0x")
 
 	privateKeyBytes, err := hex.DecodeString(privateKeyHex)
 	if err != nil {

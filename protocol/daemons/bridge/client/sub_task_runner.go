@@ -296,14 +296,24 @@ func (s *SubTaskRunnerImpl) SubmitWithdrawalRequests(
 		return err
 	}
 
-	tx := s.createTransaction(nonce, gasPrice, data)
+	bridgeContractAddress, err := s.getBridgeContractAddress()
+	if err != nil {
+		return err
+	}
+
+	tx := s.createTransaction(bridgeContractAddress, nonce, gasPrice, data)
 
 	signedTx, err := auth.Signer(auth.From, tx)
 	if err != nil {
 		return fmt.Errorf("failed to sign transaction: %w", err)
 	}
 
-	return s.sendTransaction(ctx, ethClient, signedTx)
+	err = s.sendTransaction(ctx, ethClient, signedTx)
+	if err != nil {
+		return fmt.Errorf("failed to send transaction: %w", err)
+	}
+
+	return nil
 }
 
 func (s *SubTaskRunnerImpl) createTransactor() (*bind.TransactOpts, error) {
@@ -356,6 +366,10 @@ func (s *SubTaskRunnerImpl) encodeWithdrawTransactionData(requests []BridgeContr
 	}
 
 	return append(methodID, packed...), nil
+}
+
+func (s *SubTaskRunnerImpl) getBridgeContractAddress() (ethcommon.Address, error) {
+	return ethcommon.HexToAddress(s.bridgeContractAddress), nil
 }
 
 func (s *SubTaskRunnerImpl) createTransaction(bridgeContractAddress ethcommon.Address, nonce uint64, gasPrice *big.Int, data []byte) *ethtypes.Transaction {

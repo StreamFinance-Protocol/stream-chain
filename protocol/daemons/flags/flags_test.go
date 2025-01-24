@@ -26,6 +26,10 @@ func TestAddDaemonFlagsToCmd(t *testing.T) {
 
 		flags.FlagBridgeDaemonEnabled,
 		flags.FlagBridgeDaemonLoopDelayMs,
+		flags.FlagBridgeDaemonEthRpcEndpoint,
+		flags.FlagBridgeDaemonEthChainId,
+		flags.FlagBridgeDaemonEthGasLimit,
+		flags.FlagBridgeDaemonEthBridgeContractAddress,
 
 		flags.FlagPriceDaemonEnabled,
 		flags.FlagPriceDaemonLoopDelayMs,
@@ -53,6 +57,9 @@ func TestGetDaemonFlagValuesFromOptions_Custom(t *testing.T) {
 	optsMap[flags.FlagBridgeDaemonEnabled] = true
 	optsMap[flags.FlagBridgeDaemonLoopDelayMs] = uint32(1111)
 	optsMap[flags.FlagBridgeDaemonEthRpcEndpoint] = "test-eth-rpc-endpoint"
+	optsMap[flags.FlagBridgeDaemonEthChainId] = uint64(8453)
+	optsMap[flags.FlagBridgeDaemonEthGasLimit] = uint64(1_000)
+	optsMap[flags.FlagBridgeDaemonEthBridgeContractAddress] = "0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
 
 	optsMap[flags.FlagSDAIDaemonEnabled] = true
 	optsMap[flags.FlagSDAIDaemonMockEnabled] = true
@@ -96,6 +103,9 @@ func TestGetDaemonFlagValuesFromOptions_Custom(t *testing.T) {
 	require.Equal(t, optsMap[flags.FlagBridgeDaemonEnabled], r.Bridge.Enabled)
 	require.Equal(t, optsMap[flags.FlagBridgeDaemonLoopDelayMs], r.Bridge.LoopDelayMs)
 	require.Equal(t, optsMap[flags.FlagBridgeDaemonEthRpcEndpoint], r.Bridge.EthRpcEndpoint)
+	require.Equal(t, optsMap[flags.FlagBridgeDaemonEthChainId], r.Bridge.EthChainId)
+	require.Equal(t, optsMap[flags.FlagBridgeDaemonEthGasLimit], r.Bridge.EthGasLimit)
+	require.Equal(t, optsMap[flags.FlagBridgeDaemonEthBridgeContractAddress], r.Bridge.EthBridgeContractAddress)
 
 	// Price Daemon.
 	require.Equal(t, optsMap[flags.FlagPriceDaemonEnabled], r.Price.Enabled)

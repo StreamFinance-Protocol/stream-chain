@@ -51,6 +51,35 @@ func GetModuleAccAssetBalance(
 	return 0, nil
 }
 
+// GetTotalSupplyOfDenom is a test utility function to query the
+// total supply of a denom from the bank module.
+func GetTotalSupplyOfDenom(
+	val *network.Validator,
+	codec codec.Codec,
+	denom string,
+) (
+	totalSupply uint64,
+	err error,
+) {
+	resp, err := testutil.GetRequest(fmt.Sprintf(
+		"%s/cosmos/bank/v1beta1/supply/by_denom?denom=%s",
+		val.APIAddress,
+		denom,
+	))
+	if err != nil {
+		return 0, err
+	}
+
+	var balRes banktypes.QuerySupplyOfResponse
+
+	err = codec.UnmarshalJSON(resp, &balRes)
+	if err != nil {
+		return 0, err
+	}
+
+	return balRes.Amount.Amount.Uint64(), nil
+}
+
 // MatchTDaiOfAmount is a test utility function to generate a matcher function
 // passed into mock.MatchedBy(). This matcher can be used to match parameters of
 // *big.Int type when setting up mocks.

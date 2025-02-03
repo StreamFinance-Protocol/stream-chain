@@ -23,6 +23,11 @@ func CmdWithdraw() *cobra.Command {
 			argEthAddress := args[1]
 			argSdaiQuantums := args[2]
 
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
 			msg := types.NewMsgBridgeWithdraw(types.BridgeWithdraw{
 				Account:      argOwner,
 				EthRecipient: argEthAddress,
@@ -30,11 +35,6 @@ func CmdWithdraw() *cobra.Command {
 			})
 
 			if err := msg.ValidateBasic(); err != nil {
-				return err
-			}
-
-			clientCtx, err := client.GetClientTxContext(cmd)
-			if err != nil {
 				return err
 			}
 

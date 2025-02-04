@@ -29,10 +29,6 @@ func (k Keeper) ProcessNewSDaiConversionRateUpdate(ctx sdk.Context, sDaiConversi
 		return fmt.Errorf("sDai conversion rate must be greater than 1.0: %s", sDaiConversionRate)
 	}
 
-	if sDaiConversionRate.Cmp(oneScaledBySDaiDecimals) == 0 {
-		return nil
-	}
-
 	lastBlockUpdated, found := k.GetSDAILastBlockUpdated(ctx)
 	if found && ctx.BlockHeight()-lastBlockUpdated.Int64() < types.SDAI_UPDATE_BLOCK_DELAY {
 		return nil

@@ -63,7 +63,7 @@ func TestMaccPerms(t *testing.T) {
 		"insurance_fund":         nil,
 		"not_bonded_tokens_pool": {"burner", "staking"},
 		"subaccounts":            nil,
-		"sDAIPoolAccount":        nil,
+		"sDAIPoolAccount":        {"burner"},
 		"transfer":               {"minter", "burner"},
 		"interchainaccounts":     nil,
 		"liquidity_module":       nil,

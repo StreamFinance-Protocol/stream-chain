@@ -96,3 +96,14 @@ func TestQueryDelayedCompleteBridgeMessages(t *testing.T) {
 	require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
 	require.Equal(t, []types.DelayedCompleteBridgeMessage{}, resp.Messages)
 }
+
+func TestQueryWithdrawEvents(t *testing.T) {
+	net, ctx := setupNetwork(t)
+
+	out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdQueryWithdrawEvents(), []string{})
+
+	require.NoError(t, err)
+	var resp types.QueryWithdrawalsResponse
+	require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
+	require.Equal(t, []types.BridgeEvent{}, resp.Withdrawals)
+}

@@ -179,7 +179,6 @@ func CmdQueryDelayedCompleteBridgeMessages() *cobra.Command {
 	return cmd
 }
 
-// WithdrawEvents
 // TODO: Add a num withdrawals arg to the query
 func CmdQueryWithdrawEvents() *cobra.Command {
 	cmd := &cobra.Command{

@@ -27,6 +27,7 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 	cmd.AddCommand(CmdQueryAcknowledgedEventInfo())
 	cmd.AddCommand(CmdQueryRecognizedEventInfo())
 	cmd.AddCommand(CmdQueryDelayedCompleteBridgeMessages())
+	cmd.AddCommand(CmdQueryWithdrawEvents())
 
 	return cmd
 }
@@ -165,6 +166,33 @@ func CmdQueryDelayedCompleteBridgeMessages() *cobra.Command {
 				&types.QueryDelayedCompleteBridgeMessagesRequest{
 					Address: address,
 				},
+			)
+			if err != nil {
+				return err
+			}
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+// WithdrawEvents
+// TODO: Add a num withdrawals arg to the query
+func CmdQueryWithdrawEvents() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "get-withdraw-events",
+		Short: "get withdraw events that have been emitted by node",
+		Args:  cobra.MaximumNArgs(0),
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			clientCtx := client.GetClientContextFromCmd(cmd)
+			queryClient := types.NewQueryClient(clientCtx)
+
+			res, err := queryClient.WithdrawEvents(
+				context.Background(),
+				&types.QueryWithdrawalsRequest{},
 			)
 			if err != nil {
 				return err

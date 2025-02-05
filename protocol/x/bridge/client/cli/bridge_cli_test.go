@@ -197,6 +197,51 @@ func (s *BridgeIntegrationTestSuite) SetupTest() {
 	s.Require().NoError(err)
 }
 
+func (s *BridgeIntegrationTestSuite) TestCLIBridge_SuccessUnevenSdaiQuantums() {
+	s.sendBridgeAndVerifyEvent(
+		"0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+		uint64(98_987_654_321_321_321),
+		uint64(1_012_345_678_678_679),
+		uint64(1_012),
+	)
+}
+
+func (s *BridgeIntegrationTestSuite) TestCLIBridge_SuccessLargerSdaiQuantums() {
+	s.sendBridgeAndVerifyEvent(
+		"0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+		uint64(99_000_000_000_000_000),
+		uint64(1_000_000_000_000_000),
+		uint64(1_000),
+	)
+}
+
+func (s *BridgeIntegrationTestSuite) TestCLIBridge_SuccessSemiLargeSdaiQuantums() {
+	s.sendBridgeAndVerifyEvent(
+		"0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+		uint64(1_000_000_000_000_000),
+		uint64(99_000_000_000_000_000),
+		uint64(99_000),
+	)
+}
+
+func (s *BridgeIntegrationTestSuite) TestCLIBridge_SuccessSomeSdaiQuantums() {
+	s.sendBridgeAndVerifyEvent(
+		"0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+		uint64(1_000_000_000),
+		uint64(99_999_999_000_000_000),
+		uint64(99_999),
+	)
+}
+
+func (s *BridgeIntegrationTestSuite) TestCLIBridge_SuccessAllSdaiQuantums() {
+	s.sendBridgeAndVerifyEvent(
+		"0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+		testSdaiBalance.Uint64(),
+		uint64(0),
+		uint64(0),
+	)
+}
+
 func (s *BridgeIntegrationTestSuite) TestCLIBridge_SuccessOneSdaiQuantum() {
 	s.sendBridgeAndVerifyEvent(
 		"0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
@@ -206,13 +251,27 @@ func (s *BridgeIntegrationTestSuite) TestCLIBridge_SuccessOneSdaiQuantum() {
 	)
 }
 
-func (s *BridgeIntegrationTestSuite) sendBridgeAndVerifyEvent(
-	ethAddress string,
-	amount uint64,
-	expectedSDaiSupply uint64,
-	expectedTDaiSupply uint64,
-) {
+func (s *BridgeIntegrationTestSuite) TestCLIBridge_FailureZeroSdaiQuantum() {
+	s.sendBridgeAndExpectError(
+		s.validatorAddress.String(),
+		"0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+		uint64(0),
+		testSdaiBalance.Uint64(),
+		testTdaiBalancePlusYield.Uint64(),
+	)
+}
 
+func (s *BridgeIntegrationTestSuite) TestCLIBridge_FailureMalformedWithdrawer() {
+	s.sendBridgeAndExpectError(
+		"wrong-address",
+		"0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+		uint64(0),
+		testSdaiBalance.Uint64(),
+		testTdaiBalancePlusYield.Uint64(),
+	)
+}
+
+func (s *BridgeIntegrationTestSuite) prepareAccountForWithdrawal() {
 	val := s.network.Validators[0]
 	ctx := val.ClientCtx
 
@@ -253,9 +312,23 @@ func (s *BridgeIntegrationTestSuite) sendBridgeAndVerifyEvent(
 
 	_, err = s.network.WaitForHeight(currentHeight + 3)
 	s.Require().NoError(err)
+}
+
+func (s *BridgeIntegrationTestSuite) sendWithdrawalCommand(
+	withdrawerAddress string,
+	ethAddress string,
+	amount uint64,
+	expectedSDaiSupply uint64,
+	expectedTDaiSupply uint64,
+	expectErr bool,
+) {
+	s.prepareAccountForWithdrawal()
+
+	val := s.network.Validators[0]
+	ctx := val.ClientCtx
 
 	args := []string{
-		s.validatorAddress.String(),
+		withdrawerAddress,
 		ethAddress,
 		fmt.Sprint(amount),
 	}
@@ -265,15 +338,31 @@ func (s *BridgeIntegrationTestSuite) sendBridgeAndVerifyEvent(
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 	)
 
-	_, err = clitestutil.ExecTestCLICmd(ctx, bridgecli.CmdWithdraw(), args)
-	s.Require().NoError(err)
+	_, err := clitestutil.ExecTestCLICmd(ctx, bridgecli.CmdWithdraw(), args)
+	if expectErr {
+		s.Require().Error(err)
+	} else {
+		s.Require().NoError(err)
+	}
 
-	currentHeight, err = s.network.LatestHeight()
+	currentHeight, err := s.network.LatestHeight()
 	s.Require().NoError(err)
 
 	// Wait for a few blocks to ensure the bridge request was completed.
 	_, err = s.network.WaitForHeight(currentHeight + 3)
 	s.Require().NoError(err)
+}
+
+func (s *BridgeIntegrationTestSuite) sendBridgeAndVerifyEvent(
+	ethAddress string,
+	amount uint64,
+	expectedSDaiSupply uint64,
+	expectedTDaiSupply uint64,
+) {
+	s.sendWithdrawalCommand(s.validatorAddress.String(), ethAddress, amount, expectedSDaiSupply, expectedTDaiSupply, false)
+
+	val := s.network.Validators[0]
+	ctx := val.ClientCtx
 
 	resp, err := clitestutil.ExecTestCLICmd(ctx, bridgecli.CmdQueryWithdrawEvents(), []string{})
 	s.Require().NoError(err)
@@ -296,4 +385,25 @@ func (s *BridgeIntegrationTestSuite) sendBridgeAndVerifyEvent(
 
 	s.Require().Equal(expectedSDaiSupply, totalSupplySDai)
 	s.Require().Equal(expectedTDaiSupply, totalSupplyTDai)
+}
+
+func (s *BridgeIntegrationTestSuite) sendBridgeAndExpectError(
+	withdrawerAddress string,
+	ethAddress string,
+	amount uint64,
+	expectedSDaiSupply uint64,
+	expectedTDaiSupply uint64,
+) {
+	s.sendWithdrawalCommand(withdrawerAddress, ethAddress, amount, expectedSDaiSupply, expectedTDaiSupply, true)
+
+	val := s.network.Validators[0]
+	ctx := val.ClientCtx
+
+	resp, err := clitestutil.ExecTestCLICmd(ctx, bridgecli.CmdQueryWithdrawEvents(), []string{})
+	s.Require().NoError(err)
+
+	var queryWithdrawEventsResponse types.QueryWithdrawalsResponse
+	s.Require().NoError(s.cfg.Codec.UnmarshalJSON(resp.Bytes(), &queryWithdrawEventsResponse))
+
+	s.Require().Equal(len(queryWithdrawEventsResponse.Withdrawals), 0)
 }

@@ -50,7 +50,7 @@ const GenesisStateNoVeIBC1 = `{
           "atomic_resolution": -8,
           "denom": "btc-denom",
           "denom_exponent": "-8",
-          "has_market": true,
+          "has_market": false,
           "id": 1,
           "market_id": 0,
           "symbol": "BTC",

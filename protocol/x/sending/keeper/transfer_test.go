@@ -158,12 +158,6 @@ func runProcessTransferTest(t *testing.T, tc TransferTestCase) {
 		)
 	}
 
-	subaccounts := ks.SubaccountsKeeper.GetAllSubaccount(ks.Ctx)
-	for _, subacc := range subaccounts {
-		assets := subacc.GetAssetPosition(tc.asset.Id)
-		fmt.Println("subaccount XXX", subacc.Id, assets)
-	}
-
 	err = ks.SendingKeeper.ProcessTransfer(ks.Ctx, tc.transfer)
 	for subaccountId, expectedQuoteBalance := range tc.expectedSubaccountBalance {
 		subaccount := ks.SubaccountsKeeper.GetSubaccount(ks.Ctx, subaccountId)
@@ -282,7 +276,7 @@ func TestProcessTransferWithinSameCollateralPool(t *testing.T) {
 		},
 		"Sender is under collateralized - non tdai": {
 			subaccounts: []satypes.Subaccount{
-				constants.Carl_Num0_2BTC_Asset_1BTC_Short,
+				constants.Carl_Num0_100000BTC_Asset_1BTC_Short,
 				constants.Dave_Num0_1BTC,
 			},
 			asset: *constants.BtcUsd,
@@ -291,8 +285,8 @@ func TestProcessTransferWithinSameCollateralPool(t *testing.T) {
 			},
 			transfer: &constants.Transfer_Carl_Num0_Dave_Num0_Quote_1Tenth_BTC,
 			expectedSubaccountBalance: map[satypes.SubaccountId]*big.Int{
-				constants.Carl_Num0: big.NewInt(200_000_000), // balance unchanged
-				constants.Dave_Num0: big.NewInt(100_000_000), // balance unchanged
+				constants.Carl_Num0: big.NewInt(10_000_000_000_000), // balance unchanged
+				constants.Dave_Num0: big.NewInt(100_000_000),        // balance unchanged
 			},
 			expectedErr: fmt.Sprintf(
 				"Subaccount with id %v failed with UpdateResult: NewlyUndercollateralized: failed to apply subaccount updates",
@@ -320,7 +314,7 @@ func TestProcessTransferWithinSameCollateralPool(t *testing.T) {
 		},
 		"Transfer violates multi collateral constraints": {
 			subaccounts: []satypes.Subaccount{
-				constants.Carl_Num0_2BTC_Asset_1BTC_Short,
+				constants.Carl_Num0_100000BTC_Asset_1BTC_Short,
 				constants.Dave_Num0_1BTC,
 			},
 			asset: *constants.BtcUsd,
@@ -329,7 +323,7 @@ func TestProcessTransferWithinSameCollateralPool(t *testing.T) {
 			},
 			transfer: &constants.Transfer_Carl_Num0_Dave_Num0_Quote_500,
 			expectedSubaccountBalance: map[satypes.SubaccountId]*big.Int{
-				constants.Carl_Num0: big.NewInt(200_000_000),
+				constants.Carl_Num0: big.NewInt(10_000_000_000_000),
 				constants.Dave_Num0: big.NewInt(100_000_000),
 			},
 			expectedErr: fmt.Sprintf(

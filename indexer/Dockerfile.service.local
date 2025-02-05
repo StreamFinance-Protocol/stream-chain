@@ -1,5 +1,5 @@
 # Dockerfile to containerize services locally
-FROM dydxprotocol/indexer-node:16-alpine
+FROM node:18.14.0-alpine
 ENV NODE_ENV=development
 ARG service
 
@@ -53,6 +53,12 @@ COPY ./scripts/container-run.sh /home/klyra/app/services/$service/scripts/
 RUN chown klyra:klyra -R /home/klyra/app
 
 USER klyra
+
+RUN npm install -g pnpm@9.15.1
+
+RUN node -v
+RUN npm -v
+RUN pnpm -v
 
 # NOTE: For prod testing, use "RUN pnpm i --loglevel warn --production --frozen-lockfile"
 RUN pnpm i --loglevel warn --frozen-lockfile

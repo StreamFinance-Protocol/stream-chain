@@ -59,7 +59,7 @@ export class LCDQueryClient {
     const endpoint = `klyraprotocol/perpetuals/liquidity_tiers`;
     return await this.req.get<QueryAllLiquidityTiersResponseSDKType>(endpoint, options);
   }
-  /* AllCollateralPools */
+  /* Queries a list of CollateralPools. */
 
 
   async allCollateralPools(params: QueryAllCollateralPoolsRequest = {

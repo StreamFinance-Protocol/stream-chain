@@ -17,7 +17,7 @@
         "symbol": "BTC",
         "denom": "btc-denom",
         "denom_exponent": -8,
-        "has_market": true,
+        "has_market": false,
         "market_id": 0,
         "atomic_resolution": -8,
         "asset_yield_index": "",

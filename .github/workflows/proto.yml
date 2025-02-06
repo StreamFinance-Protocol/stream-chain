@@ -4,36 +4,36 @@ on: # yamllint disable-line rule:truthy
     paths:
       # Keep in sync with below
       # The protos themselves
-      - "**.proto"
+      - '**.proto'
       # Any generated code
-      - "**.pb.go"
-      - "**.pb.gw.go"
-      - "indexer/packages/v4-protos/**"
+      - '**.pb.go'
+      - '**.pb.gw.go'
+      - 'indexer/packages/v4-protos/**'
       # Code that affects generation
-      - "v4-proto-py/**"
-      - "v4-proto-js/**"
-      - "proto/**"
-      - "indexer/package.json"
-      - "protocol/scripts/protoc**"
+      - 'v4-proto-py/**'
+      - 'v4-proto-js/**'
+      - 'proto/**'
+      - 'indexer/package.json'
+      - 'protocol/scripts/protoc**'
   push:
     branches:
       - main
-      - "release/protocol/v[0-9]+.[0-9]+.x" # e.g. release/protocol/v0.1.x
-      - "release/protocol/v[0-9]+.x" # e.g. release/protocol/v1.x
+      - 'release/protocol/v[0-9]+.[0-9]+.x' # e.g. release/protocol/v0.1.x
+      - 'release/protocol/v[0-9]+.x' # e.g. release/protocol/v1.x
     paths:
       # Keep in sync with above
       # The protos themselves
-      - "**.proto"
+      - '**.proto'
       # Any generated code
-      - "**.pb.go"
-      - "**.pb.gw.go"
-      - "indexer/packages/v4-protos/**"
+      - '**.pb.go'
+      - '**.pb.gw.go'
+      - 'indexer/packages/v4-protos/**'
       # Code that affects generation
-      - "v4-proto-py/**"
-      - "v4-proto-js/**"
-      - "proto/**"
-      - "indexer/package.json"
-      - "protocol/scripts/protoc**"
+      - 'v4-proto-py/**'
+      - 'v4-proto-js/**'
+      - 'proto/**'
+      - 'indexer/package.json'
+      - 'protocol/scripts/protoc**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
@@ -68,10 +68,10 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18.14.0
       - working-directory: ./indexer
         run: |
-          npm install -g pnpm@6.34.0
+          npm install -g pnpm@9.15.1
           pnpm install --loglevel warn --frozen-lockfile
           cd packages/v4-protos && npm run build:verify-proto
   v4-proto-py-gen:

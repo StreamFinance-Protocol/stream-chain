@@ -37,6 +37,8 @@ message Perpetual {
   string yield_index = 5;
 }
 
+// MultiCollateralAssetsArray is an array of assets represented by their
+// asset ids.
 message MultiCollateralAssetsArray {
   repeated uint32 multi_collateral_assets = 1;
 }

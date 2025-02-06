@@ -307,7 +307,7 @@ func TestGetSubaccountCollateralizationInfo(t *testing.T) {
 				AssetPositions: []*satypes.AssetPosition{
 					{
 						AssetId:  1,
-						Quantums: dtypes.NewInt(100_000_000),
+						Quantums: dtypes.NewInt(5_000_000_000_000),
 					},
 				},
 				PerpetualPositions: []*satypes.PerpetualPosition{
@@ -332,7 +332,7 @@ func TestGetSubaccountCollateralizationInfo(t *testing.T) {
 				AssetPositions: []*satypes.AssetPosition{
 					{
 						AssetId:  1,
-						Quantums: dtypes.NewInt(101_000_000),
+						Quantums: dtypes.NewInt(5_050_000_000_000),
 					},
 				},
 				PerpetualPositions: []*satypes.PerpetualPosition{
@@ -357,7 +357,7 @@ func TestGetSubaccountCollateralizationInfo(t *testing.T) {
 				AssetPositions: []*satypes.AssetPosition{
 					{
 						AssetId:  1,
-						Quantums: dtypes.NewInt(200_000_000),
+						Quantums: dtypes.NewInt(10_000_000_000_000),
 					},
 				},
 				PerpetualPositions: []*satypes.PerpetualPosition{
@@ -382,7 +382,7 @@ func TestGetSubaccountCollateralizationInfo(t *testing.T) {
 				AssetPositions: []*satypes.AssetPosition{
 					{
 						AssetId:  1,
-						Quantums: dtypes.NewInt(50_000_000),
+						Quantums: dtypes.NewInt(2_500_000_000_000),
 					},
 				},
 				PerpetualPositions: []*satypes.PerpetualPosition{
@@ -407,7 +407,7 @@ func TestGetSubaccountCollateralizationInfo(t *testing.T) {
 				AssetPositions: []*satypes.AssetPosition{
 					{
 						AssetId:  1,
-						Quantums: dtypes.NewInt(300_000_000),
+						Quantums: dtypes.NewInt(15_000_000_000_000),
 					},
 				},
 				PerpetualPositions: []*satypes.PerpetualPosition{
@@ -542,6 +542,40 @@ func TestUpdateCollateralizationInfoGivenAssets(t *testing.T) {
 			expectedTotalNetCollateral:    big.NewInt(1_000_000_000),
 			expectedError:                 nil,
 		},
+		`Success: Correctly adds up collateral for subaccount with an TDAI asset position but no perpetual positions`: {
+			settledSubaccount: satypes.Subaccount{
+				Id: &constants.Carl_Num0,
+				AssetPositions: []*satypes.AssetPosition{
+					{
+						AssetId:  0,
+						Quantums: dtypes.NewInt(-5_000_000_000),
+					},
+				},
+				PerpetualPositions: []*satypes.PerpetualPosition{},
+			},
+			perpetuals:                    []perptypes.Perpetual{},
+			totalNetCollateral:            big.NewInt(1_000_000_000),
+			quoteCurrencyAtomicResolution: assettypes.AssetTDai.AtomicResolution,
+			expectedTotalNetCollateral:    big.NewInt(-4_000_000_000),
+			expectedError:                 nil,
+		},
+		`Success: Correctly adds up collateral for subaccount with an non-TDAI asset position but no perpetual positions`: {
+			settledSubaccount: satypes.Subaccount{
+				Id: &constants.Carl_Num0,
+				AssetPositions: []*satypes.AssetPosition{
+					{
+						AssetId:  1,
+						Quantums: dtypes.NewInt(1_000),
+					},
+				},
+				PerpetualPositions: []*satypes.PerpetualPosition{},
+			},
+			perpetuals:                    []perptypes.Perpetual{},
+			totalNetCollateral:            big.NewInt(1),
+			quoteCurrencyAtomicResolution: constants.BtcUsd.AtomicResolution,
+			expectedTotalNetCollateral:    big.NewInt(1001),
+			expectedError:                 nil,
+		},
 		`Success: Correctly adds up collateral for TDAI quote asset`: {
 			settledSubaccount:             constants.Carl_Num0_1BTC_Short_50000USD,
 			perpetuals:                    []perptypes.Perpetual{constants.BtcUsd_20PercentInitial_10PercentMaintenance},
@@ -555,7 +589,7 @@ func TestUpdateCollateralizationInfoGivenAssets(t *testing.T) {
 			perpetuals:                    []perptypes.Perpetual{constants.IsoBtc_20PercentInitial_10PercentMaintenance_CollatPool1_Id5_DangerIndex1},
 			totalNetCollateral:            big.NewInt(100),
 			quoteCurrencyAtomicResolution: constants.BtcUsd.AtomicResolution,
-			expectedTotalNetCollateral:    big.NewInt(-49999900),
+			expectedTotalNetCollateral:    big.NewInt(-900),
 			expectedError:                 nil,
 		},
 		`Failure: Errors out if more than one asset position is found`: {
@@ -601,22 +635,6 @@ func TestUpdateCollateralizationInfoGivenAssets(t *testing.T) {
 			quoteCurrencyAtomicResolution: constants.BtcUsd.AtomicResolution,
 			expectedTotalNetCollateral:    nil,
 			expectedError:                 clobtypes.ErrMultiCollateralNotImplemented,
-		},
-		`Failure: Errors out if no perpetuals present in subaccount and asset position is not TDAI`: {
-			settledSubaccount: satypes.Subaccount{
-				Id: &constants.Carl_Num0,
-				AssetPositions: []*satypes.AssetPosition{
-					{
-						AssetId:  1,
-						Quantums: dtypes.NewInt(50_000),
-					},
-				},
-			},
-			perpetuals:                    []perptypes.Perpetual{},
-			totalNetCollateral:            big.NewInt(100),
-			quoteCurrencyAtomicResolution: constants.BtcUsd.AtomicResolution,
-			expectedTotalNetCollateral:    nil,
-			expectedError:                 assettypes.ErrTDaiMustBeQuoteAssetOfBaseCollateralPool,
 		},
 	}
 
@@ -752,7 +770,7 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 					AssetPositions: []*satypes.AssetPosition{
 						{
 							AssetId:  1,
-							Quantums: dtypes.NewInt(101_000_000),
+							Quantums: dtypes.NewInt(5_050_000_000_000),
 						},
 					},
 					PerpetualPositions: []*satypes.PerpetualPosition{
@@ -783,7 +801,7 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 					AssetPositions: []*satypes.AssetPosition{
 						{
 							AssetId:  1,
-							Quantums: dtypes.NewInt(50_000_000),
+							Quantums: dtypes.NewInt(2_500_000_000_000),
 						},
 					},
 					PerpetualPositions: []*satypes.PerpetualPosition{
@@ -816,7 +834,7 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 					AssetPositions: []*satypes.AssetPosition{
 						{
 							AssetId:  1,
-							Quantums: dtypes.NewInt(50_000_000),
+							Quantums: dtypes.NewInt(2_500_000_000_000),
 						},
 					},
 					PerpetualPositions: []*satypes.PerpetualPosition{
@@ -833,7 +851,7 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 					AssetPositions: []*satypes.AssetPosition{
 						{
 							AssetId:  1,
-							Quantums: dtypes.NewInt(101_000_000),
+							Quantums: dtypes.NewInt(5_050_000_000_000),
 						},
 					},
 					PerpetualPositions: []*satypes.PerpetualPosition{
@@ -926,7 +944,7 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 					AssetPositions: []*satypes.AssetPosition{
 						{
 							AssetId:  1,
-							Quantums: dtypes.NewInt(50_000_000),
+							Quantums: dtypes.NewInt(2_500_000_000_000),
 						},
 					},
 					PerpetualPositions: []*satypes.PerpetualPosition{
@@ -943,7 +961,7 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 					AssetPositions: []*satypes.AssetPosition{
 						{
 							AssetId:  1,
-							Quantums: dtypes.NewInt(101_000_000),
+							Quantums: dtypes.NewInt(5_050_000_000_000),
 						},
 					},
 					PerpetualPositions: []*satypes.PerpetualPosition{

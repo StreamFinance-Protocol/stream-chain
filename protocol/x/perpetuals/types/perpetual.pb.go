@@ -87,6 +87,8 @@ func (m *Perpetual) GetYieldIndex() string {
 	return ""
 }
 
+// MultiCollateralAssetsArray is an array of assets represented by their
+// asset ids.
 type MultiCollateralAssetsArray struct {
 	MultiCollateralAssets []uint32 `protobuf:"varint,1,rep,packed,name=multi_collateral_assets,json=multiCollateralAssets,proto3" json:"multi_collateral_assets,omitempty"`
 }

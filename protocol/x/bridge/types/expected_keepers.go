@@ -16,6 +16,13 @@ type BankKeeper interface {
 		amt sdk.Coins,
 	) error
 
+	SendCoinsFromModuleToModule(
+		context context.Context,
+		senderModule string,
+		recipientModule string,
+		amt sdk.Coins,
+	) error
+
 	BurnCoins(ctx context.Context, moduleName string, amt sdk.Coins) error
 	MintCoins(ctx context.Context, moduleName string, amt sdk.Coins) error
 }
@@ -26,5 +33,11 @@ type RateLimitKeeper interface {
 		userAddr sdk.AccAddress,
 		sDaiAmount *big.Int,
 		shouldSendToUser bool,
+	) error
+
+	MintTradingDAIToUserAccount(
+		ctx sdk.Context,
+		userAddr sdk.AccAddress,
+		amount *big.Int,
 	) error
 }

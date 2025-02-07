@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib/metrics"
+	ratelimittypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -23,10 +24,20 @@ func (k Keeper) CompleteBridge(
 		metrics.Latency,
 	)
 
-	// Mint coin to bridge module account.
-	bridgedCoins := sdk.Coins{bridge.Coin}
-	if err = k.bankKeeper.MintCoins(ctx, types.ModuleName, bridgedCoins); err != nil {
-		return err
+	// Emit metric on last completed bridge id if no error.
+	defer func() {
+		if err == nil {
+			telemetry.SetGauge(
+				float32(bridge.Id),
+				types.ModuleName,
+				metrics.LastCompletedBridgeId,
+			)
+		}
+	}()
+
+	// Return early if coin amount is not positive since no action is needed
+	if !bridge.Coin.Amount.IsPositive() {
+		return nil
 	}
 
 	// Do not complete bridge if bridging is disabled.
@@ -41,27 +52,32 @@ func (k Keeper) CompleteBridge(
 		return err
 	}
 
-	// If coin amount is positive, send coin from bridge module account to
-	// specified account.
-	if bridge.Coin.Amount.IsPositive() {
-		if err = k.bankKeeper.SendCoinsFromModuleToAccount(
-			ctx,
-			types.ModuleName,
-			bridgeAccAddress,
-			bridgedCoins,
-		); err != nil {
-			return err
-		}
+	bridgedCoins := sdk.Coins{bridge.Coin}
+	if err = k.bankKeeper.MintCoins(
+		ctx,
+		types.ModuleName,
+		bridgedCoins,
+	); err != nil {
+		return err
 	}
 
-	// Emit metric on last completed bridge id.
-	telemetry.SetGauge(
-		float32(bridge.Id),
+	if err = k.bankKeeper.SendCoinsFromModuleToModule(
+		ctx,
 		types.ModuleName,
-		metrics.LastCompletedBridgeId,
+		ratelimittypes.SDaiPoolAccount,
+		bridgedCoins,
+	); err != nil {
+		return err
+	}
+
+	// send to bridgeAccAddress
+	err = k.ratelimitKeeper.MintTradingDAIToUserAccount(
+		ctx,
+		bridgeAccAddress,
+		bridge.Coin.Amount.BigInt(),
 	)
 
-	return nil
+	return err
 }
 
 // `GetDelayedCompleteBridgeMessages` returns all delayed complete bridge

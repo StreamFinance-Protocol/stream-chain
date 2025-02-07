@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib/metrics"
-	ratelimittypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -53,28 +52,25 @@ func (k Keeper) CompleteBridge(
 	}
 
 	bridgedCoins := sdk.Coins{bridge.Coin}
-	if err = k.bankKeeper.MintCoins(
+	if err = k.bankKeeper.MintCoins(ctx, types.ModuleName, bridgedCoins); err != nil {
+		return err
+	}
+
+	// Send coins to user account. The coins are sent to sdai pool account
+	// when the corresponding tdai is minted.
+	if err = k.bankKeeper.SendCoinsFromModuleToAccount(
 		ctx,
 		types.ModuleName,
+		bridgeAccAddress,
 		bridgedCoins,
 	); err != nil {
 		return err
 	}
 
-	if err = k.bankKeeper.SendCoinsFromModuleToModule(
-		ctx,
-		types.ModuleName,
-		ratelimittypes.SDaiPoolAccount,
-		bridgedCoins,
-	); err != nil {
-		return err
-	}
-
-	// send to bridgeAccAddress
 	err = k.ratelimitKeeper.MintTradingDAIToUserAccount(
 		ctx,
 		bridgeAccAddress,
-		bridge.Coin.Amount.BigInt(),
+		bridgedCoins[0].Amount.BigInt(),
 	)
 
 	return err

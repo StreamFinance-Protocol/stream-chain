@@ -23,6 +23,12 @@ func (k Keeper) CompleteBridge(
 		metrics.Latency,
 	)
 
+	// Mint coin to bridge module account.
+	bridgedCoins := sdk.Coins{bridge.Coin}
+	if err = k.bankKeeper.MintCoins(ctx, types.ModuleName, bridgedCoins); err != nil {
+		return err
+	}
+
 	// Do not complete bridge if bridging is disabled.
 	safetyParams := k.GetSafetyParams(ctx)
 	if safetyParams.IsDisabled {
@@ -42,7 +48,7 @@ func (k Keeper) CompleteBridge(
 			ctx,
 			types.ModuleName,
 			bridgeAccAddress,
-			sdk.Coins{bridge.Coin},
+			bridgedCoins,
 		); err != nil {
 			return err
 		}

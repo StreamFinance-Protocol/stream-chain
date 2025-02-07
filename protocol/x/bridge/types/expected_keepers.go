@@ -17,6 +17,7 @@ type BankKeeper interface {
 	) error
 
 	BurnCoins(ctx context.Context, moduleName string, amt sdk.Coins) error
+	MintCoins(ctx context.Context, moduleName string, amt sdk.Coins) error
 }
 
 type RateLimitKeeper interface {

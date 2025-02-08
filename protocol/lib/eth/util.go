@@ -4,6 +4,8 @@ import (
 	"math/big"
 	"strings"
 	"sync"
+	"fmt"
+	"encoding/hex"
 
 	sdkmath "cosmossdk.io/math"
 
@@ -69,7 +71,7 @@ func BridgeDepositLogToEvent(
 		panic(err)
 	}
 	amount := bridgeEventData[0].(*big.Int)
-	address := PadOrTruncateAddress(bridgeEventData[2].([]byte))
+	address := string(bridgeEventData[2].([]byte))
 
 	// Unused daemon fields.
 	// bridgeEventData[1] is the Ethereum address that sent the tokens
@@ -78,7 +80,7 @@ func BridgeDepositLogToEvent(
 	return bridgetypes.BridgeEvent{
 		Id:          id,
 		Coin:        sdk.NewCoin(denom, sdkmath.NewIntFromBigInt(amount)),
-		Address:     sdk.MustBech32ifyAddressBytes(config.Bech32PrefixAccAddr, address),
+		Address:     address,
 		BlockHeight: log.BlockNumber,
 		IsDeposit:   true,
 	}

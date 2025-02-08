@@ -23,5 +23,8 @@ func GetTxCmd() *cobra.Command {
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
+
+	cmd.AddCommand(CmdWithdraw())
+
 	return cmd
 }

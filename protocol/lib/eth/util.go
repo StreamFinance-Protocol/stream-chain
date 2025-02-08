@@ -4,12 +4,9 @@ import (
 	"math/big"
 	"strings"
 	"sync"
-	"fmt"
-	"encoding/hex"
 
 	sdkmath "cosmossdk.io/math"
 
-	"github.com/StreamFinance-Protocol/stream-chain/protocol/app/config"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/constants"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib"
 	bridgetypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"

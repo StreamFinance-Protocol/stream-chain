@@ -199,7 +199,8 @@ func TestAppModuleBasic_GetTxCmd(t *testing.T) {
 
 	cmd := am.GetTxCmd()
 	require.Equal(t, "bridge", cmd.Use)
-	require.Equal(t, 0, len(cmd.Commands()))
+	require.Equal(t, 1, len(cmd.Commands()))
+	require.Equal(t, "withdraw", cmd.Commands()[0].Name())
 }
 
 func TestAppModuleBasic_GetQueryCmd(t *testing.T) {

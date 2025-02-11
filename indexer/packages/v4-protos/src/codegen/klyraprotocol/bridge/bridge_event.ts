@@ -12,9 +12,12 @@ export interface BridgeEvent {
   /** The account address or module address to bridge to. */
 
   address: string;
-  /** The Ethereum block height of the event. */
+  /** The Ethereum or klyra block height of the event. */
 
-  ethBlockHeight: Long;
+  blockHeight: Long;
+  /** True if the bridge event is for a deposit */
+
+  isDeposit: boolean;
 }
 /** BridgeEvent is a recognized event from the Ethereum blockchain. */
 
@@ -27,9 +30,32 @@ export interface BridgeEventSDKType {
   /** The account address or module address to bridge to. */
 
   address: string;
-  /** The Ethereum block height of the event. */
+  /** The Ethereum or klyra block height of the event. */
 
-  eth_block_height: Long;
+  block_height: Long;
+  /** True if the bridge event is for a deposit */
+
+  is_deposit: boolean;
+}
+export interface BridgeWithdraw {
+  /** The amount of sdai to withdraw */
+  sdaiAmount: string;
+  /** The klyra account that sdai is being withdrawn from */
+
+  account: string;
+  /** The eth address that the funds are being bridged to */
+
+  ethRecipient: string;
+}
+export interface BridgeWithdrawSDKType {
+  /** The amount of sdai to withdraw */
+  sdai_amount: string;
+  /** The klyra account that sdai is being withdrawn from */
+
+  account: string;
+  /** The eth address that the funds are being bridged to */
+
+  eth_recipient: string;
 }
 
 function createBaseBridgeEvent(): BridgeEvent {
@@ -37,7 +63,8 @@ function createBaseBridgeEvent(): BridgeEvent {
     id: 0,
     coin: undefined,
     address: "",
-    ethBlockHeight: Long.UZERO
+    blockHeight: Long.UZERO,
+    isDeposit: false
   };
 }
 
@@ -55,8 +82,12 @@ export const BridgeEvent = {
       writer.uint32(26).string(message.address);
     }
 
-    if (!message.ethBlockHeight.isZero()) {
-      writer.uint32(32).uint64(message.ethBlockHeight);
+    if (!message.blockHeight.isZero()) {
+      writer.uint32(32).uint64(message.blockHeight);
+    }
+
+    if (message.isDeposit === true) {
+      writer.uint32(40).bool(message.isDeposit);
     }
 
     return writer;
@@ -84,7 +115,11 @@ export const BridgeEvent = {
           break;
 
         case 4:
-          message.ethBlockHeight = (reader.uint64() as Long);
+          message.blockHeight = (reader.uint64() as Long);
+          break;
+
+        case 5:
+          message.isDeposit = reader.bool();
           break;
 
         default:
@@ -101,7 +136,73 @@ export const BridgeEvent = {
     message.id = object.id ?? 0;
     message.coin = object.coin !== undefined && object.coin !== null ? Coin.fromPartial(object.coin) : undefined;
     message.address = object.address ?? "";
-    message.ethBlockHeight = object.ethBlockHeight !== undefined && object.ethBlockHeight !== null ? Long.fromValue(object.ethBlockHeight) : Long.UZERO;
+    message.blockHeight = object.blockHeight !== undefined && object.blockHeight !== null ? Long.fromValue(object.blockHeight) : Long.UZERO;
+    message.isDeposit = object.isDeposit ?? false;
+    return message;
+  }
+
+};
+
+function createBaseBridgeWithdraw(): BridgeWithdraw {
+  return {
+    sdaiAmount: "",
+    account: "",
+    ethRecipient: ""
+  };
+}
+
+export const BridgeWithdraw = {
+  encode(message: BridgeWithdraw, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.sdaiAmount !== "") {
+      writer.uint32(10).string(message.sdaiAmount);
+    }
+
+    if (message.account !== "") {
+      writer.uint32(18).string(message.account);
+    }
+
+    if (message.ethRecipient !== "") {
+      writer.uint32(26).string(message.ethRecipient);
+    }
+
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): BridgeWithdraw {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseBridgeWithdraw();
+
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+
+      switch (tag >>> 3) {
+        case 1:
+          message.sdaiAmount = reader.string();
+          break;
+
+        case 2:
+          message.account = reader.string();
+          break;
+
+        case 3:
+          message.ethRecipient = reader.string();
+          break;
+
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+
+    return message;
+  },
+
+  fromPartial(object: DeepPartial<BridgeWithdraw>): BridgeWithdraw {
+    const message = createBaseBridgeWithdraw();
+    message.sdaiAmount = object.sdaiAmount ?? "";
+    message.account = object.account ?? "";
+    message.ethRecipient = object.ethRecipient ?? "";
     return message;
   }
 

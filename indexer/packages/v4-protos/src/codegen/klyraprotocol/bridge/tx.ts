@@ -1,4 +1,4 @@
-import { BridgeEvent, BridgeEventSDKType } from "./bridge_event";
+import { BridgeEvent, BridgeEventSDKType, BridgeWithdraw, BridgeWithdrawSDKType } from "./bridge_event";
 import { EventParams, EventParamsSDKType, ProposeParams, ProposeParamsSDKType, SafetyParams, SafetyParamsSDKType } from "./params";
 import * as _m0 from "protobufjs/minimal";
 import { DeepPartial } from "../../helpers";
@@ -26,6 +26,30 @@ export interface MsgAcknowledgeBridgesResponse {}
  */
 
 export interface MsgAcknowledgeBridgesResponseSDKType {}
+/** MsgBridgeWithdraw is the Msg/BridgeWithdraw request type. */
+
+export interface MsgBridgeWithdraw {
+  /** The events to acknowledge. */
+  withdraw?: BridgeWithdraw;
+}
+/** MsgBridgeWithdraw is the Msg/BridgeWithdraw request type. */
+
+export interface MsgBridgeWithdrawSDKType {
+  /** The events to acknowledge. */
+  withdraw?: BridgeWithdrawSDKType;
+}
+/**
+ * MsgBridgeWithdrawResponse is the Msg/BridgeWithdraw response
+ * type.
+ */
+
+export interface MsgBridgeWithdrawResponse {}
+/**
+ * MsgBridgeWithdrawResponse is the Msg/BridgeWithdraw response
+ * type.
+ */
+
+export interface MsgBridgeWithdrawResponseSDKType {}
 /** MsgCompleteBridge is the Msg/CompleteBridgeResponse request type. */
 
 export interface MsgCompleteBridge {
@@ -189,6 +213,85 @@ export const MsgAcknowledgeBridgesResponse = {
 
   fromPartial(_: DeepPartial<MsgAcknowledgeBridgesResponse>): MsgAcknowledgeBridgesResponse {
     const message = createBaseMsgAcknowledgeBridgesResponse();
+    return message;
+  }
+
+};
+
+function createBaseMsgBridgeWithdraw(): MsgBridgeWithdraw {
+  return {
+    withdraw: undefined
+  };
+}
+
+export const MsgBridgeWithdraw = {
+  encode(message: MsgBridgeWithdraw, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.withdraw !== undefined) {
+      BridgeWithdraw.encode(message.withdraw, writer.uint32(10).fork()).ldelim();
+    }
+
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgBridgeWithdraw {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgBridgeWithdraw();
+
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+
+      switch (tag >>> 3) {
+        case 1:
+          message.withdraw = BridgeWithdraw.decode(reader, reader.uint32());
+          break;
+
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+
+    return message;
+  },
+
+  fromPartial(object: DeepPartial<MsgBridgeWithdraw>): MsgBridgeWithdraw {
+    const message = createBaseMsgBridgeWithdraw();
+    message.withdraw = object.withdraw !== undefined && object.withdraw !== null ? BridgeWithdraw.fromPartial(object.withdraw) : undefined;
+    return message;
+  }
+
+};
+
+function createBaseMsgBridgeWithdrawResponse(): MsgBridgeWithdrawResponse {
+  return {};
+}
+
+export const MsgBridgeWithdrawResponse = {
+  encode(_: MsgBridgeWithdrawResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgBridgeWithdrawResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgBridgeWithdrawResponse();
+
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+
+    return message;
+  },
+
+  fromPartial(_: DeepPartial<MsgBridgeWithdrawResponse>): MsgBridgeWithdrawResponse {
+    const message = createBaseMsgBridgeWithdrawResponse();
     return message;
   }
 

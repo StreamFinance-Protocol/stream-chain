@@ -1,5 +1,5 @@
 import { LCDClient } from "@osmonauts/lcd";
-import { QueryEventParamsRequest, QueryEventParamsResponseSDKType, QueryProposeParamsRequest, QueryProposeParamsResponseSDKType, QuerySafetyParamsRequest, QuerySafetyParamsResponseSDKType, QueryAcknowledgedEventInfoRequest, QueryAcknowledgedEventInfoResponseSDKType, QueryRecognizedEventInfoRequest, QueryRecognizedEventInfoResponseSDKType, QueryDelayedCompleteBridgeMessagesRequest, QueryDelayedCompleteBridgeMessagesResponseSDKType } from "./query";
+import { QueryEventParamsRequest, QueryEventParamsResponseSDKType, QueryProposeParamsRequest, QueryProposeParamsResponseSDKType, QuerySafetyParamsRequest, QuerySafetyParamsResponseSDKType, QueryAcknowledgedEventInfoRequest, QueryAcknowledgedEventInfoResponseSDKType, QueryWithdrawalsRequest, QueryWithdrawalsResponseSDKType, QueryRecognizedEventInfoRequest, QueryRecognizedEventInfoResponseSDKType, QueryDelayedCompleteBridgeMessagesRequest, QueryDelayedCompleteBridgeMessagesResponseSDKType } from "./query";
 export class LCDQueryClient {
   req: LCDClient;
 
@@ -13,6 +13,7 @@ export class LCDQueryClient {
     this.proposeParams = this.proposeParams.bind(this);
     this.safetyParams = this.safetyParams.bind(this);
     this.acknowledgedEventInfo = this.acknowledgedEventInfo.bind(this);
+    this.withdrawEvents = this.withdrawEvents.bind(this);
     this.recognizedEventInfo = this.recognizedEventInfo.bind(this);
     this.delayedCompleteBridgeMessages = this.delayedCompleteBridgeMessages.bind(this);
   }
@@ -45,6 +46,13 @@ export class LCDQueryClient {
   async acknowledgedEventInfo(_params: QueryAcknowledgedEventInfoRequest = {}): Promise<QueryAcknowledgedEventInfoResponseSDKType> {
     const endpoint = `klyraprotocol/v4/bridge/acknowledged_event_info`;
     return await this.req.get<QueryAcknowledgedEventInfoResponseSDKType>(endpoint);
+  }
+  /* Queries the Withdrawals */
+
+
+  async withdrawEvents(_params: QueryWithdrawalsRequest = {}): Promise<QueryWithdrawalsResponseSDKType> {
+    const endpoint = `klyraprotocol/v4/bridge/withdrawals`;
+    return await this.req.get<QueryWithdrawalsResponseSDKType>(endpoint);
   }
   /* Queries the RecognizedEventInfo.
    A "recognized" event is one that is finalized on the Ethereum blockchain

@@ -1,6 +1,6 @@
 import { Rpc } from "../../helpers";
 import * as _m0 from "protobufjs/minimal";
-import { MsgAcknowledgeBridges, MsgAcknowledgeBridgesResponse, MsgCompleteBridge, MsgCompleteBridgeResponse, MsgUpdateEventParams, MsgUpdateEventParamsResponse, MsgUpdateProposeParams, MsgUpdateProposeParamsResponse, MsgUpdateSafetyParams, MsgUpdateSafetyParamsResponse } from "./tx";
+import { MsgAcknowledgeBridges, MsgAcknowledgeBridgesResponse, MsgBridgeWithdraw, MsgBridgeWithdrawResponse, MsgCompleteBridge, MsgCompleteBridgeResponse, MsgUpdateEventParams, MsgUpdateEventParamsResponse, MsgUpdateProposeParams, MsgUpdateProposeParamsResponse, MsgUpdateSafetyParams, MsgUpdateSafetyParamsResponse } from "./tx";
 /** Msg defines the Msg service. */
 
 export interface Msg {
@@ -9,6 +9,9 @@ export interface Msg {
    * later block.
    */
   acknowledgeBridges(request: MsgAcknowledgeBridges): Promise<MsgAcknowledgeBridgesResponse>;
+  /** BridgeWithdraw withdraws SDAI from the bridge. */
+
+  bridgeWithdraw(request: MsgBridgeWithdraw): Promise<MsgBridgeWithdrawResponse>;
   /** CompleteBridge finalizes a bridge by minting coins to an address. */
 
   completeBridge(request: MsgCompleteBridge): Promise<MsgCompleteBridgeResponse>;
@@ -28,6 +31,7 @@ export class MsgClientImpl implements Msg {
   constructor(rpc: Rpc) {
     this.rpc = rpc;
     this.acknowledgeBridges = this.acknowledgeBridges.bind(this);
+    this.bridgeWithdraw = this.bridgeWithdraw.bind(this);
     this.completeBridge = this.completeBridge.bind(this);
     this.updateEventParams = this.updateEventParams.bind(this);
     this.updateProposeParams = this.updateProposeParams.bind(this);
@@ -38,6 +42,12 @@ export class MsgClientImpl implements Msg {
     const data = MsgAcknowledgeBridges.encode(request).finish();
     const promise = this.rpc.request("klyraprotocol.bridge.Msg", "AcknowledgeBridges", data);
     return promise.then(data => MsgAcknowledgeBridgesResponse.decode(new _m0.Reader(data)));
+  }
+
+  bridgeWithdraw(request: MsgBridgeWithdraw): Promise<MsgBridgeWithdrawResponse> {
+    const data = MsgBridgeWithdraw.encode(request).finish();
+    const promise = this.rpc.request("klyraprotocol.bridge.Msg", "BridgeWithdraw", data);
+    return promise.then(data => MsgBridgeWithdrawResponse.decode(new _m0.Reader(data)));
   }
 
   completeBridge(request: MsgCompleteBridge): Promise<MsgCompleteBridgeResponse> {

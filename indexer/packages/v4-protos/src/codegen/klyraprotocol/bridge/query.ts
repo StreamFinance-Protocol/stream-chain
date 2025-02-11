@@ -1,5 +1,6 @@
 import { EventParams, EventParamsSDKType, ProposeParams, ProposeParamsSDKType, SafetyParams, SafetyParamsSDKType } from "./params";
 import { BridgeEventInfo, BridgeEventInfoSDKType } from "./bridge_event_info";
+import { BridgeEvent, BridgeEventSDKType } from "./bridge_event";
 import { MsgCompleteBridge, MsgCompleteBridgeSDKType } from "./tx";
 import * as _m0 from "protobufjs/minimal";
 import { DeepPartial } from "../../helpers";
@@ -84,6 +85,28 @@ export interface QueryAcknowledgedEventInfoResponse {
 
 export interface QueryAcknowledgedEventInfoResponseSDKType {
   info?: BridgeEventInfoSDKType;
+}
+/** QueryWithdrawalsRequest is a request type for the withdrawals RPC method. */
+
+export interface QueryWithdrawalsRequest {}
+/** QueryWithdrawalsRequest is a request type for the withdrawals RPC method. */
+
+export interface QueryWithdrawalsRequestSDKType {}
+/**
+ * QueryWithdrawalsResponse is a response type for the
+ * Withdrawals RPC method.
+ */
+
+export interface QueryWithdrawalsResponse {
+  Withdrawals: BridgeEvent[];
+}
+/**
+ * QueryWithdrawalsResponse is a response type for the
+ * Withdrawals RPC method.
+ */
+
+export interface QueryWithdrawalsResponseSDKType {
+  Withdrawals: BridgeEventSDKType[];
 }
 /**
  * QueryRecognizedEventInfoRequest is a request type for the
@@ -485,6 +508,85 @@ export const QueryAcknowledgedEventInfoResponse = {
   fromPartial(object: DeepPartial<QueryAcknowledgedEventInfoResponse>): QueryAcknowledgedEventInfoResponse {
     const message = createBaseQueryAcknowledgedEventInfoResponse();
     message.info = object.info !== undefined && object.info !== null ? BridgeEventInfo.fromPartial(object.info) : undefined;
+    return message;
+  }
+
+};
+
+function createBaseQueryWithdrawalsRequest(): QueryWithdrawalsRequest {
+  return {};
+}
+
+export const QueryWithdrawalsRequest = {
+  encode(_: QueryWithdrawalsRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryWithdrawalsRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryWithdrawalsRequest();
+
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+
+    return message;
+  },
+
+  fromPartial(_: DeepPartial<QueryWithdrawalsRequest>): QueryWithdrawalsRequest {
+    const message = createBaseQueryWithdrawalsRequest();
+    return message;
+  }
+
+};
+
+function createBaseQueryWithdrawalsResponse(): QueryWithdrawalsResponse {
+  return {
+    Withdrawals: []
+  };
+}
+
+export const QueryWithdrawalsResponse = {
+  encode(message: QueryWithdrawalsResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.Withdrawals) {
+      BridgeEvent.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryWithdrawalsResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryWithdrawalsResponse();
+
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+
+      switch (tag >>> 3) {
+        case 1:
+          message.Withdrawals.push(BridgeEvent.decode(reader, reader.uint32()));
+          break;
+
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+
+    return message;
+  },
+
+  fromPartial(object: DeepPartial<QueryWithdrawalsResponse>): QueryWithdrawalsResponse {
+    const message = createBaseQueryWithdrawalsResponse();
+    message.Withdrawals = object.Withdrawals?.map(e => BridgeEvent.fromPartial(e)) || [];
     return message;
   }
 

@@ -23,6 +23,34 @@ export interface AddBridgeEventsResponse {}
 /** AddBridgeEventsResponse is a response message for BridgeEventRequest. */
 
 export interface AddBridgeEventsResponseSDKType {}
+/**
+ * UpdateLastConfirmedWithdrawIdRequest is a request message that updates
+ * the last confimed withdraw on ethereum.
+ */
+
+export interface UpdateLastConfirmedWithdrawIdRequest {
+  lastConfirmedWithdrawId: number;
+}
+/**
+ * UpdateLastConfirmedWithdrawIdRequest is a request message that updates
+ * the last confimed withdraw on ethereum.
+ */
+
+export interface UpdateLastConfirmedWithdrawIdRequestSDKType {
+  last_confirmed_withdraw_id: number;
+}
+/**
+ * UpdateLastConfirmedWithdrawIdResponse is a response message for
+ * UpdateLastConfirmedWithdrawIdResponse.
+ */
+
+export interface UpdateLastConfirmedWithdrawIdResponse {}
+/**
+ * UpdateLastConfirmedWithdrawIdResponse is a response message for
+ * UpdateLastConfirmedWithdrawIdResponse.
+ */
+
+export interface UpdateLastConfirmedWithdrawIdResponseSDKType {}
 
 function createBaseAddBridgeEventsRequest(): AddBridgeEventsRequest {
   return {
@@ -98,6 +126,85 @@ export const AddBridgeEventsResponse = {
 
   fromPartial(_: DeepPartial<AddBridgeEventsResponse>): AddBridgeEventsResponse {
     const message = createBaseAddBridgeEventsResponse();
+    return message;
+  }
+
+};
+
+function createBaseUpdateLastConfirmedWithdrawIdRequest(): UpdateLastConfirmedWithdrawIdRequest {
+  return {
+    lastConfirmedWithdrawId: 0
+  };
+}
+
+export const UpdateLastConfirmedWithdrawIdRequest = {
+  encode(message: UpdateLastConfirmedWithdrawIdRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.lastConfirmedWithdrawId !== 0) {
+      writer.uint32(8).uint32(message.lastConfirmedWithdrawId);
+    }
+
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): UpdateLastConfirmedWithdrawIdRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdateLastConfirmedWithdrawIdRequest();
+
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+
+      switch (tag >>> 3) {
+        case 1:
+          message.lastConfirmedWithdrawId = reader.uint32();
+          break;
+
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+
+    return message;
+  },
+
+  fromPartial(object: DeepPartial<UpdateLastConfirmedWithdrawIdRequest>): UpdateLastConfirmedWithdrawIdRequest {
+    const message = createBaseUpdateLastConfirmedWithdrawIdRequest();
+    message.lastConfirmedWithdrawId = object.lastConfirmedWithdrawId ?? 0;
+    return message;
+  }
+
+};
+
+function createBaseUpdateLastConfirmedWithdrawIdResponse(): UpdateLastConfirmedWithdrawIdResponse {
+  return {};
+}
+
+export const UpdateLastConfirmedWithdrawIdResponse = {
+  encode(_: UpdateLastConfirmedWithdrawIdResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): UpdateLastConfirmedWithdrawIdResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdateLastConfirmedWithdrawIdResponse();
+
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+
+    return message;
+  },
+
+  fromPartial(_: DeepPartial<UpdateLastConfirmedWithdrawIdResponse>): UpdateLastConfirmedWithdrawIdResponse {
+    const message = createBaseUpdateLastConfirmedWithdrawIdResponse();
     return message;
   }
 

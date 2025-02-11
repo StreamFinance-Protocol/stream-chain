@@ -116,7 +116,7 @@ func TestBridgeLogToEvent(t *testing.T) {
 		expectedEvent bridgetypes.BridgeEvent
 	}{
 		"Success: event ID 0": {
-			inputLog:   constants.EthLog_Event0,
+			inputLog:   constants.EthLog_KlyraAddress_Event0,
 			inputDenom: "adv4tnt",
 			expectedEvent: bridgetypes.BridgeEvent{
 				Id: 0,
@@ -138,14 +138,13 @@ func TestBridgeLogToEvent(t *testing.T) {
 					"test-token",
 					sdkmath.NewInt(55),
 				),
-				// address shorter than 20 bytes is padded with zeros.
-				Address:     "klyra1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9tm50p",
+				Address:     "",
 				BlockHeight: 3969937,
 				IsDeposit:   true,
 			},
 		},
 		"Success: event ID 2": {
-			inputLog:   constants.EthLog_Event2,
+			inputLog:   constants.EthLog_KlyraAddress_Event2,
 			inputDenom: "test-token",
 			expectedEvent: bridgetypes.BridgeEvent{
 				Id: 2,
@@ -153,14 +152,13 @@ func TestBridgeLogToEvent(t *testing.T) {
 					"test-token",
 					sdkmath.NewInt(777),
 				),
-				// 32 bytes * 8 bits / 5 bits = 51.2 characters ~ 52 bech32 characters
 				Address:     "klyra1qqgzqvzq2ps8pqys5zcvp58q7rluextxzy3rx3z4vemc3xgq42ascrl594",
 				BlockHeight: 4139345,
 				IsDeposit:   true,
 			},
 		},
 		"Success: event ID 3": {
-			inputLog:   constants.EthLog_Event3,
+			inputLog:   constants.EthLog_KlyraAddress_Event3,
 			inputDenom: "test-token-2",
 			expectedEvent: bridgetypes.BridgeEvent{
 				Id: 3,
@@ -168,15 +166,13 @@ func TestBridgeLogToEvent(t *testing.T) {
 					"test-token-2",
 					sdkmath.NewInt(888),
 				),
-				// address data is 62 bytes but we take the first 32 bytes only.
-				// 32 bytes * 8 bits / 5 bits ~ 52 bech32 characters
-				Address:     "klyra124n92ej4ve2kv4tx24n92ej4ve2kv4tx24n92ej4ve2kv4tx24nq60sw0w",
+				Address:     "klyra124n92ej4ve2kv4tx24n92ej4ve2kv4tx24n92ej4ve2kv4tx24nq60sw",
 				BlockHeight: 4139348,
 				IsDeposit:   true,
 			},
 		},
 		"Success: event ID 4": {
-			inputLog:   constants.EthLog_Event4,
+			inputLog:   constants.EthLog_KlyraAddress_Event4,
 			inputDenom: "adv4tnt",
 			expectedEvent: bridgetypes.BridgeEvent{
 				Id: 4,
@@ -185,7 +181,7 @@ func TestBridgeLogToEvent(t *testing.T) {
 					sdkmath.NewInt(1234123443214321),
 				),
 				// address shorter than 20 bytes is padded with zeros.
-				Address:     "klyra1zg6pydqqqqqqqqqqqqqqqqqqqqqqqqqqy7kmtk",
+				Address:     "klyra1zg6pydqqqqqqqqqqqqqqqqqqqqqqqqqy7kmtk",
 				BlockHeight: 4139349,
 				IsDeposit:   true,
 			},

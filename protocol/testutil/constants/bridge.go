@@ -40,6 +40,9 @@ var (
 		Amount: sdkmath.NewIntFromUint64(888),
 	}
 
+	SDaiConversionRateOneString = "1000000000000000000000000000"
+	SDaiConversionRateTwoString = "2000000000000000000000000000"
+
 	// Bridge Event.
 	BridgeDepositEvent_Id0_Height0 = types.BridgeEvent{
 		Id:          0,

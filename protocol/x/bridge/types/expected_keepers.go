@@ -33,4 +33,6 @@ type RateLimitKeeper interface {
 		userAddr sdk.AccAddress,
 		amount *big.Int,
 	) error
+
+	SetSDAIPrice(ctx sdk.Context, price *big.Int)
 }

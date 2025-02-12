@@ -145,10 +145,10 @@ func (k Keeper) MintNewTDaiYield(ctx sdk.Context) (*big.Int, *big.Int, error) {
 		return nil, nil, err
 	}
 
-	if tDAIAfterYield.Cmp(tDaiSupplyDenomAmount) <= 0 {
+	if tDAIAfterYield.Cmp(tDaiSupplyDenomAmount) < 0 {
 		return nil, nil, errorsmod.Wrap(
 			types.ErrInvalidSDAIConversionRate,
-			"TDai after mint is less than or equal to tDai before mint.",
+			"TDai after mint is less than tDai before mint.",
 		)
 	}
 

@@ -52,9 +52,9 @@ COPY ./scripts/container-run.sh /home/klyra/app/services/$service/scripts/
 
 RUN chown klyra:klyra -R /home/klyra/app
 
-USER klyra
-
 RUN npm install -g pnpm@9.15.1
+
+USER klyra
 
 RUN node -v
 RUN npm -v

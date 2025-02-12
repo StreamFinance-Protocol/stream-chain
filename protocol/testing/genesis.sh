@@ -1087,9 +1087,11 @@ function edit_genesis() {
 	dasel put -t int -f "$GENESIS" '.app_state.prices.market_prices.[33].exponent' -v '-9'
 	dasel put -t int -f "$GENESIS" '.app_state.prices.market_prices.[33].spot_price' -v '1000000000'          # $1 = 1 USDT.
 	dasel put -t int -f "$GENESIS" '.app_state.prices.market_prices.[33].pnl_price' -v '1000000000'          # $1 = 1 USDT.
+
 	# USDT Exchange Config
 	usdt_exchange_config_json=$(cat "$EXCHANGE_CONFIG_JSON_DIR/usdt_exchange_config.json" | jq -c '.')
 	dasel put -t string -f "$GENESIS" '.app_state.prices.market_params.[33].exchange_config_json' -v "$usdt_exchange_config_json"
+
 
 	total_accounts_quote_balance=0
 	acct_idx=0
@@ -1099,12 +1101,16 @@ function edit_genesis() {
 		total_accounts_quote_balance=$(($total_accounts_quote_balance + $DEFAULT_SUBACCOUNT_QUOTE_BALANCE))
 		acct_idx=$(($acct_idx + 1))
 	done
+
+
 	# Update subaccounts module for faucet accounts.
 	for acct in "${INPUT_FAUCET_ACCOUNTS[@]}"; do
 		add_subaccount "$GENESIS" "$acct_idx" "$acct" "$DEFAULT_SUBACCOUNT_QUOTE_BALANCE_FAUCET"
 		total_accounts_quote_balance=$(($total_accounts_quote_balance + $DEFAULT_SUBACCOUNT_QUOTE_BALANCE_FAUCET))
 		acct_idx=$(($acct_idx + 1))
 	done
+
+
 
 	next_bank_idx=0
 	if (( total_accounts_quote_balance > 0 )); then
@@ -1532,9 +1538,8 @@ function add_subaccount() {
 	dasel put -t int -f "$GEN_FILE" ".app_state.subaccounts.subaccounts.[$IDX].id.number" -v '0'
 	dasel put -t bool -f "$GEN_FILE" ".app_state.subaccounts.subaccounts.[$IDX].margin_enabled" -v 'true'
 	dasel put -t string -f "$GEN_FILE" ".app_state.subaccounts.subaccounts.[$IDX].asset_yield_index" -v "0/1"
-	dasel put -t int -f "$GEN_FILE" ".app_state.subaccounts.subaccounts.[$IDX].max_slippage_ppm" -v '0'
 
-	dasel put -t json -f "$GEN_FILE" ".app_state.subaccounts.subaccounts.[$IDX].asset_positions.[]"s -v '{}'
+	dasel put -t json -f "$GEN_FILE" ".app_state.subaccounts.subaccounts.[$IDX].asset_positions.[]" -v '{}'
 	dasel put -t int -f "$GEN_FILE" ".app_state.subaccounts.subaccounts.[$IDX].asset_positions.[0].asset_id" -v '0'
 	dasel put -t string -f "$GEN_FILE" ".app_state.subaccounts.subaccounts.[$IDX].asset_positions.[0].quantums" -v "${QUOTE_BALANCE}"
 	dasel put -t int -f "$GEN_FILE" ".app_state.subaccounts.subaccounts.[$IDX].asset_positions.[0].index" -v '0'

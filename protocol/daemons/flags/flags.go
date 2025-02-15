@@ -113,19 +113,19 @@ func GetDefaultDaemonFlags() DaemonFlags {
 				MaxDaemonUnhealthySeconds:   5 * 60, // 5 minutes.
 			},
 			SDAI: SDAIFlags{
-				Enabled:        true,
+				Enabled:        false,
 				MockEnabled:    false,
 				MockNoYield:    false,
 				LoopDelayMs:    30_000,
 				EthRpcEndpoint: "https://eth-mainnet.g.alchemy.com/v2/-IfChTcasSLaAOyyJMXRe5BbTT3uHG6I",
 			},
 			Deleveraging: DeleveragingFlags{
-				Enabled:        true,
+				Enabled:        false,
 				LoopDelayMs:    1_600,
 				QueryPageLimit: 1_000,
 			},
 			Bridge: BridgeFlags{
-				Enabled:                  true,
+				Enabled:                  false,
 				LoopDelayMs:              30_000,
 				EthRpcEndpoint:           "",
 				EthChainId:               1,
@@ -133,7 +133,7 @@ func GetDefaultDaemonFlags() DaemonFlags {
 				EthBridgeContractAddress: "0x748c6d4bC7527FDD1d3E2c52391960014a8f51D8",
 			},
 			Price: PriceFlags{
-				Enabled:     true,
+				Enabled:     false,
 				LoopDelayMs: 3_000,
 			},
 		}

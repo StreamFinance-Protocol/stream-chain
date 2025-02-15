@@ -122,9 +122,12 @@ func (k Keeper) AcknowledgeBridges(
 	// - `NextId` is set to ID of last acknowledged bridge event + 1
 	// - `EthBlockHeight`is set to block height of last acknowledged bridge event
 	lastBridgeEvent := bridgeEvents[len(bridgeEvents)-1]
+	currAcknowledgedEventInfo := k.GetAcknowledgedEventInfo(ctx)
 	if err = k.SetAcknowledgedEventInfo(ctx, types.BridgeEventInfo{
-		NextDepositId:  lastBridgeEvent.GetId() + 1,
-		EthBlockHeight: lastBridgeEvent.GetBlockHeight(),
+		NextDepositId:     lastBridgeEvent.GetId() + 1,
+		EthBlockHeight:    lastBridgeEvent.GetBlockHeight(),
+		NextWithdrawId:    currAcknowledgedEventInfo.NextWithdrawId,
+		KlyraBlockHeight: currAcknowledgedEventInfo.KlyraBlockHeight,
 	}); err != nil {
 		return err
 	}

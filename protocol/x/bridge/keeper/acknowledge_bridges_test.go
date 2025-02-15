@@ -21,6 +21,8 @@ func TestAcknowledgeBridges(t *testing.T) {
 		bridgingDisabled bool
 		// Error responses of mock delayMsgKeeper.
 		delayMsgErrors []error
+		// Initial AcknowledgedEventInfo values
+		initialAEI types.BridgeEventInfo
 
 		/* --- Expectations --- */
 		// Expected AcknowledgedEventInfo.
@@ -29,31 +31,49 @@ func TestAcknowledgeBridges(t *testing.T) {
 		expectedError string
 	}{
 		"Success: no events": {
+			initialAEI: types.BridgeEventInfo{
+				NextWithdrawId:    5,
+				KlyraBlockHeight: 100,
+			},
 			bridgeEvents: []types.BridgeEvent{},
 			expectedAEI: types.BridgeEventInfo{
-				NextDepositId:  0,
-				EthBlockHeight: 0,
+				NextDepositId:     0,
+				EthBlockHeight:    0,
+				NextWithdrawId:    5,
+				KlyraBlockHeight: 100,
 			},
 		},
 		"Success: 1 event": {
+			initialAEI: types.BridgeEventInfo{
+				NextWithdrawId:    10,
+				KlyraBlockHeight: 200,
+			},
 			bridgeEvents: []types.BridgeEvent{
 				constants.BridgeDepositEvent_Id55_Height15,
 			},
 			delayMsgErrors: []error{nil},
 			expectedAEI: types.BridgeEventInfo{
-				NextDepositId:  56,
-				EthBlockHeight: 15,
+				NextDepositId:     56,
+				EthBlockHeight:    15,
+				NextWithdrawId:    10,
+				KlyraBlockHeight: 200,
 			},
 		},
 		"Success: 2 events": {
+			initialAEI: types.BridgeEventInfo{
+				NextWithdrawId:    15,
+				KlyraBlockHeight: 300,
+			},
 			bridgeEvents: []types.BridgeEvent{
 				constants.BridgeDepositEvent_Id0_Height0,
 				constants.BridgeDepositEvent_Id1_Height0,
 			},
 			delayMsgErrors: []error{nil, nil},
 			expectedAEI: types.BridgeEventInfo{
-				NextDepositId:  2,
-				EthBlockHeight: 0,
+				NextDepositId:     2,
+				EthBlockHeight:    0,
+				NextWithdrawId:    15,
+				KlyraBlockHeight: 300,
 			},
 		},
 		"Error: bridging disabled": {
@@ -83,6 +103,11 @@ func TestAcknowledgeBridges(t *testing.T) {
 				DelayBlocks: ks.BridgeKeeper.GetSafetyParams(ks.Ctx).DelayBlocks,
 			})
 			require.NoError(t, err)
+			
+			// Set initial AcknowledgedEventInfo
+			err = ks.BridgeKeeper.SetAcknowledgedEventInfo(ks.Ctx, tc.initialAEI)
+			require.NoError(t, err)
+
 			for i := range tc.bridgeEvents {
 				ks.MockDelayMsgKeeper.On(
 					"DelayMessageByBlocks",
@@ -91,7 +116,6 @@ func TestAcknowledgeBridges(t *testing.T) {
 					mock.Anything,
 				).Return(uint32(i), tc.delayMsgErrors[i]).Once()
 			}
-			initialAei := ks.BridgeKeeper.GetAcknowledgedEventInfo(ks.Ctx)
 
 			// Invoke AcknowledgeBridges.
 			err = ks.BridgeKeeper.AcknowledgeBridges(ks.Ctx, tc.bridgeEvents)
@@ -101,7 +125,7 @@ func TestAcknowledgeBridges(t *testing.T) {
 				require.ErrorContains(t, err, tc.expectedError)
 
 				// Verify that AcknowledgedEventInfo was not updated.
-				require.Equal(t, initialAei, ks.BridgeKeeper.GetAcknowledgedEventInfo(ks.Ctx))
+				require.Equal(t, tc.initialAEI, ks.BridgeKeeper.GetAcknowledgedEventInfo(ks.Ctx))
 
 				if tc.bridgingDisabled {
 					// Verify that no messages were delayed.

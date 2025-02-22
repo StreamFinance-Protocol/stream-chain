@@ -37,6 +37,8 @@ export interface BridgeEventSDKType {
 
   is_deposit: boolean;
 }
+/** BridgeWithdraw contains information about a withdrawal. */
+
 export interface BridgeWithdraw {
   /** The amount of sdai to withdraw */
   sdaiAmount: string;
@@ -47,6 +49,8 @@ export interface BridgeWithdraw {
 
   ethRecipient: string;
 }
+/** BridgeWithdraw contains information about a withdrawal. */
+
 export interface BridgeWithdrawSDKType {
   /** The amount of sdai to withdraw */
   sdai_amount: string;

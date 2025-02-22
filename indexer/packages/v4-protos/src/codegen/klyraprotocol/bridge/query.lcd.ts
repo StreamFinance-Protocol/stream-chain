@@ -1,5 +1,5 @@
 import { LCDClient } from "@osmonauts/lcd";
-import { QueryEventParamsRequest, QueryEventParamsResponseSDKType, QueryProposeParamsRequest, QueryProposeParamsResponseSDKType, QuerySafetyParamsRequest, QuerySafetyParamsResponseSDKType, QueryAcknowledgedEventInfoRequest, QueryAcknowledgedEventInfoResponseSDKType, QueryWithdrawalsRequest, QueryWithdrawalsResponseSDKType, QueryRecognizedEventInfoRequest, QueryRecognizedEventInfoResponseSDKType, QueryDelayedCompleteBridgeMessagesRequest, QueryDelayedCompleteBridgeMessagesResponseSDKType } from "./query";
+import { QueryEventParamsRequest, QueryEventParamsResponseSDKType, QueryProposeParamsRequest, QueryProposeParamsResponseSDKType, QuerySafetyParamsRequest, QuerySafetyParamsResponseSDKType, QueryAcknowledgedEventInfoRequest, QueryAcknowledgedEventInfoResponseSDKType, QueryWithdrawEventsRequest, QueryWithdrawEventsResponseSDKType, QueryRecognizedEventInfoRequest, QueryRecognizedEventInfoResponseSDKType, QueryDelayedCompleteBridgeMessagesRequest, QueryDelayedCompleteBridgeMessagesResponseSDKType } from "./query";
 export class LCDQueryClient {
   req: LCDClient;
 
@@ -50,9 +50,9 @@ export class LCDQueryClient {
   /* Queries the Withdrawals */
 
 
-  async withdrawEvents(_params: QueryWithdrawalsRequest = {}): Promise<QueryWithdrawalsResponseSDKType> {
+  async withdrawEvents(_params: QueryWithdrawEventsRequest = {}): Promise<QueryWithdrawEventsResponseSDKType> {
     const endpoint = `klyraprotocol/v4/bridge/withdrawals`;
-    return await this.req.get<QueryWithdrawalsResponseSDKType>(endpoint);
+    return await this.req.get<QueryWithdrawEventsResponseSDKType>(endpoint);
   }
   /* Queries the RecognizedEventInfo.
    A "recognized" event is one that is finalized on the Ethereum blockchain

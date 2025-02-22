@@ -111,8 +111,8 @@ export interface IndexerEventsStoreValueSDKType {
 }
 /**
  * IndexerTendermintEvent contains the base64 encoded event proto emitted from
- * the Klyra application as well as additional metadata to determine the ordering
- * of the event within the block and the subtype of the event.
+ * the Klyra application as well as additional metadata to determine the
+ * ordering of the event within the block and the subtype of the event.
  */
 
 export interface IndexerTendermintEvent {
@@ -136,8 +136,8 @@ export interface IndexerTendermintEvent {
 }
 /**
  * IndexerTendermintEvent contains the base64 encoded event proto emitted from
- * the Klyra application as well as additional metadata to determine the ordering
- * of the event within the block and the subtype of the event.
+ * the Klyra application as well as additional metadata to determine the
+ * ordering of the event within the block and the subtype of the event.
  */
 
 export interface IndexerTendermintEventSDKType {

@@ -124,10 +124,9 @@ export enum OrderRemoveV1_OrderRemovalStatus {
   ORDER_REMOVAL_STATUS_BEST_EFFORT_CANCELED = 1,
 
   /**
-   * ORDER_REMOVAL_STATUS_CANCELED - A canceled order is one that is confirmed to be removed on all Klyra nodes
-   * (discounting dishonest Klyra nodes) and will not be included in any future
-   * order matches.
-   * The cases where this happens includes:
+   * ORDER_REMOVAL_STATUS_CANCELED - A canceled order is one that is confirmed to be removed on all Klyra
+   * nodes (discounting dishonest Klyra nodes) and will not be included in any
+   * future order matches. The cases where this happens includes:
    * - the order is expired.
    */
   ORDER_REMOVAL_STATUS_CANCELED = 2,
@@ -160,10 +159,9 @@ export enum OrderRemoveV1_OrderRemovalStatusSDKType {
   ORDER_REMOVAL_STATUS_BEST_EFFORT_CANCELED = 1,
 
   /**
-   * ORDER_REMOVAL_STATUS_CANCELED - A canceled order is one that is confirmed to be removed on all Klyra nodes
-   * (discounting dishonest Klyra nodes) and will not be included in any future
-   * order matches.
-   * The cases where this happens includes:
+   * ORDER_REMOVAL_STATUS_CANCELED - A canceled order is one that is confirmed to be removed on all Klyra
+   * nodes (discounting dishonest Klyra nodes) and will not be included in any
+   * future order matches. The cases where this happens includes:
    * - the order is expired.
    */
   ORDER_REMOVAL_STATUS_CANCELED = 2,

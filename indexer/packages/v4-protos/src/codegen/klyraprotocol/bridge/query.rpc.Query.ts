@@ -1,7 +1,7 @@
 import { Rpc } from "../../helpers";
 import * as _m0 from "protobufjs/minimal";
 import { QueryClient, createProtobufRpcClient } from "@cosmjs/stargate";
-import { QueryEventParamsRequest, QueryEventParamsResponse, QueryProposeParamsRequest, QueryProposeParamsResponse, QuerySafetyParamsRequest, QuerySafetyParamsResponse, QueryAcknowledgedEventInfoRequest, QueryAcknowledgedEventInfoResponse, QueryWithdrawalsRequest, QueryWithdrawalsResponse, QueryRecognizedEventInfoRequest, QueryRecognizedEventInfoResponse, QueryDelayedCompleteBridgeMessagesRequest, QueryDelayedCompleteBridgeMessagesResponse } from "./query";
+import { QueryEventParamsRequest, QueryEventParamsResponse, QueryProposeParamsRequest, QueryProposeParamsResponse, QuerySafetyParamsRequest, QuerySafetyParamsResponse, QueryAcknowledgedEventInfoRequest, QueryAcknowledgedEventInfoResponse, QueryWithdrawEventsRequest, QueryWithdrawEventsResponse, QueryRecognizedEventInfoRequest, QueryRecognizedEventInfoResponse, QueryDelayedCompleteBridgeMessagesRequest, QueryDelayedCompleteBridgeMessagesResponse } from "./query";
 /** Query defines the gRPC querier service. */
 
 export interface Query {
@@ -22,7 +22,7 @@ export interface Query {
   acknowledgedEventInfo(request?: QueryAcknowledgedEventInfoRequest): Promise<QueryAcknowledgedEventInfoResponse>;
   /** Queries the Withdrawals */
 
-  withdrawEvents(request?: QueryWithdrawalsRequest): Promise<QueryWithdrawalsResponse>;
+  withdrawEvents(request?: QueryWithdrawEventsRequest): Promise<QueryWithdrawEventsResponse>;
   /**
    * Queries the RecognizedEventInfo.
    * A "recognized" event is one that is finalized on the Ethereum blockchain
@@ -75,10 +75,10 @@ export class QueryClientImpl implements Query {
     return promise.then(data => QueryAcknowledgedEventInfoResponse.decode(new _m0.Reader(data)));
   }
 
-  withdrawEvents(request: QueryWithdrawalsRequest = {}): Promise<QueryWithdrawalsResponse> {
-    const data = QueryWithdrawalsRequest.encode(request).finish();
+  withdrawEvents(request: QueryWithdrawEventsRequest = {}): Promise<QueryWithdrawEventsResponse> {
+    const data = QueryWithdrawEventsRequest.encode(request).finish();
     const promise = this.rpc.request("klyraprotocol.bridge.Query", "WithdrawEvents", data);
-    return promise.then(data => QueryWithdrawalsResponse.decode(new _m0.Reader(data)));
+    return promise.then(data => QueryWithdrawEventsResponse.decode(new _m0.Reader(data)));
   }
 
   recognizedEventInfo(request: QueryRecognizedEventInfoRequest = {}): Promise<QueryRecognizedEventInfoResponse> {
@@ -114,7 +114,7 @@ export const createRpcQueryExtension = (base: QueryClient) => {
       return queryService.acknowledgedEventInfo(request);
     },
 
-    withdrawEvents(request?: QueryWithdrawalsRequest): Promise<QueryWithdrawalsResponse> {
+    withdrawEvents(request?: QueryWithdrawEventsRequest): Promise<QueryWithdrawEventsResponse> {
       return queryService.withdrawEvents(request);
     },
 

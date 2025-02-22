@@ -89,9 +89,9 @@ func (k Keeper) AcknowledgedEventInfo(
 
 func (k Keeper) WithdrawEvents(
 	c context.Context,
-	req *types.QueryWithdrawalsRequest,
+	req *types.QueryWithdrawEventsRequest,
 ) (
-	*types.QueryWithdrawalsResponse,
+	*types.QueryWithdrawEventsResponse,
 	error,
 ) {
 	if req == nil {
@@ -111,7 +111,7 @@ func (k Keeper) WithdrawEvents(
 		events = append(events, withdrawEvent)
 	}
 
-	return &types.QueryWithdrawalsResponse{
+	return &types.QueryWithdrawEventsResponse{
 		Withdrawals: events,
 	}, nil
 }

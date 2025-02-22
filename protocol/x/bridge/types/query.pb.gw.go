@@ -106,7 +106,7 @@ func local_request_Query_AcknowledgedEventInfo_0(ctx context.Context, marshaler 
 }
 
 func request_Query_WithdrawEvents_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq QueryWithdrawalsRequest
+	var protoReq QueryWithdrawEventsRequest
 	var metadata runtime.ServerMetadata
 
 	msg, err := client.WithdrawEvents(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -115,7 +115,7 @@ func request_Query_WithdrawEvents_0(ctx context.Context, marshaler runtime.Marsh
 }
 
 func local_request_Query_WithdrawEvents_0(ctx context.Context, marshaler runtime.Marshaler, server QueryServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq QueryWithdrawalsRequest
+	var protoReq QueryWithdrawEventsRequest
 	var metadata runtime.ServerMetadata
 
 	msg, err := server.WithdrawEvents(ctx, &protoReq)

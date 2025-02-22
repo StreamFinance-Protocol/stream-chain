@@ -103,7 +103,7 @@ func TestQueryWithdrawEvents(t *testing.T) {
 	out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdQueryWithdrawEvents(), []string{})
 
 	require.NoError(t, err)
-	var resp types.QueryWithdrawalsResponse
+	var resp types.QueryWithdrawEventsResponse
 	require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
 	require.Equal(t, []types.BridgeEvent{}, resp.Withdrawals)
 }

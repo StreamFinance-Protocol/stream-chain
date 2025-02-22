@@ -88,8 +88,8 @@ message QueryAllCollateralPoolsRequest {
   cosmos.base.query.v1beta1.PageRequest pagination = 1;
 }
 
-// QueryAllCollateralPoolsResponse is response type for the AllCollateralPools RPC
-// method.
+// QueryAllCollateralPoolsResponse is response type for the AllCollateralPools
+// RPC method.
 message QueryAllCollateralPoolsResponse {
   repeated CollateralPool collateral_pools = 1 [ (gogoproto.nullable) = false ];
   cosmos.base.query.v1beta1.PageResponse pagination = 2;

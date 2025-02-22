@@ -12,7 +12,8 @@ service BridgeService {
   rpc AddBridgeEvents(AddBridgeEventsRequest) returns (AddBridgeEventsResponse);
 
   // Updates the last confirmed withdraw
-  rpc UpdateLastConfirmedWithdrawId(UpdateLastConfirmedWithdrawIdRequest) returns (UpdateLastConfirmedWithdrawIdResponse);
+  rpc UpdateLastConfirmedWithdrawId(UpdateLastConfirmedWithdrawIdRequest)
+      returns (UpdateLastConfirmedWithdrawIdResponse);
 }
 
 // AddBridgeEventsRequest is a request message that contains a list of new
@@ -31,7 +32,6 @@ message UpdateLastConfirmedWithdrawIdRequest {
   uint32 last_confirmed_withdraw_id = 1;
 }
 
-// UpdateLastConfirmedWithdrawIdResponse is a response message for 
+// UpdateLastConfirmedWithdrawIdResponse is a response message for
 // UpdateLastConfirmedWithdrawIdResponse.
 message UpdateLastConfirmedWithdrawIdResponse {}
-

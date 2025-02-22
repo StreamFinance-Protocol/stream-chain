@@ -66,14 +66,14 @@ func TestRunBridgeDaemonTaskLoop(t *testing.T) {
 		addBridgeEventsErr               error
 
 		// Query Client Mocking
-		withdrawBridgeResponse  *bridgetypes.QueryWithdrawalsResponse
+		withdrawBridgeResponse  *bridgetypes.QueryWithdrawEventsResponse
 		withdrawBridgeEventsErr error
 
 		expectedErrorString string
 		expectedError       error
 	}{
 		"Success: zero deposits and zero withdrawals": {
-			withdrawBridgeResponse: &bridgetypes.QueryWithdrawalsResponse{
+			withdrawBridgeResponse: &bridgetypes.QueryWithdrawEventsResponse{
 				Withdrawals: []bridgetypes.BridgeEvent{},
 			},
 			eventParams:           constants.EventParams,
@@ -110,7 +110,7 @@ func TestRunBridgeDaemonTaskLoop(t *testing.T) {
 			ethTransactionReceipt: ethReceiptStatusSuccess,
 		},
 		"Success: one withdrawal": {
-			withdrawBridgeResponse: &bridgetypes.QueryWithdrawalsResponse{
+			withdrawBridgeResponse: &bridgetypes.QueryWithdrawEventsResponse{
 				Withdrawals: []bridgetypes.BridgeEvent{
 					constants.BridgeWithdrawalEvent1,
 				},
@@ -124,7 +124,7 @@ func TestRunBridgeDaemonTaskLoop(t *testing.T) {
 			ethTransactionReceipt: ethReceiptStatusSuccess,
 		},
 		"Success: multiple withdrawals": {
-			withdrawBridgeResponse: &bridgetypes.QueryWithdrawalsResponse{
+			withdrawBridgeResponse: &bridgetypes.QueryWithdrawEventsResponse{
 				Withdrawals: []bridgetypes.BridgeEvent{
 					constants.BridgeWithdrawalEvent1,
 					constants.BridgeWithdrawalEvent2,
@@ -206,7 +206,7 @@ func TestRunBridgeDaemonTaskLoop(t *testing.T) {
 			chainId:                 constants.EthChainId,
 			withdrawBridgeEventsErr: errGetWithdrawEvents,
 			expectedError:           errGetWithdrawEvents,
-			withdrawBridgeResponse: &bridgetypes.QueryWithdrawalsResponse{
+			withdrawBridgeResponse: &bridgetypes.QueryWithdrawEventsResponse{
 				Withdrawals: []bridgetypes.BridgeEvent{
 					constants.BridgeWithdrawalEvent2_CoinDenomNotSDai,
 				},
@@ -219,7 +219,7 @@ func TestRunBridgeDaemonTaskLoop(t *testing.T) {
 			chainId:             constants.EthChainId,
 			pendingNonceAtErr:   errPendingNonceAt,
 			expectedError:       errPendingNonceAt,
-			withdrawBridgeResponse: &bridgetypes.QueryWithdrawalsResponse{
+			withdrawBridgeResponse: &bridgetypes.QueryWithdrawEventsResponse{
 				Withdrawals: []bridgetypes.BridgeEvent{
 					constants.BridgeWithdrawalEvent1,
 					constants.BridgeWithdrawalEvent2,
@@ -234,7 +234,7 @@ func TestRunBridgeDaemonTaskLoop(t *testing.T) {
 			pendingNonceAt:      zeroPendingNonce,
 			suggestGasPriceErr:  errSuggestGasPrice,
 			expectedError:       errSuggestGasPrice,
-			withdrawBridgeResponse: &bridgetypes.QueryWithdrawalsResponse{
+			withdrawBridgeResponse: &bridgetypes.QueryWithdrawEventsResponse{
 				Withdrawals: []bridgetypes.BridgeEvent{
 					constants.BridgeWithdrawalEvent1,
 					constants.BridgeWithdrawalEvent2,
@@ -250,7 +250,7 @@ func TestRunBridgeDaemonTaskLoop(t *testing.T) {
 			suggestGasPrice:     basicSuggestedGasPrice,
 			sendTransactionErr:  errSendTransaction,
 			expectedError:       errSendTransaction,
-			withdrawBridgeResponse: &bridgetypes.QueryWithdrawalsResponse{
+			withdrawBridgeResponse: &bridgetypes.QueryWithdrawEventsResponse{
 				Withdrawals: []bridgetypes.BridgeEvent{
 					constants.BridgeWithdrawalEvent1,
 					constants.BridgeWithdrawalEvent2,
@@ -266,7 +266,7 @@ func TestRunBridgeDaemonTaskLoop(t *testing.T) {
 			suggestGasPrice:       basicSuggestedGasPrice,
 			ethTransactionReceipt: ethReceiptStatusFailure,
 			expectedErrorString:   "failed to handle withdraw requests",
-			withdrawBridgeResponse: &bridgetypes.QueryWithdrawalsResponse{
+			withdrawBridgeResponse: &bridgetypes.QueryWithdrawEventsResponse{
 				Withdrawals: []bridgetypes.BridgeEvent{
 					constants.BridgeWithdrawalEvent1,
 					constants.BridgeWithdrawalEvent2,
@@ -283,7 +283,7 @@ func TestRunBridgeDaemonTaskLoop(t *testing.T) {
 			ethTransactionReceipt:            ethReceiptStatusSuccess,
 			updateLastConfirmedWithdrawIdErr: errUpdateLastConfirmedWithdrawId,
 			expectedError:                    errUpdateLastConfirmedWithdrawId,
-			withdrawBridgeResponse: &bridgetypes.QueryWithdrawalsResponse{
+			withdrawBridgeResponse: &bridgetypes.QueryWithdrawEventsResponse{
 				Withdrawals: []bridgetypes.BridgeEvent{
 					constants.BridgeWithdrawalEvent1,
 					constants.BridgeWithdrawalEvent2,

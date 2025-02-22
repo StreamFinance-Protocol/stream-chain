@@ -240,7 +240,7 @@ func (_m *BridgeQueryClient) SafetyParams(ctx context.Context, in *types.QuerySa
 }
 
 // WithdrawEvents provides a mock function with given fields: ctx, in, opts
-func (_m *BridgeQueryClient) WithdrawEvents(ctx context.Context, in *types.QueryWithdrawalsRequest, opts ...grpc.CallOption) (*types.QueryWithdrawalsResponse, error) {
+func (_m *BridgeQueryClient) WithdrawEvents(ctx context.Context, in *types.QueryWithdrawEventsRequest, opts ...grpc.CallOption) (*types.QueryWithdrawEventsResponse, error) {
 	_va := make([]interface{}, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
@@ -254,20 +254,20 @@ func (_m *BridgeQueryClient) WithdrawEvents(ctx context.Context, in *types.Query
 		panic("no return value specified for WithdrawEvents")
 	}
 
-	var r0 *types.QueryWithdrawalsResponse
+	var r0 *types.QueryWithdrawEventsResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *types.QueryWithdrawalsRequest, ...grpc.CallOption) (*types.QueryWithdrawalsResponse, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *types.QueryWithdrawEventsRequest, ...grpc.CallOption) (*types.QueryWithdrawEventsResponse, error)); ok {
 		return rf(ctx, in, opts...)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *types.QueryWithdrawalsRequest, ...grpc.CallOption) *types.QueryWithdrawalsResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *types.QueryWithdrawEventsRequest, ...grpc.CallOption) *types.QueryWithdrawEventsResponse); ok {
 		r0 = rf(ctx, in, opts...)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*types.QueryWithdrawalsResponse)
+			r0 = ret.Get(0).(*types.QueryWithdrawEventsResponse)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *types.QueryWithdrawalsRequest, ...grpc.CallOption) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *types.QueryWithdrawEventsRequest, ...grpc.CallOption) error); ok {
 		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)

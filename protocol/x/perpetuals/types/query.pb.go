@@ -362,8 +362,8 @@ func (m *QueryAllCollateralPoolsRequest) GetPagination() *query.PageRequest {
 	return nil
 }
 
-// QueryAllCollateralPoolsResponse is response type for the AllCollateralPools RPC
-// method.
+// QueryAllCollateralPoolsResponse is response type for the AllCollateralPools
+// RPC method.
 type QueryAllCollateralPoolsResponse struct {
 	CollateralPools []CollateralPool    `protobuf:"bytes,1,rep,name=collateral_pools,json=collateralPools,proto3" json:"collateral_pools"`
 	Pagination      *query.PageResponse `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`

@@ -39,10 +39,9 @@ service Query {
   }
 
   // Queries the Withdrawals
-  rpc WithdrawEvents(QueryWithdrawalsRequest) 
-      returns (QueryWithdrawalsResponse) {
-    option (google.api.http).get = 
-        "/klyraprotocol/v4/bridge/withdrawals";
+  rpc WithdrawEvents(QueryWithdrawEventsRequest)
+      returns (QueryWithdrawEventsResponse) {
+    option (google.api.http).get = "/klyraprotocol/v4/bridge/withdrawals";
   }
 
   // Queries the RecognizedEventInfo.
@@ -98,13 +97,13 @@ message QueryAcknowledgedEventInfoResponse {
   BridgeEventInfo info = 1 [ (gogoproto.nullable) = false ];
 }
 
-// QueryWithdrawalsRequest is a request type for the withdrawals RPC method.
-message QueryWithdrawalsRequest {}
+// QueryWithdrawEventsRequest is a request type for the withdrawals RPC method.
+message QueryWithdrawEventsRequest {}
 
-// QueryWithdrawalsResponse is a response type for the
+// QueryWithdrawEventsResponse is a response type for the
 // Withdrawals RPC method.
-message QueryWithdrawalsResponse {
-  repeated BridgeEvent Withdrawals = 1 [ (gogoproto.nullable) = false ];
+message QueryWithdrawEventsResponse {
+  repeated BridgeEvent withdrawals = 1 [ (gogoproto.nullable) = false ];
 }
 
 // QueryRecognizedEventInfoRequest is a request type for the

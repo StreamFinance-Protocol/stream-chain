@@ -107,6 +107,7 @@ func (m *BridgeEvent) GetIsDeposit() bool {
 	return false
 }
 
+// BridgeWithdraw contains information about a withdrawal.
 type BridgeWithdraw struct {
 	// The amount of sdai to withdraw
 	SdaiAmount string `protobuf:"bytes,1,opt,name=sdai_amount,json=sdaiAmount,proto3" json:"sdai_amount,omitempty"`

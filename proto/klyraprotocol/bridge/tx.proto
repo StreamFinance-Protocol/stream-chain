@@ -17,8 +17,7 @@ service Msg {
       returns (MsgAcknowledgeBridgesResponse);
 
   // BridgeWithdraw withdraws SDAI from the bridge.
-  rpc BridgeWithdraw(MsgBridgeWithdraw)
-      returns (MsgBridgeWithdrawResponse);
+  rpc BridgeWithdraw(MsgBridgeWithdraw) returns (MsgBridgeWithdrawResponse);
 
   // CompleteBridge finalizes a bridge by minting coins to an address.
   rpc CompleteBridge(MsgCompleteBridge) returns (MsgCompleteBridgeResponse);

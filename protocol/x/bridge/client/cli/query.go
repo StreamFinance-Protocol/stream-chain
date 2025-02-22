@@ -191,7 +191,7 @@ func CmdQueryWithdrawEvents() *cobra.Command {
 
 			res, err := queryClient.WithdrawEvents(
 				context.Background(),
-				&types.QueryWithdrawalsRequest{},
+				&types.QueryWithdrawEventsRequest{},
 			)
 			if err != nil {
 				return err

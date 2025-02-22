@@ -130,7 +130,7 @@ func (s *SubTaskRunnerImpl) handleWithdrawRequests(
 	serviceClient api.BridgeServiceClient,
 	ethClient types.EthClient,
 ) (err error) {
-	withdrawEvents, err := queryClient.WithdrawEvents(ctx, &bridgetypes.QueryWithdrawalsRequest{})
+	withdrawEvents, err := queryClient.WithdrawEvents(ctx, &bridgetypes.QueryWithdrawEventsRequest{})
 	if err != nil {
 		return fmt.Errorf("failed to fetch withdraw events: %w", err)
 	}
@@ -214,7 +214,7 @@ func (s *SubTaskRunnerImpl) validateChainId(
 }
 
 func (s *SubTaskRunnerImpl) GetWithdrawContractCallParams(
-	events *bridgetypes.QueryWithdrawalsResponse,
+	events *bridgetypes.QueryWithdrawEventsResponse,
 ) ([]BridgeContractWithdrawRequest, error) {
 	requests := make([]BridgeContractWithdrawRequest, len(events.Withdrawals))
 	for i, event := range events.Withdrawals {

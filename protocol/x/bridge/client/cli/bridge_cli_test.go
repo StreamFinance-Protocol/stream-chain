@@ -367,7 +367,7 @@ func (s *BridgeIntegrationTestSuite) sendBridgeAndVerifyEvent(
 	resp, err := clitestutil.ExecTestCLICmd(ctx, bridgecli.CmdQueryWithdrawEvents(), []string{})
 	s.Require().NoError(err)
 
-	var queryWithdrawEventsResponse types.QueryWithdrawalsResponse
+	var queryWithdrawEventsResponse types.QueryWithdrawEventsResponse
 	s.Require().NoError(s.cfg.Codec.UnmarshalJSON(resp.Bytes(), &queryWithdrawEventsResponse))
 
 	s.Require().Equal(len(queryWithdrawEventsResponse.Withdrawals), 1)
@@ -402,7 +402,7 @@ func (s *BridgeIntegrationTestSuite) sendBridgeAndExpectError(
 	resp, err := clitestutil.ExecTestCLICmd(ctx, bridgecli.CmdQueryWithdrawEvents(), []string{})
 	s.Require().NoError(err)
 
-	var queryWithdrawEventsResponse types.QueryWithdrawalsResponse
+	var queryWithdrawEventsResponse types.QueryWithdrawEventsResponse
 	s.Require().NoError(s.cfg.Codec.UnmarshalJSON(resp.Bytes(), &queryWithdrawEventsResponse))
 
 	s.Require().Equal(len(queryWithdrawEventsResponse.Withdrawals), 0)

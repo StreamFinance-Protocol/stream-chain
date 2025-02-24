@@ -104,7 +104,8 @@ func (k Keeper) WithdrawEvents(
 	events := make([]types.BridgeEvent, 0)
 
 	for i := uint32(0); i < proposeParams.MaxBridgesPerBlock; i++ {
-		withdrawEvent, _, found := k.bridgeEventManager.GetBridgeEventById(lastSubmittedWithdrawEventId+i, false)
+		withdrawEventId := lastSubmittedWithdrawEventId + i + 1
+		withdrawEvent, _, found := k.bridgeEventManager.GetBridgeEventById(withdrawEventId, false)
 		if !found {
 			break
 		}

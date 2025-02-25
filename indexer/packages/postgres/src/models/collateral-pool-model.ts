@@ -23,7 +23,10 @@ export default class CollateralPoolsModel extends BaseModel {
       ],
       properties: {
         id: { type: 'integer' },
-        maxCumulativeInsuranceFundDeltaPerBlock: { type: 'integer' },
+        maxCumulativeInsuranceFundDeltaPerBlock: {
+          type: 'string',
+          postgresql: { type: 'bigint' },
+        },
         multiCollateralAssets: {
           type: 'string',
           items: { type: 'integer', minimum: 0 },
@@ -43,7 +46,7 @@ export default class CollateralPoolsModel extends BaseModel {
   static get sqlToJsonConversions() {
     return {
       id: 'integer',
-      maxCumulativeInsuranceFundDeltaPerBlock: 'integer',
+      maxCumulativeInsuranceFundDeltaPerBlock: 'string',
       multiCollateralAssets: 'string',
       quoteAssetId: 'integer',
     };

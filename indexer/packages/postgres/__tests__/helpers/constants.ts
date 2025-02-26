@@ -693,14 +693,14 @@ export const defaultLiquidityTier2: LiquidityTiersCreateObject = {
 
 export const defaultCollateralPool: CollateralPoolsCreateObject = {
   id: 0,
-  maxCumulativeInsuranceFundDeltaPerBlock: 100000,
+  maxCumulativeInsuranceFundDeltaPerBlock: '100000',
   multiCollateralAssets: '{0}',
   quoteAssetId: 0,
 };
 
 export const defaultCollateralPool2: CollateralPoolsCreateObject = {
   id: 1,
-  maxCumulativeInsuranceFundDeltaPerBlock: 100000,
+  maxCumulativeInsuranceFundDeltaPerBlock: '100000',
   multiCollateralAssets: '{1}',
   quoteAssetId: 1,
 };

@@ -73,13 +73,13 @@ describe('CollateralPool store', () => {
 
     const collateralPool = await CollateralPoolTable.update({
       id: defaultCollateralPool.id,
-      maxCumulativeInsuranceFundDeltaPerBlock: 2000000,
+      maxCumulativeInsuranceFundDeltaPerBlock: '2000000',
     });
 
     expect(collateralPool).toEqual(
       normalizeCollateralPool({
         ...defaultCollateralPool,
-        maxCumulativeInsuranceFundDeltaPerBlock: 2000000,
+        maxCumulativeInsuranceFundDeltaPerBlock: '2000000',
       }),
     );
   });
@@ -94,13 +94,13 @@ describe('CollateralPool store', () => {
 
     const collateralPool = await CollateralPoolTable.upsert({
       ...defaultCollateralPool,
-      maxCumulativeInsuranceFundDeltaPerBlock: 2000000,
+      maxCumulativeInsuranceFundDeltaPerBlock: '2000000',
     });
 
     expect(collateralPool).toEqual(
       normalizeCollateralPool({
         ...defaultCollateralPool,
-        maxCumulativeInsuranceFundDeltaPerBlock: 2000000,
+        maxCumulativeInsuranceFundDeltaPerBlock: '2000000',
       }),
     );
   });

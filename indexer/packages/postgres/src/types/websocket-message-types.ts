@@ -222,7 +222,7 @@ export interface CollateralPoolContents {
 
 export interface CollateralPoolMessage {
   id?: number;
-  maxCumulativeInsuranceFundDeltaPerBlock?: number;
+  maxCumulativeInsuranceFundDeltaPerBlock?: string;
   multiCollateralAssets?: string;
   quoteAssetId: number;
 }

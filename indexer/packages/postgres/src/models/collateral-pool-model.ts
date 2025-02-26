@@ -56,7 +56,7 @@ export default class CollateralPoolsModel extends BaseModel {
 
   QueryBuilderType!: UpsertQueryBuilder<this>;
 
-  maxCumulativeInsuranceFundDeltaPerBlock!: number;
+  maxCumulativeInsuranceFundDeltaPerBlock!: string;
 
   multiCollateralAssets!: string;
 

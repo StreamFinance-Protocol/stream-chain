@@ -97,7 +97,7 @@ export interface PerpetualMarketFromDatabase {
 
 export interface CollateralPoolFromDatabase {
   id: number;
-  maxCumulativeInsuranceFundDeltaPerBlock: number;
+  maxCumulativeInsuranceFundDeltaPerBlock: string;
   multiCollateralAssets: string;
   quoteAssetId: number;
 }

@@ -119,6 +119,9 @@ func TestHandleSdaiWithdraw(t *testing.T) {
 
 			ks.MockTimeProvider.On("Now").Return(timeNow).Once()
 
+			totalSupply := ks.BankKeeper.GetSupply(ks.Ctx, ratelimittypes.SDaiDenom)
+			require.Equal(t, 0, tc.sDaiPoolBalance.Cmp(totalSupply.Amount.BigInt()))
+
 			err = ks.BridgeKeeper.HandleSdaiWithdraw(ks.Ctx, tc.withdraw)
 
 			if tc.expectedErr != nil {
@@ -134,6 +137,12 @@ func TestHandleSdaiWithdraw(t *testing.T) {
 
 			accBalance := ks.BankKeeper.GetBalance(ks.Ctx, constants.BobAccAddress, ratelimittypes.TDaiDenom)
 			require.Equal(t, tc.expectedAccTdaiBalance, accBalance.Amount.BigInt())
+
+			accBalanceSDai := ks.BankKeeper.GetBalance(ks.Ctx, constants.BobAccAddress, ratelimittypes.SDaiDenom)
+			require.Equal(t, int64(0), accBalanceSDai.Amount.Int64())
+
+			totalSupply = ks.BankKeeper.GetSupply(ks.Ctx, ratelimittypes.SDaiDenom)
+			require.Equal(t, 0, tc.expectedSdaiPoolBalance.Cmp(totalSupply.Amount.BigInt()))
 
 			sdaiPoolAccountAddress := ks.AccountKeeper.GetModuleAddress(ratelimittypes.SDaiPoolAccount)
 			sdaiPoolBalance := ks.BankKeeper.GetBalance(ks.Ctx, sdaiPoolAccountAddress, ratelimittypes.SDaiDenom)

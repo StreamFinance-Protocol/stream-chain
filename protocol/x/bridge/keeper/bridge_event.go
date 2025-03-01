@@ -5,6 +5,11 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+func (k Keeper) SendWithdrawalEventsToEventManager(ctx sdk.Context) error {
+	withdrawalEvents := k.GetBridgeWithdrawalEvents(ctx)
+	return k.bridgeEventManager.AddBridgeEvents(withdrawalEvents)
+}
+
 func (k Keeper) AddBridgeWithdrawalEvent(
 	ctx sdk.Context,
 	withdrawalEvent types.BridgeEvent,

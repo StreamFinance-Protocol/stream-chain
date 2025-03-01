@@ -176,6 +176,24 @@ func (_m *BridgeKeeper) HasAuthority(authority string) bool {
 	return r0
 }
 
+// SendWithdrawalEventsToEventManager provides a mock function with given fields: ctx
+func (_m *BridgeKeeper) SendWithdrawalEventsToEventManager(ctx types.Context) error {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SendWithdrawalEventsToEventManager")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(types.Context) error); ok {
+		r0 = rf(ctx)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // UpdateEventParams provides a mock function with given fields: ctx, params
 func (_m *BridgeKeeper) UpdateEventParams(ctx types.Context, params bridgetypes.EventParams) error {
 	ret := _m.Called(ctx, params)

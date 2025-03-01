@@ -4,12 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"cosmossdk.io/core/appmodule"
 
+	"github.com/cosmos/cosmos-sdk/telemetry"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 
+	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/client/cli"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
@@ -141,3 +144,11 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 
 // ConsensusVersion implements ConsensusVersion.
 func (AppModule) ConsensusVersion() uint64 { return 1 }
+
+// EndBlock executes all ABCI EndBlock logic respective to the bridge module. It
+// returns no validator updates.
+func (am AppModule) EndBlock(ctx context.Context) error {
+	defer telemetry.ModuleMeasureSince(am.Name(), time.Now(), telemetry.MetricKeyEndBlocker)
+	sdkCtx := lib.UnwrapSDKContext(ctx, types.ModuleName)
+	return EndBlocker(sdkCtx, am.keeper)
+}

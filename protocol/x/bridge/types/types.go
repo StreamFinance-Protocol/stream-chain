@@ -5,7 +5,6 @@ import (
 )
 
 type BridgeKeeper interface {
-	// Bridge Events
 	GetAcknowledgedEventInfo(ctx sdk.Context) BridgeEventInfo
 
 	GetRecognizedEventInfo(ctx sdk.Context) BridgeEventInfo
@@ -14,26 +13,24 @@ type BridgeKeeper interface {
 
 	CompleteBridge(ctx sdk.Context, bridges BridgeEvent) error
 
-	// Event Params
 	GetEventParams(ctx sdk.Context) EventParams
 
 	UpdateEventParams(ctx sdk.Context, params EventParams) error
 
-	// Propose Params
 	GetProposeParams(ctx sdk.Context) ProposeParams
 
 	UpdateProposeParams(ctx sdk.Context, params ProposeParams) error
 
-	// Safety Params
 	GetSafetyParams(ctx sdk.Context) SafetyParams
 
 	UpdateSafetyParams(ctx sdk.Context, params SafetyParams) error
 
-	// Authority.
 	HasAuthority(authority string) bool
 
 	HandleSdaiWithdraw(
 		ctx sdk.Context,
 		withdraw BridgeWithdraw,
 	) (err error)
+
+	SendWithdrawalEventsToEventManager(ctx sdk.Context) error
 }

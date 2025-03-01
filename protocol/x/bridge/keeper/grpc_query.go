@@ -99,12 +99,18 @@ func (k Keeper) WithdrawEvents(
 	}
 
 	ctx := lib.UnwrapSDKContext(c, types.ModuleName)
-	lastSubmittedWithdrawEventId := k.bridgeEventManager.GetLastSubmittedWithdrawEventId()
+	lastSubmittedWithdrawEventId, hasSubmittedWithdrawEvent := k.bridgeEventManager.GetLastSubmittedWithdrawEventId()
 	proposeParams := k.GetProposeParams(ctx)
 	events := make([]types.BridgeEvent, 0)
 
+	// If no events have been submitted yet, start from event ID 0
+	startEventId := uint32(0)
+	if hasSubmittedWithdrawEvent {
+		startEventId = lastSubmittedWithdrawEventId + 1
+	}
+
 	for i := uint32(0); i < proposeParams.MaxBridgesPerBlock; i++ {
-		withdrawEventId := lastSubmittedWithdrawEventId + i + 1
+		withdrawEventId := startEventId + i
 		withdrawEvent, _, found := k.bridgeEventManager.GetBridgeEventById(withdrawEventId, false)
 		if !found {
 			break

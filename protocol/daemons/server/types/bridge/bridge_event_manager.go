@@ -28,6 +28,7 @@ type BridgeEventManager struct {
 
 	// The last withdraw that was submitted to ethereum
 	lastSubmittedWithdrawEventId EventId
+	hasSubmittedWithdrawEvent    bool
 
 	// Stores:
 	// - The next unused key in the bridges map (`NextDepositId` and `NextWithdrawId`)
@@ -84,6 +85,7 @@ func (b *BridgeEventManager) AddBridgeEvents(
 		}
 	}
 	now := b.timeProvider.Now()
+
 	for _, event := range events {
 		// Ignore stale events which may be the result of a race condition.
 		if b.isEventIdStale(event) {
@@ -211,11 +213,11 @@ func (b *BridgeEventManager) GetNow() time.Time {
 	return b.timeProvider.Now()
 }
 
-func (b *BridgeEventManager) GetLastSubmittedWithdrawEventId() EventId {
+func (b *BridgeEventManager) GetLastSubmittedWithdrawEventId() (EventId, bool) {
 	b.Lock()
 	defer b.Unlock()
 
-	return b.lastSubmittedWithdrawEventId
+	return b.lastSubmittedWithdrawEventId, b.hasSubmittedWithdrawEvent
 }
 
 func (b *BridgeEventManager) SetLastSubmittedWithdrawEventId(id EventId) {
@@ -223,4 +225,5 @@ func (b *BridgeEventManager) SetLastSubmittedWithdrawEventId(id EventId) {
 	defer b.Unlock()
 
 	b.lastSubmittedWithdrawEventId = id
+	b.hasSubmittedWithdrawEvent = true
 }

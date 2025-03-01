@@ -36,3 +36,8 @@ message BridgeWithdraw {
   // The eth address that the funds are being bridged to
   string eth_recipient = 3;
 }
+
+// BridgeEventList is a list of bridge events.
+message BridgeEventList {
+  repeated BridgeEvent events = 1 [(gogoproto.nullable) = false];
+}

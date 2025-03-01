@@ -45,18 +45,24 @@ func (k Keeper) HandleSdaiWithdraw(
 		return err
 	}
 
-	recognizedEventInfo := k.bridgeEventManager.GetRecognizedEventInfo()
-	k.bridgeEventManager.AddBridgeEvents(
-		[]types.BridgeEvent{
-			{
-				Id:          recognizedEventInfo.NextWithdrawId,
-				Coin:        sdk.NewCoin(ratelimittypes.SDaiDenom, sdkmath.NewIntFromBigInt(sdaiAmount)),
-				Address:     withdraw.EthRecipient,
-				BlockHeight: uint64(ctx.BlockHeight()),
-				IsDeposit:   false,
-			},
-		},
-	)
+	acknowledgedEventInfo := k.GetAcknowledgedEventInfo(ctx)
+	nextWithdrawalId := acknowledgedEventInfo.NextWithdrawId
+
+	withdrawalEvent := types.BridgeEvent{
+		Id:          nextWithdrawalId,
+		Coin:        sdk.NewCoin(
+			ratelimittypes.SDaiDenom,
+			sdkmath.NewIntFromBigInt(sdaiAmount),
+		),
+		Address:     withdraw.EthRecipient,
+		BlockHeight: uint64(ctx.BlockHeight()),
+		IsDeposit:   false,
+	}
+	k.AddBridgeWithdrawalEvent(ctx, withdrawalEvent)
+
+	acknowledgedEventInfo.NextWithdrawId = nextWithdrawalId + 1
+	acknowledgedEventInfo.KlyraBlockHeight = uint64(ctx.BlockHeight())
+	k.SetAcknowledgedEventInfo(ctx, acknowledgedEventInfo)
 
 	return nil
 }

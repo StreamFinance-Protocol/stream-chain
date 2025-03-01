@@ -116,6 +116,8 @@ func createBridgeKeeper(
 	storeKey := storetypes.NewKVStoreKey(types.StoreKey)
 	stateStore.MountStoreWithDB(storeKey, storetypes.StoreTypeIAVL, db)
 
+	stateStore.MountStoreWithDB(transientStoreKey, storetypes.StoreTypeTransient, db)
+
 	mockTimeProvider := &mocks.TimeProvider{}
 	bridgeEventManager := bridgeserver_types.NewBridgeEventManager(mockTimeProvider)
 
@@ -124,6 +126,7 @@ func createBridgeKeeper(
 	k := keeper.NewKeeper(
 		cdc,
 		storeKey,
+		transientStoreKey,
 		bridgeEventManager,
 		ratelimitKeeper,
 		bankKeeper,

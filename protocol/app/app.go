@@ -416,6 +416,7 @@ func New(
 	keys[authtypes.StoreKey] = keys[authtypes.StoreKey].WithLocking()
 	tkeys := storetypes.NewTransientStoreKeys(
 		paramstypes.TStoreKey,
+		bridgemoduletypes.TransientStoreKey,
 		clobmoduletypes.TransientStoreKey,
 		statsmoduletypes.TransientStoreKey,
 		indexer_manager.TransientStoreKey,
@@ -916,6 +917,7 @@ func New(
 	app.BridgeKeeper = *bridgemodulekeeper.NewKeeper(
 		appCodec,
 		keys[bridgemoduletypes.StoreKey],
+		tkeys[bridgemoduletypes.TransientStoreKey],
 		bridgeEventManager,
 		app.RatelimitKeeper,
 		app.BankKeeper,

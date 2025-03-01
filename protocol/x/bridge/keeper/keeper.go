@@ -18,6 +18,7 @@ type (
 	Keeper struct {
 		cdc                codec.BinaryCodec
 		storeKey           storetypes.StoreKey
+		transientStoreKey  storetypes.StoreKey
 		bridgeEventManager *bridgeserver.BridgeEventManager
 		ratelimitKeeper    types.RateLimitKeeper
 		bankKeeper         types.BankKeeper
@@ -31,6 +32,7 @@ type (
 func NewKeeper(
 	cdc codec.BinaryCodec,
 	storeKey storetypes.StoreKey,
+	transientStoreKey storetypes.StoreKey,
 	bridgeEventManager *bridgeserver.BridgeEventManager,
 	ratelimitKeeper types.RateLimitKeeper,
 	bankKeeper types.BankKeeper,
@@ -40,6 +42,7 @@ func NewKeeper(
 	return &Keeper{
 		cdc:                cdc,
 		storeKey:           storeKey,
+		transientStoreKey:  transientStoreKey,
 		bridgeEventManager: bridgeEventManager,
 		ratelimitKeeper:    ratelimitKeeper,
 		bankKeeper:         bankKeeper,

@@ -7,6 +7,9 @@ const (
 
 	// StoreKey defines the primary module store key
 	StoreKey = ModuleName
+
+	// TransientStoreKey defines the transient module store key
+	TransientStoreKey = "tmp_" + ModuleName
 )
 
 // State
@@ -22,4 +25,7 @@ const (
 
 	// SafetyParamsKey defines the key for the SafetyParams
 	SafetyParamsKey = "SafetyParams"
+
+	// WithdrawalEventsKey defines the key for the WithdrawalEvents
+	WithdrawalEventsKey = "WithdrawalEvents"
 )

@@ -144,17 +144,17 @@ func (s *SubTaskRunnerImpl) handleWithdrawRequests(
 		return fmt.Errorf("failed to get withdraw contract call params: %w", err)
 	}
 
-	err = s.SubmitWithdrawalRequests(ctx, ethClient, requests)
-	if err != nil {
-		return fmt.Errorf("failed to submit withdrawal requests: %w", err)
-	}
-
 	lastConfirmedWithdrawId := withdrawEvents.Withdrawals[len(withdrawEvents.Withdrawals)-1].Id
 	_, err = serviceClient.UpdateLastConfirmedWithdrawId(ctx, &api.UpdateLastConfirmedWithdrawIdRequest{
 		LastConfirmedWithdrawId: lastConfirmedWithdrawId,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to update last confirmed withdraw id: %w", err)
+	}
+
+	err = s.SubmitWithdrawalRequests(ctx, ethClient, requests)
+	if err != nil {
+		return fmt.Errorf("failed to submit withdrawal requests: %w", err)
 	}
 
 	return nil

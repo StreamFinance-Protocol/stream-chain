@@ -87,6 +87,15 @@ async function sendMessages(topic: string): Promise<void> {
   let success: boolean = false;
 
   try {
+    // TODO: Disable this temporary fix once the header issue is resolved
+    for (const message of messages) {
+      if (message.headers !== undefined) {
+        if (message.headers.message_received_timestamp === undefined) {
+          message.headers.message_received_timestamp = new Date().toString();
+        }
+      }
+    }
+
     await producer.send({
       topic,
       messages,

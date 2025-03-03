@@ -1,11 +1,14 @@
-# Dockerfile to containerize services locally
+# Dockerfile to containerize services
 FROM node:18.14.0-alpine
-ENV NODE_ENV=development
+
+# Argument used to specify the name of the service
 ARG service
 
+# Install required packages
 RUN apk add --no-cache bash jq aws-cli
-RUN addgroup -S klyra && \
-    adduser -S klyra -G klyra
+
+# Environment setup
+RUN adduser -S klyra
 RUN mkdir -p /home/klyra/app
 RUN chown klyra -R /home/klyra/app
 
@@ -32,37 +35,24 @@ COPY ./packages/v4-protos/build ./packages/v4-protos/build/
 COPY ./packages/v4-proto-parser/build ./packages/v4-proto-parser/build/
 COPY ./packages/compliance/build ./packages/compliance/build/
 
-# Add debug logging before copying service files
-RUN echo "Service name: ${service}"
-RUN echo "Checking source directory structure:"
-RUN ls -la ./services/${service}/build/src/scripts/handlers || echo "Source handlers directory not found"
-
-
 # Copy package.json, build files, and environment files from service being run
 COPY ./services/${service}/package.json ./services/${service}/
 COPY ./services/${service}/build ./services/${service}/build
 COPY ./services/${service}/.env* ./services/${service}/
 
-# Add debug logging after copying
-RUN echo "Checking destination directory structure:"
-RUN ls -la /home/klyra/app/services/${service}/build/src/scripts/handlers || echo "Destination handlers directory not found"
-
 # Copy container start script
 COPY ./scripts/container-run.sh /home/klyra/app/services/$service/scripts/
 
-RUN chown klyra:klyra -R /home/klyra/app
+RUN chown klyra -R /home/klyra/app
 
 RUN npm install -g pnpm@9.15.1
 
+# Install npm modules using pnpm
+RUN pnpm i --loglevel warn --production --frozen-lockfile
+
 USER klyra
-
-RUN node -v
-RUN npm -v
-RUN pnpm -v
-
-# NOTE: For prod testing, use "RUN pnpm i --loglevel warn --production --frozen-lockfile"
-RUN pnpm i --loglevel warn --frozen-lockfile
 
 WORKDIR /home/klyra/app/services/$service
 
+# TODO: This script to run the service is very complex and should be simplified
 CMD ["sh", "-c", "bash ./scripts/container-run.sh"]

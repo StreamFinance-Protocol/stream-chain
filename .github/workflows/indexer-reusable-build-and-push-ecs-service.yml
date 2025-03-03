@@ -62,6 +62,6 @@ jobs:
           DOCKER_BUILDKIT=1 docker build \
             --platform amd64 \
             -t $ECR_REGISTRY/$ECR_REPOSITORY:$commit_hash \
-            -f Dockerfile.service.remote \
+            -f Dockerfile.service \
             --build-arg service=$SERVICE .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY --all-tags

@@ -65,7 +65,7 @@ jobs:
           DOCKER_BUILDKIT=1 docker build \
             --platform amd64 \
             -t service-base \
-            -f Dockerfile.service.remote \
+            -f Dockerfile.service \
             --build-arg service=$SERVICE .
 
       - name: Setup database

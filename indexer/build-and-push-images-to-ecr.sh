@@ -18,11 +18,11 @@ branch_name=$(git rev-parse --abbrev-ref HEAD)
 echo "Using branch name as image tag: $branch_name"
 
 declare -A services=(
-  ["ender"]="Dockerfile.service.remote"
-  ["vulcan"]="Dockerfile.service.remote"
-  ["socks"]="Dockerfile.service.remote"
-  ["roundtable"]="Dockerfile.service.remote"
-  ["comlink"]="Dockerfile.service.remote"
+  ["ender"]="Dockerfile.service"
+  ["vulcan"]="Dockerfile.service"
+  ["socks"]="Dockerfile.service"
+  ["roundtable"]="Dockerfile.service"
+  ["comlink"]="Dockerfile.service"
   ["auxo"]="Dockerfile.auxo.remote"
   ["bazooka"]="Dockerfile.bazooka.remote"
 )

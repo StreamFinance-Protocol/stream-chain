@@ -164,7 +164,7 @@ services:
   ender:
     build:
       context: ../indexer
-      dockerfile: ../indexer/Dockerfile.service.local
+      dockerfile: ../indexer/Dockerfile.service
       args:
         service: ender
     ports:
@@ -181,7 +181,7 @@ services:
   comlink:
     build:
       context: ../indexer
-      dockerfile: ../indexer/Dockerfile.service.local
+      dockerfile: ../indexer/Dockerfile.service
       args:
         service: comlink
     environment:
@@ -200,7 +200,7 @@ services:
   socks:
     build:
       context: ../indexer
-      dockerfile: ../indexer/Dockerfile.service.local
+      dockerfile: ../indexer/Dockerfile.service
       args:
         service: socks
     ports:
@@ -218,7 +218,7 @@ services:
   roundtable:
     build:
       context: ../indexer
-      dockerfile: ../indexer/Dockerfile.service.local
+      dockerfile: ../indexer/Dockerfile.service
       args:
         service: roundtable
     ports:
@@ -233,7 +233,7 @@ services:
   vulcan:
     build:
       context: ../indexer
-      dockerfile: ../indexer/Dockerfile.service.local
+      dockerfile: ../indexer/Dockerfile.service
       args:
         service: vulcan
     environment:

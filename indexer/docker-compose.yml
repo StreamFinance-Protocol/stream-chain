@@ -31,89 +31,93 @@ services:
       timeout: 20s
       retries: 10
 
-  postgres-package:
-    build:
-      context: .
-      dockerfile: Dockerfile.postgres-package.local
-    depends_on:
-      postgres:
-        condition: service_healthy
+  ################################################
+  # Disable the services below for running tests #
+  ################################################
 
-  ender:
-    build:
-      context: .
-      dockerfile: Dockerfile.service
-      args:
-        service: ender
-    env_file:
-      - .env.docker.ender
-    depends_on:
-      kafka:
-        condition: service_healthy
-      postgres:
-        condition: service_healthy
-      postgres-package:
-        condition: service_completed_successfully
+  # postgres-package:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.postgres-package.local
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
 
-  comlink:
-    build:
-      context: .
-      dockerfile: Dockerfile.service
-      args:
-        service: comlink
-    env_file:
-      - .env.docker.comlink
-    ports:
-      - 3000:3000
-    depends_on:
-      postgres:
-        condition: service_healthy
-      postgres-package:
-        condition: service_completed_successfully
+  # ender:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.service
+  #     args:
+  #       service: ender
+  #   env_file:
+  #     - .env.docker.ender
+  #   depends_on:
+  #     kafka:
+  #       condition: service_healthy
+  #     postgres:
+  #       condition: service_healthy
+  #     postgres-package:
+  #       condition: service_completed_successfully
 
-  socks:
-    build:
-      context: .
-      dockerfile: Dockerfile.service
-      args:
-        service: socks
-    env_file:
-      - .env.docker.socks
-    ports:
-      - 3001:3001
-      - 3002:3002
-    depends_on:
-      kafka:
-        condition: service_healthy
-      postgres:
-        condition: service_healthy
-      postgres-package:
-        condition: service_completed_successfully
+  # comlink:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.service
+  #     args:
+  #       service: comlink
+  #   env_file:
+  #     - .env.docker.comlink
+  #   ports:
+  #     - 3000:3000
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     postgres-package:
+  #       condition: service_completed_successfully
 
-  roundtable:
-    build:
-      context: .
-      dockerfile: Dockerfile.service
-      args:
-        service: roundtable
-    env_file:
-      - .env.docker.roundtable
-    depends_on:
-      kafka:
-        condition: service_healthy
-      postgres:
-        condition: service_healthy
-      postgres-package:
-        condition: service_completed_successfully
+  # socks:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.service
+  #     args:
+  #       service: socks
+  #   env_file:
+  #     - .env.docker.socks
+  #   ports:
+  #     - 3001:3001
+  #     - 3002:3002
+  #   depends_on:
+  #     kafka:
+  #       condition: service_healthy
+  #     postgres:
+  #       condition: service_healthy
+  #     postgres-package:
+  #       condition: service_completed_successfully
 
-  vulcan:
-    build:
-      context: .
-      dockerfile: Dockerfile.service
-      args:
-        service: vulcan
-    env_file:
-      - .env.docker.vulcan
-    depends_on:
-      kafka:
-        condition: service_healthy
+  # roundtable:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.service
+  #     args:
+  #       service: roundtable
+  #   env_file:
+  #     - .env.docker.roundtable
+  #   depends_on:
+  #     kafka:
+  #       condition: service_healthy
+  #     postgres:
+  #       condition: service_healthy
+  #     postgres-package:
+  #       condition: service_completed_successfully
+
+  # vulcan:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.service
+  #     args:
+  #       service: vulcan
+  #   env_file:
+  #     - .env.docker.vulcan
+  #   depends_on:
+  #     kafka:
+  #       condition: service_healthy

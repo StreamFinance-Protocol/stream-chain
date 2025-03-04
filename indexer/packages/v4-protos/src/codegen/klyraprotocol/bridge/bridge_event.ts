@@ -61,6 +61,16 @@ export interface BridgeWithdrawSDKType {
 
   eth_recipient: string;
 }
+/** BridgeEventList is a list of bridge events. */
+
+export interface BridgeEventList {
+  events: BridgeEvent[];
+}
+/** BridgeEventList is a list of bridge events. */
+
+export interface BridgeEventListSDKType {
+  events: BridgeEventSDKType[];
+}
 
 function createBaseBridgeEvent(): BridgeEvent {
   return {
@@ -207,6 +217,51 @@ export const BridgeWithdraw = {
     message.sdaiAmount = object.sdaiAmount ?? "";
     message.account = object.account ?? "";
     message.ethRecipient = object.ethRecipient ?? "";
+    return message;
+  }
+
+};
+
+function createBaseBridgeEventList(): BridgeEventList {
+  return {
+    events: []
+  };
+}
+
+export const BridgeEventList = {
+  encode(message: BridgeEventList, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.events) {
+      BridgeEvent.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): BridgeEventList {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseBridgeEventList();
+
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+
+      switch (tag >>> 3) {
+        case 1:
+          message.events.push(BridgeEvent.decode(reader, reader.uint32()));
+          break;
+
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+
+    return message;
+  },
+
+  fromPartial(object: DeepPartial<BridgeEventList>): BridgeEventList {
+    const message = createBaseBridgeEventList();
+    message.events = object.events?.map(e => BridgeEvent.fromPartial(e)) || [];
     return message;
   }
 

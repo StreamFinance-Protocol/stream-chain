@@ -2,40 +2,118 @@ version: '3'
 services:
   kafka:
     image: blacktop/kafka:2.6
+    env_file:
+      - .env.docker.kafka
     ports:
       - 9092:9092
-    environment:
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_ADVERTISED_HOST_NAME: localhost
-      KAFKA_CREATE_TOPICS: 
-        "to-ender:1:1,\
-        to-vulcan:1:1,\
-        to-websockets-orderbooks:1:1,\
-        to-websockets-subaccounts:1:1,\
-        to-websockets-trades:1:1,\
-        to-websockets-markets:1:1,\
-        to-websockets-candles:1:1"
-  postgres-test:
-    build:
-      context: .
-      dockerfile: Dockerfile.postgres.local
-    ports:
-      - 5436:5432
-    environment:
-      POSTGRES_PASSWORD: klyraserver123
-      POSTGRES_USER: klyra_test
-      DATADOG_POSTGRES_PASSWORD: klyraserver123
-  postgres:
-    build:
-      context: .
-      dockerfile: Dockerfile.postgres.local
-    ports:
-      - 5432:5432
-    environment:
-      POSTGRES_PASSWORD: klyraserver123
-      POSTGRES_USER: klyra_dev
-      DATADOG_POSTGRES_PASSWORD: klyraserver123
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics.sh --bootstrap-server 127.0.0.1:9092 --topic to-websockets-candles --describe"]
+      interval: 5s
+      timeout: 20s
+      retries: 50
+
   redis:
     image: redis:5.0.6-alpine
     ports:
       - 6379:6379
+
+  postgres:
+    build:
+      context: .
+      dockerfile: Dockerfile.postgres.local
+    env_file:
+      - .env.docker.postgres
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U klyra_dev"]
+      interval: 5s
+      timeout: 20s
+      retries: 10
+
+  postgres-package:
+    build:
+      context: .
+      dockerfile: Dockerfile.postgres-package.local
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  ender:
+    build:
+      context: .
+      dockerfile: Dockerfile.service
+      args:
+        service: ender
+    env_file:
+      - .env.docker.ender
+    depends_on:
+      kafka:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      postgres-package:
+        condition: service_completed_successfully
+
+  comlink:
+    build:
+      context: .
+      dockerfile: Dockerfile.service
+      args:
+        service: comlink
+    env_file:
+      - .env.docker.comlink
+    ports:
+      - 3000:3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      postgres-package:
+        condition: service_completed_successfully
+
+  socks:
+    build:
+      context: .
+      dockerfile: Dockerfile.service
+      args:
+        service: socks
+    env_file:
+      - .env.docker.socks
+    ports:
+      - 3001:3001
+      - 3002:3002
+    depends_on:
+      kafka:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      postgres-package:
+        condition: service_completed_successfully
+
+  roundtable:
+    build:
+      context: .
+      dockerfile: Dockerfile.service
+      args:
+        service: roundtable
+    env_file:
+      - .env.docker.roundtable
+    depends_on:
+      kafka:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      postgres-package:
+        condition: service_completed_successfully
+
+  vulcan:
+    build:
+      context: .
+      dockerfile: Dockerfile.service
+      args:
+        service: vulcan
+    env_file:
+      - .env.docker.vulcan
+    depends_on:
+      kafka:
+        condition: service_healthy

@@ -30,7 +30,7 @@ services:
       context: .
       dockerfile: Dockerfile.postgres.local
     ports:
-      - 5435:5432
+      - 5432:5432
     environment:
       POSTGRES_PASSWORD: klyraserver123
       POSTGRES_USER: klyra_dev
@@ -38,4 +38,4 @@ services:
   redis:
     image: redis:5.0.6-alpine
     ports:
-      - 6382:6379
+      - 6379:6379

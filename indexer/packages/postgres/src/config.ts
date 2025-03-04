@@ -24,7 +24,7 @@ export const postgresConfigSchema = {
   DB_READONLY_HOSTNAME: parseString({ default: 'localhost' }),
   IS_USING_DB_READONLY: parseBoolean({ default: true }),
 
-  DB_PORT: parseInteger({ default: 5435 }),
+  DB_PORT: parseInteger({ default: 5432 }),
   DB_NAME: parseString({ default: 'klyra_dev' }),
   DB_USERNAME: parseString({ default: 'klyra_dev' }),
   DB_PASSWORD: parseString({ default: 'klyraserver123' }),
@@ -38,9 +38,6 @@ export const postgresConfigSchema = {
   MARKET_REFRESHER_INTERVAL_MS: parseInteger({ default: 30_000 }), // 30 seconds
   LIQUIDITY_TIER_REFRESHER_INTERVAL_MS: parseInteger({ default: 30_000 }), // 30 seconds
   USE_READ_REPLICA: parseBoolean({ default: false }),
-
-  // Optional environment variables.
-  NODE_ENV: parseString({ default: null }),
 };
 
 export default parseSchema(postgresConfigSchema);

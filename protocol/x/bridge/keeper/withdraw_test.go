@@ -128,10 +128,10 @@ func TestHandleSdaiWithdraw(t *testing.T) {
 				require.Contains(t, err.Error(), tc.expectedErr.Error())
 			} else {
 				require.NoError(t, err)
-				for _, expectedBridgeWithdraw := range tc.expectedBridgeWithdraws {
-					bridgeEvent, _, found := ks.BridgeEventManager.GetBridgeEventById(expectedBridgeWithdraw.Id, false)
-					require.True(t, found)
-					require.Equal(t, bridgeEvent, tc.expectedBridgeWithdraws[bridgeEvent.Id])
+				bridgeWithdrawalEvents := ks.BridgeKeeper.GetBridgeWithdrawalEvents(ks.Ctx)
+				require.Equal(t, len(tc.expectedBridgeWithdraws), len(bridgeWithdrawalEvents))
+				for _, withdrawalEvent := range bridgeWithdrawalEvents {
+					require.Equal(t, withdrawalEvent, tc.expectedBridgeWithdraws[withdrawalEvent.Id])
 				}
 			}
 

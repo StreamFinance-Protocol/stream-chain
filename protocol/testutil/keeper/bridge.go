@@ -116,7 +116,8 @@ func createBridgeKeeper(
 	storeKey := storetypes.NewKVStoreKey(types.StoreKey)
 	stateStore.MountStoreWithDB(storeKey, storetypes.StoreTypeIAVL, db)
 
-	stateStore.MountStoreWithDB(transientStoreKey, storetypes.StoreTypeTransient, db)
+	bridgeTransientStoreKey := storetypes.NewTransientStoreKey(types.TransientStoreKey)
+	stateStore.MountStoreWithDB(bridgeTransientStoreKey, storetypes.StoreTypeTransient, db)
 
 	mockTimeProvider := &mocks.TimeProvider{}
 	bridgeEventManager := bridgeserver_types.NewBridgeEventManager(mockTimeProvider)

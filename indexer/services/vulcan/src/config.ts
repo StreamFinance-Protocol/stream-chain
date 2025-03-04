@@ -12,11 +12,15 @@ import {
   kafkaConfigSchema,
 } from '@klyraprotocol-indexer/kafka';
 import {
+  postgresConfigSchema,
+} from '@klyraprotocol-indexer/postgres';
+import {
   redisConfigSchema,
 } from '@klyraprotocol-indexer/redis';
 
 export const configSchema = {
   ...baseConfigSchema,
+  ...postgresConfigSchema, // Vulcan invokes a script that requires database access
   ...kafkaConfigSchema,
   ...redisConfigSchema,
 

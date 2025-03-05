@@ -271,6 +271,34 @@ func (s *BridgeIntegrationTestSuite) TestCLIBridge_FailureMalformedWithdrawer() 
 	)
 }
 
+func (s *BridgeIntegrationTestSuite) TestCLIBridge_SuccessMultipleWithdrawals() {
+	withdrawals := []struct {
+		ethAddress string
+		amount     uint64
+	}{
+		{
+			ethAddress: "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+			amount:     testSdaiBalance.Uint64() / 2,
+		},
+		{
+			ethAddress: "0xd8da6bf26964af9d7eed9e03e53415d37aa96046",
+			amount:     testSdaiBalance.Uint64() / 2,
+		},
+	}
+
+	expectedSDaiSupply := testSdaiBalance.Uint64() -
+		withdrawals[0].amount -
+		withdrawals[1].amount
+
+	expectedTDaiSupply := uint64(0)
+
+	s.sendBridgeAndVerifyEvents(
+		withdrawals,
+		expectedSDaiSupply,
+		expectedTDaiSupply,
+	)
+}
+
 func (s *BridgeIntegrationTestSuite) prepareAccountForWithdrawal() {
 	val := s.network.Validators[0]
 	ctx := val.ClientCtx
@@ -348,18 +376,28 @@ func (s *BridgeIntegrationTestSuite) sendWithdrawalCommand(
 	currentHeight, err := s.network.LatestHeight()
 	s.Require().NoError(err)
 
-	// Wait for a few blocks to ensure the bridge request was completed.
-	_, err = s.network.WaitForHeight(currentHeight + 3)
+	_, err = s.network.WaitForHeight(currentHeight + 1)
 	s.Require().NoError(err)
 }
 
-func (s *BridgeIntegrationTestSuite) sendBridgeAndVerifyEvent(
-	ethAddress string,
-	amount uint64,
+func (s *BridgeIntegrationTestSuite) sendBridgeAndVerifyEvents(
+	withdrawals []struct {
+		ethAddress string
+		amount     uint64
+	},
 	expectedSDaiSupply uint64,
 	expectedTDaiSupply uint64,
 ) {
-	s.sendWithdrawalCommand(s.validatorAddress.String(), ethAddress, amount, expectedSDaiSupply, expectedTDaiSupply, false)
+	for _, withdrawal := range withdrawals {
+		s.sendWithdrawalCommand(
+			s.validatorAddress.String(),
+			withdrawal.ethAddress,
+			withdrawal.amount,
+			expectedSDaiSupply,
+			expectedTDaiSupply,
+			false,
+		)
+	}
 
 	val := s.network.Validators[0]
 	ctx := val.ClientCtx
@@ -370,12 +408,15 @@ func (s *BridgeIntegrationTestSuite) sendBridgeAndVerifyEvent(
 	var queryWithdrawEventsResponse types.QueryWithdrawEventsResponse
 	s.Require().NoError(s.cfg.Codec.UnmarshalJSON(resp.Bytes(), &queryWithdrawEventsResponse))
 
-	s.Require().Equal(len(queryWithdrawEventsResponse.Withdrawals), 1)
-	s.Require().Equal(queryWithdrawEventsResponse.Withdrawals[0].Coin.Amount.Uint64(), amount)
-	s.Require().Equal(queryWithdrawEventsResponse.Withdrawals[0].Coin.Denom, ratelimittypes.SDaiDenom)
-	s.Require().Equal(queryWithdrawEventsResponse.Withdrawals[0].Address, ethAddress)
-	s.Require().Greater(queryWithdrawEventsResponse.Withdrawals[0].BlockHeight, uint64(1))
-	s.Require().False(queryWithdrawEventsResponse.Withdrawals[0].IsDeposit)
+	s.Require().Equal(len(queryWithdrawEventsResponse.Withdrawals), len(withdrawals))
+
+	for i, withdrawal := range withdrawals {
+		s.Require().Equal(queryWithdrawEventsResponse.Withdrawals[i].Coin.Amount.Uint64(), withdrawal.amount)
+		s.Require().Equal(queryWithdrawEventsResponse.Withdrawals[i].Coin.Denom, ratelimittypes.SDaiDenom)
+		s.Require().Equal(queryWithdrawEventsResponse.Withdrawals[i].Address, withdrawal.ethAddress)
+		s.Require().Greater(queryWithdrawEventsResponse.Withdrawals[i].BlockHeight, uint64(1))
+		s.Require().False(queryWithdrawEventsResponse.Withdrawals[i].IsDeposit)
+	}
 
 	totalSupplySDai, err := testutil_bank.GetTotalSupplyOfDenom(val, s.cfg.Codec, ratelimittypes.SDaiDenom)
 	s.Require().NoError(err)
@@ -385,6 +426,24 @@ func (s *BridgeIntegrationTestSuite) sendBridgeAndVerifyEvent(
 
 	s.Require().Equal(expectedSDaiSupply, totalSupplySDai)
 	s.Require().Equal(expectedTDaiSupply, totalSupplyTDai)
+}
+
+func (s *BridgeIntegrationTestSuite) sendBridgeAndVerifyEvent(
+	ethAddress string,
+	amount uint64,
+	expectedSDaiSupply uint64,
+	expectedTDaiSupply uint64,
+) {
+	s.sendBridgeAndVerifyEvents(
+		[]struct {
+			ethAddress string
+			amount     uint64
+		}{
+			{ethAddress: ethAddress, amount: amount},
+		},
+		expectedSDaiSupply,
+		expectedTDaiSupply,
+	)
 }
 
 func (s *BridgeIntegrationTestSuite) sendBridgeAndExpectError(

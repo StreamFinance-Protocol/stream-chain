@@ -43,7 +43,7 @@ func (k Keeper) CompleteBridge(
 	// Do not complete bridge if bridging is disabled.
 	safetyParams := k.GetSafetyParams(ctx)
 	if safetyParams.IsDisabled {
-		return types.ErrBridgingDisabled
+		k.Logger(ctx).Warn("Bridge is disabled, but complete bridge was called. Completing bridge now.")
 	}
 
 	// Convert bridge address string to sdk.AccAddress.

@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"errors"
+
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -14,6 +16,9 @@ func (k Keeper) AddBridgeWithdrawalEvent(
 	ctx sdk.Context,
 	withdrawalEvent types.BridgeEvent,
 ) error {
+	if withdrawalEvent.IsDeposit {
+		return errors.New("attempting to add deposit event to withdrawal event store")
+	}
 	withdrawalEvents := k.GetBridgeWithdrawalEvents(ctx)
 	withdrawalEvents = append(withdrawalEvents, withdrawalEvent)
 	k.SetBridgeWithdrawalEvents(ctx, withdrawalEvents)

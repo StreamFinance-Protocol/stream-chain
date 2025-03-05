@@ -21,7 +21,7 @@ Note, the '--from' flag is ignored as it is implied from [sender_key_or_address]
 [sender_key_or_address] and [sender_subaccount_number] together specify the sender subaccount.
 [quantums] specifies the amount to withdraw.
 `,
-		Args: cobra.ExactArgs(4),
+		Args: cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argSenderOwner := args[0]
 			err = cmd.Flags().Set(flags.FlagFrom, argSenderOwner)

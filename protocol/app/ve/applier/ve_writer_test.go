@@ -396,15 +396,15 @@ func TestWriteSDaiConversionRateToStoreAndMaybeCache(t *testing.T) {
 		expectedLastBlockUpdated    *big.Int
 		expectedCacheConversionRate *big.Int
 	}{
-		"10^27 is valid but not written to state but is written to cache": {
+		"10^27 (conversion rate of 1.0) is written to state and to cache": {
 			initialSDaiPrice:            big.NewInt(500000),
 			initialLastBlockUpdated:     big.NewInt(100),
 			sDaiConversionRate:          new(big.Int).Exp(big.NewInt(10), big.NewInt(27), nil),
 			round:                       1,
 			writeToCache:                true,
 			expectedError:               nil,
-			expectedSDaiPrice:           big.NewInt(500000),
-			expectedLastBlockUpdated:    big.NewInt(100),
+			expectedSDaiPrice:           new(big.Int).Exp(big.NewInt(10), big.NewInt(27), nil),
+			expectedLastBlockUpdated:    big.NewInt(testHeight),
 			expectedCacheConversionRate: new(big.Int).Exp(big.NewInt(10), big.NewInt(27), nil),
 		},
 		"Valid conversion rate": {

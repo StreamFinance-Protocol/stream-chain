@@ -14,6 +14,7 @@ type PrepareProposalTxs struct {
 
 	AddPremiumVotesTx    []byte
 	ProposedOperationsTx []byte
+	AcknowledgeBridgesTx []byte
 	OtherTxs             [][]byte
 	ExtInfoBz            []byte
 	// Bytes.
@@ -66,6 +67,17 @@ func (t *PrepareProposalTxs) SetProposedOperationsTx(tx []byte) error {
 		return err
 	}
 	t.ProposedOperationsTx = tx
+	return nil
+}
+
+// SetAcknowledgeBridgesTx sets the tx used for acknowledging bridges.
+func (t *PrepareProposalTxs) SetAcknowledgeBridgesTx(tx []byte) error {
+	oldBytes := uint64(len(t.AcknowledgeBridgesTx))
+	newBytes := uint64(len(tx))
+	if err := t.UpdateUsedBytes(oldBytes, newBytes); err != nil {
+		return err
+	}
+	t.AcknowledgeBridgesTx = tx
 	return nil
 }
 
@@ -122,6 +134,10 @@ func (t *PrepareProposalTxs) GetTxsInOrder(veEnabled bool) ([][]byte, error) {
 		return nil, errors.New("AddPremiumVotesTx must be set")
 	}
 
+	if len(t.AcknowledgeBridgesTx) == 0 {
+		return nil, errors.New("AcknowledgeBridgesTx must be set")
+	}
+
 	var txsToReturn [][]byte
 
 	// 1. ve info. it gets included even if empty
@@ -142,6 +158,8 @@ func (t *PrepareProposalTxs) GetTxsInOrder(veEnabled bool) ([][]byte, error) {
 	if len(t.OtherTxs) > 0 {
 		txsToReturn = append(txsToReturn, t.OtherTxs...)
 	}
+
+	txsToReturn = append(txsToReturn, t.AcknowledgeBridgesTx)
 
 	// 4. Funding samples.
 	// The validation for `AddPremiumVotesTx` is done at the beginning.

@@ -64,6 +64,7 @@ func (k Keeper) WithdrawSDaiFromTDai(
 	ctx sdk.Context,
 	userAddr sdk.AccAddress,
 	sDaiAmount *big.Int,
+	shouldSendToUser bool,
 ) error {
 	tDaiDenomAmount, err := k.GetTradingDAIFromSDAIAmountAndRoundUp(ctx, sDaiAmount)
 	if err != nil {
@@ -73,6 +74,10 @@ func (k Keeper) WithdrawSDaiFromTDai(
 	err = k.burnTDaiInUserAccount(ctx, userAddr, tDaiDenomAmount)
 	if err != nil {
 		return err
+	}
+
+	if !shouldSendToUser {
+		return nil
 	}
 
 	return k.sendSDaiAmountToUserAccount(ctx, userAddr, sDaiAmount)

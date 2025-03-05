@@ -15,7 +15,6 @@ func main() {
 
 	option := cmd.GetOptionWithCustomStartCmd()
 	rootCmd := cmd.NewRootCmd(option, app.DefaultNodeHome)
-
 	cmd.AddTendermintSubcommands(rootCmd)
 	cmd.AddInitCmdPostRunE(rootCmd)
 

@@ -211,6 +211,10 @@ func TestNormalMsgs_Key(t *testing.T) {
 		"/ibc.lightclients.tendermint.v1.Header",
 		"/ibc.lightclients.tendermint.v1.Misbehaviour",
 
+		// bridge
+		"/klyraprotocol.bridge.MsgBridgeWithdraw",
+		"/klyraprotocol.bridge.MsgBridgeWithdrawResponse",
+
 		// clob
 		"/klyraprotocol.clob.MsgBatchCancel",
 		"/klyraprotocol.clob.MsgBatchCancelResponse",

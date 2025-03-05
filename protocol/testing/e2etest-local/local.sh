@@ -95,12 +95,13 @@ create_validators() {
 		cat <<<"$new_file" >"$VAL_CONFIG_DIR"/node_key.json
 
 		edit_config "$VAL_CONFIG_DIR"
-
 		# Using "*" as a subscript results in a single arg: "klyra1... klyra1... klyra1..."
 		# Using "@" as a subscript results in separate args: "klyra1..." "klyra1..." "klyra1..."
 		# Note: `edit_genesis` must be called before `add-genesis-account`.
 		edit_genesis "$VAL_CONFIG_DIR" "${TEST_ACCOUNTS[*]}" "${FAUCET_ACCOUNTS[*]}" "" "" "" ""
+
 		update_genesis_use_test_volatile_market "$VAL_CONFIG_DIR"
+
 		update_all_markets_with_fixed_price_exchange "$VAL_CONFIG_DIR"
 
 		echo "${MNEMONICS[$i]}" | klyraprotocold keys add "${MONIKERS[$i]}" --recover --keyring-backend=test --home "$VAL_HOME_DIR"
@@ -108,12 +109,13 @@ create_validators() {
 		for acct in "${TEST_ACCOUNTS[@]}"; do
 			klyraprotocold add-genesis-account "$acct" 100000000000000000$TDAI_DENOM,$TESTNET_VALIDATOR_NATIVE_TOKEN_BALANCE$NATIVE_TOKEN --home "$VAL_HOME_DIR"
 		done
+
 		for acct in "${FAUCET_ACCOUNTS[@]}"; do
 			klyraprotocold add-genesis-account "$acct" 900000000000000000$TDAI_DENOM,$TESTNET_VALIDATOR_NATIVE_TOKEN_BALANCE$NATIVE_TOKEN --home "$VAL_HOME_DIR"
 		done
 
 		klyraprotocold gentx "${MONIKERS[$i]}" $TESTNET_VALIDATOR_SELF_DELEGATE_AMOUNT$NATIVE_TOKEN --moniker="${MONIKERS[$i]}" --keyring-backend=test --chain-id=$CHAIN_ID --home "$VAL_HOME_DIR"
-		
+
 		# Copy the gentx to a shared directory.
 		cp -a "$VAL_CONFIG_DIR/gentx/." /tmp/gentx
 	done

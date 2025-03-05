@@ -13,6 +13,7 @@ import (
 
 func init() {
 	txIndicesAndOffsets := []int{
+		constants.AcknowledgeBridgesTxLenOffset,
 		constants.ProposedOperationsTxIndex,
 		constants.AddPremiumVotesTxLenOffset,
 	}
@@ -30,6 +31,7 @@ func init() {
 	}
 	txIndicesForMinTxsCount := []int{
 		constants.ProposedOperationsTxIndex,
+		constants.AcknowledgeBridgesTxLenOffset + constants.MinTxsCount,
 		constants.AddPremiumVotesTxLenOffset + constants.MinTxsCount,
 	}
 	if constants.MinTxsCount != len(txIndicesForMinTxsCount) {
@@ -49,6 +51,7 @@ func init() {
 type ProcessProposalTxs struct {
 	// Single msg txs.
 	ProposedOperationsTx *ProposedOperationsTx
+	AcknowledgeBridgesTx *AcknowledgeBridgesTx
 	AddPremiumVotesTx    *AddPremiumVotesTx
 
 	// Multi msgs txs.
@@ -57,8 +60,10 @@ type ProcessProposalTxs struct {
 
 // DecodeProcessProposalTxs returns a new `processProposalTxs`.
 func DecodeProcessProposalTxs(
+	ctx sdk.Context,
 	decoder sdk.TxDecoder,
 	req *abci.RequestProcessProposal,
+	bridgeKeeper ProcessBridgeKeeper,
 	pricesKeeper ve.PreBlockExecPricesKeeper,
 ) (*ProcessProposalTxs, error) {
 	// Check len.
@@ -78,6 +83,17 @@ func DecodeProcessProposalTxs(
 	if err != nil {
 		return nil, err
 	}
+
+	// Acknowledge bridges.
+	acknowledgeBridgesTx, err := DecodeAcknowledgeBridgesTx(
+		ctx,
+		bridgeKeeper,
+		decoder,
+		req.Txs[numTxs+constants.AcknowledgeBridgesTxLenOffset],
+	)
+	if err != nil {
+		return nil, err
+	}
 	// Other txs.
 	allOtherTxs := make([]*OtherMsgsTx, numTxs-constants.MinTxsCount)
 	for i, txBytes := range req.Txs[constants.FirstOtherTxIndex : numTxs+constants.LastOtherTxLenOffset] {
@@ -90,6 +106,7 @@ func DecodeProcessProposalTxs(
 	}
 	return &ProcessProposalTxs{
 		ProposedOperationsTx: operationsTx,
+		AcknowledgeBridgesTx: acknowledgeBridgesTx,
 		AddPremiumVotesTx:    addPremiumVotesTx,
 		OtherTxs:             allOtherTxs,
 	}, nil
@@ -105,6 +122,7 @@ func (ppt *ProcessProposalTxs) Validate() error {
 	singleTxs := []SingleMsgTx{
 		ppt.ProposedOperationsTx,
 		ppt.AddPremiumVotesTx,
+		ppt.AcknowledgeBridgesTx,
 	}
 	for _, smt := range singleTxs {
 		if err := smt.Validate(); err != nil {

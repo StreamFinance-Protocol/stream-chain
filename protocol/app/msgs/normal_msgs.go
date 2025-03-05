@@ -4,6 +4,7 @@ import (
 	evidence "cosmossdk.io/x/evidence/types"
 	feegrant "cosmossdk.io/x/feegrant"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib"
+	bridge "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
 	clob "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	sending "github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
@@ -233,6 +234,10 @@ var (
 
 	// Custom modules
 	NormalMsgsKlyraCustom = map[string]sdk.Msg{
+		// bridge
+		"/klyraprotocol.bridge.MsgBridgeWithdraw":         &bridge.MsgBridgeWithdraw{},
+		"/klyraprotocol.bridge.MsgBridgeWithdrawResponse": nil,
+
 		// clob
 		"/klyraprotocol.clob.MsgBatchCancel":         &clob.MsgBatchCancel{},
 		"/klyraprotocol.clob.MsgBatchCancelResponse": nil,

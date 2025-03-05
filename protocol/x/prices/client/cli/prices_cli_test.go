@@ -109,6 +109,9 @@ func (s *PricesIntegrationTestSuite) SetupTest() {
 			// Disable the Liquidations daemon.
 			appOptions.Set(daemonflags.FlagDeleveragingDaemonEnabled, false)
 
+			// Disable the Bridge Daemon.
+			appOptions.Set(daemonflags.FlagBridgeDaemonEnabled, false)
+
 			// Enable the Price daemon.
 			appOptions.Set(daemonflags.FlagPriceDaemonEnabled, true)
 			appOptions.Set(daemonflags.FlagPriceDaemonLoopDelayMs, 1_000)

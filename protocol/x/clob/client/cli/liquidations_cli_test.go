@@ -78,6 +78,7 @@ func TestLiquidationOrderIntegrationTestSuite(t *testing.T) {
 
 			// Disable the Price daemon in the integration tests.
 			appOptions.Set(daemonflags.FlagPriceDaemonEnabled, false)
+			appOptions.Set(daemonflags.FlagBridgeDaemonEnabled, false)
 
 			// Effectively disable the health monitor panic timeout for these tests. This is necessary
 			// because all clob cli tests are running in the same process and the total time to run is >> 5 minutes

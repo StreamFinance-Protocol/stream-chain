@@ -15,6 +15,7 @@ const (
 type successMetricParams struct {
 	txs                 PrepareProposalTxs
 	pricesTx            PricesTxResponse
+	bridgeTx            BridgeTxResponse
 	fundingTx           FundingTxResponse
 	operationsTx        OperationsTxResponse
 	numTxsToReturn      int
@@ -53,6 +54,13 @@ func recordSuccessMetrics(params successMetricParams) {
 		float32(params.fundingTx.NumVotes),
 		ModuleName,
 		metrics.NumPremiumVotes,
+	)
+
+	// Bridge tx.
+	telemetry.IncrCounter(
+		float32(params.bridgeTx.NumBridges),
+		ModuleName,
+		metrics.NumBridges,
 	)
 
 	// Operations tx.

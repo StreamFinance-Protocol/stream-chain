@@ -63,6 +63,7 @@ require (
 	github.com/ethereum/go-ethereum v1.14.6
 	github.com/go-kit/log v0.2.1
 	github.com/hashicorp/go-metrics v0.5.3
+	github.com/joho/godotenv v1.5.1
 	github.com/ory/dockertest/v3 v3.10.0
 	github.com/pelletier/go-toml v1.9.5
 	github.com/rs/zerolog v1.32.0

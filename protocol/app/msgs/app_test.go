@@ -187,10 +187,11 @@ func TestDisallowMsgs_PrepareProposal_Filter(t *testing.T) {
 					// 2. Validate that PrepareProposal would filter out the disallow msgs.
 					ValidateRespPrepare: func(ctx sdk.Context, resp abcitypes.ResponsePrepareProposal) (haltChain bool) {
 						proposalTxs := resp.GetTxs()
-						require.Len(t, proposalTxs, 3)
+						require.Len(t, proposalTxs, 4)
 						require.Equal(t, constants.ValidMultiEmptyVoteExtInfoBytes, proposalTxs[0])
 						require.Equal(t, constants.ValidEmptyMsgProposedOperationsTxBytes, proposalTxs[1])
-						require.Equal(t, constants.EmptyMsgAddPremiumVotesTxBytes, proposalTxs[2])
+						require.Equal(t, constants.MsgAcknowledgeBridges_NoEvents_TxBytes, proposalTxs[2])
+						require.Equal(t, constants.EmptyMsgAddPremiumVotesTxBytes, proposalTxs[3])
 						return false
 					},
 

@@ -39,6 +39,7 @@ var (
 // Note: stakingKeeper and perpetualKeeper are only needed for MEV calculations.
 func ProcessProposalHandler(
 	txConfig client.TxConfig,
+	bridgeKeeper ProcessBridgeKeeper,
 	clobKeeper ProcessClobKeeper,
 	stakingKeeper ProcessStakingKeeper,
 	perpetualKeeper ProcessPerpetualKeeper,
@@ -100,7 +101,7 @@ func ProcessProposalHandler(
 			request.Txs = request.Txs[1:]
 		}
 
-		txs, err := DecodeProcessProposalTxs(txConfig.TxDecoder(), request, pricesKeeper)
+		txs, err := DecodeProcessProposalTxs(ctx, txConfig.TxDecoder(), request, bridgeKeeper, pricesKeeper)
 		if err != nil {
 			error_lib.LogErrorWithOptionalContext(ctx, "DecodeProcessProposalTxs failed", err)
 			recordErrorMetricsWithLabel(metrics.Decode)

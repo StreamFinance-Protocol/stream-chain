@@ -24,6 +24,7 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/cmd/klyraprotocold/cmd"
 	sdaitypes "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/server/types/sdaioracle"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/indexer"
+	bridgetypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
 	tmcfg "github.com/cometbft/cometbft/config"
 	tmcli "github.com/cometbft/cometbft/libs/cli"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -232,6 +233,7 @@ type GenesisStates interface {
 		epochstypes.GenesisState |
 		sendingtypes.GenesisState |
 		delaymsgtypes.GenesisState |
+		bridgetypes.GenesisState |
 		ratelimittypes.GenesisState
 }
 
@@ -254,6 +256,8 @@ func UpdateGenesisDocWithAppStateForModule[T GenesisStates](genesisDoc *types.Ge
 		moduleName = banktypes.ModuleName
 	case blocktimetypes.GenesisState:
 		moduleName = blocktimetypes.ModuleName
+	case bridgetypes.GenesisState:
+		moduleName = bridgetypes.ModuleName
 	case delaymsgtypes.GenesisState:
 		moduleName = delaymsgtypes.ModuleName
 	case perptypes.GenesisState:
@@ -1338,6 +1342,11 @@ func launchValidatorInDir(
 		"--home",
 		validatorHomeDir,
 		// TODO(CORE-29): Allow the daemons to be launched and cleaned-up successfully by default.
+		"--bridge-daemon-enabled",
+		"false",
+		"--bridge-daemon-eth-rpc-endpoint",
+		"https://eth-sepolia.g.alchemy.com/v2/demo",
+
 		"--price-daemon-enabled",
 		"false",
 		"--deleveraging-daemon-enabled",

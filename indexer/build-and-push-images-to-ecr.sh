@@ -13,6 +13,10 @@ fi
 read -p "Please enter the ECR base URL: " ecr_base_url
 echo "ECR base URL: $ecr_base_url"
 
+# Get current git branch name
+branch_name=$(git rev-parse --abbrev-ref HEAD)
+echo "Using branch name as image tag: $branch_name"
+
 declare -A services=(
   ["ender"]="Dockerfile.service.remote"
   ["vulcan"]="Dockerfile.service.remote"
@@ -23,23 +27,22 @@ declare -A services=(
   ["bazooka"]="Dockerfile.bazooka.remote"
 )
 
-
 for service in "${!services[@]}"; do
   dockerfile="${services[$service]}"
-  
+
   echo "Building and pushing Docker image for service: $service using $dockerfile"
 
   if [ "$delete_remote_image" = true ]; then
-    echo "Deleting current remote image"
-    aws ecr batch-delete-image --repository-name "dev-indexer-$service" --image-ids imageTag=latest
+    echo "Deleting current remote image with tag: $branch_name"
+    aws ecr batch-delete-image --repository-name "dev-indexer-$service" --image-ids imageTag="$branch_name"
     echo "Done deleting remote image."
   fi
 
   echo "Building and pushing new image"
 
-  sudo docker build --platform amd64 -t "$ecr_base_url/dev-indexer-$service:latest" -f "$dockerfile" --build-arg service="$service" .
+  sudo docker build --platform amd64 -t "$ecr_base_url/dev-indexer-$service:$branch_name" -f "$dockerfile" --build-arg service="$service" .
 
-  sudo docker push "$ecr_base_url/dev-indexer-$service:latest"
+  sudo docker push "$ecr_base_url/dev-indexer-$service:$branch_name"
 
   echo "Completed for service: $service"
 done

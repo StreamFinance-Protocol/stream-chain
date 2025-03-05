@@ -31,7 +31,9 @@ mock-gen:
 	@go run github.com/vektra/mockery/v2 --name=HealthCheckable --dir=./daemons/types --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=PrepareClobKeeper --dir=./app/prepare --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=PreparePerpetualsKeeper --dir=./app/prepare --recursive --output=./mocks
+	@go run github.com/vektra/mockery/v2 --name=PrepareBridgeKeeper --dir=./app/prepare --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=PreBlockExecPricesKeeper --dir=./app/ve --recursive --output=./mocks
+	@go run github.com/vektra/mockery/v2 --name=ProcessBridgeKeeper --dir=./app/process --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=ProcessClobKeeper --dir=./app/process --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=ProcessStakingKeeper --dir=./app/process --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=ProcessPerpetualKeeper --dir=./app/process --recursive --output=./mocks
@@ -45,6 +47,7 @@ mock-gen:
 	@go run github.com/vektra/mockery/v2 --name=VEApplierInterface --dir=./app/ve --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=VoteExtensionRateLimitKeeper --dir=./app/ve --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=MemClob --dir=./x/clob/types --recursive --output=./mocks
+	@go run github.com/vektra/mockery/v2 --name=BridgeKeeper --dir=./x/bridge/types --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=DelayMsgKeeper --dir=./x/delaymsg/types --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=ClobKeeper --dir=./x/clob/types --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=MemClobKeeper --dir=./x/clob/types --recursive --output=./mocks
@@ -70,6 +73,9 @@ mock-gen:
 	@go run github.com/vektra/mockery/v2 --name=PriceUpdatesCache --dir=./caches/pricecache --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=BigIntCache --dir=./caches/bigintcache --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=EthQueryClient --dir=./daemons/sdaioracle/client/eth_query_client --recursive --output=./mocks
+	@go run github.com/vektra/mockery/v2 --name=EthClient --dir=./daemons/bridge/client/types --recursive --output=./mocks
+	@go run github.com/vektra/mockery/v2 --name=BridgeQueryClient --dir=./daemons/bridge/client/types --recursive --output=./mocks
+	@go run github.com/vektra/mockery/v2 --name=BridgeServiceClient --dir=./daemons/bridge/api --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=SDAIServiceClient --dir=./daemons/sdaioracle/api --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=SDAIEventManager --dir=./daemons/server/types/sdaioracle --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=ICS4Wrapper --dir=x/ratelimit/types --recursive --output=./mocks --replace-type github.com/cosmos/ibc-go/v8/modules/core/02-client/types=clienttypes:github.com/cosmos/ibc-go/v8/modules/core/02-client/types

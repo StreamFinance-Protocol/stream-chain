@@ -128,21 +128,21 @@ describe('collateralPoolHandler', () => {
         },
       );
       expect(newCollateralPools.length).toEqual(1);
-      expectCollateralPool(newCollateralPools[0], collateralPoolEvent);
+      expectCollateralPoolMatchesEvent(newCollateralPools[0], collateralPoolEvent);
       validateCollateralPoolRefresher(defaultCreateCollateralPoolEvent);
       expectKafkaMessages(producerSendMock, collateralPoolEvent, 1);
     });
   });
 });
 
-export function expectCollateralPool(
+export function expectCollateralPoolMatchesEvent(
   collateralPoolFromDb: CollateralPoolFromDatabase,
-  event: any,
+  event: CollateralPoolUpsertEvent,
 ): void {
   expect(collateralPoolFromDb.id).toEqual(event.id);
-  // Convert the Long type to a number for comparison
+  // Convert the Long type to a string for comparison
   expect(collateralPoolFromDb.maxCumulativeInsuranceFundDeltaPerBlock).toEqual(
-    Number(event.maxCumulativeInsuranceFundDeltaPerBlock.low).toString(),
+    event.maxCumulativeInsuranceFundDeltaPerBlock.toString(),
   );
   expect(collateralPoolFromDb.quoteAssetId).toEqual(event.quoteAssetId);
   // Convert multiCollateralAssets for comparison
@@ -212,7 +212,7 @@ function validateCollateralPoolRefresher(
 
   expect(collateralPool.id).toEqual(collateralPoolEvent.id);
   expect(collateralPool.maxCumulativeInsuranceFundDeltaPerBlock).toEqual(
-    Number(collateralPoolEvent.maxCumulativeInsuranceFundDeltaPerBlock.low),
+    collateralPoolEvent.maxCumulativeInsuranceFundDeltaPerBlock.toString(),
   );
   expect(collateralPool.quoteAssetId).toEqual(collateralPoolEvent.quoteAssetId);
   // Convert multiCollateralAssets for comparison

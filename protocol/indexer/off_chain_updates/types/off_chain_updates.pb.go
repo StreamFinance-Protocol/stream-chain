@@ -86,10 +86,9 @@ const (
 	// nodes including other Klyra validator nodes and may still be included in
 	// future order matches.
 	OrderRemoveV1_ORDER_REMOVAL_STATUS_BEST_EFFORT_CANCELED OrderRemoveV1_OrderRemovalStatus = 1
-	// A canceled order is one that is confirmed to be removed on all Klyra nodes
-	// (discounting dishonest Klyra nodes) and will not be included in any future
-	// order matches.
-	// The cases where this happens includes:
+	// A canceled order is one that is confirmed to be removed on all Klyra
+	// nodes (discounting dishonest Klyra nodes) and will not be included in any
+	// future order matches. The cases where this happens includes:
 	// - the order is expired.
 	OrderRemoveV1_ORDER_REMOVAL_STATUS_CANCELED OrderRemoveV1_OrderRemovalStatus = 2
 	// An order was fully-filled. Only sent by the Indexer for stateful orders.

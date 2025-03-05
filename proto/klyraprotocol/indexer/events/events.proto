@@ -7,7 +7,6 @@ import "klyraprotocol/indexer/shared/removal_reason.proto";
 import "klyraprotocol/indexer/protocol/v1/clob.proto";
 import "klyraprotocol/indexer/protocol/v1/subaccount.proto";
 
-
 option go_package = "github.com/StreamFinance-Protocol/stream-chain/protocol/indexer/events";
 
 // Do not make any breaking changes to these protos, a new version should be
@@ -129,9 +128,10 @@ message SourceOfFunds {
 // When a subaccount is involved, a SubaccountUpdateEvent message will
 // be produced with the updated asset positions.
 message TransferEventV1 {
-  klyraprotocol.indexer.protocol.v1.IndexerSubaccountId sender_subaccount_id = 1;
-  klyraprotocol.indexer.protocol.v1.IndexerSubaccountId recipient_subaccount_id =
-      2;
+  klyraprotocol.indexer.protocol.v1.IndexerSubaccountId sender_subaccount_id =
+      1;
+  klyraprotocol.indexer.protocol.v1.IndexerSubaccountId
+      recipient_subaccount_id = 2;
   // Id of the asset transfered.
   uint32 asset_id = 3;
   // The amount of asset in quantums to transfer.

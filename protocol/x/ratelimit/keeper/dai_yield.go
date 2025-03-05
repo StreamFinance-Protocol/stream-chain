@@ -29,10 +29,6 @@ func (k Keeper) ProcessNewSDaiConversionRateUpdate(ctx sdk.Context, sDaiConversi
 		return fmt.Errorf("sDai conversion rate must be greater than 1.0: %s", sDaiConversionRate)
 	}
 
-	if sDaiConversionRate.Cmp(oneScaledBySDaiDecimals) == 0 {
-		return nil
-	}
-
 	lastBlockUpdated, found := k.GetSDAILastBlockUpdated(ctx)
 	if found && ctx.BlockHeight()-lastBlockUpdated.Int64() < types.SDAI_UPDATE_BLOCK_DELAY {
 		return nil
@@ -149,10 +145,10 @@ func (k Keeper) MintNewTDaiYield(ctx sdk.Context) (*big.Int, *big.Int, error) {
 		return nil, nil, err
 	}
 
-	if tDAIAfterYield.Cmp(tDaiSupplyDenomAmount) <= 0 {
+	if tDAIAfterYield.Cmp(tDaiSupplyDenomAmount) < 0 {
 		return nil, nil, errorsmod.Wrap(
 			types.ErrInvalidSDAIConversionRate,
-			"TDai after mint is less than or equal to tDai before mint.",
+			"TDai after mint is less than tDai before mint.",
 		)
 	}
 

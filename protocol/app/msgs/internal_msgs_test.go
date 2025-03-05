@@ -79,6 +79,16 @@ func TestInternalMsgSamples_Gov_Key(t *testing.T) {
 		"/klyraprotocol.blocktime.MsgUpdateDowntimeParams",
 		"/klyraprotocol.blocktime.MsgUpdateDowntimeParamsResponse",
 
+		// bridge
+		"/klyraprotocol.bridge.MsgCompleteBridge",
+		"/klyraprotocol.bridge.MsgCompleteBridgeResponse",
+		"/klyraprotocol.bridge.MsgUpdateEventParams",
+		"/klyraprotocol.bridge.MsgUpdateEventParamsResponse",
+		"/klyraprotocol.bridge.MsgUpdateProposeParams",
+		"/klyraprotocol.bridge.MsgUpdateProposeParamsResponse",
+		"/klyraprotocol.bridge.MsgUpdateSafetyParams",
+		"/klyraprotocol.bridge.MsgUpdateSafetyParamsResponse",
+
 		// clob
 		"/klyraprotocol.clob.MsgCreateClobPair",
 		"/klyraprotocol.clob.MsgCreateClobPairResponse",

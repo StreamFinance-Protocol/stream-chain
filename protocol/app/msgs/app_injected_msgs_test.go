@@ -19,6 +19,10 @@ import (
 
 func TestAppInjectedMsgSamples_Key(t *testing.T) {
 	expectedMsgs := []string{
+		// bridge
+		"/klyraprotocol.bridge.MsgAcknowledgeBridges",
+		"/klyraprotocol.bridge.MsgAcknowledgeBridgesResponse",
+
 		// clob
 		"/klyraprotocol.clob.MsgProposedOperations",
 		"/klyraprotocol.clob.MsgProposedOperationsResponse",

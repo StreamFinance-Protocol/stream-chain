@@ -1,11 +1,47 @@
 package eth_test
 
 import (
+	"sync"
 	"testing"
 
+	sdkmath "cosmossdk.io/math"
+
 	libeth "github.com/StreamFinance-Protocol/stream-chain/protocol/lib/eth"
+	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/constants"
+	bridgetypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/ethereum/go-ethereum/accounts/abi"
+	ethcoretypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/stretchr/testify/require"
 )
+
+func TestGetBridgeEventAbi(t *testing.T) {
+	results := make([]*abi.ABI, 0)
+	mu := sync.Mutex{}
+	var wg sync.WaitGroup
+
+	// Get the ABI 200 times.
+	for i := 0; i < 200; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			r := libeth.GetBridgeEventAbi()
+
+			mu.Lock()
+			defer mu.Unlock()
+			results = append(results, r)
+		}()
+	}
+	wg.Wait()
+
+	// Call the function one more time.
+	// Ensure that all the pointers are equal.
+	expected := libeth.GetBridgeEventAbi()
+	require.NotNil(t, expected)
+	for _, r := range results {
+		require.Same(t, expected, r)
+	}
+}
 
 func TestPadOrTruncateAddress(t *testing.T) {
 	tests := map[string]struct {
@@ -68,6 +104,94 @@ func TestPadOrTruncateAddress(t *testing.T) {
 			require.Equal(t, tc.expected, actual)
 			require.GreaterOrEqual(t, len(actual), libeth.MinAddrLen)
 			require.LessOrEqual(t, len(actual), libeth.MaxAddrLen)
+		})
+	}
+}
+
+func TestBridgeLogToEvent(t *testing.T) {
+	tests := map[string]struct {
+		inputLog   ethcoretypes.Log
+		inputDenom string
+
+		expectedEvent bridgetypes.BridgeEvent
+	}{
+		"Success: event ID 0": {
+			inputLog:   constants.EthLog_KlyraAddress_Event0,
+			inputDenom: "adv4tnt",
+			expectedEvent: bridgetypes.BridgeEvent{
+				Id: 0,
+				Coin: sdk.NewCoin(
+					"adv4tnt",
+					sdkmath.NewInt(12345),
+				),
+				Address:     "klyra1qqgzqvzq2ps8pqys5zcvp58q7rluextx6mnchc",
+				BlockHeight: 3872013,
+				IsDeposit:   true,
+			},
+		},
+		"Success: event ID 1 - empty address": {
+			inputLog:   constants.EthLog_Event1,
+			inputDenom: "test-token",
+			expectedEvent: bridgetypes.BridgeEvent{
+				Id: 1,
+				Coin: sdk.NewCoin(
+					"test-token",
+					sdkmath.NewInt(55),
+				),
+				Address:     "",
+				BlockHeight: 3969937,
+				IsDeposit:   true,
+			},
+		},
+		"Success: event ID 2": {
+			inputLog:   constants.EthLog_KlyraAddress_Event2,
+			inputDenom: "test-token",
+			expectedEvent: bridgetypes.BridgeEvent{
+				Id: 2,
+				Coin: sdk.NewCoin(
+					"test-token",
+					sdkmath.NewInt(777),
+				),
+				Address:     "klyra1qqgzqvzq2ps8pqys5zcvp58q7rluextxzy3rx3z4vemc3xgq42ascrl594",
+				BlockHeight: 4139345,
+				IsDeposit:   true,
+			},
+		},
+		"Success: event ID 3": {
+			inputLog:   constants.EthLog_KlyraAddress_Event3,
+			inputDenom: "test-token-2",
+			expectedEvent: bridgetypes.BridgeEvent{
+				Id: 3,
+				Coin: sdk.NewCoin(
+					"test-token-2",
+					sdkmath.NewInt(888),
+				),
+				Address:     "klyra124n92ej4ve2kv4tx24n92ej4ve2kv4tx24n92ej4ve2kv4tx24nq60sw",
+				BlockHeight: 4139348,
+				IsDeposit:   true,
+			},
+		},
+		"Success: event ID 4": {
+			inputLog:   constants.EthLog_KlyraAddress_Event4,
+			inputDenom: "adv4tnt",
+			expectedEvent: bridgetypes.BridgeEvent{
+				Id: 4,
+				Coin: sdk.NewCoin(
+					"adv4tnt",
+					sdkmath.NewInt(1234123443214321),
+				),
+				// address shorter than 20 bytes is padded with zeros.
+				Address:     "klyra1zg6pydqqqqqqqqqqqqqqqqqqqqqqqqqy7kmtk",
+				BlockHeight: 4139349,
+				IsDeposit:   true,
+			},
+		},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			event := libeth.BridgeDepositLogToEvent(tc.inputLog, tc.inputDenom)
+			require.Equal(t, tc.expectedEvent, event)
 		})
 	}
 }

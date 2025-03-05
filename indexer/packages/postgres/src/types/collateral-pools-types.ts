@@ -2,7 +2,7 @@
 
 export interface CollateralPoolsCreateObject {
   id: number;
-  maxCumulativeInsuranceFundDeltaPerBlock: number;
+  maxCumulativeInsuranceFundDeltaPerBlock: string;
   multiCollateralAssets: string;
   quoteAssetId: number;
 }
@@ -16,7 +16,7 @@ export enum CollateralPoolsColumns {
 
 export interface CollateralPoolsUpdateObject {
   id: number;
-  maxCumulativeInsuranceFundDeltaPerBlock?: number;
+  maxCumulativeInsuranceFundDeltaPerBlock?: string;
   multiCollateralAssets?: string;
   quoteAssetId?: number;
 }

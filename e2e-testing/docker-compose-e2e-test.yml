@@ -56,8 +56,15 @@ services:
       - "17e5e45691f0d01449c84fd4ae87279578cdd7ec@klyraprotocold0:26656,47539956aaa8e624e0f1d926040e54908ad0eb44@klyraprotocold2:26656,5882428984d83b03d0c907c1f0af343534987052@klyraprotocold3:26656"
       - --sDAI-daemon-mock-no-yield
       - "true"
+      - --sDai-daemon-enabled
+      - "true"
+      - --price-daemon-enabled
+      - "true"
+      - --deleveraging-daemon-enabled
+      - "true"
     environment:
       - DAEMON_HOME=/klyraprotocol/chain/.alice
+      - ETH_RPC_ENDPOINT
     volumes:
       - ../protocol/localnet/klyraprotocol0:/klyraprotocol/chain/.alice/data
     ports:
@@ -108,8 +115,15 @@ services:
        - "17e5e45691f0d01449c84fd4ae87279578cdd7ec@klyraprotocold0:26656,47539956aaa8e624e0f1d926040e54908ad0eb44@klyraprotocold2:26656,5882428984d83b03d0c907c1f0af343534987052@klyraprotocold3:26656"
        - --sDAI-daemon-mock-no-yield
        - "true"
+       - --sDai-daemon-enabled
+       - "true"
+       - --price-daemon-enabled
+       - "true"
+       - --deleveraging-daemon-enabled
+       - "true"
     environment:
       - DAEMON_HOME=/klyraprotocol/chain/.carl
+      - ETH_RPC_ENDPOINT
     volumes:
       - ../protocol/localnet/klyraprotocol2:/klyraprotocol/chain/.carl/data
 
@@ -127,8 +141,15 @@ services:
        - "17e5e45691f0d01449c84fd4ae87279578cdd7ec@klyraprotocold0:26656,47539956aaa8e624e0f1d926040e54908ad0eb44@klyraprotocold2:26656,5882428984d83b03d0c907c1f0af343534987052@klyraprotocold3:26656"
        - --sDAI-daemon-mock-no-yield
        - "true"
+       - --sDai-daemon-enabled
+       - "true"
+       - --price-daemon-enabled
+       - "true"
+       - --deleveraging-daemon-enabled
+       - "true"
     environment:
       - DAEMON_HOME=/klyraprotocol/chain/.dave
+      - ETH_RPC_ENDPOINT
     volumes:
       - ../protocol/localnet/klyraprotocol3:/klyraprotocol/chain/.dave/data
   postgres-package:

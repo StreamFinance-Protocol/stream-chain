@@ -25,13 +25,15 @@ message MakerFill {
   // TODO(CLOB-571): update to use SerializableInt.
   uint64 fill_amount = 1;
   // The `OrderId` of the matched maker order.
-  klyraprotocol.clob.OrderId maker_order_id = 2 [ (gogoproto.nullable) = false ];
+  klyraprotocol.clob.OrderId maker_order_id = 2
+      [ (gogoproto.nullable) = false ];
 }
 
 // MatchOrders is an injected message used for matching orders.
 message MatchOrders {
   // The `OrderId` of the taker order.
-  klyraprotocol.clob.OrderId taker_order_id = 1 [ (gogoproto.nullable) = false ];
+  klyraprotocol.clob.OrderId taker_order_id = 1
+      [ (gogoproto.nullable) = false ];
   // An ordered list of fills created by this taker order.
   repeated MakerFill fills = 2 [ (gogoproto.nullable) = false ];
 }

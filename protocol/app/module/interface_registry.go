@@ -92,8 +92,12 @@ func NewInterfaceRegistry(addrPrefix string, valAddrPrefix string) (types.Interf
 				"klyraprotocol.sending.MsgWithdrawFromSubaccount": getLegacyMsgSignerFn(
 					[]string{"sender", "owner"},
 				),
+				"klyraprotocol.bridge.MsgBridgeWithdraw": getLegacyMsgSignerFn(
+					[]string{"withdraw", "account"},
+				),
 
 				// App injected messages have no signers.
+				"klyraprotocol.bridge.MsgAcknowledgeBridges":  noSigners,
 				"klyraprotocol.clob.MsgProposedOperations":    noSigners,
 				"klyraprotocol.perpetuals.MsgAddPremiumVotes": noSigners,
 			},

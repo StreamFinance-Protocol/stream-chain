@@ -33,10 +33,10 @@ COPY ./packages/postgres/.env* ./packages/postgres/
 
 RUN chown klyra -R /home/klyra/app
 
-USER klyra
-
 # Install npm modules using pnpm
 RUN npm install -g pnpm@9.15.1
+
+USER klyra
 
 RUN node -v
 RUN npm -v

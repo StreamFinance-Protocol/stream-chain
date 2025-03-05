@@ -87,8 +87,8 @@ export interface QueryAllCollateralPoolsRequestSDKType {
   pagination?: PageRequestSDKType;
 }
 /**
- * QueryAllCollateralPoolsResponse is response type for the AllCollateralPools RPC
- * method.
+ * QueryAllCollateralPoolsResponse is response type for the AllCollateralPools
+ * RPC method.
  */
 
 export interface QueryAllCollateralPoolsResponse {
@@ -96,8 +96,8 @@ export interface QueryAllCollateralPoolsResponse {
   pagination?: PageResponse;
 }
 /**
- * QueryAllCollateralPoolsResponse is response type for the AllCollateralPools RPC
- * method.
+ * QueryAllCollateralPoolsResponse is response type for the AllCollateralPools
+ * RPC method.
  */
 
 export interface QueryAllCollateralPoolsResponseSDKType {

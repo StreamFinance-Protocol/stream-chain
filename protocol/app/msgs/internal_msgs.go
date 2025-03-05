@@ -4,6 +4,7 @@ import (
 	upgrade "cosmossdk.io/x/upgrade/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib"
 	blocktime "github.com/StreamFinance-Protocol/stream-chain/protocol/x/blocktime/types"
+	bridge "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
 	clob "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	delaymsg "github.com/StreamFinance-Protocol/stream-chain/protocol/x/delaymsg/types"
 	feetiers "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers/types"
@@ -120,6 +121,16 @@ var (
 		// delaymsg
 		"/klyraprotocol.delaymsg.MsgDelayMessage":         &delaymsg.MsgDelayMessage{},
 		"/klyraprotocol.delaymsg.MsgDelayMessageResponse": nil,
+
+		// bridge
+		"/klyraprotocol.bridge.MsgCompleteBridge":              &bridge.MsgCompleteBridge{},
+		"/klyraprotocol.bridge.MsgCompleteBridgeResponse":      nil,
+		"/klyraprotocol.bridge.MsgUpdateEventParams":           &bridge.MsgUpdateEventParams{},
+		"/klyraprotocol.bridge.MsgUpdateEventParamsResponse":   nil,
+		"/klyraprotocol.bridge.MsgUpdateProposeParams":         &bridge.MsgUpdateProposeParams{},
+		"/klyraprotocol.bridge.MsgUpdateProposeParamsResponse": nil,
+		"/klyraprotocol.bridge.MsgUpdateSafetyParams":          &bridge.MsgUpdateSafetyParams{},
+		"/klyraprotocol.bridge.MsgUpdateSafetyParamsResponse":  nil,
 
 		// feetiers
 		"/klyraprotocol.feetiers.MsgUpdatePerpetualFeeParams":         &feetiers.MsgUpdatePerpetualFeeParams{},

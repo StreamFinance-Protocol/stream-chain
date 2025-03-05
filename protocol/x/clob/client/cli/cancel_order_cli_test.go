@@ -122,6 +122,7 @@ func (s *CancelOrderIntegrationTestSuite) SetupTest() {
 
 			// Disable the Price daemon in the integration tests.
 			appOptions.Set(daemonflags.FlagPriceDaemonEnabled, false)
+			appOptions.Set(daemonflags.FlagBridgeDaemonEnabled, false)
 			appOptions.Set(daemonflags.FlagSDAIDaemonMockEnabled, true)
 
 			// Effectively disable the health monitor panic timeout for these tests. This is necessary

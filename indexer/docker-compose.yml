@@ -3,7 +3,7 @@ services:
   kafka:
     image: blacktop/kafka:2.6
     env_file:
-      - .env.docker.kafka
+      - .env.kafka
     ports:
       - 9092:9092
     healthcheck:
@@ -22,7 +22,7 @@ services:
       context: .
       dockerfile: Dockerfile.postgres.local
     env_file:
-      - .env.docker.postgres
+      - .env.postgres
     ports:
       - 5432:5432
     healthcheck:
@@ -50,7 +50,7 @@ services:
   #     args:
   #       service: ender
   #   env_file:
-  #     - .env.docker.ender
+  #     - ./services/ender/.env
   #   depends_on:
   #     kafka:
   #       condition: service_healthy
@@ -66,7 +66,7 @@ services:
   #     args:
   #       service: comlink
   #   env_file:
-  #     - .env.docker.comlink
+  #     - ./services/comlink/.env
   #   ports:
   #     - 3000:3000
   #   depends_on:
@@ -82,7 +82,7 @@ services:
   #     args:
   #       service: socks
   #   env_file:
-  #     - .env.docker.socks
+  #     - ./services/socks/.env
   #   ports:
   #     - 3001:3001
   #     - 3002:3002
@@ -101,7 +101,7 @@ services:
   #     args:
   #       service: roundtable
   #   env_file:
-  #     - .env.docker.roundtable
+  #     - ./services/roundtable/.env
   #   depends_on:
   #     kafka:
   #       condition: service_healthy
@@ -117,7 +117,7 @@ services:
   #     args:
   #       service: vulcan
   #   env_file:
-  #     - .env.docker.vulcan
+  #     - ./services/vulcan/.env
   #   depends_on:
   #     kafka:
   #       condition: service_healthy

@@ -72,6 +72,21 @@ func TestCompleteBridge(t *testing.T) {
 			},
 			expectedModAccBalance: sdk.NewCoin(ratelimittypes.SDaiDenom, sdkmath.NewInt(1_000)),
 		},
+		"Success: completes even when bridging is disabled": {
+			initialModAccBalance: sdk.NewCoin(ratelimittypes.SDaiDenom, sdkmath.NewInt(1_000)),
+			bridgeEvent: types.BridgeEvent{
+				Id:      7,
+				Address: constants.BobAccAddress.String(),
+				Coin: sdk.Coin{
+					Denom:  ratelimittypes.SDaiDenom,
+					Amount: sdkmath.NewInt(1_000_000_000_000_000),
+				},
+				BlockHeight: 3,
+				IsDeposit:   true,
+			},
+			bridgingDisabled:      true,
+			expectedModAccBalance: sdk.NewCoin(ratelimittypes.SDaiDenom, sdkmath.NewInt(1_000)),
+		},
 		"Failure: invalid address string": {
 			initialModAccBalance: sdk.NewCoin("adv4tnt", sdkmath.NewInt(1_000)),
 			bridgeEvent: types.BridgeEvent{
@@ -83,13 +98,6 @@ func TestCompleteBridge(t *testing.T) {
 			},
 			expectedError:         "decoding bech32 failed",
 			expectedModAccBalance: sdk.NewCoin("adv4tnt", sdkmath.NewInt(1_000)),
-		},
-		"Failure: bridging is disabled": {
-			initialModAccBalance:  sdk.NewCoin("adv4tnt", sdkmath.NewInt(1_000)),
-			bridgeEvent:           constants.BridgeDepositEvent_Id0_Height0, // bridges 888 tokens.
-			bridgingDisabled:      true,
-			expectedError:         types.ErrBridgingDisabled.Error(),
-			expectedModAccBalance: sdk.NewCoin("adv4tnt", sdkmath.NewInt(1_000)), // same as initial.
 		},
 	}
 

@@ -40,7 +40,7 @@ func (k Keeper) CompleteBridge(
 		return nil
 	}
 
-	// Do not complete bridge if bridging is disabled.
+	// Complete bridge if bridging is disabled.
 	safetyParams := k.GetSafetyParams(ctx)
 	if safetyParams.IsDisabled {
 		k.Logger(ctx).Warn("Bridge is disabled, but complete bridge was called. Completing bridge now.")

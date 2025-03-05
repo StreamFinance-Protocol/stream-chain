@@ -1,9 +1,19 @@
 version: '3'
+
+x-env: &env
+  environment: # Docker Compose overrides
+    DB_HOSTNAME: postgres
+    DB_READONLY_HOSTNAME: postgres
+    KAFKA_BROKER_URLS: kafka:9092
+    REDIS_URL: redis://redis:6379
+
 services:
   kafka:
     image: blacktop/kafka:2.6
     env_file:
       - .env.kafka
+    environment: # Only for Docker Compose overrides
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
     ports:
       - 9092:9092
     healthcheck:
@@ -31,93 +41,94 @@ services:
       timeout: 20s
       retries: 10
 
-  ################################################
-  # Disable the services below for running tests #
-  ################################################
+  postgres-package:
+    build:
+      context: .
+      dockerfile: Dockerfile.postgres-package.local
+    depends_on:
+      postgres:
+        condition: service_healthy
 
-  # postgres-package:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile.postgres-package.local
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
+  ender:
+    <<: *env
+    build:
+      context: .
+      dockerfile: Dockerfile.service
+      args:
+        service: ender
+    env_file:
+      - ./services/ender/.env
+    depends_on:
+      kafka:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      postgres-package:
+        condition: service_completed_successfully
 
-  # ender:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile.service
-  #     args:
-  #       service: ender
-  #   env_file:
-  #     - ./services/ender/.env
-  #   depends_on:
-  #     kafka:
-  #       condition: service_healthy
-  #     postgres:
-  #       condition: service_healthy
-  #     postgres-package:
-  #       condition: service_completed_successfully
+  comlink:
+    <<: *env
+    build:
+      context: .
+      dockerfile: Dockerfile.service
+      args:
+        service: comlink
+    env_file:
+      - ./services/comlink/.env
+    ports:
+      - 3000:3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      postgres-package:
+        condition: service_completed_successfully
 
-  # comlink:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile.service
-  #     args:
-  #       service: comlink
-  #   env_file:
-  #     - ./services/comlink/.env
-  #   ports:
-  #     - 3000:3000
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-  #     postgres-package:
-  #       condition: service_completed_successfully
+  socks:
+    <<: *env
+    build:
+      context: .
+      dockerfile: Dockerfile.service
+      args:
+        service: socks
+    env_file:
+      - ./services/socks/.env
+    ports:
+      - 3001:3001
+      - 3002:3002
+    depends_on:
+      kafka:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      postgres-package:
+        condition: service_completed_successfully
 
-  # socks:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile.service
-  #     args:
-  #       service: socks
-  #   env_file:
-  #     - ./services/socks/.env
-  #   ports:
-  #     - 3001:3001
-  #     - 3002:3002
-  #   depends_on:
-  #     kafka:
-  #       condition: service_healthy
-  #     postgres:
-  #       condition: service_healthy
-  #     postgres-package:
-  #       condition: service_completed_successfully
+  roundtable:
+    <<: *env
+    build:
+      context: .
+      dockerfile: Dockerfile.service
+      args:
+        service: roundtable
+    env_file:
+      - ./services/roundtable/.env
+    depends_on:
+      kafka:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      postgres-package:
+        condition: service_completed_successfully
 
-  # roundtable:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile.service
-  #     args:
-  #       service: roundtable
-  #   env_file:
-  #     - ./services/roundtable/.env
-  #   depends_on:
-  #     kafka:
-  #       condition: service_healthy
-  #     postgres:
-  #       condition: service_healthy
-  #     postgres-package:
-  #       condition: service_completed_successfully
-
-  # vulcan:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile.service
-  #     args:
-  #       service: vulcan
-  #   env_file:
-  #     - ./services/vulcan/.env
-  #   depends_on:
-  #     kafka:
-  #       condition: service_healthy
+  vulcan:
+    <<: *env
+    build:
+      context: .
+      dockerfile: Dockerfile.service
+      args:
+        service: vulcan
+    env_file:
+      - ./services/vulcan/.env
+    depends_on:
+      kafka:
+        condition: service_healthy

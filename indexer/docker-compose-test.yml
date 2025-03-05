@@ -1,0 +1,32 @@
+version: '3'
+services:
+  kafka:
+    image: blacktop/kafka:2.6
+    env_file:
+      - .env.kafka
+    ports:
+      - 9092:9092
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics.sh --bootstrap-server 127.0.0.1:9092 --topic to-websockets-candles --describe"]
+      interval: 5s
+      timeout: 20s
+      retries: 50
+
+  redis:
+    image: redis:5.0.6-alpine
+    ports:
+      - 6379:6379
+
+  postgres:
+    build:
+      context: .
+      dockerfile: Dockerfile.postgres.local
+    env_file:
+      - .env.postgres
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U klyra_dev"]
+      interval: 5s
+      timeout: 20s
+      retries: 10

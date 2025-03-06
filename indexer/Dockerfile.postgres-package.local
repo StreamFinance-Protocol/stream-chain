@@ -28,7 +28,7 @@ COPY ./packages/postgres/src ./packages/postgres/src
 # Copy knexfile.js for configurations
 COPY ./packages/postgres/knexfile.js ./packages/postgres
 
-# Copy .env files
+# Copy .env files # TODO: This is NOT good, but removing this might have unintended consequences
 COPY ./packages/postgres/.env* ./packages/postgres/
 
 RUN chown klyra -R /home/klyra/app

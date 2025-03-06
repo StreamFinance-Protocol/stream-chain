@@ -1,12 +1,5 @@
 version: '3'
 
-x-env: &env
-  environment: # Docker Compose overrides
-    DB_HOSTNAME: postgres
-    DB_READONLY_HOSTNAME: postgres
-    KAFKA_BROKER_URLS: kafka:9092
-    REDIS_URL: redis://redis:6379
-
 services:
   kafka:
     image: blacktop/kafka:2.6
@@ -50,7 +43,6 @@ services:
         condition: service_healthy
 
   ender:
-    <<: *env
     build:
       context: .
       dockerfile: Dockerfile.service
@@ -58,6 +50,11 @@ services:
         service: ender
     env_file:
       - ./services/ender/.env
+    environment: # Docker Compose overrides
+      DB_HOSTNAME: postgres
+      DB_READONLY_HOSTNAME: postgres
+      KAFKA_BROKER_URLS: kafka:9092
+      REDIS_URL: redis://redis:6379
     depends_on:
       kafka:
         condition: service_healthy
@@ -67,7 +64,6 @@ services:
         condition: service_completed_successfully
 
   comlink:
-    <<: *env
     build:
       context: .
       dockerfile: Dockerfile.service
@@ -75,6 +71,11 @@ services:
         service: comlink
     env_file:
       - ./services/comlink/.env
+    environment: # Docker Compose overrides
+      DB_HOSTNAME: postgres
+      DB_READONLY_HOSTNAME: postgres
+      REDIS_URL: redis://redis:6379
+      RATE_LIMIT_REDIS_URL: redis://redis:6379
     ports:
       - 3000:3000
     depends_on:
@@ -84,7 +85,6 @@ services:
         condition: service_completed_successfully
 
   socks:
-    <<: *env
     build:
       context: .
       dockerfile: Dockerfile.service
@@ -92,6 +92,10 @@ services:
         service: socks
     env_file:
       - ./services/socks/.env
+    environment: # Docker Compose overrides
+      DB_HOSTNAME: postgres
+      DB_READONLY_HOSTNAME: postgres
+      KAFKA_BROKER_URLS: kafka:9092
     ports:
       - 3001:3001
       - 3002:3002
@@ -104,7 +108,6 @@ services:
         condition: service_completed_successfully
 
   roundtable:
-    <<: *env
     build:
       context: .
       dockerfile: Dockerfile.service
@@ -112,6 +115,11 @@ services:
         service: roundtable
     env_file:
       - ./services/roundtable/.env
+    environment: # Docker Compose overrides
+      DB_HOSTNAME: postgres
+      DB_READONLY_HOSTNAME: postgres
+      KAFKA_BROKER_URLS: kafka:9092
+      REDIS_URL: redis://redis:6379
     depends_on:
       kafka:
         condition: service_healthy
@@ -121,7 +129,6 @@ services:
         condition: service_completed_successfully
 
   vulcan:
-    <<: *env
     build:
       context: .
       dockerfile: Dockerfile.service
@@ -129,6 +136,11 @@ services:
         service: vulcan
     env_file:
       - ./services/vulcan/.env
+    environment: # Docker Compose overrides
+      DB_HOSTNAME: postgres
+      DB_READONLY_HOSTNAME: postgres
+      KAFKA_BROKER_URLS: kafka:9092
+      REDIS_URL: redis://redis:6379
     depends_on:
       kafka:
         condition: service_healthy

@@ -37,7 +37,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-northeast-1
+          aws-region: sa-east-1
 
       - name: Login to Amazon ECR
         id: login-ecr
@@ -56,12 +56,17 @@ jobs:
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ inputs.ENVIRONMENT }}-indexer-${{ inputs.SERVICE }}
+          ECR_REPOSITORY: indexer-${{ inputs.SERVICE }}
+          SERVICE: ${{ inputs.SERVICE }}
+          ENVIRONMENT: ${{ inputs.ENVIRONMENT }}
         run: |
           current_time=$(date '+%Y%m%d%H%M')
           commit_hash=$(git rev-parse --short HEAD)
+          image_tag="$ENVIRONMENT-$commit_hash"
+
           DOCKER_BUILDKIT=1 docker build \
             --platform amd64 \
-            -t $ECR_REGISTRY/$ECR_REPOSITORY:$commit_hash \
-            -f Dockerfile.${{ inputs.SERVICE }}.remote .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY --all-tags
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:$image_tag \
+            -f Dockerfile.${SERVICE}.remote .
+
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$image_tag

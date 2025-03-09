@@ -168,10 +168,6 @@ func calculateAssetYieldInQuoteQuantums(
 		return big.NewInt(0), nil
 	}
 
-	if subaccount.AssetYieldIndex == "" {
-		return nil, types.ErrYieldIndexUninitialized
-	}
-
 	currentYieldIndex, success := new(big.Rat).SetString(subaccount.AssetYieldIndex)
 	if !success {
 		return nil, types.ErrRatConversion

@@ -427,8 +427,8 @@ func TestUpdateSubaccounts(t *testing.T) {
 			updates: []types.Update{
 				{
 					AssetUpdates: append(
-						testutil.CreateBTCAssetUpdate(big.NewInt(100)),
-						testutil.CreateTDaiAssetUpdate(big.NewInt(500))...,
+						testutil.CreateTDaiAssetUpdate(big.NewInt(500)),
+						testutil.CreateBTCAssetUpdate(big.NewInt(100))...,
 					),
 				},
 			},
@@ -1854,14 +1854,14 @@ func TestUpdateSubaccounts(t *testing.T) {
 					YieldIndex:   big.NewRat(0, 1).String(),
 				},
 				{
-					PerpetualId:  uint32(1),
-					Quantums:     dtypes.NewInt(1_000_000_000), // 1 ETH
+					PerpetualId:  uint32(2),
+					Quantums:     dtypes.NewInt(1_000_000_000), // 1 SOL
 					FundingIndex: dtypes.NewInt(0),
 					YieldIndex:   big.NewRat(0, 1).String(),
 				},
 				{
-					PerpetualId:  uint32(2),
-					Quantums:     dtypes.NewInt(1_000_000_000), // 1 SOL
+					PerpetualId:  uint32(1),
+					Quantums:     dtypes.NewInt(1_000_000_000), // 1 ETH
 					FundingIndex: dtypes.NewInt(0),
 					YieldIndex:   big.NewRat(0, 1).String(),
 				},
@@ -1920,12 +1920,6 @@ func TestUpdateSubaccounts(t *testing.T) {
 			},
 			expectedPerpetualPositions: []*types.PerpetualPosition{
 				{
-					PerpetualId:  uint32(0),
-					Quantums:     dtypes.NewInt(100_000_000), // 1 BTC
-					FundingIndex: dtypes.NewInt(0),
-					YieldIndex:   big.NewRat(0, 1).String(),
-				},
-				{
 					PerpetualId:  uint32(1),
 					Quantums:     dtypes.NewInt(1_000_000_000), // 1 ETH
 					FundingIndex: dtypes.NewInt(0),
@@ -1934,6 +1928,12 @@ func TestUpdateSubaccounts(t *testing.T) {
 				{
 					PerpetualId:  uint32(2),
 					Quantums:     dtypes.NewInt(1_000_000_000), // 1 SOL
+					FundingIndex: dtypes.NewInt(0),
+					YieldIndex:   big.NewRat(0, 1).String(),
+				},
+				{
+					PerpetualId:  uint32(0),
+					Quantums:     dtypes.NewInt(100_000_000), // 1 BTC
 					FundingIndex: dtypes.NewInt(0),
 					YieldIndex:   big.NewRat(0, 1).String(),
 				},
@@ -1991,15 +1991,15 @@ func TestUpdateSubaccounts(t *testing.T) {
 			},
 			expectedPerpetualPositions: []*types.PerpetualPosition{
 				{
-					PerpetualId:  uint32(1),
-					Quantums:     dtypes.NewInt(1_000_000_000), // 1 ETH
-					FundingIndex: dtypes.NewInt(-5000),
-					YieldIndex:   big.NewRat(0, 1).String(),
-				},
-				{
 					PerpetualId:  uint32(2),
 					Quantums:     dtypes.NewInt(1_000_000_000), // 1 SOL
 					FundingIndex: dtypes.NewInt(2000),
+					YieldIndex:   big.NewRat(0, 1).String(),
+				},
+				{
+					PerpetualId:  uint32(1),
+					Quantums:     dtypes.NewInt(1_000_000_000), // 1 ETH
+					FundingIndex: dtypes.NewInt(-5000),
 					YieldIndex:   big.NewRat(0, 1).String(),
 				},
 			},

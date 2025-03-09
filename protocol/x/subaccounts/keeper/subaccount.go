@@ -47,7 +47,7 @@ func (k Keeper) SetSubaccount(ctx sdk.Context, subaccount types.Subaccount) {
 			if err != nil {
 				panic(err)
 			}
-			yieldIndex, err := getCurrentYieldIndexForPerp(perpetual)
+			yieldIndex, err := GetCurrentYieldIndexForPerp(perpetual)
 			if err != nil {
 				perpetualPosition.YieldIndex = "0/1"
 			} else {

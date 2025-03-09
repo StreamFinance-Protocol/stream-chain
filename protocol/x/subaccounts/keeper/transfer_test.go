@@ -1,7 +1,6 @@
 package keeper_test
 
 import (
-	"fmt"
 	"math"
 	"math/big"
 	"testing"
@@ -303,10 +302,6 @@ func TestWithdrawFundsFromSubaccountToAccount_DepositFundsFromAccountToSubaccoun
 
 			ratelimitKeeper.SetAssetYieldIndex(ctx, big.NewRat(1, 1))
 
-			fmt.Println("COLLATERAL POOLS", perpetualsKeeper.GetAllCollateralPools(ctx))
-			subaccountsModuleAccBalance := bankKeeper.GetBalance(ctx, tc.collateralPoolAddr, tc.asset.Denom)
-			fmt.Println("INITIAL SUBACCOUNTS MODULE ACC BALANCE", subaccountsModuleAccBalance)
-
 			// Set up Subaccounts module account.
 			auth_testutil.CreateTestModuleAccount(ctx, accountKeeper, types.ModuleName, []string{})
 
@@ -384,10 +379,7 @@ func TestWithdrawFundsFromSubaccountToAccount_DepositFundsFromAccountToSubaccoun
 			)
 
 			// Check the subaccount module balance.
-			subaccountsModuleAccBalance = bankKeeper.GetBalance(ctx, tc.collateralPoolAddr, tc.asset.Denom)
-			fmt.Println("subaccountsModuleAccBalance", subaccountsModuleAccBalance)
-			fmt.Println("ASSET DENOM", tc.asset.Denom)
-			fmt.Println("tc", tc.asset.Id)
+			subaccountsModuleAccBalance := bankKeeper.GetBalance(ctx, tc.collateralPoolAddr, tc.asset.Denom)
 			require.Equal(t,
 				sdk.NewCoin(tc.asset.Denom, sdkmath.NewIntFromBigInt(tc.expectedSubaccountsModuleAccBalance)),
 				subaccountsModuleAccBalance,

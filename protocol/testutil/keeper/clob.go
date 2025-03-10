@@ -133,10 +133,8 @@ func NewClobKeepersTestContextWithUninitializedMemStore(
 			stateStore,
 			db,
 			cdc,
-			ks.BlockTimeKeeper,
 			bankKeeper,
 			ks.PerpetualsKeeper,
-			ks.AssetsKeeper,
 			indexerEventsTransientStoreKey,
 			true,
 		)

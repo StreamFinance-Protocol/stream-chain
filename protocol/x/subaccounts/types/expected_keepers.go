@@ -3,7 +3,6 @@ package types
 import (
 	"context"
 	"math/big"
-	"time"
 
 	blocktimetypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/blocktime/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
@@ -117,7 +116,7 @@ type BankKeeper interface {
 }
 
 type BlocktimeKeeper interface {
-	GetDowntimeInfoFor(ctx sdk.Context, duration time.Duration) blocktimetypes.AllDowntimeInfo_DowntimeInfo
+	GetPreviousBlockInfo(ctx sdk.Context) blocktimetypes.BlockInfo
 }
 
 type YieldKeeper interface {

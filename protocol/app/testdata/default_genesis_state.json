@@ -48,14 +48,7 @@
     "denom_metadata": [],
     "send_enabled": []
   },
-  "blocktime": {
-    "params": {
-      "durations": [
-        "300s",
-        "1800s"
-      ]
-    }
-  },
+  "blocktime": {},
     "bridge": {
     "event_params": {
       "denom": "bridge-token",

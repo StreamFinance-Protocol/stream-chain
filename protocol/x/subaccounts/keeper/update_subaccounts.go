@@ -288,7 +288,7 @@ func (k Keeper) isTradingBlocked(ctx sdk.Context, settledUpdates []SettledUpdate
 	}
 
 	// Panic if the current block is less than the last block a chain outage was seen.
-	downtimeInfo := k.blocktimeKeeper.GetDowntimeInfoFor(
+	downtimeInfo := k.blocktimeKeeper.GetDowntimeInfofFor(
 		ctx,
 		types.WITHDRAWAL_AND_TRANSFERS_BLOCKED_AFTER_CHAIN_OUTAGE_DURATION,
 	)

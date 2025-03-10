@@ -63,10 +63,6 @@ func TestInternalMsgSamples_Gov_Key(t *testing.T) {
 		"/cosmos.upgrade.v1beta1.MsgSoftwareUpgrade",
 		"/cosmos.upgrade.v1beta1.MsgSoftwareUpgradeResponse",
 
-		// blocktime
-		"/klyraprotocol.blocktime.MsgUpdateDowntimeParams",
-		"/klyraprotocol.blocktime.MsgUpdateDowntimeParamsResponse",
-
 		// bridge
 		"/klyraprotocol.bridge.MsgCompleteBridge",
 		"/klyraprotocol.bridge.MsgCompleteBridgeResponse",

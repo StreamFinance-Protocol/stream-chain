@@ -11,7 +11,6 @@ import (
 	govplus "github.com/StreamFinance-Protocol/stream-chain/protocol/x/govplus/types"
 	perpetuals "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	prices "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
-	ratelimit "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
 	sending "github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending/types"
 	stats "github.com/StreamFinance-Protocol/stream-chain/protocol/x/stats/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -158,11 +157,7 @@ var (
 		"/klyraprotocol.prices.MsgUpdateMarketParam":          &prices.MsgUpdateMarketParam{},
 		"/klyraprotocol.prices.MsgUpdateMarketParamResponse":  nil,
 
-		// ratelimit
-		"/klyraprotocol.ratelimit.MsgSetLimitParams":         &ratelimit.MsgSetLimitParams{},
-		"/klyraprotocol.ratelimit.MsgSetLimitParamsResponse": nil,
-
-		// sending
+		// sending ddd
 		"/klyraprotocol.sending.MsgSendFromModuleToAccount":         &sending.MsgSendFromModuleToAccount{},
 		"/klyraprotocol.sending.MsgSendFromModuleToAccountResponse": nil,
 

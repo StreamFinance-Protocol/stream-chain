@@ -10,7 +10,6 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 
-	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/client/cli"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
@@ -26,7 +25,6 @@ var (
 	_ module.HasGenesisBasics = AppModuleBasic{}
 
 	_ appmodule.AppModule        = AppModule{}
-	_ appmodule.HasEndBlocker    = AppModule{}
 	_ module.HasConsensusVersion = AppModule{}
 	_ module.HasGenesis          = AppModule{}
 	_ module.HasServices         = AppModule{}
@@ -149,11 +147,3 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 // consensus-breaking change introduced by the module. To avoid wrong/empty versions, the initial version should
 // be set to 1
 func (AppModule) ConsensusVersion() uint64 { return 1 }
-
-// EndBlock contains the logic that is automatically triggered at the end of each block
-func (am AppModule) EndBlock(ctx context.Context) error {
-	sdkCtx := lib.UnwrapSDKContext(ctx, types.ModuleName)
-	am.keeper.UpdateAllCapacitiesEndBlocker(sdkCtx)
-
-	return nil
-}

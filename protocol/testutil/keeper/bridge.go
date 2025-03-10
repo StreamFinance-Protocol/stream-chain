@@ -51,7 +51,6 @@ func BridgeKeepers(
 	) []GenesisInitializer {
 		// Define necessary keepers here for unit tests
 		epochsKeeper, _ := createEpochsKeeper(stateStore, db, cdc)
-		blockTimeKeeper, _ := createBlockTimeKeeper(stateStore, db, cdc)
 		ks.PricesKeeper, _, _, _, _ = createPricesKeeper(stateStore, db, cdc, transientStoreKey)
 		ks.AssetsKeeper, _ = createAssetsKeeper(
 			stateStore,
@@ -77,10 +76,8 @@ func BridgeKeepers(
 			stateStore,
 			db,
 			cdc,
-			blockTimeKeeper,
 			ks.BankKeeper,
 			ks.PerpetualsKeeper,
-			ks.AssetsKeeper,
 			transientStoreKey,
 			true,
 		)

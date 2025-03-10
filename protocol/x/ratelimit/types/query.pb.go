@@ -29,264 +29,6 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// ListLimitParamsRequest is a request type of the ListLimitParams RPC method.
-type ListLimitParamsRequest struct {
-}
-
-func (m *ListLimitParamsRequest) Reset()         { *m = ListLimitParamsRequest{} }
-func (m *ListLimitParamsRequest) String() string { return proto.CompactTextString(m) }
-func (*ListLimitParamsRequest) ProtoMessage()    {}
-func (*ListLimitParamsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ecc33bde80a52312, []int{0}
-}
-func (m *ListLimitParamsRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *ListLimitParamsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_ListLimitParamsRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *ListLimitParamsRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ListLimitParamsRequest.Merge(m, src)
-}
-func (m *ListLimitParamsRequest) XXX_Size() int {
-	return m.Size()
-}
-func (m *ListLimitParamsRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_ListLimitParamsRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ListLimitParamsRequest proto.InternalMessageInfo
-
-// ListLimitParamsResponse is a response type of the ListLimitParams RPC method.
-type ListLimitParamsResponse struct {
-	LimitParamsList []LimitParams `protobuf:"bytes,1,rep,name=limit_params_list,json=limitParamsList,proto3" json:"limit_params_list"`
-}
-
-func (m *ListLimitParamsResponse) Reset()         { *m = ListLimitParamsResponse{} }
-func (m *ListLimitParamsResponse) String() string { return proto.CompactTextString(m) }
-func (*ListLimitParamsResponse) ProtoMessage()    {}
-func (*ListLimitParamsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ecc33bde80a52312, []int{1}
-}
-func (m *ListLimitParamsResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *ListLimitParamsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_ListLimitParamsResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *ListLimitParamsResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ListLimitParamsResponse.Merge(m, src)
-}
-func (m *ListLimitParamsResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *ListLimitParamsResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_ListLimitParamsResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ListLimitParamsResponse proto.InternalMessageInfo
-
-func (m *ListLimitParamsResponse) GetLimitParamsList() []LimitParams {
-	if m != nil {
-		return m.LimitParamsList
-	}
-	return nil
-}
-
-// QueryCapacityByDenomRequest is a request type for the CapacityByDenom RPC
-// method.
-type QueryCapacityByDenomRequest struct {
-	Denom string `protobuf:"bytes,1,opt,name=denom,proto3" json:"denom,omitempty"`
-}
-
-func (m *QueryCapacityByDenomRequest) Reset()         { *m = QueryCapacityByDenomRequest{} }
-func (m *QueryCapacityByDenomRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryCapacityByDenomRequest) ProtoMessage()    {}
-func (*QueryCapacityByDenomRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ecc33bde80a52312, []int{2}
-}
-func (m *QueryCapacityByDenomRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *QueryCapacityByDenomRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_QueryCapacityByDenomRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *QueryCapacityByDenomRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryCapacityByDenomRequest.Merge(m, src)
-}
-func (m *QueryCapacityByDenomRequest) XXX_Size() int {
-	return m.Size()
-}
-func (m *QueryCapacityByDenomRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryCapacityByDenomRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_QueryCapacityByDenomRequest proto.InternalMessageInfo
-
-func (m *QueryCapacityByDenomRequest) GetDenom() string {
-	if m != nil {
-		return m.Denom
-	}
-	return ""
-}
-
-// QueryCapacityByDenomResponse is a response type of the CapacityByDenom RPC
-// method.
-type QueryCapacityByDenomResponse struct {
-	LimiterCapacityList []LimiterCapacity `protobuf:"bytes,1,rep,name=limiter_capacity_list,json=limiterCapacityList,proto3" json:"limiter_capacity_list"`
-}
-
-func (m *QueryCapacityByDenomResponse) Reset()         { *m = QueryCapacityByDenomResponse{} }
-func (m *QueryCapacityByDenomResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryCapacityByDenomResponse) ProtoMessage()    {}
-func (*QueryCapacityByDenomResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ecc33bde80a52312, []int{3}
-}
-func (m *QueryCapacityByDenomResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *QueryCapacityByDenomResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_QueryCapacityByDenomResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *QueryCapacityByDenomResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryCapacityByDenomResponse.Merge(m, src)
-}
-func (m *QueryCapacityByDenomResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *QueryCapacityByDenomResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryCapacityByDenomResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_QueryCapacityByDenomResponse proto.InternalMessageInfo
-
-func (m *QueryCapacityByDenomResponse) GetLimiterCapacityList() []LimiterCapacity {
-	if m != nil {
-		return m.LimiterCapacityList
-	}
-	return nil
-}
-
-// QueryAllPendingSendPacketsRequest is a request type for the
-// AllPendingSendPackets RPC
-type QueryAllPendingSendPacketsRequest struct {
-}
-
-func (m *QueryAllPendingSendPacketsRequest) Reset()         { *m = QueryAllPendingSendPacketsRequest{} }
-func (m *QueryAllPendingSendPacketsRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryAllPendingSendPacketsRequest) ProtoMessage()    {}
-func (*QueryAllPendingSendPacketsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ecc33bde80a52312, []int{4}
-}
-func (m *QueryAllPendingSendPacketsRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *QueryAllPendingSendPacketsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_QueryAllPendingSendPacketsRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *QueryAllPendingSendPacketsRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryAllPendingSendPacketsRequest.Merge(m, src)
-}
-func (m *QueryAllPendingSendPacketsRequest) XXX_Size() int {
-	return m.Size()
-}
-func (m *QueryAllPendingSendPacketsRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryAllPendingSendPacketsRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_QueryAllPendingSendPacketsRequest proto.InternalMessageInfo
-
-// QueryAllPendingSendPacketsResponse is a response type of the
-// AllPendingSendPackets RPC
-type QueryAllPendingSendPacketsResponse struct {
-	PendingSendPackets []PendingSendPacket `protobuf:"bytes,1,rep,name=pending_send_packets,json=pendingSendPackets,proto3" json:"pending_send_packets"`
-}
-
-func (m *QueryAllPendingSendPacketsResponse) Reset()         { *m = QueryAllPendingSendPacketsResponse{} }
-func (m *QueryAllPendingSendPacketsResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryAllPendingSendPacketsResponse) ProtoMessage()    {}
-func (*QueryAllPendingSendPacketsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ecc33bde80a52312, []int{5}
-}
-func (m *QueryAllPendingSendPacketsResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *QueryAllPendingSendPacketsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_QueryAllPendingSendPacketsResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *QueryAllPendingSendPacketsResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryAllPendingSendPacketsResponse.Merge(m, src)
-}
-func (m *QueryAllPendingSendPacketsResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *QueryAllPendingSendPacketsResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryAllPendingSendPacketsResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_QueryAllPendingSendPacketsResponse proto.InternalMessageInfo
-
-func (m *QueryAllPendingSendPacketsResponse) GetPendingSendPackets() []PendingSendPacket {
-	if m != nil {
-		return m.PendingSendPackets
-	}
-	return nil
-}
-
 // GetSDAIPriceRequest is a request type for the GetSDAIPrice RPC method.
 type GetSDAIPriceQueryRequest struct {
 }
@@ -295,7 +37,7 @@ func (m *GetSDAIPriceQueryRequest) Reset()         { *m = GetSDAIPriceQueryReque
 func (m *GetSDAIPriceQueryRequest) String() string { return proto.CompactTextString(m) }
 func (*GetSDAIPriceQueryRequest) ProtoMessage()    {}
 func (*GetSDAIPriceQueryRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ecc33bde80a52312, []int{6}
+	return fileDescriptor_ecc33bde80a52312, []int{0}
 }
 func (m *GetSDAIPriceQueryRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -333,7 +75,7 @@ func (m *GetSDAIPriceQueryResponse) Reset()         { *m = GetSDAIPriceQueryResp
 func (m *GetSDAIPriceQueryResponse) String() string { return proto.CompactTextString(m) }
 func (*GetSDAIPriceQueryResponse) ProtoMessage()    {}
 func (*GetSDAIPriceQueryResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ecc33bde80a52312, []int{7}
+	return fileDescriptor_ecc33bde80a52312, []int{1}
 }
 func (m *GetSDAIPriceQueryResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -378,7 +120,7 @@ func (m *GetAssetYieldIndexQueryRequest) Reset()         { *m = GetAssetYieldInd
 func (m *GetAssetYieldIndexQueryRequest) String() string { return proto.CompactTextString(m) }
 func (*GetAssetYieldIndexQueryRequest) ProtoMessage()    {}
 func (*GetAssetYieldIndexQueryRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ecc33bde80a52312, []int{8}
+	return fileDescriptor_ecc33bde80a52312, []int{2}
 }
 func (m *GetAssetYieldIndexQueryRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -417,7 +159,7 @@ func (m *GetAssetYieldIndexQueryResponse) Reset()         { *m = GetAssetYieldIn
 func (m *GetAssetYieldIndexQueryResponse) String() string { return proto.CompactTextString(m) }
 func (*GetAssetYieldIndexQueryResponse) ProtoMessage()    {}
 func (*GetAssetYieldIndexQueryResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ecc33bde80a52312, []int{9}
+	return fileDescriptor_ecc33bde80a52312, []int{3}
 }
 func (m *GetAssetYieldIndexQueryResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -454,12 +196,6 @@ func (m *GetAssetYieldIndexQueryResponse) GetAssetYieldIndex() string {
 }
 
 func init() {
-	proto.RegisterType((*ListLimitParamsRequest)(nil), "klyraprotocol.ratelimit.ListLimitParamsRequest")
-	proto.RegisterType((*ListLimitParamsResponse)(nil), "klyraprotocol.ratelimit.ListLimitParamsResponse")
-	proto.RegisterType((*QueryCapacityByDenomRequest)(nil), "klyraprotocol.ratelimit.QueryCapacityByDenomRequest")
-	proto.RegisterType((*QueryCapacityByDenomResponse)(nil), "klyraprotocol.ratelimit.QueryCapacityByDenomResponse")
-	proto.RegisterType((*QueryAllPendingSendPacketsRequest)(nil), "klyraprotocol.ratelimit.QueryAllPendingSendPacketsRequest")
-	proto.RegisterType((*QueryAllPendingSendPacketsResponse)(nil), "klyraprotocol.ratelimit.QueryAllPendingSendPacketsResponse")
 	proto.RegisterType((*GetSDAIPriceQueryRequest)(nil), "klyraprotocol.ratelimit.GetSDAIPriceQueryRequest")
 	proto.RegisterType((*GetSDAIPriceQueryResponse)(nil), "klyraprotocol.ratelimit.GetSDAIPriceQueryResponse")
 	proto.RegisterType((*GetAssetYieldIndexQueryRequest)(nil), "klyraprotocol.ratelimit.GetAssetYieldIndexQueryRequest")
@@ -471,50 +207,31 @@ func init() {
 }
 
 var fileDescriptor_ecc33bde80a52312 = []byte{
-	// 680 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x93, 0x41, 0x4f, 0x13, 0x41,
-	0x14, 0xc7, 0x3b, 0x2a, 0x1a, 0xc7, 0x43, 0xc3, 0x58, 0xa4, 0xae, 0x64, 0xc1, 0xc5, 0x18, 0xd2,
-	0x48, 0xd7, 0x16, 0x08, 0xa2, 0x07, 0x03, 0x12, 0x09, 0x09, 0x26, 0x15, 0x12, 0x13, 0xbd, 0x6c,
-	0xa6, 0xbb, 0x93, 0x65, 0xc2, 0x74, 0x66, 0xd9, 0x19, 0x0c, 0xbd, 0x72, 0xf2, 0x68, 0xe2, 0xc7,
-	0x30, 0xf1, 0xe6, 0xcd, 0xbb, 0x1c, 0x31, 0x5e, 0x3c, 0x19, 0x03, 0x7e, 0x10, 0xb3, 0xd3, 0x69,
-	0x6d, 0xe9, 0xee, 0x62, 0xbd, 0x34, 0xdd, 0x79, 0xff, 0xf7, 0xde, 0xef, 0xbd, 0x99, 0x3f, 0x9c,
-	0xdd, 0x63, 0xed, 0x18, 0x47, 0xb1, 0x50, 0xc2, 0x17, 0xcc, 0x8d, 0xb1, 0x22, 0x8c, 0xb6, 0xa8,
-	0x72, 0xf7, 0x0f, 0x48, 0xdc, 0xae, 0xea, 0x00, 0x9a, 0x1c, 0x10, 0x55, 0x7b, 0x22, 0xab, 0x14,
-	0x8a, 0x50, 0xe8, 0x73, 0x37, 0xf9, 0xd7, 0x91, 0x5b, 0x53, 0xa1, 0x10, 0x21, 0x23, 0x2e, 0x8e,
-	0xa8, 0x8b, 0x39, 0x17, 0x0a, 0x2b, 0x2a, 0xb8, 0x34, 0xd1, 0x4a, 0x56, 0x47, 0xfd, 0xeb, 0x45,
-	0x38, 0xc6, 0xad, 0xae, 0xf6, 0x7e, 0x96, 0xd6, 0xc7, 0x11, 0xf6, 0xa9, 0x32, 0x80, 0x56, 0x2d,
-	0x4b, 0x17, 0x11, 0x1e, 0x50, 0x1e, 0x7a, 0x92, 0xf0, 0xc0, 0x8b, 0xb0, 0xbf, 0x47, 0x54, 0x27,
-	0xc5, 0x29, 0xc3, 0x5b, 0x5b, 0x54, 0xaa, 0xad, 0x44, 0xd6, 0xd0, 0x3d, 0xb7, 0xc9, 0xfe, 0x01,
-	0x91, 0xca, 0xd9, 0x87, 0x93, 0x43, 0x11, 0x19, 0x09, 0x2e, 0x09, 0x7a, 0x05, 0xc7, 0xfb, 0x29,
-	0x3d, 0x46, 0xa5, 0x2a, 0x83, 0x99, 0xcb, 0x73, 0x37, 0xea, 0xf7, 0xaa, 0x19, 0x4b, 0xaa, 0xf6,
-	0x15, 0x5a, 0xbb, 0x72, 0xfc, 0x73, 0xba, 0xb0, 0x5d, 0x64, 0x7f, 0x8f, 0x92, 0x56, 0xce, 0x02,
-	0xbc, 0xf3, 0x32, 0xd9, 0xf7, 0x33, 0x33, 0xd6, 0x5a, 0x7b, 0x9d, 0x70, 0xd1, 0x32, 0x44, 0xa8,
-	0x04, 0xc7, 0x82, 0xe4, 0xbb, 0x0c, 0x66, 0xc0, 0xdc, 0xf5, 0xed, 0xce, 0x87, 0x73, 0x04, 0xe0,
-	0x54, 0x7a, 0x96, 0xa1, 0x6d, 0xc2, 0x09, 0xdd, 0x88, 0xc4, 0x5e, 0x77, 0x5f, 0xfd, 0xc4, 0x73,
-	0xf9, 0xc4, 0x24, 0xee, 0xd5, 0xed, 0x50, 0xdf, 0x64, 0x83, 0xc7, 0x9a, 0x7c, 0x16, 0xde, 0xd5,
-	0x0c, 0xab, 0x8c, 0x35, 0x3a, 0xbb, 0xde, 0x21, 0x3c, 0x68, 0xe8, 0x4d, 0xf7, 0x36, 0xfa, 0x0e,
-	0x40, 0x27, 0x4f, 0xd5, 0xe3, 0x2d, 0xa5, 0xdc, 0x97, 0x34, 0xb8, 0x95, 0x4c, 0xdc, 0xa1, 0x92,
-	0x06, 0x18, 0x45, 0x43, 0xbd, 0x1c, 0x0b, 0x96, 0x37, 0x88, 0xda, 0x59, 0x5f, 0xdd, 0x6c, 0xc4,
-	0xd4, 0x27, 0x9a, 0xaa, 0x8b, 0x59, 0x83, 0xb7, 0x53, 0x62, 0x06, 0xae, 0x04, 0xc7, 0xa2, 0xe4,
-	0xb4, 0x7b, 0x07, 0xfa, 0xc3, 0x99, 0x81, 0xf6, 0x06, 0x51, 0xab, 0x52, 0x12, 0xf5, 0x9a, 0x12,
-	0x16, 0x6c, 0xf2, 0x80, 0x1c, 0x0e, 0x14, 0x7d, 0x01, 0xa7, 0x33, 0x15, 0xa6, 0x74, 0x05, 0x8e,
-	0xe3, 0x24, 0xee, 0xb5, 0x13, 0x81, 0x47, 0x13, 0x85, 0x69, 0x53, 0xc4, 0x83, 0x89, 0xf5, 0x2f,
-	0xd7, 0xe0, 0x98, 0xce, 0x46, 0x1f, 0x01, 0x2c, 0x9e, 0x7b, 0xa7, 0xc8, 0xcd, 0xb9, 0xd2, 0xb4,
-	0xb7, 0x6e, 0x3d, 0xfc, 0xf7, 0x84, 0x0e, 0xac, 0xb3, 0x74, 0xf4, 0xfd, 0xf7, 0x87, 0x4b, 0x2e,
-	0x9a, 0x77, 0x07, 0x3d, 0xf7, 0x76, 0x71, 0xc0, 0xca, 0x52, 0x79, 0xfd, 0x4e, 0x41, 0x9f, 0x01,
-	0x2c, 0x9e, 0x7b, 0xa7, 0x68, 0x31, 0xb3, 0x79, 0x8e, 0x19, 0xac, 0xa5, 0x11, 0xb3, 0x46, 0xe1,
-	0xee, 0xd9, 0xa4, 0xd9, 0xf6, 0xb4, 0xc9, 0xd0, 0x37, 0x00, 0x27, 0x52, 0x5f, 0x2d, 0x7a, 0x9c,
-	0xcf, 0x91, 0x67, 0x08, 0xeb, 0xc9, 0x7f, 0xe5, 0x9a, 0x49, 0x9e, 0xea, 0x49, 0x56, 0xd0, 0x72,
-	0xde, 0x24, 0x21, 0x51, 0x1e, 0x66, 0xcc, 0x4b, 0x31, 0x14, 0xfa, 0x04, 0xe0, 0xf8, 0xd0, 0x43,
-	0x47, 0xb5, 0x4c, 0xa6, 0x2c, 0xc3, 0x58, 0xf5, 0x51, 0x52, 0x0c, 0x7d, 0x5d, 0xd3, 0x3f, 0x40,
-	0x95, 0x8b, 0xe8, 0x65, 0x80, 0xa9, 0xa7, 0x5d, 0x86, 0xbe, 0x02, 0x38, 0x99, 0x61, 0x22, 0xb4,
-	0x9c, 0xc7, 0x90, 0x63, 0x4c, 0xeb, 0xd1, 0xe8, 0x89, 0x66, 0x84, 0x15, 0x3d, 0xc2, 0x02, 0xaa,
-	0x5d, 0x78, 0x01, 0xe7, 0x5d, 0xbd, 0xe6, 0x1f, 0x9f, 0xda, 0xe0, 0xe4, 0xd4, 0x06, 0xbf, 0x4e,
-	0x6d, 0xf0, 0xfe, 0xcc, 0x2e, 0x9c, 0x9c, 0xd9, 0x85, 0x1f, 0x67, 0x76, 0xe1, 0xcd, 0x66, 0x48,
-	0xd5, 0xee, 0x41, 0xb3, 0xea, 0x8b, 0x96, 0xbb, 0xa3, 0x62, 0x82, 0x5b, 0xcf, 0x29, 0xc7, 0xdc,
-	0x27, 0xf3, 0x8d, 0x6e, 0x7d, 0xa9, 0x8f, 0xe7, 0xfd, 0x5d, 0x4c, 0xb9, 0xdb, 0xeb, 0x7a, 0xd8,
-	0xd7, 0x54, 0xb5, 0x23, 0x22, 0x9b, 0x57, 0x75, 0x6c, 0xe1, 0x4f, 0x00, 0x00, 0x00, 0xff, 0xff,
-	0x53, 0x79, 0xd8, 0x8c, 0xdc, 0x07, 0x00, 0x00,
+	// 383 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x51, 0x41, 0x6b, 0xe2, 0x40,
+	0x14, 0x36, 0xbb, 0xb8, 0xb0, 0x73, 0x59, 0x1c, 0x04, 0xdd, 0xb0, 0x64, 0x25, 0x7b, 0x59, 0x64,
+	0xcd, 0xa0, 0x2e, 0xec, 0xf6, 0x68, 0x29, 0x15, 0x0f, 0x05, 0xab, 0xa7, 0xf6, 0x12, 0xc6, 0xf8,
+	0x88, 0x43, 0xe3, 0x4c, 0xcc, 0x8c, 0xc5, 0x5c, 0xfd, 0x05, 0x85, 0xfe, 0x8f, 0xfe, 0x8d, 0xf6,
+	0x28, 0xf4, 0xd2, 0x63, 0xd1, 0xfe, 0x90, 0x92, 0xc4, 0x8a, 0xc1, 0xc6, 0xe2, 0x6d, 0xe6, 0x7d,
+	0xdf, 0x7b, 0xdf, 0xfb, 0xbe, 0x87, 0x7e, 0x5d, 0x79, 0x61, 0x40, 0xfd, 0x40, 0x28, 0xe1, 0x08,
+	0x8f, 0x04, 0x54, 0x81, 0xc7, 0xc6, 0x4c, 0x91, 0xc9, 0x14, 0x82, 0xd0, 0x8a, 0x01, 0x5c, 0x4a,
+	0x91, 0xac, 0x0d, 0x49, 0x2f, 0xba, 0xc2, 0x15, 0x71, 0x9d, 0x44, 0xaf, 0x84, 0xae, 0xff, 0x70,
+	0x85, 0x70, 0x3d, 0x20, 0xd4, 0x67, 0x84, 0x72, 0x2e, 0x14, 0x55, 0x4c, 0x70, 0x99, 0xa0, 0xa6,
+	0x8e, 0xca, 0x6d, 0x50, 0xfd, 0x93, 0x56, 0xa7, 0x1b, 0x30, 0x07, 0xce, 0x23, 0x9d, 0x1e, 0x4c,
+	0xa6, 0x20, 0x95, 0x59, 0x47, 0xdf, 0xdf, 0xc1, 0xa4, 0x2f, 0xb8, 0x04, 0x5c, 0x44, 0x79, 0x3f,
+	0xaa, 0x96, 0xb5, 0x8a, 0xf6, 0xfb, 0x6b, 0x2f, 0xf9, 0x98, 0x15, 0x64, 0xb4, 0x41, 0xb5, 0xa4,
+	0x04, 0x75, 0xc1, 0xc0, 0x1b, 0x76, 0xf8, 0x10, 0x66, 0xa9, 0xa1, 0x67, 0xe8, 0x67, 0x26, 0x63,
+	0x3d, 0xba, 0x8a, 0x0a, 0x34, 0xc2, 0xed, 0x30, 0x22, 0xd8, 0x2c, 0x62, 0xac, 0x65, 0xbe, 0xd1,
+	0x74, 0x63, 0x63, 0xfe, 0x19, 0xe5, 0xe3, 0x6e, 0x7c, 0xa7, 0xa1, 0xc2, 0xce, 0xba, 0xb8, 0x6e,
+	0x65, 0xa4, 0x65, 0x65, 0xd9, 0xd6, 0x1b, 0x87, 0xb4, 0x24, 0x2b, 0x9b, 0x8d, 0xf9, 0xe3, 0xcb,
+	0xed, 0xa7, 0x3f, 0xb8, 0x4a, 0xd2, 0x17, 0xbc, 0xfe, 0xbb, 0x75, 0x44, 0x17, 0x94, 0x2d, 0x87,
+	0x94, 0xd9, 0x71, 0x56, 0xf8, 0x5e, 0x43, 0xa5, 0x8c, 0x28, 0xf0, 0xbf, 0x7d, 0x3b, 0xec, 0x89,
+	0x57, 0xff, 0x7f, 0x78, 0xe3, 0xda, 0xc2, 0x51, 0x6c, 0xa1, 0x89, 0xeb, 0x1f, 0x59, 0xd8, 0xb9,
+	0xcd, 0xb1, 0xf3, 0xb0, 0x34, 0xb4, 0xc5, 0xd2, 0xd0, 0x9e, 0x97, 0x86, 0x76, 0xb3, 0x32, 0x72,
+	0x8b, 0x95, 0x91, 0x7b, 0x5a, 0x19, 0xb9, 0xcb, 0x8e, 0xcb, 0xd4, 0x68, 0x3a, 0xb0, 0x1c, 0x31,
+	0x26, 0x7d, 0x15, 0x00, 0x1d, 0x9f, 0x32, 0x4e, 0xb9, 0x03, 0xb5, 0xee, 0xdb, 0x7c, 0x19, 0x97,
+	0x6b, 0xce, 0x88, 0x32, 0x4e, 0x36, 0xaa, 0xb3, 0x2d, 0x51, 0x15, 0xfa, 0x20, 0x07, 0x5f, 0x62,
+	0xac, 0xf9, 0x1a, 0x00, 0x00, 0xff, 0xff, 0x6d, 0xe5, 0xf9, 0x05, 0x24, 0x03, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -529,12 +246,6 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type QueryClient interface {
-	// List all limit params.
-	ListLimitParams(ctx context.Context, in *ListLimitParamsRequest, opts ...grpc.CallOption) (*ListLimitParamsResponse, error)
-	// Query capacity by denom.
-	CapacityByDenom(ctx context.Context, in *QueryCapacityByDenomRequest, opts ...grpc.CallOption) (*QueryCapacityByDenomResponse, error)
-	// Get all pending send packets
-	AllPendingSendPackets(ctx context.Context, in *QueryAllPendingSendPacketsRequest, opts ...grpc.CallOption) (*QueryAllPendingSendPacketsResponse, error)
 	// Get the price of sDAI.
 	GetSDAIPriceQuery(ctx context.Context, in *GetSDAIPriceQueryRequest, opts ...grpc.CallOption) (*GetSDAIPriceQueryResponse, error)
 	// Get the price of sDAI.
@@ -547,33 +258,6 @@ type queryClient struct {
 
 func NewQueryClient(cc grpc1.ClientConn) QueryClient {
 	return &queryClient{cc}
-}
-
-func (c *queryClient) ListLimitParams(ctx context.Context, in *ListLimitParamsRequest, opts ...grpc.CallOption) (*ListLimitParamsResponse, error) {
-	out := new(ListLimitParamsResponse)
-	err := c.cc.Invoke(ctx, "/klyraprotocol.ratelimit.Query/ListLimitParams", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *queryClient) CapacityByDenom(ctx context.Context, in *QueryCapacityByDenomRequest, opts ...grpc.CallOption) (*QueryCapacityByDenomResponse, error) {
-	out := new(QueryCapacityByDenomResponse)
-	err := c.cc.Invoke(ctx, "/klyraprotocol.ratelimit.Query/CapacityByDenom", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *queryClient) AllPendingSendPackets(ctx context.Context, in *QueryAllPendingSendPacketsRequest, opts ...grpc.CallOption) (*QueryAllPendingSendPacketsResponse, error) {
-	out := new(QueryAllPendingSendPacketsResponse)
-	err := c.cc.Invoke(ctx, "/klyraprotocol.ratelimit.Query/AllPendingSendPackets", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *queryClient) GetSDAIPriceQuery(ctx context.Context, in *GetSDAIPriceQueryRequest, opts ...grpc.CallOption) (*GetSDAIPriceQueryResponse, error) {
@@ -596,12 +280,6 @@ func (c *queryClient) GetAssetYieldIndexQuery(ctx context.Context, in *GetAssetY
 
 // QueryServer is the server API for Query service.
 type QueryServer interface {
-	// List all limit params.
-	ListLimitParams(context.Context, *ListLimitParamsRequest) (*ListLimitParamsResponse, error)
-	// Query capacity by denom.
-	CapacityByDenom(context.Context, *QueryCapacityByDenomRequest) (*QueryCapacityByDenomResponse, error)
-	// Get all pending send packets
-	AllPendingSendPackets(context.Context, *QueryAllPendingSendPacketsRequest) (*QueryAllPendingSendPacketsResponse, error)
 	// Get the price of sDAI.
 	GetSDAIPriceQuery(context.Context, *GetSDAIPriceQueryRequest) (*GetSDAIPriceQueryResponse, error)
 	// Get the price of sDAI.
@@ -612,15 +290,6 @@ type QueryServer interface {
 type UnimplementedQueryServer struct {
 }
 
-func (*UnimplementedQueryServer) ListLimitParams(ctx context.Context, req *ListLimitParamsRequest) (*ListLimitParamsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListLimitParams not implemented")
-}
-func (*UnimplementedQueryServer) CapacityByDenom(ctx context.Context, req *QueryCapacityByDenomRequest) (*QueryCapacityByDenomResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CapacityByDenom not implemented")
-}
-func (*UnimplementedQueryServer) AllPendingSendPackets(ctx context.Context, req *QueryAllPendingSendPacketsRequest) (*QueryAllPendingSendPacketsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AllPendingSendPackets not implemented")
-}
 func (*UnimplementedQueryServer) GetSDAIPriceQuery(ctx context.Context, req *GetSDAIPriceQueryRequest) (*GetSDAIPriceQueryResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSDAIPriceQuery not implemented")
 }
@@ -630,60 +299,6 @@ func (*UnimplementedQueryServer) GetAssetYieldIndexQuery(ctx context.Context, re
 
 func RegisterQueryServer(s grpc1.Server, srv QueryServer) {
 	s.RegisterService(&_Query_serviceDesc, srv)
-}
-
-func _Query_ListLimitParams_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListLimitParamsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(QueryServer).ListLimitParams(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/klyraprotocol.ratelimit.Query/ListLimitParams",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).ListLimitParams(ctx, req.(*ListLimitParamsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Query_CapacityByDenom_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryCapacityByDenomRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(QueryServer).CapacityByDenom(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/klyraprotocol.ratelimit.Query/CapacityByDenom",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).CapacityByDenom(ctx, req.(*QueryCapacityByDenomRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Query_AllPendingSendPackets_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryAllPendingSendPacketsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(QueryServer).AllPendingSendPackets(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/klyraprotocol.ratelimit.Query/AllPendingSendPackets",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).AllPendingSendPackets(ctx, req.(*QueryAllPendingSendPacketsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
 }
 
 func _Query_GetSDAIPriceQuery_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -727,18 +342,6 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*QueryServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "ListLimitParams",
-			Handler:    _Query_ListLimitParams_Handler,
-		},
-		{
-			MethodName: "CapacityByDenom",
-			Handler:    _Query_CapacityByDenom_Handler,
-		},
-		{
-			MethodName: "AllPendingSendPackets",
-			Handler:    _Query_AllPendingSendPackets_Handler,
-		},
-		{
 			MethodName: "GetSDAIPriceQuery",
 			Handler:    _Query_GetSDAIPriceQuery_Handler,
 		},
@@ -749,193 +352,6 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "klyraprotocol/ratelimit/query.proto",
-}
-
-func (m *ListLimitParamsRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ListLimitParamsRequest) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *ListLimitParamsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	return len(dAtA) - i, nil
-}
-
-func (m *ListLimitParamsResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ListLimitParamsResponse) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *ListLimitParamsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.LimitParamsList) > 0 {
-		for iNdEx := len(m.LimitParamsList) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.LimitParamsList[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintQuery(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0xa
-		}
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *QueryCapacityByDenomRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *QueryCapacityByDenomRequest) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *QueryCapacityByDenomRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.Denom) > 0 {
-		i -= len(m.Denom)
-		copy(dAtA[i:], m.Denom)
-		i = encodeVarintQuery(dAtA, i, uint64(len(m.Denom)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *QueryCapacityByDenomResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *QueryCapacityByDenomResponse) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *QueryCapacityByDenomResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.LimiterCapacityList) > 0 {
-		for iNdEx := len(m.LimiterCapacityList) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.LimiterCapacityList[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintQuery(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0xa
-		}
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *QueryAllPendingSendPacketsRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *QueryAllPendingSendPacketsRequest) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *QueryAllPendingSendPacketsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	return len(dAtA) - i, nil
-}
-
-func (m *QueryAllPendingSendPacketsResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *QueryAllPendingSendPacketsResponse) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *QueryAllPendingSendPacketsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.PendingSendPackets) > 0 {
-		for iNdEx := len(m.PendingSendPackets) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.PendingSendPackets[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintQuery(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0xa
-		}
-	}
-	return len(dAtA) - i, nil
 }
 
 func (m *GetSDAIPriceQueryRequest) Marshal() (dAtA []byte, err error) {
@@ -1055,82 +471,6 @@ func encodeVarintQuery(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *ListLimitParamsRequest) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	return n
-}
-
-func (m *ListLimitParamsResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if len(m.LimitParamsList) > 0 {
-		for _, e := range m.LimitParamsList {
-			l = e.Size()
-			n += 1 + l + sovQuery(uint64(l))
-		}
-	}
-	return n
-}
-
-func (m *QueryCapacityByDenomRequest) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.Denom)
-	if l > 0 {
-		n += 1 + l + sovQuery(uint64(l))
-	}
-	return n
-}
-
-func (m *QueryCapacityByDenomResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if len(m.LimiterCapacityList) > 0 {
-		for _, e := range m.LimiterCapacityList {
-			l = e.Size()
-			n += 1 + l + sovQuery(uint64(l))
-		}
-	}
-	return n
-}
-
-func (m *QueryAllPendingSendPacketsRequest) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	return n
-}
-
-func (m *QueryAllPendingSendPacketsResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if len(m.PendingSendPackets) > 0 {
-		for _, e := range m.PendingSendPackets {
-			l = e.Size()
-			n += 1 + l + sovQuery(uint64(l))
-		}
-	}
-	return n
-}
-
 func (m *GetSDAIPriceQueryRequest) Size() (n int) {
 	if m == nil {
 		return 0
@@ -1180,440 +520,6 @@ func sovQuery(x uint64) (n int) {
 }
 func sozQuery(x uint64) (n int) {
 	return sovQuery(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-}
-func (m *ListLimitParamsRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowQuery
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: ListLimitParamsRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ListLimitParamsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		default:
-			iNdEx = preIndex
-			skippy, err := skipQuery(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *ListLimitParamsResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowQuery
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: ListLimitParamsResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ListLimitParamsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LimitParamsList", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowQuery
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthQuery
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.LimitParamsList = append(m.LimitParamsList, LimitParams{})
-			if err := m.LimitParamsList[len(m.LimitParamsList)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipQuery(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *QueryCapacityByDenomRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowQuery
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: QueryCapacityByDenomRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryCapacityByDenomRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Denom", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowQuery
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthQuery
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Denom = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipQuery(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *QueryCapacityByDenomResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowQuery
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: QueryCapacityByDenomResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryCapacityByDenomResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LimiterCapacityList", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowQuery
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthQuery
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.LimiterCapacityList = append(m.LimiterCapacityList, LimiterCapacity{})
-			if err := m.LimiterCapacityList[len(m.LimiterCapacityList)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipQuery(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *QueryAllPendingSendPacketsRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowQuery
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: QueryAllPendingSendPacketsRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryAllPendingSendPacketsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		default:
-			iNdEx = preIndex
-			skippy, err := skipQuery(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *QueryAllPendingSendPacketsResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowQuery
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: QueryAllPendingSendPacketsResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryAllPendingSendPacketsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PendingSendPackets", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowQuery
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthQuery
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.PendingSendPackets = append(m.PendingSendPackets, PendingSendPacket{})
-			if err := m.PendingSendPackets[len(m.PendingSendPackets)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipQuery(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
 }
 func (m *GetSDAIPriceQueryRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)

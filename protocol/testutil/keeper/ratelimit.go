@@ -4,11 +4,7 @@ import (
 	sdaidaemontypes "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/server/types/sdaioracle"
 	indexerevents "github.com/StreamFinance-Protocol/stream-chain/protocol/indexer/events"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/indexer/indexer_manager"
-	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/mocks"
-	assetskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets/keeper"
-	blocktimekeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/blocktime/keeper"
-	delaymsgtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/delaymsg/types"
 	perpskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/keeper"
 	ratelimitkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/keeper"
 	dbm "github.com/cosmos/cosmos-db"
@@ -25,22 +21,13 @@ func createRatelimitKeeper(
 	stateStore storetypes.CommitMultiStore,
 	db *dbm.MemDB,
 	cdc *codec.ProtoCodec,
-	btk *blocktimekeeper.Keeper,
 	bk bankkeeper.Keeper,
 	perpk *perpskeeper.Keeper,
-	assetsk *assetskeeper.Keeper,
 	transientStoreKey storetypes.StoreKey,
 	msgSenderEnabled bool,
 ) (*ratelimitkeeper.Keeper, storetypes.StoreKey) {
 	storeKey := storetypes.NewKVStoreKey(types.StoreKey)
 	stateStore.MountStoreWithDB(storeKey, storetypes.StoreTypeIAVL, db)
-
-	authorities := []string{
-		delaymsgtypes.ModuleAddress.String(),
-		lib.GovModuleAddress.String(),
-	}
-
-	ics4wrapper := mocks.ICS4Wrapper{}
 
 	sdaidaemontypes.SDAIEventFetcher = &sdaidaemontypes.MockEventFetcher{}
 	sDAIEventManager := sdaidaemontypes.NewsDAIEventManager()
@@ -55,11 +42,7 @@ func createRatelimitKeeper(
 		sDAIEventManager,
 		mockIndexerEventsManager,
 		bk,
-		*btk,
 		*perpk,
-		*assetsk,
-		&ics4wrapper, // this is a pointer, since the mock has pointer receiver
-		authorities,
 	)
 
 	return k, storeKey

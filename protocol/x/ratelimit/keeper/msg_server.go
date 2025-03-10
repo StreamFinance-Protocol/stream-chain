@@ -1,14 +1,7 @@
 package keeper
 
 import (
-	"context"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
-
-	errorsmod "cosmossdk.io/errors"
-
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 )
 
 type msgServer struct {
@@ -22,24 +15,3 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 }
 
 var _ types.MsgServer = msgServer{}
-
-func (k msgServer) SetLimitParams(
-	ctx context.Context,
-	msg *types.MsgSetLimitParams,
-) (*types.MsgSetLimitParamsResponse, error) {
-	if !k.HasAuthority(msg.Authority) {
-		return nil, errorsmod.Wrapf(
-			govtypes.ErrInvalidSigner,
-			"invalid authority %s",
-			msg.Authority,
-		)
-	}
-
-	// msg.LimitParams.Validate() is called in `Keeper.SetLimitParams`
-	sdkCtx := sdk.UnwrapSDKContext(ctx)
-	if err := k.Keeper.SetLimitParams(sdkCtx, msg.LimitParams); err != nil {
-		return nil, err
-	}
-
-	return &types.MsgSetLimitParamsResponse{}, nil
-}

@@ -48,7 +48,6 @@ require (
 	cosmossdk.io/log v1.3.1
 	cosmossdk.io/store v1.1.0
 	cosmossdk.io/tools/confix v0.1.1
-	cosmossdk.io/x/circuit v0.1.0
 	cosmossdk.io/x/evidence v0.1.0
 	cosmossdk.io/x/feegrant v0.1.0
 	cosmossdk.io/x/tx v0.13.2
@@ -71,7 +70,6 @@ require (
 	github.com/spf13/viper v1.18.2
 	google.golang.org/genproto/googleapis/api v0.0.0-20240723171418-e6d459c13d2a
 	google.golang.org/protobuf v1.34.2
-	gotest.tools/v3 v3.5.1
 )
 
 require (
@@ -421,6 +419,7 @@ require (
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+	gotest.tools/v3 v3.5.1 // indirect
 	honnef.co/go/tools v0.4.6 // indirect
 	mvdan.cc/gofumpt v0.6.0 // indirect
 	mvdan.cc/interfacer v0.0.0-20180901003855-c20040233aed // indirect

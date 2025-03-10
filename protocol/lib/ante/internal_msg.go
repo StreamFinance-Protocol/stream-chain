@@ -10,7 +10,6 @@ import (
 	govplus "github.com/StreamFinance-Protocol/stream-chain/protocol/x/govplus/types"
 	perpetuals "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	prices "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
-	ratelimit "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
 	sending "github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending/types"
 	stats "github.com/StreamFinance-Protocol/stream-chain/protocol/x/stats/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -101,10 +100,6 @@ func IsInternalMsg(msg sdk.Msg) bool {
 		// prices
 		*prices.MsgCreateOracleMarket,
 		*prices.MsgUpdateMarketParam,
-
-		// ratelimit
-		*ratelimit.MsgSetLimitParams,
-		*ratelimit.MsgSetLimitParamsResponse,
 
 		// sending
 		*sending.MsgSendFromModuleToAccount,

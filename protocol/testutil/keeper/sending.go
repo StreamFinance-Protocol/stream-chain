@@ -84,10 +84,8 @@ func SendingKeepersWithSubaccountsKeeper(t testing.TB, saKeeper types.Subaccount
 			stateStore,
 			db,
 			cdc,
-			blockTimeKeeper,
 			ks.BankKeeper,
 			ks.PerpetualsKeeper,
-			ks.AssetsKeeper,
 			transientStoreKey,
 			true,
 		)

@@ -20,9 +20,6 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	cmd.AddCommand(CmdListLimitParams())
-	cmd.AddCommand(CmdQueryCapacityByDenom())
-	cmd.AddCommand(CmdPendingSendPackets())
 	cmd.AddCommand(CmdGetSDAIPriceQuery())
 	cmd.AddCommand(CmdGetAssetYieldIndexQuery())
 

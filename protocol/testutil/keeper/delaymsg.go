@@ -53,7 +53,6 @@ func DelayMsgKeepers(
 
 		// Register perpetuals messages for encoding / decoding.
 		perpetualstypes.RegisterInterfaces(registry)
-		blockTimeKeeper, _ := createBlockTimeKeeper(stateStore, db, cdc)
 		epochsKeeper, _ := createEpochsKeeper(stateStore, db, cdc)
 		pricesKeeper, _, _, _, _ = createPricesKeeper(stateStore, db, cdc, transientStoreKey)
 		assetsKeeper, _ := createAssetsKeeper(stateStore, db, cdc, pricesKeeper, transientStoreKey, true)
@@ -64,10 +63,8 @@ func DelayMsgKeepers(
 			stateStore,
 			db,
 			cdc,
-			blockTimeKeeper,
 			bankKeeper,
 			perpsKeeper,
-			assetsKeeper,
 			transientStoreKey,
 			true,
 		)

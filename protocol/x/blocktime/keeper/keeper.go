@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"fmt"
+	"time"
 
 	"cosmossdk.io/log"
 	storetypes "cosmossdk.io/store/types"
@@ -36,7 +37,10 @@ func (k Keeper) GetPreviousBlockInfo(ctx sdk.Context) types.BlockInfo {
 	bytes := store.Get([]byte(types.PreviousBlockInfoKey))
 
 	if bytes == nil {
-		return types.BlockInfo{}
+		return types.BlockInfo{
+			Height:    0,
+			Timestamp: time.Time{},
+		}
 	}
 
 	var info types.BlockInfo

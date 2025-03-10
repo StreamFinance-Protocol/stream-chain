@@ -288,25 +288,21 @@ func (k Keeper) isTradingBlocked(ctx sdk.Context, settledUpdates []SettledUpdate
 	}
 
 	// Panic if the current block is less than the last block a chain outage was seen.
-	downtimeInfo := k.blocktimeKeeper.GetDowntimeInfofFor(
-		ctx,
-		types.WITHDRAWAL_AND_TRANSFERS_BLOCKED_AFTER_CHAIN_OUTAGE_DURATION,
-	)
-	chainOutageExists := downtimeInfo.BlockInfo.Height > 0 && downtimeInfo.Duration > 0
-	if chainOutageExists && currentBlock < downtimeInfo.BlockInfo.Height {
+	isChainOutage, chainOutageHeight := k.getOutageHeight(ctx)
+	if isChainOutage && currentBlock < chainOutageHeight {
 		panic(
 			fmt.Sprintf(
 				"internalCanUpdateSubaccounts: current block (%d) is less than the last "+
 					"block a chain outage was seen (%d)",
 				currentBlock,
-				downtimeInfo.BlockInfo.Height,
+				chainOutageHeight,
 			),
 		)
 	}
 
 	negativeTncSubaccountSeen := negativeTncSubaccountExists && currentBlock-lastBlockNegativeTncSubaccountSeen <
 		types.WITHDRAWAL_AND_TRANSFERS_BLOCKED_AFTER_NEGATIVE_TNC_SUBACCOUNT_SEEN_BLOCKS
-	chainOutageSeen := chainOutageExists && currentBlock-downtimeInfo.BlockInfo.Height <
+	chainOutageSeen := isChainOutage && currentBlock-chainOutageHeight <
 		types.WITHDRAWAL_AND_TRANSFERS_BLOCKED_AFTER_NEGATIVE_TNC_SUBACCOUNT_SEEN_BLOCKS
 
 	return negativeTncSubaccountSeen, chainOutageSeen, nil

@@ -19,7 +19,7 @@ func (k Keeper) GetWithdrawalAndTransfersBlockedInfo(
 	}
 	ctx := sdktypes.UnwrapSDKContext(c)
 
-	isChainOutage, chainOutageSeenAtBlock := k.GetOutageHeight(ctx)
+	isChainOutage, chainOutageSeenAtBlock := k.GetChainOutageInfo(ctx)
 	negativeTncSubaccountSeenAtBlock, negativeTncSubaccountSeenAtBlockExists, err := k.GetNegativeTncSubaccountSeenAtBlock(
 		ctx,
 		req.PerpetualId,

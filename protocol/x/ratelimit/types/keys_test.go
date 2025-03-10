@@ -13,7 +13,7 @@ func TestModuleKeys(t *testing.T) {
 	require.Equal(t, "ratelimit", types.StoreKey)
 }
 func TestAccountConstants(t *testing.T) {
-	require.Equal(t, "transfer", types.TDaiPoolAccount)
+	require.Equal(t, "tDAIPoolAccount", types.TDaiPoolAccount)
 	require.Equal(t, "sDAIPoolAccount", types.SDaiPoolAccount)
 }
 

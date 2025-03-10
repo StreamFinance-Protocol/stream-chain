@@ -12,7 +12,6 @@ import (
 	libante "github.com/StreamFinance-Protocol/stream-chain/protocol/lib/ante"
 	clobante "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/ante"
 	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
-	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
 
 	"sync"
 
@@ -28,7 +27,6 @@ type HandlerOptions struct {
 	Codec        codec.Codec
 	AuthStoreKey storetypes.StoreKey
 	ClobKeeper   clobtypes.ClobKeeper
-	IBCKeeper    ibckeeper.Keeper
 }
 
 // NewAnteHandler returns an AnteHandler that checks and increments sequence

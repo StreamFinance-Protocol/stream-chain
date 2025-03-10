@@ -864,43 +864,6 @@ const GenesisStateNoVe = `{
       "votes": []
     },
     "govplus": {},
-   "ibc": {
-      "channel_genesis": {
-        "ack_sequences": [],
-        "acknowledgements": [],
-        "channels": [],
-        "commitments": [],
-        "next_channel_sequence": "0",
-        "receipts": [],
-        "recv_sequences": [],
-        "send_sequences": [],
-        "params": {
-          "upgrade_timeout": {
-            "timestamp": "1"
-          }
-        }
-      },
-      "client_genesis": {
-        "clients": [],
-        "clients_consensus": [],
-        "clients_metadata": [],
-        "create_localhost": false,
-        "next_client_sequence": "0",
-        "params": {
-          "allowed_clients": [
-            "07-tendermint"
-          ]
-        }
-      },
-      "connection_genesis": {
-        "client_connection_paths": [],
-        "connections": [],
-        "next_connection_sequence": "0",
-        "params": {
-          "max_expected_time_per_block": "30000000000"
-        }
-      }
-    },
     "perpetuals": {
       "collateral_pools": [
         {

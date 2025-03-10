@@ -12,8 +12,6 @@ import (
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	icatypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/types"
-	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 	"github.com/stretchr/testify/require"
 )
 
@@ -25,10 +23,8 @@ func TestModuleAccountsToAddresses(t *testing.T) {
 		stakingtypes.BondedPoolName:             "klyra1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3rnjy3t",
 		stakingtypes.NotBondedPoolName:          "klyra1tygms3xhhs3yv487phx3dw4a95jn7t7lhnw48l",
 		govtypes.ModuleName:                     "klyra10d07y265gmmuvt4z0w9aw880jnsr700jv2gw70",
-		ibctransfertypes.ModuleName:             "klyra1yl6hdjhmkf37639730gffanpzndzdpmhchdzll",
 		satypes.ModuleName:                      "klyra1v88c3xv9xyv3eetdx0tvcmq7ung3dywptd5ps3",
 		perpetualsmoduletypes.InsuranceFundName: "klyra1c7ptc87hkd54e3r7zjy92q29xkq7t79w9y9stt",
-		icatypes.ModuleName:                     "klyra1vlthgax23ca9syk7xgaz347xmf4nunef3qduyv",
 		ratelimittypes.SDaiPoolAccount:          "klyra1r3fsd6humm0ghyq0te5jf8eumklmclyaw0hs3y",
 		satypes.LiquidityFeeModuleAddress:       "klyra1l4fct6xefgds6tsslrluwy2juuyaet366dl234",
 	}
@@ -79,7 +75,6 @@ func TestModuleAccountAddrs(t *testing.T) {
 		"klyra1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3rnjy3t": true, // x/staking.bondedPool
 		"klyra1tygms3xhhs3yv487phx3dw4a95jn7t7lhnw48l": true, // x/staking.notBondedPool
 		"klyra10d07y265gmmuvt4z0w9aw880jnsr700jv2gw70": true, // x/ gov
-		"klyra1yl6hdjhmkf37639730gffanpzndzdpmhchdzll": true, // ibc transfer
 		"klyra1vlthgax23ca9syk7xgaz347xmf4nunef3qduyv": true, // interchainaccounts
 		"klyra1v88c3xv9xyv3eetdx0tvcmq7ung3dywptd5ps3": true, // x/subaccount
 		"klyra1c7ptc87hkd54e3r7zjy92q29xkq7t79w9y9stt": true, // x/clob.insuranceFund

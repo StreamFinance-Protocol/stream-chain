@@ -17,10 +17,6 @@ import (
 	govbeta "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	slashing "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	staking "github.com/cosmos/cosmos-sdk/x/staking/types"
-	ibctransfer "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
-	ibcclient "github.com/cosmos/ibc-go/v8/modules/core/02-client/types" //nolint:staticcheck
-	ibcconn "github.com/cosmos/ibc-go/v8/modules/core/03-connection/types"
-	ibccore "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
 )
 
 var (
@@ -135,101 +131,6 @@ var (
 		// upgrade
 		"/cosmos.upgrade.v1beta1.CancelSoftwareUpgradeProposal": nil,
 		"/cosmos.upgrade.v1beta1.SoftwareUpgradeProposal":       nil,
-
-		// ibc.applications
-		"/ibc.applications.transfer.v1.MsgTransfer":           &ibctransfer.MsgTransfer{},
-		"/ibc.applications.transfer.v1.MsgTransferResponse":   nil,
-		"/ibc.applications.transfer.v1.TransferAuthorization": nil,
-
-		// ibc.core.channel
-		"/ibc.core.channel.v1.Channel":                          nil,
-		"/ibc.core.channel.v1.Counterparty":                     nil,
-		"/ibc.core.channel.v1.MsgAcknowledgement":               &ibccore.MsgAcknowledgement{},
-		"/ibc.core.channel.v1.MsgAcknowledgementResponse":       nil,
-		"/ibc.core.channel.v1.MsgChannelCloseConfirm":           &ibccore.MsgChannelCloseConfirm{},
-		"/ibc.core.channel.v1.MsgChannelCloseConfirmResponse":   nil,
-		"/ibc.core.channel.v1.MsgChannelCloseInit":              &ibccore.MsgChannelCloseInit{},
-		"/ibc.core.channel.v1.MsgChannelCloseInitResponse":      nil,
-		"/ibc.core.channel.v1.MsgChannelOpenAck":                &ibccore.MsgChannelOpenAck{},
-		"/ibc.core.channel.v1.MsgChannelOpenAckResponse":        nil,
-		"/ibc.core.channel.v1.MsgChannelOpenConfirm":            &ibccore.MsgChannelOpenConfirm{},
-		"/ibc.core.channel.v1.MsgChannelOpenConfirmResponse":    nil,
-		"/ibc.core.channel.v1.MsgChannelOpenInit":               &ibccore.MsgChannelOpenInit{},
-		"/ibc.core.channel.v1.MsgChannelOpenInitResponse":       nil,
-		"/ibc.core.channel.v1.MsgChannelOpenTry":                &ibccore.MsgChannelOpenTry{},
-		"/ibc.core.channel.v1.MsgChannelOpenTryResponse":        nil,
-		"/ibc.core.channel.v1.MsgRecvPacket":                    &ibccore.MsgRecvPacket{},
-		"/ibc.core.channel.v1.MsgRecvPacketResponse":            nil,
-		"/ibc.core.channel.v1.MsgTimeout":                       &ibccore.MsgTimeout{},
-		"/ibc.core.channel.v1.MsgTimeoutOnClose":                &ibccore.MsgTimeoutOnClose{},
-		"/ibc.core.channel.v1.MsgTimeoutOnCloseResponse":        nil,
-		"/ibc.core.channel.v1.MsgTimeoutResponse":               nil,
-		"/ibc.core.channel.v1.Packet":                           nil,
-		"/ibc.core.channel.v1.MsgChannelUpgradeAck":             &ibccore.MsgChannelUpgradeAck{},
-		"/ibc.core.channel.v1.MsgChannelUpgradeAckResponse":     nil,
-		"/ibc.core.channel.v1.MsgChannelUpgradeCancel":          &ibccore.MsgChannelUpgradeCancel{},
-		"/ibc.core.channel.v1.MsgChannelUpgradeCancelResponse":  nil,
-		"/ibc.core.channel.v1.MsgChannelUpgradeConfirm":         &ibccore.MsgChannelUpgradeConfirm{},
-		"/ibc.core.channel.v1.MsgChannelUpgradeConfirmResponse": nil,
-		"/ibc.core.channel.v1.MsgChannelUpgradeInit":            &ibccore.MsgChannelUpgradeInit{},
-		"/ibc.core.channel.v1.MsgChannelUpgradeInitResponse":    nil,
-		"/ibc.core.channel.v1.MsgChannelUpgradeOpen":            &ibccore.MsgChannelUpgradeOpen{},
-		"/ibc.core.channel.v1.MsgChannelUpgradeOpenResponse":    nil,
-		"/ibc.core.channel.v1.MsgChannelUpgradeTimeout":         &ibccore.MsgChannelUpgradeTimeout{},
-		"/ibc.core.channel.v1.MsgChannelUpgradeTimeoutResponse": nil,
-		"/ibc.core.channel.v1.MsgChannelUpgradeTry":             &ibccore.MsgChannelUpgradeTry{},
-		"/ibc.core.channel.v1.MsgChannelUpgradeTryResponse":     nil,
-		"/ibc.core.channel.v1.MsgPruneAcknowledgements":         &ibccore.MsgPruneAcknowledgements{},
-		"/ibc.core.channel.v1.MsgPruneAcknowledgementsResponse": nil,
-		"/ibc.core.channel.v1.MsgUpdateParams":                  &ibccore.MsgUpdateParams{},
-		"/ibc.core.channel.v1.MsgUpdateParamsResponse":          nil,
-
-		// ibc.core.client
-		"/ibc.core.client.v1.ClientUpdateProposal":          nil,
-		"/ibc.core.client.v1.Height":                        nil,
-		"/ibc.core.client.v1.MsgCreateClient":               &ibcclient.MsgCreateClient{},
-		"/ibc.core.client.v1.MsgCreateClientResponse":       nil,
-		"/ibc.core.client.v1.MsgIBCSoftwareUpgrade":         &ibcclient.MsgIBCSoftwareUpgrade{},
-		"/ibc.core.client.v1.MsgIBCSoftwareUpgradeResponse": nil,
-		"/ibc.core.client.v1.MsgRecoverClient":              &ibcclient.MsgRecoverClient{},
-		"/ibc.core.client.v1.MsgRecoverClientResponse":      nil,
-		"/ibc.core.client.v1.MsgSubmitMisbehaviour":         &ibcclient.MsgSubmitMisbehaviour{}, //nolint:staticcheck
-		"/ibc.core.client.v1.MsgSubmitMisbehaviourResponse": nil,
-		// TODO(CORE-851): Move MsgUpdateClient and MsgUpgradeClient to unsupported_msgs once v4.0.0 upgrade has
-		// been completed and Cosmos 0.50 performs well.
-		"/ibc.core.client.v1.MsgUpdateClient":          &ibcclient.MsgUpdateClient{},
-		"/ibc.core.client.v1.MsgUpdateClientResponse":  nil,
-		"/ibc.core.client.v1.MsgUpgradeClient":         &ibcclient.MsgUpgradeClient{},
-		"/ibc.core.client.v1.MsgUpgradeClientResponse": nil,
-		"/ibc.core.client.v1.UpgradeProposal":          nil,
-
-		// ibc.core.commitment
-		"/ibc.core.commitment.v1.MerklePath":   nil,
-		"/ibc.core.commitment.v1.MerklePrefix": nil,
-		"/ibc.core.commitment.v1.MerkleProof":  nil,
-		"/ibc.core.commitment.v1.MerkleRoot":   nil,
-
-		// ibc.core.connection
-		"/ibc.core.connection.v1.ConnectionEnd":                    nil,
-		"/ibc.core.connection.v1.Counterparty":                     nil,
-		"/ibc.core.connection.v1.MsgConnectionOpenAck":             &ibcconn.MsgConnectionOpenAck{},
-		"/ibc.core.connection.v1.MsgConnectionOpenAckResponse":     nil,
-		"/ibc.core.connection.v1.MsgConnectionOpenConfirm":         &ibcconn.MsgConnectionOpenConfirm{},
-		"/ibc.core.connection.v1.MsgConnectionOpenConfirmResponse": nil,
-		"/ibc.core.connection.v1.MsgConnectionOpenInit":            &ibcconn.MsgConnectionOpenInit{},
-		"/ibc.core.connection.v1.MsgConnectionOpenInitResponse":    nil,
-		"/ibc.core.connection.v1.MsgConnectionOpenTry":             &ibcconn.MsgConnectionOpenTry{},
-		"/ibc.core.connection.v1.MsgConnectionOpenTryResponse":     nil,
-
-		// ibc.lightclients
-		"/ibc.lightclients.localhost.v2.ClientState":     nil,
-		"/ibc.lightclients.tendermint.v1.ClientState":    nil,
-		"/ibc.lightclients.tendermint.v1.ConsensusState": nil,
-		"/ibc.lightclients.tendermint.v1.Header":         nil,
-		"/ibc.lightclients.tendermint.v1.Misbehaviour":   nil,
-
-		// ica
-		"/ibc.applications.interchain_accounts.v1.InterchainAccount": nil,
 	}
 
 	// Custom modules

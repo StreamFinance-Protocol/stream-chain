@@ -5,8 +5,6 @@ import (
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	icatypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/types"
-	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/app/config"
 	bridgemoduletypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
@@ -30,8 +28,6 @@ var (
 		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
-		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner}, // Note: TDaiPoolAccount is another name for ibctransfertypes.ModuleName
-		icatypes.ModuleName:            nil,
 		// -------- klyra custom module accounts --------
 		// bridge module account mints tokens for bridged funds.
 		bridgemoduletypes.ModuleName: {authtypes.Minter},
@@ -51,8 +47,6 @@ var (
 		distrtypes.ModuleName:          true,
 		stakingtypes.BondedPoolName:    true,
 		stakingtypes.NotBondedPoolName: true,
-		ibctransfertypes.ModuleName:    true,
-		icatypes.ModuleName:            true,
 	}
 )
 

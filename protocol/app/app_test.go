@@ -42,10 +42,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/params"
 	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
 	"github.com/cosmos/cosmos-sdk/x/staking"
-	"github.com/cosmos/ibc-go/modules/capability"
-	ica "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts"
-	"github.com/cosmos/ibc-go/v8/modules/apps/transfer"
-	ibc "github.com/cosmos/ibc-go/v8/modules/core"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/typ.v4/slices"
 )
@@ -171,7 +167,6 @@ func TestModuleBasics(t *testing.T) {
 		auth.AppModuleBasic{},
 		genutil.NewAppModuleBasic(genutiltypes.DefaultMessageValidator),
 		bank.AppModuleBasic{},
-		capability.AppModuleBasic{},
 		staking.AppModuleBasic{},
 		distr.AppModuleBasic{},
 		gov.NewAppModuleBasic(
@@ -184,10 +179,7 @@ func TestModuleBasics(t *testing.T) {
 		custommodule.SlashingModuleBasic{},
 		evidencemodule.AppModuleBasic{},
 		feegrantmodule.AppModuleBasic{},
-		ibc.AppModuleBasic{},
-		ica.AppModuleBasic{},
 		upgrade.AppModuleBasic{},
-		transfer.AppModuleBasic{},
 		consensus.AppModuleBasic{},
 		authzmodule.AppModuleBasic{},
 

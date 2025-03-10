@@ -17,6 +17,7 @@ import (
 	bigintcache "github.com/StreamFinance-Protocol/stream-chain/protocol/caches/bigintcache"
 	pricecache "github.com/StreamFinance-Protocol/stream-chain/protocol/caches/pricecache"
 	vecache "github.com/StreamFinance-Protocol/stream-chain/protocol/caches/vecache"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
 	reflectionv1 "cosmossdk.io/api/cosmos/reflection/v1"
@@ -1318,6 +1319,7 @@ func New(
 			tmos.Exit(err.Error())
 		}
 	}
+	app.initializeRateLimiters()
 
 	// Report out app version and git commit. This will be run when validators restart.
 	version := version.NewInfo()
@@ -1366,6 +1368,15 @@ func createSDAIEventManager(appFlags flags.Flags, daemonFlags daemonflags.Daemon
 // DisableHealthMonitorForTesting disables the health monitor for testing.
 func (app *App) DisableHealthMonitorForTesting() {
 	app.DaemonHealthMonitor.DisableForTesting()
+}
+
+// initializeRateLimiters initializes the rate limiters from state if the application is
+// not started from genesis.
+func (app *App) initializeRateLimiters() {
+	// Create an `uncachedCtx` where the underlying MultiStore is the `rootMultiStore`.
+	// We use this to hydrate the `orderRateLimiter` with values from the underlying `rootMultiStore`.
+	uncachedCtx := app.BaseApp.NewUncachedContext(true, tmproto.Header{})
+	app.ClobKeeper.InitalizeBlockRateLimitFromStateIfExists(uncachedCtx)
 }
 
 // GetBaseApp returns the base app of the application

@@ -1,6 +1,10 @@
 import * as _m0 from "protobufjs/minimal";
 import { DeepPartial } from "../../helpers";
+/** GenesisState defines the yield module's genesis state. */
+
 export interface GenesisState {}
+/** GenesisState defines the yield module's genesis state. */
+
 export interface GenesisStateSDKType {}
 
 function createBaseGenesisState(): GenesisState {

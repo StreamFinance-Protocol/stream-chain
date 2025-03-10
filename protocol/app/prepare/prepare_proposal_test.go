@@ -1294,10 +1294,10 @@ func buildMockKeepers() (*mocks.PreBlockExecPricesKeeper, *mocks.PrepareClobKeep
 	mPricesk := &mocks.PreBlockExecPricesKeeper{}
 	mClobk := &mocks.PrepareClobKeeper{}
 	mPerpk2 := &mocks.PreparePerpetualsKeeper{}
-	mRatelimitk := &mocks.VoteExtensionYieldKeeper{}
+	mYieldk := &mocks.VoteExtensionYieldKeeper{}
 	mBridgek := &mocks.PrepareBridgeKeeper{}
 
-	return mPricesk, mClobk, mPerpk2, mRatelimitk, mBridgek
+	return mPricesk, mClobk, mPerpk2, mYieldk, mBridgek
 }
 
 func setMockResponses(

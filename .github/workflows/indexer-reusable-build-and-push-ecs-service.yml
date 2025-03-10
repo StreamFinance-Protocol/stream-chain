@@ -55,13 +55,13 @@ jobs:
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: indexer-${{ inputs.SERVICE }}
+          ECR_REPOSITORY: ${{ inputs.ENVIRONMENT }}-indexer-${{ inputs.SERVICE }}
           SERVICE: ${{ inputs.SERVICE }}
-          ENVIRONMENT: ${{ inputs.ENVIRONMENT }}
         run: |
+          commit_hash=$(git rev-parse --short HEAD)
           DOCKER_BUILDKIT=1 docker build \
             --platform amd64 \
-            -t $ECR_REGISTRY/$ECR_REPOSITORY:$ENVIRONMENT \
-            -f Dockerfile.service \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:$commit_hash \
+            -f Dockerfile.service.remote \
             --build-arg service=$SERVICE .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$ENVIRONMENT
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY --all-tags

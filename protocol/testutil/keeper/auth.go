@@ -44,6 +44,7 @@ func createAccountKeeper(
 		satypes.ModuleName:                nil,
 		perpetualstypes.InsuranceFundName: nil,
 		ratelimittypes.SDaiPoolAccount:    {types.Minter, types.Burner},
+		ratelimittypes.TDaiPoolAccount:    {types.Minter, types.Burner},
 		satypes.LiquidityFeeModuleAddress: nil,
 	}
 

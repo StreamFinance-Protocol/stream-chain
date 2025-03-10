@@ -2,7 +2,6 @@ package types
 
 import (
 	assettypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets/types"
-	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 )
 
 // Module name and store keys
@@ -19,7 +18,7 @@ const (
 	// Addresses of tDAI and sDAI pools in x/bank module
 
 	// TDaiPool: Address, where tDAI yield is held before it is claimed by subaccount.
-	TDaiPoolAccount = ibctransfertypes.ModuleName
+	TDaiPoolAccount = "tDAIPoolAccount"
 	// SDaiPool: Address, where bridged sDAI is held until it is bridged out.
 	SDaiPoolAccount = "sDAIPoolAccount"
 

@@ -36,6 +36,7 @@ var (
 		// insurance fund account manages insurance fund for liquidations.
 		perpetualsmoduletypes.InsuranceFundName: nil,
 		ratelimittypes.SDaiPoolAccount:          {authtypes.Burner},
+		ratelimittypes.TDaiPoolAccount:          {authtypes.Burner, authtypes.Minter},
 		// liquidity fee module account holds tokens for liquidity fee.
 		satypes.LiquidityFeeModuleAddress: nil,
 	}

@@ -26,6 +26,7 @@ func TestModuleAccountsToAddresses(t *testing.T) {
 		satypes.ModuleName:                      "klyra1v88c3xv9xyv3eetdx0tvcmq7ung3dywptd5ps3",
 		perpetualsmoduletypes.InsuranceFundName: "klyra1c7ptc87hkd54e3r7zjy92q29xkq7t79w9y9stt",
 		ratelimittypes.SDaiPoolAccount:          "klyra1r3fsd6humm0ghyq0te5jf8eumklmclyaw0hs3y",
+		ratelimittypes.TDaiPoolAccount:          "klyra1yl6hdjhmkf37639730gffanpzndzdpmhchdzll",
 		satypes.LiquidityFeeModuleAddress:       "klyra1l4fct6xefgds6tsslrluwy2juuyaet366dl234",
 	}
 
@@ -60,7 +61,7 @@ func TestMaccPerms(t *testing.T) {
 		"not_bonded_tokens_pool": {"burner", "staking"},
 		"subaccounts":            nil,
 		"sDAIPoolAccount":        {"burner"},
-		"transfer":               {"minter", "burner"},
+		"tDAIPoolAccount":        {"minter", "burner"},
 		"interchainaccounts":     nil,
 		"liquidity_module":       nil,
 	}
@@ -79,6 +80,7 @@ func TestModuleAccountAddrs(t *testing.T) {
 		"klyra1v88c3xv9xyv3eetdx0tvcmq7ung3dywptd5ps3": true, // x/subaccount
 		"klyra1c7ptc87hkd54e3r7zjy92q29xkq7t79w9y9stt": true, // x/clob.insuranceFund
 		"klyra1r3fsd6humm0ghyq0te5jf8eumklmclyaw0hs3y": true, // x/ratelimit.SDAIPoolAccount
+		"klyra1yl6hdjhmkf37639730gffanpzndzdpmhchdzll": true, // x/ratelimit.TDAIPoolAccount
 		"klyra1l4fct6xefgds6tsslrluwy2juuyaet366dl234": true, // x/subaccount.LiquidityFeeModuleAddress
 	}
 

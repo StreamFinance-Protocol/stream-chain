@@ -104,11 +104,6 @@ function edit_genesis() {
 	dasel put -t int -f "$GENESIS" '.app_state.assets.assets.[0].market_id' -v '0'
 	dasel put -t int -f "$GENESIS" '.app_state.assets.assets.[0].atomic_resolution' -v '-6'
 
-	# Update ibc module.
-	dasel put -t bool -f "$GENESIS" '.app_state.ibc.client_genesis.create_localhost' -v "false"
-	dasel put -t json -f "$GENESIS" '.app_state.ibc.client_genesis.params.allowed_clients' -v "[]"
-	dasel put -t string -f "$GENESIS" '.app_state.ibc.client_genesis.params.allowed_clients.[]' -v "07-tendermint"
-
 	# Collateral Pools
 	dasel put -t json -f "$GENESIS" '.app_state.perpetuals.collateral_pools' -v "[]"
 	dasel put -t json -f "$GENESIS" '.app_state.perpetuals.collateral_pools.[]' -v "{}"
@@ -1664,19 +1659,6 @@ function update_genesis_use_test_volatile_market() {
 	dasel put -t int -f "$GENESIS" '.app_state.clob.clob_pairs.last().step_base_quantums' -v '1000000'
 	dasel put -t int -f "$GENESIS" '.app_state.clob.clob_pairs.last().subticks_per_tick' -v '100' # $0.01 ticks
 	dasel put -t int -f "$GENESIS" '.app_state.clob.clob_pairs.last().quantum_conversion_exponent' -v '-8'
-}
-
-# Modify the genesis file with ICA Host params that are consistent with
-# v3.0.0 upgrade.
-function update_ica_host_params() {
-	dasel put -t json -f "$GENESIS" '.app_state.interchainaccounts.host_genesis_state.params.allow_messages' -v '[]'
-	dasel put -t string -f "$GENESIS" '.app_state.interchainaccounts.host_genesis_state.params.allow_messages.[]' -v "/ibc.applications.transfer.v1.MsgTransfer"
-	dasel put -t string -f "$GENESIS" '.app_state.interchainaccounts.host_genesis_state.params.allow_messages.[]' -v "/cosmos.bank.v1beta1.MsgSend"
-
-}
-
-function update_ica_controller_params() {
-	dasel put -t bool -f "$GENESIS" '.app_state.interchainaccounts.controller_genesis_state.params.controller_enabled' -v "false"
 }
 
 # Modify the genesis file to only use fixed price exchange.

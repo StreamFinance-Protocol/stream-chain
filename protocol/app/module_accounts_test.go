@@ -26,7 +26,7 @@ func TestModuleAccountsToAddresses(t *testing.T) {
 		satypes.ModuleName:                      "klyra1v88c3xv9xyv3eetdx0tvcmq7ung3dywptd5ps3",
 		perpetualsmoduletypes.InsuranceFundName: "klyra1c7ptc87hkd54e3r7zjy92q29xkq7t79w9y9stt",
 		ratelimittypes.SDaiPoolAccount:          "klyra1r3fsd6humm0ghyq0te5jf8eumklmclyaw0hs3y",
-		ratelimittypes.TDaiPoolAccount:          "klyra1yl6hdjhmkf37639730gffanpzndzdpmhchdzll",
+		ratelimittypes.TDaiPoolAccount:          "klyra1lv0pg8fqarvuwekkp6xuv64nt9yn7fd4q0kgn3",
 		satypes.LiquidityFeeModuleAddress:       "klyra1l4fct6xefgds6tsslrluwy2juuyaet366dl234",
 	}
 
@@ -43,8 +43,6 @@ func TestBlockedAddresses(t *testing.T) {
 		"klyra1jv65s3grqf6v6jl3dp4t6c9t9rk99cd83hlhpr": true,
 		"klyra1tygms3xhhs3yv487phx3dw4a95jn7t7lhnw48l": true,
 		"klyra1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3rnjy3t": true,
-		"klyra1yl6hdjhmkf37639730gffanpzndzdpmhchdzll": true,
-		"klyra1vlthgax23ca9syk7xgaz347xmf4nunef3qduyv": true,
 	}
 	require.Equal(t, expectedBlockedAddresses, app.BlockedAddresses())
 }
@@ -61,8 +59,7 @@ func TestMaccPerms(t *testing.T) {
 		"not_bonded_tokens_pool": {"burner", "staking"},
 		"subaccounts":            nil,
 		"sDAIPoolAccount":        {"burner"},
-		"tDAIPoolAccount":        {"minter", "burner"},
-		"interchainaccounts":     nil,
+		"tDAIPoolAccount":        {"burner", "minter"},
 		"liquidity_module":       nil,
 	}
 	require.Equal(t, expectedMaccPerms, maccPerms, "default macc perms list does not match expected")
@@ -76,11 +73,10 @@ func TestModuleAccountAddrs(t *testing.T) {
 		"klyra1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3rnjy3t": true, // x/staking.bondedPool
 		"klyra1tygms3xhhs3yv487phx3dw4a95jn7t7lhnw48l": true, // x/staking.notBondedPool
 		"klyra10d07y265gmmuvt4z0w9aw880jnsr700jv2gw70": true, // x/ gov
-		"klyra1vlthgax23ca9syk7xgaz347xmf4nunef3qduyv": true, // interchainaccounts
 		"klyra1v88c3xv9xyv3eetdx0tvcmq7ung3dywptd5ps3": true, // x/subaccount
 		"klyra1c7ptc87hkd54e3r7zjy92q29xkq7t79w9y9stt": true, // x/clob.insuranceFund
 		"klyra1r3fsd6humm0ghyq0te5jf8eumklmclyaw0hs3y": true, // x/ratelimit.SDAIPoolAccount
-		"klyra1yl6hdjhmkf37639730gffanpzndzdpmhchdzll": true, // x/ratelimit.TDAIPoolAccount
+		"klyra1lv0pg8fqarvuwekkp6xuv64nt9yn7fd4q0kgn3": true, // x/ratelimit.TDAIPoolAccount
 		"klyra1l4fct6xefgds6tsslrluwy2juuyaet366dl234": true, // x/subaccount.LiquidityFeeModuleAddress
 	}
 

@@ -3,4 +3,5 @@ package klyraprotocol.yields;
 
 option go_package = "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types";
 
- message GenesisState {}
+// GenesisState defines the yield module's genesis state.
+message GenesisState {}

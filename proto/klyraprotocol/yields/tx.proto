@@ -6,6 +6,7 @@ option go_package = "github.com/StreamFinance-Protocol/stream-chain/protocol/x/y
 
 import "cosmos/msg/v1/msg.proto";
 
+// Msg defines the yields Msg service for handling transactions related to yield management.
 service Msg {
   option (cosmos.msg.v1.service) = true;
   // this line is used by starport scaffolding # proto/tx/rpc

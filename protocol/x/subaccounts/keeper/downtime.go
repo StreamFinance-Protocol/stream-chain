@@ -20,7 +20,7 @@ func (k Keeper) GetChainOutageInfo(
 
 	if time.Since(previousBlockInfo.Timestamp) >= types.WITHDRAWAL_AND_TRANSFERS_BLOCKED_AFTER_CHAIN_OUTAGE_DURATION {
 
-		k.setOutageHeight(ctx, previousBlockInfo.Height)
+		k.SetOutageHeight(ctx, previousBlockInfo.Height)
 		return true, previousBlockInfo.Height
 	}
 
@@ -28,7 +28,7 @@ func (k Keeper) GetChainOutageInfo(
 
 }
 
-func (k Keeper) setOutageHeight(ctx sdk.Context, height uint32) {
+func (k Keeper) SetOutageHeight(ctx sdk.Context, height uint32) {
 	store := ctx.KVStore(k.storeKey)
 	store.Set([]byte(types.OutageHeightKey), []byte(fmt.Sprintf("%d", height)))
 }

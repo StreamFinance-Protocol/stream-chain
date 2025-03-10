@@ -19,12 +19,7 @@ func (k Keeper) GetWithdrawalAndTransfersBlockedInfo(
 	}
 	ctx := sdktypes.UnwrapSDKContext(c)
 
-	downtimeInfo := k.blocktimeKeeper.GetDowntimeInfoFor(
-		ctx,
-		types.WITHDRAWAL_AND_TRANSFERS_BLOCKED_AFTER_CHAIN_OUTAGE_DURATION,
-	)
-	chainOutageSeenAtBlock, chainOutageExists := downtimeInfo.BlockInfo.Height,
-		downtimeInfo.BlockInfo.Height > 0 && downtimeInfo.Duration > 0
+	isChainOutage, chainOutageSeenAtBlock := k.getOutageHeight(ctx)
 	negativeTncSubaccountSeenAtBlock, negativeTncSubaccountSeenAtBlockExists, err := k.GetNegativeTncSubaccountSeenAtBlock(
 		ctx,
 		req.PerpetualId,
@@ -35,7 +30,7 @@ func (k Keeper) GetWithdrawalAndTransfersBlockedInfo(
 
 	// Withdrawals and transfers are blocked at non-zero block iff a chain outage or negative TNC subaccount exists.
 	withdrawalsAndTransfersBlockedUntilBlock := uint32(0)
-	if chainOutageExists || negativeTncSubaccountSeenAtBlockExists {
+	if isChainOutage || negativeTncSubaccountSeenAtBlockExists {
 		withdrawalsAndTransfersBlockedUntilBlock = max(
 			chainOutageSeenAtBlock,
 			negativeTncSubaccountSeenAtBlock,

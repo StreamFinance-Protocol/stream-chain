@@ -79,10 +79,6 @@
       "klyra_block_height": "0"
     }
   },
-  "capability": {
-    "index": "1",
-    "owners": []
-  },
   "clob": {
     "clob_pairs": [],
     "liquidations_config": {

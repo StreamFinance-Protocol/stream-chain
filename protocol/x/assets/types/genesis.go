@@ -33,7 +33,7 @@ var (
 	}
 )
 
-// DefaultGenesis returns the default Capability genesis state
+// DefaultGenesis returns the default Assets genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
 		Assets: []Asset{

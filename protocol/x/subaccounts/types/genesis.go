@@ -7,7 +7,7 @@ import (
 	errorsmod "cosmossdk.io/errors"
 )
 
-// DefaultGenesis returns the default Capability genesis state
+// DefaultGenesis returns the default subaccounts genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
 		Subaccounts: []Subaccount{},

@@ -272,10 +272,6 @@ const GenesisState = `{
         ]
       }
     },
-    "capability": {
-      "index": "1",
-      "owners": []
-    },
     "clob": {
       "block_rate_limit_config": {
         "max_short_term_orders_and_cancels_per_n_blocks": [

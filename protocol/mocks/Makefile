@@ -78,4 +78,3 @@ mock-gen:
 	@go run github.com/vektra/mockery/v2 --name=BridgeServiceClient --dir=./daemons/bridge/api --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=SDAIServiceClient --dir=./daemons/sdaioracle/api --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=SDAIEventManager --dir=./daemons/server/types/sdaioracle --recursive --output=./mocks
-	@go run github.com/vektra/mockery/v2 --name=ICS4Wrapper --dir=x/ratelimit/types --recursive --output=./mocks --replace-type github.com/cosmos/ibc-go/v8/modules/core/02-client/types=clienttypes:github.com/cosmos/ibc-go/v8/modules/core/02-client/types

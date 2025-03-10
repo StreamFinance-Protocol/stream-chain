@@ -131,10 +131,6 @@ func TestInternalMsgSamples_Gov_Key(t *testing.T) {
 		"/klyraprotocol.prices.MsgUpdateMarketParam",
 		"/klyraprotocol.prices.MsgUpdateMarketParamResponse",
 
-		// ratelimit
-		"/klyraprotocol.ratelimit.MsgSetLimitParams",
-		"/klyraprotocol.ratelimit.MsgSetLimitParamsResponse",
-
 		// sending
 		"/klyraprotocol.sending.MsgSendFromModuleToAccount",
 		"/klyraprotocol.sending.MsgSendFromModuleToAccountResponse",

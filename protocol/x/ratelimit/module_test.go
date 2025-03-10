@@ -3,18 +3,14 @@ package ratelimit_test
 import (
 	"bytes"
 	"encoding/json"
-	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/app/module"
 	testapp "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/app"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit"
 	ratelimit_keeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/keeper"
-	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/stretchr/testify/require"
 )
 
@@ -90,35 +86,6 @@ func TestAppModuleBasic_ValidateGenesisErr(t *testing.T) {
 	}
 }
 
-func TestAppModuleBasic_RegisterGRPCGatewayRoutes(t *testing.T) {
-	am := createAppModuleBasic(t)
-
-	router := runtime.NewServeMux()
-
-	am.RegisterGRPCGatewayRoutes(client.Context{}, router)
-
-	// Expect NumMessages route registered
-	registeredRoutes := []string{
-		"/klyraprotocol/v4/ratelimit/list_limit_params",
-		"/klyraprotocol/v4/ratelimit/capacity_by_denom",
-	}
-
-	for _, route := range registeredRoutes {
-		recorder := httptest.NewRecorder()
-		req, err := http.NewRequest("GET", route, nil)
-		require.NoError(t, err)
-		router.ServeHTTP(recorder, req)
-		require.Contains(t, recorder.Body.String(), "no RPC client is defined in offline mode")
-	}
-
-	// Expect unexpected route not registered
-	recorder := httptest.NewRecorder()
-	req, err := http.NewRequest("GET", "/klyraprotocol/v4/ratelimit/foo/bar/baz", nil)
-	require.NoError(t, err)
-	router.ServeHTTP(recorder, req)
-	require.Equal(t, 404, recorder.Code)
-}
-
 func TestAppModuleBasic_GetTxCmd(t *testing.T) {
 	am := createAppModuleBasic(t)
 
@@ -133,10 +100,7 @@ func TestAppModuleBasic_GetQueryCmd(t *testing.T) {
 	cmd := am.GetQueryCmd()
 
 	require.Equal(t, "ratelimit", cmd.Use)
-	require.Equal(t, 5, len(cmd.Commands()))
-	require.Equal(t, "capacity-by-denom", cmd.Commands()[0].Name())
-	require.Equal(t, "get-asset-yield-index", cmd.Commands()[1].Name())
-	require.Equal(t, "get-sdai-price", cmd.Commands()[2].Name())
-	require.Equal(t, "list-limit-params", cmd.Commands()[3].Name())
-	require.Equal(t, "pending-send-packets", cmd.Commands()[4].Name())
+	require.Equal(t, 2, len(cmd.Commands()))
+	require.Equal(t, "get-asset-yield-index", cmd.Commands()[0].Name())
+	require.Equal(t, "get-sdai-price", cmd.Commands()[1].Name())
 }

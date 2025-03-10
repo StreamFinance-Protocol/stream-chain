@@ -218,10 +218,6 @@ var (
 		"/klyraprotocol.prices.MsgUpdateMarketParam":          {},
 		"/klyraprotocol.prices.MsgUpdateMarketParamResponse":  {},
 
-		// ratelimit
-		"/klyraprotocol.ratelimit.MsgSetLimitParams":         {},
-		"/klyraprotocol.ratelimit.MsgSetLimitParamsResponse": {},
-
 		// sending
 		"/klyraprotocol.sending.MsgCreateTransfer":                  {},
 		"/klyraprotocol.sending.MsgCreateTransferResponse":          {},

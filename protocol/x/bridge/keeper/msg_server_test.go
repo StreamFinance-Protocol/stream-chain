@@ -14,7 +14,7 @@ func setupMsgServer(t *testing.T) (keeper.Keeper, types.MsgServer, context.Conte
 	tApp := testapp.NewTestAppBuilder(t).Build()
 	ctx := tApp.InitChain()
 	k := tApp.App.BridgeKeeper
-	tApp.App.RatelimitKeeper.SetSDAIPrice(ctx, big.NewInt(1000000000000000000))
+	tApp.App.YieldKeeper.SetSDAIPrice(ctx, big.NewInt(1000000000000000000))
 
 	return k, keeper.NewMsgServerImpl(k), ctx
 }

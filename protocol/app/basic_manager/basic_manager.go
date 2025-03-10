@@ -30,10 +30,10 @@ import (
 	govplusmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/govplus"
 	perpetualsmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals"
 	pricesmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices"
-	ratelimitmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit"
 	sendingmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending"
 	statsmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/stats"
 	subaccountsmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts"
+	yieldmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield"
 
 	// Upgrades
 	"github.com/cosmos/cosmos-sdk/x/staking"
@@ -78,7 +78,7 @@ var (
 		delaymsgmodule.AppModuleBasic{},
 		sendingmodule.AppModuleBasic{},
 		epochsmodule.AppModuleBasic{},
-		ratelimitmodule.AppModuleBasic{},
+		yieldmodule.AppModuleBasic{},
 		govplusmodule.AppModuleBasic{},
 	)
 )

@@ -12,7 +12,7 @@ import (
 	sdaiserver "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/server/types/sdaioracle"
 	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
-	ratelimittypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
+	yieldtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types"
 	abci "github.com/cometbft/cometbft/abci/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -32,7 +32,7 @@ type VoteExtensionHandler struct {
 	// fetching mid price for price calc
 	clobKeeper ExtendVoteClobKeeper
 
-	rateLimitKeeper VoteExtensionRateLimitKeeper
+	yieldKeeper VoteExtensionYieldKeeper
 
 	sDAIEventManager sdaiserver.SDAIEventManager
 
@@ -57,7 +57,7 @@ func NewVoteExtensionHandler(
 	pricesKeeper PreBlockExecPricesKeeper,
 	perpetualsKeeper ExtendVotePerpetualsKeeper,
 	clobKeeper ExtendVoteClobKeeper,
-	rateLimitKeeper VoteExtensionRateLimitKeeper,
+	yieldKeeper VoteExtensionYieldKeeper,
 	sDAIEventManager sdaiserver.SDAIEventManager,
 	veApplier VEApplierInterface,
 ) *VoteExtensionHandler {
@@ -67,7 +67,7 @@ func NewVoteExtensionHandler(
 		pricesKeeper:     pricesKeeper,
 		perpetualsKeeper: perpetualsKeeper,
 		clobKeeper:       clobKeeper,
-		rateLimitKeeper:  rateLimitKeeper,
+		yieldKeeper:      yieldKeeper,
 		sDAIEventManager: sDAIEventManager,
 		veApplier:        veApplier,
 	}
@@ -169,7 +169,7 @@ func (h *VoteExtensionHandler) ValidateVE(
 		return rejectResponse, err
 	}
 
-	if err := ValidateVeSDaiConversionRate(ctx, h.rateLimitKeeper, veBytes, h.voteCodec); err != nil {
+	if err := ValidateVeSDaiConversionRate(ctx, h.yieldKeeper, veBytes, h.voteCodec); err != nil {
 		h.logger.Error(
 			"failed to validate sDAI conversion rate in vote extension",
 			"height", blockHeight,
@@ -196,9 +196,9 @@ func (h *VoteExtensionHandler) GetVEBytes(ctx sdk.Context) ([]byte, error) {
 }
 
 func (h *VoteExtensionHandler) getSDAIPriceUpdate(ctx sdk.Context) string {
-	lastBlockUpdated, found := h.rateLimitKeeper.GetSDAILastBlockUpdated(ctx)
+	lastBlockUpdated, found := h.yieldKeeper.GetSDAILastBlockUpdated(ctx)
 	if found {
-		if ctx.BlockHeight()-lastBlockUpdated.Int64() < ratelimittypes.SDAI_UPDATE_BLOCK_DELAY {
+		if ctx.BlockHeight()-lastBlockUpdated.Int64() < yieldtypes.SDAI_UPDATE_BLOCK_DELAY {
 			return ""
 		}
 	}

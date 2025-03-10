@@ -8,8 +8,8 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	sdaiservertypes "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/server/types/sdaioracle"
-	ratelimitkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/keeper"
-	ratelimittypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
+	yieldkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/keeper"
+	yieldtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	bank_testutil "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/bank"
@@ -170,7 +170,7 @@ func TestGetCollateralPool(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(
 			name, func(t *testing.T) {
-				ctx, keeper, pricesKeeper, perpetualsKeeper, _, _, assetsKeeper, rateLimitKeeper, _, _ := testutil.SubaccountsKeepers(
+				ctx, keeper, pricesKeeper, perpetualsKeeper, _, _, assetsKeeper, yieldKeeper, _, _ := testutil.SubaccountsKeepers(
 					t,
 					true,
 				)
@@ -184,7 +184,7 @@ func TestGetCollateralPool(t *testing.T) {
 				testutil.CreateTestLiquidityTiers(t, ctx, perpetualsKeeper)
 				testutil.CreateTestCollateralPools(t, ctx, perpetualsKeeper)
 
-				rateLimitKeeper.SetAssetYieldIndex(ctx, big.NewRat(1, 1))
+				yieldKeeper.SetAssetYieldIndex(ctx, big.NewRat(1, 1))
 				for _, p := range tc.perpetuals {
 					_, err := perpetualsKeeper.CreatePerpetual(
 						ctx,
@@ -213,8 +213,8 @@ func TestGetCollateralPool(t *testing.T) {
 }
 
 func TestSubaccountGet(t *testing.T) {
-	ctx, keeper, _, _, _, _, _, rateLimitKeeper, _, _ := testutil.SubaccountsKeepers(t, true)
-	rateLimitKeeper.SetAssetYieldIndex(ctx, big.NewRat(1, 1))
+	ctx, keeper, _, _, _, _, _, yieldKeeper, _, _ := testutil.SubaccountsKeepers(t, true)
+	yieldKeeper.SetAssetYieldIndex(ctx, big.NewRat(1, 1))
 	items := createNSubaccount(keeper, ctx, 10, big.NewInt(1_000))
 
 	for _, item := range items {
@@ -247,8 +247,8 @@ func TestSubaccountSet_Empty(t *testing.T) {
 }
 
 func TestSubaccountGetNonExistent(t *testing.T) {
-	ctx, keeper, _, _, _, _, _, rateLimitKeeper, _, _ := testutil.SubaccountsKeepers(t, true)
-	rateLimitKeeper.SetAssetYieldIndex(ctx, big.NewRat(1, 1))
+	ctx, keeper, _, _, _, _, _, yieldKeeper, _, _ := testutil.SubaccountsKeepers(t, true)
+	yieldKeeper.SetAssetYieldIndex(ctx, big.NewRat(1, 1))
 	id := types.SubaccountId{
 		Owner:  "non-existent",
 		Number: uint32(123),
@@ -5690,7 +5690,7 @@ func TestUpdateSubaccounts(t *testing.T) {
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			ctx, keeper, pricesKeeper, perpetualsKeeper, accountKeeper, bankKeeper, assetsKeeper, rateLimitKeeper, _, _ := testutil.SubaccountsKeepers(
+			ctx, keeper, pricesKeeper, perpetualsKeeper, accountKeeper, bankKeeper, assetsKeeper, yieldKeeper, _, _ := testutil.SubaccountsKeepers(
 				t,
 				tc.msgSenderEnabled,
 			)
@@ -5706,15 +5706,15 @@ func TestUpdateSubaccounts(t *testing.T) {
 
 			// Set up initial sdai price
 			rateString := sdaiservertypes.TestSDAIEventRequest.ConversionRate
-			rate, conversionErr := ratelimitkeeper.ConvertStringToBigInt(rateString)
+			rate, conversionErr := yieldkeeper.ConvertStringToBigInt(rateString)
 			require.NoError(t, conversionErr)
 
-			rateLimitKeeper.SetSDAIPrice(ctx, rate)
+			yieldKeeper.SetSDAIPrice(ctx, rate)
 			globalAssetYieldIndex := big.NewRat(1, 1)
 			if tc.globalAssetYieldIndex != nil {
 				globalAssetYieldIndex = tc.globalAssetYieldIndex
 			}
-			rateLimitKeeper.SetAssetYieldIndex(ctx, globalAssetYieldIndex)
+			yieldKeeper.SetAssetYieldIndex(ctx, globalAssetYieldIndex)
 
 			for _, m := range tc.marketParamPrices {
 				_, err := pricesKeeper.CreateMarket(
@@ -5770,7 +5770,7 @@ func TestUpdateSubaccounts(t *testing.T) {
 			if tc.fundsInTDaiPool != nil {
 				err := bank_testutil.FundModuleAccount(
 					ctx,
-					ratelimittypes.TDaiPoolAccount,
+					yieldtypes.TDaiPoolAccount,
 					sdk.Coins{
 						sdk.NewCoin(asstypes.AssetTDai.Denom, sdkmath.NewIntFromBigInt(tc.fundsInTDaiPool)),
 					},
@@ -5823,7 +5823,7 @@ func TestUpdateSubaccounts(t *testing.T) {
 				require.Equal(t, *ep, *newSubaccount.AssetPositions[i])
 			}
 			if tc.expectedErr == nil {
-				require.Equal(t, 0, globalAssetYieldIndex.Cmp(ratelimitkeeper.ConvertStringToBigRatWithPanicOnErr(newSubaccount.AssetYieldIndex)),
+				require.Equal(t, 0, globalAssetYieldIndex.Cmp(yieldkeeper.ConvertStringToBigRatWithPanicOnErr(newSubaccount.AssetYieldIndex)),
 					"Expected AssetYieldIndex %v. Got %v.", globalAssetYieldIndex, newSubaccount.AssetYieldIndex,
 				)
 			}
@@ -5865,7 +5865,7 @@ func TestUpdateSubaccounts(t *testing.T) {
 			if tc.expectedTDaiYieldPoolBalance != nil {
 				TDaiBal := bankKeeper.GetBalance(
 					ctx,
-					accountKeeper.GetModuleAddress(ratelimittypes.TDaiPoolAccount),
+					accountKeeper.GetModuleAddress(yieldtypes.TDaiPoolAccount),
 					asstypes.AssetTDai.Denom,
 				)
 				require.Equal(t,
@@ -7230,7 +7230,7 @@ func TestUpdateSubaccounts_WithdrawalsBlocked(t *testing.T) {
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			ctx, keeper, pricesKeeper, perpetualsKeeper, _, _, assetsKeeper, ratelimitKeeper, _, _ := testutil.SubaccountsKeepers(
+			ctx, keeper, pricesKeeper, perpetualsKeeper, _, _, assetsKeeper, yieldKeeper, _, _ := testutil.SubaccountsKeepers(
 				t,
 				tc.msgSenderEnabled,
 			)
@@ -7246,13 +7246,13 @@ func TestUpdateSubaccounts_WithdrawalsBlocked(t *testing.T) {
 
 			// Set up initial sdai price
 			rateString := sdaiservertypes.TestSDAIEventRequest.ConversionRate
-			rate, conversionErr := ratelimitkeeper.ConvertStringToBigInt(rateString)
+			rate, conversionErr := yieldkeeper.ConvertStringToBigInt(rateString)
 			require.NoError(t, conversionErr)
 
-			ratelimitKeeper.SetSDAIPrice(ctx, rate)
-			ratelimitKeeper.SetAssetYieldIndex(ctx, big.NewRat(1, 1))
+			yieldKeeper.SetSDAIPrice(ctx, rate)
+			yieldKeeper.SetAssetYieldIndex(ctx, big.NewRat(1, 1))
 
-			// ratelimitKeeper.SetCurrentDaiYieldEpochNumber(ctx, 0)
+			// yieldKeeper.SetCurrentDaiYieldEpochNumber(ctx, 0)
 			for _, m := range tc.marketParamPrices {
 				_, err := pricesKeeper.CreateMarket(
 					ctx,
@@ -7511,7 +7511,7 @@ func TestUpdateSubaccountWithTwoSeparateUpdates(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// Initialization
-			ctx, keeper, pricesKeeper, perpetualsKeeper, accountKeeper, bankKeeper, assetsKeeper, rateLimitKeeper, _, _ := testutil.SubaccountsKeepers(
+			ctx, keeper, pricesKeeper, perpetualsKeeper, accountKeeper, bankKeeper, assetsKeeper, yieldKeeper, _, _ := testutil.SubaccountsKeepers(
 				t,
 				true,
 			)
@@ -7527,15 +7527,15 @@ func TestUpdateSubaccountWithTwoSeparateUpdates(t *testing.T) {
 
 			// Set up initial sdai price
 			rateString := sdaiservertypes.TestSDAIEventRequest.ConversionRate
-			rate, conversionErr := ratelimitkeeper.ConvertStringToBigInt(rateString)
+			rate, conversionErr := yieldkeeper.ConvertStringToBigInt(rateString)
 			require.NoError(t, conversionErr)
 
-			rateLimitKeeper.SetSDAIPrice(ctx, rate)
+			yieldKeeper.SetSDAIPrice(ctx, rate)
 			globalAssetYieldIndex := big.NewRat(1, 1)
 			if tc.initialGlobalAssetYieldIndex != nil {
 				globalAssetYieldIndex = tc.initialGlobalAssetYieldIndex
 			}
-			rateLimitKeeper.SetAssetYieldIndex(ctx, globalAssetYieldIndex)
+			yieldKeeper.SetAssetYieldIndex(ctx, globalAssetYieldIndex)
 
 			for _, m := range tc.marketParamPrices {
 				_, err := pricesKeeper.CreateMarket(
@@ -7591,7 +7591,7 @@ func TestUpdateSubaccountWithTwoSeparateUpdates(t *testing.T) {
 			if tc.fundsInTDaiPool != nil {
 				err := bank_testutil.FundModuleAccount(
 					ctx,
-					ratelimittypes.TDaiPoolAccount,
+					yieldtypes.TDaiPoolAccount,
 					sdk.Coins{
 						sdk.NewCoin(asstypes.AssetTDai.Denom, sdkmath.NewIntFromBigInt(tc.fundsInTDaiPool)),
 					},
@@ -7634,7 +7634,7 @@ func TestUpdateSubaccountWithTwoSeparateUpdates(t *testing.T) {
 
 			// Update global asset yield index
 			if tc.postFirstUpdateGlobalAssetYieldIndex != nil {
-				rateLimitKeeper.SetAssetYieldIndex(ctx, tc.postFirstUpdateGlobalAssetYieldIndex)
+				yieldKeeper.SetAssetYieldIndex(ctx, tc.postFirstUpdateGlobalAssetYieldIndex)
 			}
 
 			if len(tc.postFirstUpdatePerpetualYieldIndices) > 0 {
@@ -7679,7 +7679,7 @@ func TestUpdateSubaccountWithTwoSeparateUpdates(t *testing.T) {
 				require.Equal(t, *ep, *newSubaccount.AssetPositions[i])
 			}
 			if tc.expectedErrFirstUpdate == nil && tc.expectedErrSecondUpdate == nil {
-				require.Equal(t, 0, tc.postFirstUpdateGlobalAssetYieldIndex.Cmp(ratelimitkeeper.ConvertStringToBigRatWithPanicOnErr(newSubaccount.AssetYieldIndex)),
+				require.Equal(t, 0, tc.postFirstUpdateGlobalAssetYieldIndex.Cmp(yieldkeeper.ConvertStringToBigRatWithPanicOnErr(newSubaccount.AssetYieldIndex)),
 					"Expected AssetYieldIndex %v. Got %v.", tc.postFirstUpdateGlobalAssetYieldIndex, newSubaccount.AssetYieldIndex,
 				)
 			}
@@ -7699,7 +7699,7 @@ func TestUpdateSubaccountWithTwoSeparateUpdates(t *testing.T) {
 			if tc.expectedTDaiYieldPoolBalance != nil {
 				TDaiBal := bankKeeper.GetBalance(
 					ctx,
-					accountKeeper.GetModuleAddress(ratelimittypes.TDaiPoolAccount),
+					accountKeeper.GetModuleAddress(yieldtypes.TDaiPoolAccount),
 					asstypes.AssetTDai.Denom,
 				)
 				require.Equal(t,
@@ -8714,7 +8714,7 @@ func TestCanUpdateSubaccounts(t *testing.T) {
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			ctx, keeper, pricesKeeper, perpetualsKeeper, _, _, assetsKeeper, ratelimitKeeper, _, _ := testutil.SubaccountsKeepers(t, true)
+			ctx, keeper, pricesKeeper, perpetualsKeeper, _, _, assetsKeeper, yieldKeeper, _, _ := testutil.SubaccountsKeepers(t, true)
 			testutil.CreateTestMarkets(t, ctx, pricesKeeper)
 
 			require.NoError(t, testutil.CreateTDaiAsset(ctx, assetsKeeper))
@@ -8725,11 +8725,11 @@ func TestCanUpdateSubaccounts(t *testing.T) {
 
 			// Set up initial sdai price
 			rateString := sdaiservertypes.TestSDAIEventRequest.ConversionRate
-			rate, conversionErr := ratelimitkeeper.ConvertStringToBigInt(rateString)
+			rate, conversionErr := yieldkeeper.ConvertStringToBigInt(rateString)
 			require.NoError(t, conversionErr)
 
-			ratelimitKeeper.SetSDAIPrice(ctx, rate)
-			ratelimitKeeper.SetAssetYieldIndex(ctx, big.NewRat(1, 1))
+			yieldKeeper.SetSDAIPrice(ctx, rate)
+			yieldKeeper.SetAssetYieldIndex(ctx, big.NewRat(1, 1))
 
 			for _, a := range tc.assets {
 				_, err := assetsKeeper.CreateAsset(
@@ -9165,7 +9165,7 @@ func TestGetNetCollateralAndMarginRequirements(t *testing.T) {
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			ctx, keeper, pricesKeeper, perpetualsKeeper, _, _, assetsKeeper, ratelimitKeeper, _, _ := testutil.SubaccountsKeepers(t, true)
+			ctx, keeper, pricesKeeper, perpetualsKeeper, _, _, assetsKeeper, yieldKeeper, _, _ := testutil.SubaccountsKeepers(t, true)
 			testutil.CreateTestMarkets(t, ctx, pricesKeeper)
 
 			require.NoError(t, testutil.CreateTDaiAsset(ctx, assetsKeeper))
@@ -9176,11 +9176,11 @@ func TestGetNetCollateralAndMarginRequirements(t *testing.T) {
 
 			// Set up initial sdai price
 			rateString := sdaiservertypes.TestSDAIEventRequest.ConversionRate
-			rate, conversionErr := ratelimitkeeper.ConvertStringToBigInt(rateString)
+			rate, conversionErr := yieldkeeper.ConvertStringToBigInt(rateString)
 			require.NoError(t, conversionErr)
 
-			ratelimitKeeper.SetSDAIPrice(ctx, rate)
-			ratelimitKeeper.SetAssetYieldIndex(ctx, big.NewRat(1, 1))
+			yieldKeeper.SetSDAIPrice(ctx, rate)
+			yieldKeeper.SetAssetYieldIndex(ctx, big.NewRat(1, 1))
 
 			for _, a := range tc.assets {
 				_, err := assetsKeeper.CreateAsset(

@@ -21,14 +21,14 @@ import (
 	vetesting "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/ve"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/memclob"
 	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
-	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
+	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types"
 	cometabci "github.com/cometbft/cometbft/abci/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/stretchr/testify/require"
 
-	ratelimitkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/keeper"
+	yieldkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/keeper"
 )
 
 func TestWritePricesToStoreAndMaybeCache(t *testing.T) {
@@ -325,7 +325,7 @@ func TestWritePricesToStoreAndMaybeCache(t *testing.T) {
 			voteCodec := vecodec.NewDefaultVoteExtensionCodec()
 			extCodec := vecodec.NewDefaultExtendedCommitCodec()
 			voteAggregator := &mocks.VoteAggregator{}
-			ctx, _, pricesKeeper, _, _, _, _, ratelimitKeeper, _, _ := keepertest.SubaccountsKeepers(t, false)
+			ctx, _, pricesKeeper, _, _, _, _, yieldKeeper, _, _ := keepertest.SubaccountsKeepers(t, false)
 
 			keepertest.CreateTestMarkets(t, ctx, pricesKeeper)
 
@@ -347,7 +347,7 @@ func TestWritePricesToStoreAndMaybeCache(t *testing.T) {
 				log.NewNopLogger(),
 				voteAggregator,
 				pricesKeeper,
-				ratelimitKeeper,
+				yieldKeeper,
 				voteCodec,
 				extCodec,
 				&spotPriceUpdateCache,
@@ -469,10 +469,10 @@ func TestWriteSDaiConversionRateToStoreAndMaybeCache(t *testing.T) {
 			voteCodec := vecodec.NewDefaultVoteExtensionCodec()
 			extCodec := vecodec.NewDefaultExtendedCommitCodec()
 			voteAggregator := &mocks.VoteAggregator{}
-			ctx, _, pricesKeeper, _, _, bankKeeper, _, ratelimitKeeper, _, _ := keepertest.SubaccountsKeepers(t, false)
+			ctx, _, pricesKeeper, _, _, bankKeeper, _, yieldKeeper, _, _ := keepertest.SubaccountsKeepers(t, false)
 
-			ratelimitKeeper.SetSDAIPrice(ctx, tc.initialSDaiPrice)
-			ratelimitKeeper.SetSDAILastBlockUpdated(ctx, tc.initialLastBlockUpdated)
+			yieldKeeper.SetSDAIPrice(ctx, tc.initialSDaiPrice)
+			yieldKeeper.SetSDAILastBlockUpdated(ctx, tc.initialLastBlockUpdated)
 
 			spotPriceUpdateCache := pricecache.PriceUpdatesCacheImpl{}
 			pnlPriceUpdateCache := pricecache.PriceUpdatesCacheImpl{}
@@ -483,7 +483,7 @@ func TestWriteSDaiConversionRateToStoreAndMaybeCache(t *testing.T) {
 				log.NewNopLogger(),
 				voteAggregator,
 				pricesKeeper,
-				ratelimitKeeper,
+				yieldKeeper,
 				voteCodec,
 				extCodec,
 				&spotPriceUpdateCache,
@@ -500,7 +500,7 @@ func TestWriteSDaiConversionRateToStoreAndMaybeCache(t *testing.T) {
 			err := bankKeeper.MintCoins(ctx, types.TDaiPoolAccount, tDaiToMintCoins)
 			require.NoError(t, err)
 
-			initialTestAmountSDai := sdkmath.NewIntFromBigInt(ratelimitkeeper.ConvertStringToBigIntWithPanicOnErr("100000000000000000000000000000000000000000000"))
+			initialTestAmountSDai := sdkmath.NewIntFromBigInt(yieldkeeper.ConvertStringToBigIntWithPanicOnErr("100000000000000000000000000000000000000000000"))
 			sDaiToMintCoins := sdk.NewCoins(sdk.NewCoin(types.SDaiDenom, initialTestAmountSDai))
 			err = bankKeeper.MintCoins(ctx, types.TDaiPoolAccount, sDaiToMintCoins)
 			require.NoError(t, err)
@@ -515,12 +515,12 @@ func TestWriteSDaiConversionRateToStoreAndMaybeCache(t *testing.T) {
 				require.NoError(t, err)
 			}
 
-			// Check ratelimitKeeper state
-			actualSDaiPrice, found := ratelimitKeeper.GetSDAIPrice(ctx)
+			// Check yieldKeeper state
+			actualSDaiPrice, found := yieldKeeper.GetSDAIPrice(ctx)
 			require.True(t, found)
 			require.Equal(t, tc.expectedSDaiPrice, actualSDaiPrice)
 
-			actualLastBlockUpdated, found := ratelimitKeeper.GetSDAILastBlockUpdated(ctx)
+			actualLastBlockUpdated, found := yieldKeeper.GetSDAILastBlockUpdated(ctx)
 			require.True(t, found)
 			require.Equal(t, tc.expectedLastBlockUpdated, actualLastBlockUpdated)
 
@@ -541,8 +541,8 @@ func TestVEWriter(t *testing.T) {
 	pricesKeeper := &mocks.VEApplierPricesKeeper{}
 	pricesKeeper.On("PerformStatefulPriceUpdateValidation", mock.Anything, mock.Anything).Return(true, true)
 
-	ratelimitKeeper := &mocks.VEApplierRatelimitKeeper{}
-	ratelimitKeeper.On("ProcessNewSDaiConversionRateUpdate", mock.Anything, mock.Anything, mock.Anything).Return(nil)
+	yieldKeeper := &mocks.VEApplierYieldKeeper{}
+	yieldKeeper.On("ProcessNewSDaiConversionRateUpdate", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 	spotPriceUpdateCache := pricecache.PriceUpdatesCacheImpl{}
 	pnlPriceUpdateCache := pricecache.PriceUpdatesCacheImpl{}
@@ -553,7 +553,7 @@ func TestVEWriter(t *testing.T) {
 		log.NewNopLogger(),
 		voteAggregator,
 		pricesKeeper,
-		ratelimitKeeper,
+		yieldKeeper,
 		voteCodec,
 		extCodec,
 		&spotPriceUpdateCache,
@@ -1420,7 +1420,7 @@ func TestVEWriter(t *testing.T) {
 			true,
 		)
 		require.NoError(t, err)
-		ratelimitKeeper.AssertNumberOfCalls(t, "ProcessNewSDaiConversionRateUpdate", 3)
+		yieldKeeper.AssertNumberOfCalls(t, "ProcessNewSDaiConversionRateUpdate", 3)
 	})
 
 	t.Run("correctly uses cache for prices and doesn't recompute", func(t *testing.T) {

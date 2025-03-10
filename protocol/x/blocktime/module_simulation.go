@@ -5,7 +5,7 @@ import (
 
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/sample"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/blocktime/types"
-	ratelimitsimulation "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/simulation"
+	ratelimitsimulation "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/simulation"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"

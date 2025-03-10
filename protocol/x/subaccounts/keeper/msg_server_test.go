@@ -14,10 +14,10 @@ import (
 	testutil "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/keeper"
 	asstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
-	ratelimitkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/keeper"
-	ratelimittypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
+	yieldkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/keeper"
+	yieldtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 )
@@ -886,7 +886,7 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			ctx, subaccountsKeeper, pricesKeeper, perpetualsKeeper, accountKeeper, bankKeeper, assetsKeeper, rateLimitKeeper, _, _ := testutil.SubaccountsKeepers(
+			ctx, subaccountsKeeper, pricesKeeper, perpetualsKeeper, accountKeeper, bankKeeper, assetsKeeper, yieldKeeper, _, _ := testutil.SubaccountsKeepers(
 				t,
 				true,
 			)
@@ -902,15 +902,15 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 
 			// Set up initial sdai price
 			rateString := sdaiservertypes.TestSDAIEventRequest.ConversionRate
-			rate, conversionErr := ratelimitkeeper.ConvertStringToBigInt(rateString)
+			rate, conversionErr := yieldkeeper.ConvertStringToBigInt(rateString)
 			require.NoError(t, conversionErr)
 
-			rateLimitKeeper.SetSDAIPrice(ctx, rate)
+			yieldKeeper.SetSDAIPrice(ctx, rate)
 			globalAssetYieldIndex := big.NewRat(1, 1)
 			if tc.globalAssetYieldIndex != nil {
 				globalAssetYieldIndex = tc.globalAssetYieldIndex
 			}
-			rateLimitKeeper.SetAssetYieldIndex(ctx, globalAssetYieldIndex)
+			yieldKeeper.SetAssetYieldIndex(ctx, globalAssetYieldIndex)
 
 			for _, a := range tc.assets {
 				_, err := assetsKeeper.CreateAsset(
@@ -950,7 +950,7 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 			if tc.fundsInTDaiPool != nil {
 				err := bank_testutil.FundModuleAccount(
 					ctx,
-					ratelimittypes.TDaiPoolAccount,
+					yieldtypes.TDaiPoolAccount,
 					sdk.Coins{
 						sdk.NewCoin(asstypes.AssetTDai.Denom, sdkmath.NewIntFromBigInt(tc.fundsInTDaiPool)),
 					},
@@ -990,7 +990,7 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 				require.Equal(t, *ep, *newSubaccount.AssetPositions[i])
 			}
 			if tc.expectedErr == nil {
-				require.Equal(t, 0, globalAssetYieldIndex.Cmp(ratelimitkeeper.ConvertStringToBigRatWithPanicOnErr(newSubaccount.AssetYieldIndex)),
+				require.Equal(t, 0, globalAssetYieldIndex.Cmp(yieldkeeper.ConvertStringToBigRatWithPanicOnErr(newSubaccount.AssetYieldIndex)),
 					"Expected AssetYieldIndex %v. Got %v.", globalAssetYieldIndex, newSubaccount.AssetYieldIndex,
 				)
 			}
@@ -1010,7 +1010,7 @@ func TestClaimYieldForSubaccount(t *testing.T) {
 			if tc.expectedTDaiYieldPoolBalance != nil {
 				TDaiBal := bankKeeper.GetBalance(
 					ctx,
-					accountKeeper.GetModuleAddress(ratelimittypes.TDaiPoolAccount),
+					accountKeeper.GetModuleAddress(yieldtypes.TDaiPoolAccount),
 					asstypes.AssetTDai.Denom,
 				)
 				require.Equal(t,

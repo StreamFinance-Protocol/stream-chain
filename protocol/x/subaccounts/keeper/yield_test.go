@@ -14,10 +14,10 @@ import (
 	testutil "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/keeper"
 	assettypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
-	ratelimitkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/keeper"
-	ratelimittypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
 	subaccountskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
+	yieldkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/keeper"
+	yieldtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
@@ -109,17 +109,17 @@ func TestDepositYieldToSubaccount(t *testing.T) {
 			},
 		},
 		"Success: deposits tDai amount greater than max uint64": {
-			fundsInTDaiPool: ratelimitkeeper.ConvertStringToBigIntWithPanicOnErr("100000000000000000000000000"),
+			fundsInTDaiPool: yieldkeeper.ConvertStringToBigIntWithPanicOnErr("100000000000000000000000000"),
 			collateralPoolTDaiBalances: map[string]*big.Int{
 				types.ModuleAddress.String(): big.NewInt(1),
 			},
 
 			subaccountId:     defaultSubaccountId,
-			amountToTransfer: ratelimitkeeper.ConvertStringToBigIntWithPanicOnErr("100000000000000000000000000"),
+			amountToTransfer: yieldkeeper.ConvertStringToBigIntWithPanicOnErr("100000000000000000000000000"),
 
 			expectedTDaiYieldPoolBalance: big.NewInt(0),
 			expectedCollateralPoolTDaiBalances: map[string]*big.Int{
-				types.ModuleAddress.String(): ratelimitkeeper.ConvertStringToBigIntWithPanicOnErr("100000000000000000000000001"),
+				types.ModuleAddress.String(): yieldkeeper.ConvertStringToBigIntWithPanicOnErr("100000000000000000000000001"),
 			},
 		},
 		"Success: depositing nil transfer amount results in no change": {
@@ -230,7 +230,7 @@ func TestDepositYieldToSubaccount(t *testing.T) {
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			ctx, keeper, pricesKeeper, perpetualsKeeper, accountKeeper, bankKeeper, assetsKeeper, rateLimitKeeper, _, _ := testutil.SubaccountsKeepers(
+			ctx, keeper, pricesKeeper, perpetualsKeeper, accountKeeper, bankKeeper, assetsKeeper, yieldKeeper, _, _ := testutil.SubaccountsKeepers(
 				t,
 				true,
 			)
@@ -244,10 +244,10 @@ func TestDepositYieldToSubaccount(t *testing.T) {
 			testutil.CreateTestCollateralPools(t, ctx, perpetualsKeeper)
 
 			rateString := sdaiservertypes.TestSDAIEventRequest.ConversionRate
-			rate, conversionErr := ratelimitkeeper.ConvertStringToBigInt(rateString)
+			rate, conversionErr := yieldkeeper.ConvertStringToBigInt(rateString)
 			require.NoError(t, conversionErr)
-			rateLimitKeeper.SetSDAIPrice(ctx, rate)
-			rateLimitKeeper.SetAssetYieldIndex(ctx, big.NewRat(1, 1))
+			yieldKeeper.SetSDAIPrice(ctx, rate)
+			yieldKeeper.SetAssetYieldIndex(ctx, big.NewRat(1, 1))
 
 			for _, p := range tc.perpetuals {
 				perpetualsKeeper.SetPerpetualForTest(
@@ -271,7 +271,7 @@ func TestDepositYieldToSubaccount(t *testing.T) {
 			if tc.fundsInTDaiPool != nil {
 				err := bank_testutil.FundModuleAccount(
 					ctx,
-					ratelimittypes.TDaiPoolAccount,
+					yieldtypes.TDaiPoolAccount,
 					sdk.Coins{
 						sdk.NewCoin(assettypes.AssetTDai.Denom, sdkmath.NewIntFromBigInt(tc.fundsInTDaiPool)),
 					},
@@ -306,7 +306,7 @@ func TestDepositYieldToSubaccount(t *testing.T) {
 			if tc.expectedTDaiYieldPoolBalance != nil {
 				TDaiBal := bankKeeper.GetBalance(
 					ctx,
-					accountKeeper.GetModuleAddress(ratelimittypes.TDaiPoolAccount),
+					accountKeeper.GetModuleAddress(yieldtypes.TDaiPoolAccount),
 					assettypes.AssetTDai.Denom,
 				)
 				require.Equal(t,
@@ -1231,7 +1231,7 @@ func TestAddYieldToSubaccount(t *testing.T) {
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			ctx, keeper, pricesKeeper, perpetualsKeeper, _, _, assetsKeeper, rateLimitKeeper, _, _ := testutil.SubaccountsKeepers(
+			ctx, keeper, pricesKeeper, perpetualsKeeper, _, _, assetsKeeper, yieldKeeper, _, _ := testutil.SubaccountsKeepers(
 				t,
 				true,
 			)
@@ -1247,15 +1247,15 @@ func TestAddYieldToSubaccount(t *testing.T) {
 
 			// Set up initial sdai price
 			rateString := sdaiservertypes.TestSDAIEventRequest.ConversionRate
-			rate, conversionErr := ratelimitkeeper.ConvertStringToBigInt(rateString)
+			rate, conversionErr := yieldkeeper.ConvertStringToBigInt(rateString)
 			require.NoError(t, conversionErr)
 
-			rateLimitKeeper.SetSDAIPrice(ctx, rate)
+			yieldKeeper.SetSDAIPrice(ctx, rate)
 			globalAssetYieldIndex := big.NewRat(1, 1)
 			if tc.globalAssetYieldIndex != nil {
 				globalAssetYieldIndex = tc.globalAssetYieldIndex
 			}
-			rateLimitKeeper.SetAssetYieldIndex(ctx, globalAssetYieldIndex)
+			yieldKeeper.SetAssetYieldIndex(ctx, globalAssetYieldIndex)
 
 			availableYield := big.NewInt(0)
 			if tc.availableYield != nil {
@@ -1308,7 +1308,7 @@ func TestAddYieldToSubaccount(t *testing.T) {
 				for i, ep := range tc.expectedAssetPositions {
 					require.Equal(t, *ep, *newSubaccount.AssetPositions[i])
 				}
-				require.Equal(t, 0, globalAssetYieldIndex.Cmp(ratelimitkeeper.ConvertStringToBigRatWithPanicOnErr(newSubaccount.AssetYieldIndex)),
+				require.Equal(t, 0, globalAssetYieldIndex.Cmp(yieldkeeper.ConvertStringToBigRatWithPanicOnErr(newSubaccount.AssetYieldIndex)),
 					"Expected AssetYieldIndex %v. Got %v.", globalAssetYieldIndex, newSubaccount.AssetYieldIndex,
 				)
 			}
@@ -2191,7 +2191,7 @@ func TestClaimYieldForSubaccountFromIdAndSetNewState(t *testing.T) {
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			ctx, keeper, pricesKeeper, perpetualsKeeper, accountKeeper, bankKeeper, assetsKeeper, rateLimitKeeper, _, _ := testutil.SubaccountsKeepers(
+			ctx, keeper, pricesKeeper, perpetualsKeeper, accountKeeper, bankKeeper, assetsKeeper, yieldKeeper, _, _ := testutil.SubaccountsKeepers(
 				t,
 				true,
 			)
@@ -2207,15 +2207,15 @@ func TestClaimYieldForSubaccountFromIdAndSetNewState(t *testing.T) {
 
 			// Set up initial sdai price
 			rateString := sdaiservertypes.TestSDAIEventRequest.ConversionRate
-			rate, conversionErr := ratelimitkeeper.ConvertStringToBigInt(rateString)
+			rate, conversionErr := yieldkeeper.ConvertStringToBigInt(rateString)
 			require.NoError(t, conversionErr)
 
-			rateLimitKeeper.SetSDAIPrice(ctx, rate)
+			yieldKeeper.SetSDAIPrice(ctx, rate)
 			globalAssetYieldIndex := big.NewRat(1, 1)
 			if tc.globalAssetYieldIndex != nil {
 				globalAssetYieldIndex = tc.globalAssetYieldIndex
 			}
-			rateLimitKeeper.SetAssetYieldIndex(ctx, globalAssetYieldIndex)
+			yieldKeeper.SetAssetYieldIndex(ctx, globalAssetYieldIndex)
 
 			for _, a := range tc.assets {
 				_, err := assetsKeeper.CreateAsset(
@@ -2255,7 +2255,7 @@ func TestClaimYieldForSubaccountFromIdAndSetNewState(t *testing.T) {
 			if tc.fundsInTDaiPool != nil {
 				err := bank_testutil.FundModuleAccount(
 					ctx,
-					ratelimittypes.TDaiPoolAccount,
+					yieldtypes.TDaiPoolAccount,
 					sdk.Coins{
 						sdk.NewCoin(assettypes.AssetTDai.Denom, sdkmath.NewIntFromBigInt(tc.fundsInTDaiPool)),
 					},
@@ -2292,7 +2292,7 @@ func TestClaimYieldForSubaccountFromIdAndSetNewState(t *testing.T) {
 				require.Equal(t, *ep, *newSubaccount.AssetPositions[i])
 			}
 			if tc.expectedErr == nil {
-				require.Equal(t, 0, globalAssetYieldIndex.Cmp(ratelimitkeeper.ConvertStringToBigRatWithPanicOnErr(newSubaccount.AssetYieldIndex)),
+				require.Equal(t, 0, globalAssetYieldIndex.Cmp(yieldkeeper.ConvertStringToBigRatWithPanicOnErr(newSubaccount.AssetYieldIndex)),
 					"Expected AssetYieldIndex %v. Got %v.", globalAssetYieldIndex, newSubaccount.AssetYieldIndex,
 				)
 			}
@@ -2312,7 +2312,7 @@ func TestClaimYieldForSubaccountFromIdAndSetNewState(t *testing.T) {
 			if tc.expectedTDaiYieldPoolBalance != nil {
 				TDaiBal := bankKeeper.GetBalance(
 					ctx,
-					accountKeeper.GetModuleAddress(ratelimittypes.TDaiPoolAccount),
+					accountKeeper.GetModuleAddress(yieldtypes.TDaiPoolAccount),
 					assettypes.AssetTDai.Denom,
 				)
 				require.Equal(t,

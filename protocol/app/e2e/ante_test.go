@@ -27,7 +27,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/syndtr/goleveldb/leveldb/testutil"
 
-	ratelimitkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/keeper"
+	yieldkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/keeper"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 )
 
@@ -88,12 +88,12 @@ func TestParallelAnteHandler_ClobAndOther(t *testing.T) {
 	}).WithNonDeterminismChecksEnabled(false).Build()
 
 	rateString := sdaiservertypes.TestSDAIEventRequest.ConversionRate
-	rate, conversionErr := ratelimitkeeper.ConvertStringToBigInt(rateString)
+	rate, conversionErr := yieldkeeper.ConvertStringToBigInt(rateString)
 
 	require.NoError(t, conversionErr)
 
-	tApp.App.RatelimitKeeper.SetSDAIPrice(tApp.App.NewUncachedContext(false, tmproto.Header{}), rate)
-	tApp.App.RatelimitKeeper.SetAssetYieldIndex(tApp.App.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+	tApp.App.YieldKeeper.SetSDAIPrice(tApp.App.NewUncachedContext(false, tmproto.Header{}), rate)
+	tApp.App.YieldKeeper.SetAssetYieldIndex(tApp.App.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
 	_ = tApp.InitChain()
 

@@ -39,7 +39,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	sdaiservertypes "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/server/types/sdaioracle"
-	ratelimitkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/keeper"
+	yieldkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/keeper"
 )
 
 var (
@@ -552,10 +552,10 @@ func TestHydrationInPreBlocker(t *testing.T) {
 	}).WithNonDeterminismChecksEnabled(false).Build()
 
 	rateString := sdaiservertypes.TestSDAIEventRequest.ConversionRate
-	rate, conversionErr := ratelimitkeeper.ConvertStringToBigInt(rateString)
+	rate, conversionErr := yieldkeeper.ConvertStringToBigInt(rateString)
 	require.NoError(t, conversionErr)
-	tApp.App.RatelimitKeeper.SetSDAIPrice(tApp.App.NewUncachedContext(false, tmproto.Header{}), rate)
-	tApp.App.RatelimitKeeper.SetAssetYieldIndex(tApp.App.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+	tApp.App.YieldKeeper.SetSDAIPrice(tApp.App.NewUncachedContext(false, tmproto.Header{}), rate)
+	tApp.App.YieldKeeper.SetAssetYieldIndex(tApp.App.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
 	// Let's add some pre-existing orders to state.
 	// Note that the order is not added to memclob.
@@ -637,10 +637,10 @@ func TestHydrationWithMatchPreBlocker(t *testing.T) {
 	}).WithNonDeterminismChecksEnabled(false).Build()
 
 	rateString := sdaiservertypes.TestSDAIEventRequest.ConversionRate
-	rate, conversionErr := ratelimitkeeper.ConvertStringToBigInt(rateString)
+	rate, conversionErr := yieldkeeper.ConvertStringToBigInt(rateString)
 	require.NoError(t, conversionErr)
-	tApp.App.RatelimitKeeper.SetSDAIPrice(tApp.App.NewUncachedContext(false, tmproto.Header{}), rate)
-	tApp.App.RatelimitKeeper.SetAssetYieldIndex(tApp.App.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+	tApp.App.YieldKeeper.SetSDAIPrice(tApp.App.NewUncachedContext(false, tmproto.Header{}), rate)
+	tApp.App.YieldKeeper.SetAssetYieldIndex(tApp.App.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
 	// 1. Let's add some pre-existing orders to state before clob is initialized.
 	tApp.App.ClobKeeper.SetLongTermOrderPlacement(
@@ -1137,10 +1137,10 @@ func TestStats(t *testing.T) {
 	tApp := testapp.NewTestAppBuilder(t).WithAppOptions(appOpts).Build()
 
 	// rateString := sdaiservertypes.TestSDAIEventRequest.ConversionRate
-	// rate, conversionErr := ratelimitkeeper.ConvertStringToBigInt(rateString)
+	// rate, conversionErr := yieldkeeper.ConvertStringToBigInt(rateString)
 	// require.NoError(t, conversionErr)
-	// tApp.App.RatelimitKeeper.SetSDAIPrice(tApp.App.NewUncachedContext(false, tmproto.Header{}), rate)
-	// tApp.App.RatelimitKeeper.CreateAndStoreNewDaiYieldEpochParams(tApp.App.NewUncachedContext(false, tmproto.Header{}))
+	// tApp.App.YieldKeeper.SetSDAIPrice(tApp.App.NewUncachedContext(false, tmproto.Header{}), rate)
+	// tApp.App.YieldKeeper.CreateAndStoreNewDaiYieldEpochParams(tApp.App.NewUncachedContext(false, tmproto.Header{}))
 
 	// Epochs start at block height 2.
 	startTime := time.Unix(10, 0).UTC()

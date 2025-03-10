@@ -20,7 +20,7 @@ type (
 		storeKey           storetypes.StoreKey
 		transientStoreKey  storetypes.StoreKey
 		bridgeEventManager *bridgeserver.BridgeEventManager
-		ratelimitKeeper    types.RateLimitKeeper
+		yieldKeeper        types.YieldKeeper
 		bankKeeper         types.BankKeeper
 		delayMsgKeeper     delaymsgtypes.DelayMsgKeeper
 
@@ -34,7 +34,7 @@ func NewKeeper(
 	storeKey storetypes.StoreKey,
 	transientStoreKey storetypes.StoreKey,
 	bridgeEventManager *bridgeserver.BridgeEventManager,
-	ratelimitKeeper types.RateLimitKeeper,
+	yieldKeeper types.YieldKeeper,
 	bankKeeper types.BankKeeper,
 	delayMsgKeeper delaymsgtypes.DelayMsgKeeper,
 	authorities []string,
@@ -44,7 +44,7 @@ func NewKeeper(
 		storeKey:           storeKey,
 		transientStoreKey:  transientStoreKey,
 		bridgeEventManager: bridgeEventManager,
-		ratelimitKeeper:    ratelimitKeeper,
+		yieldKeeper:        yieldKeeper,
 		bankKeeper:         bankKeeper,
 		delayMsgKeeper:     delayMsgKeeper,
 		authorities:        lib.UniqueSliceToSet(authorities),

@@ -23,9 +23,9 @@ import (
 	epochstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/epochs/types"
 	perpetualstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
-	ratelimitmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
 	sendingtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
+	yieldmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types"
 	tmjson "github.com/cometbft/cometbft/libs/json"
 	tmtypes "github.com/cometbft/cometbft/types"
 	dbm "github.com/cosmos/cosmos-db"
@@ -106,7 +106,7 @@ var genesisModuleOrder = []string{
 	slashingtypes.ModuleName,
 	paramstypes.ModuleName,
 	evidencetypes.ModuleName,
-	ratelimitmodule.ModuleName,
+	yieldmodule.ModuleName,
 	pricestypes.ModuleName,
 	assetstypes.ModuleName,
 	perpetualstypes.ModuleName,

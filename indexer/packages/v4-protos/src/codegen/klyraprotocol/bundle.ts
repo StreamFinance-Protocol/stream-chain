@@ -65,25 +65,25 @@ import * as _75 from "./prices/market_param";
 import * as _76 from "./prices/market_price";
 import * as _77 from "./prices/query";
 import * as _78 from "./prices/tx";
-import * as _79 from "./ratelimit/genesis";
-import * as _80 from "./ratelimit/query";
-import * as _81 from "./ratelimit/tx";
-import * as _82 from "./sending/genesis";
-import * as _83 from "./sending/query";
-import * as _84 from "./sending/transfer";
-import * as _85 from "./sending/tx";
-import * as _86 from "./stats/genesis";
-import * as _87 from "./stats/params";
-import * as _88 from "./stats/query";
-import * as _89 from "./stats/stats";
-import * as _90 from "./stats/tx";
-import * as _91 from "./subaccounts/asset_position";
-import * as _92 from "./subaccounts/genesis";
-import * as _93 from "./subaccounts/perpetual_position";
-import * as _94 from "./subaccounts/query";
-import * as _95 from "./subaccounts/subaccount";
-import * as _96 from "./subaccounts/tx";
-import * as _97 from "./ve/ve";
+import * as _79 from "./sending/genesis";
+import * as _80 from "./sending/query";
+import * as _81 from "./sending/transfer";
+import * as _82 from "./sending/tx";
+import * as _83 from "./stats/genesis";
+import * as _84 from "./stats/params";
+import * as _85 from "./stats/query";
+import * as _86 from "./stats/stats";
+import * as _87 from "./stats/tx";
+import * as _88 from "./subaccounts/asset_position";
+import * as _89 from "./subaccounts/genesis";
+import * as _90 from "./subaccounts/perpetual_position";
+import * as _91 from "./subaccounts/query";
+import * as _92 from "./subaccounts/subaccount";
+import * as _93 from "./subaccounts/tx";
+import * as _94 from "./ve/ve";
+import * as _95 from "./yields/genesis";
+import * as _96 from "./yields/query";
+import * as _97 from "./yields/tx";
 import * as _98 from "./assets/query.lcd";
 import * as _99 from "./blocktime/query.lcd";
 import * as _100 from "./bridge/query.lcd";
@@ -93,9 +93,9 @@ import * as _103 from "./epochs/query.lcd";
 import * as _104 from "./feetiers/query.lcd";
 import * as _105 from "./perpetuals/query.lcd";
 import * as _106 from "./prices/query.lcd";
-import * as _107 from "./ratelimit/query.lcd";
-import * as _108 from "./stats/query.lcd";
-import * as _109 from "./subaccounts/query.lcd";
+import * as _107 from "./stats/query.lcd";
+import * as _108 from "./subaccounts/query.lcd";
+import * as _109 from "./yields/query.lcd";
 import * as _110 from "./assets/query.rpc.Query";
 import * as _111 from "./blocktime/query.rpc.Query";
 import * as _112 from "./bridge/query.rpc.Query";
@@ -106,10 +106,10 @@ import * as _116 from "./feetiers/query.rpc.Query";
 import * as _117 from "./govplus/query.rpc.Query";
 import * as _118 from "./perpetuals/query.rpc.Query";
 import * as _119 from "./prices/query.rpc.Query";
-import * as _120 from "./ratelimit/query.rpc.Query";
-import * as _121 from "./sending/query.rpc.Query";
-import * as _122 from "./stats/query.rpc.Query";
-import * as _123 from "./subaccounts/query.rpc.Query";
+import * as _120 from "./sending/query.rpc.Query";
+import * as _121 from "./stats/query.rpc.Query";
+import * as _122 from "./subaccounts/query.rpc.Query";
+import * as _123 from "./yields/query.rpc.Query";
 import * as _124 from "./blocktime/tx.rpc.msg";
 import * as _125 from "./bridge/tx.rpc.msg";
 import * as _126 from "./clob/tx.rpc.msg";
@@ -246,39 +246,39 @@ export namespace klyraprotocol {
     ..._119,
     ..._131
   };
-  export const ratelimit = { ..._79,
+  export const sending = { ..._79,
     ..._80,
     ..._81,
-    ..._107,
-    ..._120
-  };
-  export const sending = { ..._82,
-    ..._83,
-    ..._84,
-    ..._85,
-    ..._121,
+    ..._82,
+    ..._120,
     ..._132
   };
-  export const stats = { ..._86,
+  export const stats = { ..._83,
+    ..._84,
+    ..._85,
+    ..._86,
     ..._87,
-    ..._88,
-    ..._89,
-    ..._90,
-    ..._108,
-    ..._122,
+    ..._107,
+    ..._121,
     ..._133
   };
-  export const subaccounts = { ..._91,
+  export const subaccounts = { ..._88,
+    ..._89,
+    ..._90,
+    ..._91,
     ..._92,
     ..._93,
-    ..._94,
-    ..._95,
-    ..._96,
-    ..._109,
-    ..._123,
+    ..._108,
+    ..._122,
     ..._134
   };
-  export const ve = { ..._97
+  export const ve = { ..._94
+  };
+  export const yields = { ..._95,
+    ..._96,
+    ..._97,
+    ..._109,
+    ..._123
   };
   export const ClientFactory = { ..._135,
     ..._136,

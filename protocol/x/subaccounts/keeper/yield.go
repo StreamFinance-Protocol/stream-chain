@@ -7,8 +7,8 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib"
 	assettypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
-	ratelimittypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
+	yieldtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -343,7 +343,7 @@ func (k Keeper) DepositYieldToSubaccount(
 
 	if err := k.bankKeeper.SendCoinsFromModuleToAccount(
 		ctx,
-		ratelimittypes.TDaiPoolAccount,
+		yieldtypes.TDaiPoolAccount,
 		collateralPoolAddr,
 		[]sdk.Coin{coinToTransfer},
 	); err != nil {

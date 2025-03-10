@@ -14,7 +14,7 @@ import (
 	indexershared "github.com/StreamFinance-Protocol/stream-chain/protocol/indexer/shared/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals"
-	ratelimitkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/keeper"
+	yieldkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/keeper"
 
 	"cosmossdk.io/store/prefix"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/mocks"
@@ -43,10 +43,10 @@ func TestCreatePerpetualClobPair_MultiplePerpetual(t *testing.T) {
 	perpetuals.InitGenesis(ks.Ctx, *ks.PerpetualsKeeper, constants.Perpetuals_DefaultGenesisState)
 
 	rateString := sdaiservertypes.TestSDAIEventRequest.ConversionRate
-	rate, conversionErr := ratelimitkeeper.ConvertStringToBigInt(rateString)
+	rate, conversionErr := yieldkeeper.ConvertStringToBigInt(rateString)
 	require.NoError(t, conversionErr)
-	ks.RatelimitKeeper.SetSDAIPrice(ks.Ctx, rate)
-	ks.RatelimitKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+	ks.YieldKeeper.SetSDAIPrice(ks.Ctx, rate)
+	ks.YieldKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
 
 	clobPairs := []types.ClobPair{
 		constants.ClobPair_Btc,

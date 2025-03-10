@@ -358,7 +358,7 @@
       }
     ]
   },
-  "ratelimit": {},
+  "yield": {},
   "sending": {},
   "slashing": {
     "params": {

@@ -9,7 +9,7 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/constants"
 	keepertest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
-	ratelimittypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
+	yieldtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 )
@@ -59,33 +59,33 @@ func TestCompleteBridge(t *testing.T) {
 			expectedModAccBalance: sdk.NewCoin("adv4tnt", sdkmath.NewInt(1_000)),
 		},
 		"Success: tDAI is minted when denom is sDAI": {
-			initialModAccBalance: sdk.NewCoin(ratelimittypes.SDaiDenom, sdkmath.NewInt(1_000)),
+			initialModAccBalance: sdk.NewCoin(yieldtypes.SDaiDenom, sdkmath.NewInt(1_000)),
 			bridgeEvent: types.BridgeEvent{
 				Id:      7,
 				Address: constants.BobAccAddress.String(),
 				Coin: sdk.Coin{
-					Denom:  ratelimittypes.SDaiDenom,
+					Denom:  yieldtypes.SDaiDenom,
 					Amount: sdkmath.NewInt(1_000_000_000_000_000),
 				},
 				BlockHeight: 3,
 				IsDeposit:   true,
 			},
-			expectedModAccBalance: sdk.NewCoin(ratelimittypes.SDaiDenom, sdkmath.NewInt(1_000)),
+			expectedModAccBalance: sdk.NewCoin(yieldtypes.SDaiDenom, sdkmath.NewInt(1_000)),
 		},
 		"Success: completes even when bridging is disabled": {
-			initialModAccBalance: sdk.NewCoin(ratelimittypes.SDaiDenom, sdkmath.NewInt(1_000)),
+			initialModAccBalance: sdk.NewCoin(yieldtypes.SDaiDenom, sdkmath.NewInt(1_000)),
 			bridgeEvent: types.BridgeEvent{
 				Id:      7,
 				Address: constants.BobAccAddress.String(),
 				Coin: sdk.Coin{
-					Denom:  ratelimittypes.SDaiDenom,
+					Denom:  yieldtypes.SDaiDenom,
 					Amount: sdkmath.NewInt(1_000_000_000_000_000),
 				},
 				BlockHeight: 3,
 				IsDeposit:   true,
 			},
 			bridgingDisabled:      true,
-			expectedModAccBalance: sdk.NewCoin(ratelimittypes.SDaiDenom, sdkmath.NewInt(1_000)),
+			expectedModAccBalance: sdk.NewCoin(yieldtypes.SDaiDenom, sdkmath.NewInt(1_000)),
 		},
 		"Failure: invalid address string": {
 			initialModAccBalance: sdk.NewCoin("adv4tnt", sdkmath.NewInt(1_000)),
@@ -114,7 +114,7 @@ func TestCompleteBridge(t *testing.T) {
 			conversionRate, ok := new(big.Int).SetString(constants.SDaiConversionRateTwoString, 10)
 			require.True(t, ok)
 
-			ks.RatelimitKeeper.SetSDAIPrice(ks.Ctx, conversionRate)
+			ks.YieldKeeper.SetSDAIPrice(ks.Ctx, conversionRate)
 
 			// Fund bridge module account with enough balance.
 			err = ks.BankKeeper.MintCoins(
@@ -136,19 +136,19 @@ func TestCompleteBridge(t *testing.T) {
 
 				bridgeDenomDestinationAddress := sdk.MustAccAddressFromBech32(tc.bridgeEvent.Address)
 
-				if tc.bridgeEvent.Coin.Denom == ratelimittypes.SDaiDenom {
+				if tc.bridgeEvent.Coin.Denom == yieldtypes.SDaiDenom {
 					balance := ks.BankKeeper.GetBalance(
 						ks.Ctx,
 						sdk.MustAccAddressFromBech32(tc.bridgeEvent.Address),
-						ratelimittypes.TDaiDenom,
+						yieldtypes.TDaiDenom,
 					)
 
 					sDaiAmountBigInt := tc.bridgeEvent.Coin.Amount.BigInt()
-					expectedTDaiBalance, err := ks.RatelimitKeeper.GetTradingDAIFromSDAIAmount(ks.Ctx, sDaiAmountBigInt)
+					expectedTDaiBalance, err := ks.YieldKeeper.GetTradingDAIFromSDAIAmount(ks.Ctx, sDaiAmountBigInt)
 					require.NoError(t, err)
 					require.Equal(t, expectedTDaiBalance.String(), balance.Amount.BigInt().String())
 
-					bridgeDenomDestinationAddress = ks.AccountKeeper.GetModuleAddress(ratelimittypes.SDaiPoolAccount)
+					bridgeDenomDestinationAddress = ks.AccountKeeper.GetModuleAddress(yieldtypes.SDaiPoolAccount)
 				}
 
 				// Assert that target account's balance of bridged token is as expected.

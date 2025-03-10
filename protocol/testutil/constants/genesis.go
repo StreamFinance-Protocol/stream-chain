@@ -1485,7 +1485,7 @@ const GenesisState = `{
         }
       ]
     },
-    "ratelimit": {},
+    "yield": {},
     "sending": {},
     "slashing": {
       "missed_blocks": [],

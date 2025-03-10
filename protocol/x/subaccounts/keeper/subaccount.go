@@ -19,8 +19,8 @@ import (
 	assettypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets/types"
 	perpkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/keeper"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
-	ratelimittypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
+	yieldtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types"
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	gometrics "github.com/hashicorp/go-metrics"
@@ -33,7 +33,7 @@ func (k Keeper) SetSubaccount(ctx sdk.Context, subaccount types.Subaccount) {
 	key := subaccount.Id.ToStateKey()
 
 	if subaccount.AssetYieldIndex == "" {
-		assetYieldIndex, found := k.ratelimitKeeper.GetAssetYieldIndex(ctx)
+		assetYieldIndex, found := k.yieldKeeper.GetAssetYieldIndex(ctx)
 		if !found {
 			subaccount.AssetYieldIndex = "1/1"
 		} else {
@@ -102,7 +102,7 @@ func (k Keeper) GetSubaccount(
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(types.SubaccountKeyPrefix))
 	b := store.Get(id.ToStateKey())
 
-	assetYieldIndex, found := k.ratelimitKeeper.GetAssetYieldIndex(ctx)
+	assetYieldIndex, found := k.yieldKeeper.GetAssetYieldIndex(ctx)
 	// TODO: [YBCP-53] not good error handling
 	if !found {
 		panic("asset yield index not found")
@@ -258,7 +258,7 @@ func (k Keeper) fetchParamsToSettleSubaccount(
 		return nil, nil, nil, false, 0, err
 	}
 
-	assetYieldIndex, found := k.ratelimitKeeper.GetAssetYieldIndex(ctx)
+	assetYieldIndex, found := k.yieldKeeper.GetAssetYieldIndex(ctx)
 	if !found {
 		return nil, nil, nil, false, 0, errors.New("could not find asset yield index")
 	}
@@ -268,7 +268,7 @@ func (k Keeper) fetchParamsToSettleSubaccount(
 		return nil, nil, nil, false, 0, err
 	}
 
-	availableYieldCoin := k.bankKeeper.GetBalance(ctx, authtypes.NewModuleAddress(ratelimittypes.TDaiPoolAccount), assettypes.AssetTDai.Denom)
+	availableYieldCoin := k.bankKeeper.GetBalance(ctx, authtypes.NewModuleAddress(yieldtypes.TDaiPoolAccount), assettypes.AssetTDai.Denom)
 	availableYield, _, err = k.assetsKeeper.ConvertCoinToAsset(ctx, assettypes.AssetTDai.Id, availableYieldCoin)
 	if err != nil {
 		return nil, nil, nil, false, 0, err

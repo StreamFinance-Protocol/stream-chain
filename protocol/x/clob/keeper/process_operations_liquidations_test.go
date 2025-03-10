@@ -19,8 +19,8 @@ import (
 	keepertest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
-	ratelimittypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
+	yieldtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/stretchr/testify/mock"
@@ -229,7 +229,7 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 				bk.On(
 					"GetBalance",
 					mock.Anything,
-					authtypes.NewModuleAddress(ratelimittypes.TDaiPoolAccount),
+					authtypes.NewModuleAddress(yieldtypes.TDaiPoolAccount),
 					constants.TDai.Denom,
 				).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 			},
@@ -312,7 +312,7 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 				bk.On(
 					"GetBalance",
 					mock.Anything,
-					authtypes.NewModuleAddress(ratelimittypes.TDaiPoolAccount),
+					authtypes.NewModuleAddress(yieldtypes.TDaiPoolAccount),
 					constants.TDai.Denom,
 				).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 				bk.On(
@@ -406,7 +406,7 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 				bk.On(
 					"GetBalance",
 					mock.Anything,
-					authtypes.NewModuleAddress(ratelimittypes.TDaiPoolAccount),
+					authtypes.NewModuleAddress(yieldtypes.TDaiPoolAccount),
 					constants.TDai.Denom,
 				).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 				bk.On(
@@ -513,7 +513,7 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 				bk.On(
 					"GetBalance",
 					mock.Anything,
-					authtypes.NewModuleAddress(ratelimittypes.TDaiPoolAccount),
+					authtypes.NewModuleAddress(yieldtypes.TDaiPoolAccount),
 					constants.TDai.Denom,
 				).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 				bk.On(
@@ -627,7 +627,7 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 				bk.On(
 					"GetBalance",
 					mock.Anything,
-					authtypes.NewModuleAddress(ratelimittypes.TDaiPoolAccount),
+					authtypes.NewModuleAddress(yieldtypes.TDaiPoolAccount),
 					constants.TDai.Denom,
 				).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 				bk.On(
@@ -745,7 +745,7 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 				bk.On(
 					"GetBalance",
 					mock.Anything,
-					authtypes.NewModuleAddress(ratelimittypes.TDaiPoolAccount),
+					authtypes.NewModuleAddress(yieldtypes.TDaiPoolAccount),
 					constants.TDai.Denom,
 				).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 				bk.On(
@@ -872,7 +872,7 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 				bk.On(
 					"GetBalance",
 					mock.Anything,
-					authtypes.NewModuleAddress(ratelimittypes.TDaiPoolAccount),
+					authtypes.NewModuleAddress(yieldtypes.TDaiPoolAccount),
 					constants.TDai.Denom,
 				).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 				bk.On(
@@ -995,7 +995,7 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 				bk.On(
 					"GetBalance",
 					mock.Anything,
-					authtypes.NewModuleAddress(ratelimittypes.TDaiPoolAccount),
+					authtypes.NewModuleAddress(yieldtypes.TDaiPoolAccount),
 					constants.TDai.Denom,
 				).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 				bk.On(
@@ -1382,7 +1382,7 @@ func TestProcessProposerMatches_Liquidation_Failure(t *testing.T) {
 				bk.On(
 					"GetBalance",
 					mock.Anything,
-					authtypes.NewModuleAddress(ratelimittypes.TDaiPoolAccount),
+					authtypes.NewModuleAddress(yieldtypes.TDaiPoolAccount),
 					constants.TDai.Denom,
 				).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 				bk.On(

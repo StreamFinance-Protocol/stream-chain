@@ -1435,7 +1435,7 @@ const GenesisStateNoVe = `{
         }
       ]
     },
-    "ratelimit": {},
+    "yield": {},
     "sending": {},
     "slashing": {
       "missed_blocks": [],

@@ -5,8 +5,8 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib"
 	bridgetypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
 	perpetualstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
-	ratelimittypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
+	yieldtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/codec"
 	addresscodec "github.com/cosmos/cosmos-sdk/codec/address"
@@ -43,8 +43,8 @@ func createAccountKeeper(
 		types.FeeCollectorName:            nil,
 		satypes.ModuleName:                nil,
 		perpetualstypes.InsuranceFundName: nil,
-		ratelimittypes.SDaiPoolAccount:    {types.Minter, types.Burner},
-		ratelimittypes.TDaiPoolAccount:    {types.Minter, types.Burner},
+		yieldtypes.SDaiPoolAccount:        {types.Minter, types.Burner},
+		yieldtypes.TDaiPoolAccount:        {types.Minter, types.Burner},
 		satypes.LiquidityFeeModuleAddress: nil,
 	}
 

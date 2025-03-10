@@ -26,10 +26,10 @@ import (
 	bridgecli "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/client/cli"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
 	epochstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/epochs/types"
-	ratelimittypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
 	sendingcli "github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending/client/cli"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
 	subaccounttypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
+	yieldtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types"
 	tmtypes "github.com/cometbft/cometbft/types"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
@@ -146,11 +146,11 @@ func (s *BridgeIntegrationTestSuite) SetupTest() {
 		bankstate.Balances,
 		banktypes.Balance{
 			subaccounttypes.ModuleAddress.String(),
-			sdk.NewCoins(sdk.NewCoin(ratelimittypes.TDaiDenom, sdkmath.NewIntFromBigInt(testTdaiBalance))),
+			sdk.NewCoins(sdk.NewCoin(yieldtypes.TDaiDenom, sdkmath.NewIntFromBigInt(testTdaiBalance))),
 		},
 		banktypes.Balance{
 			sDaiPoolAccountAddressString,
-			sdk.NewCoins(sdk.NewCoin(ratelimittypes.SDaiDenom, sdkmath.NewIntFromBigInt(testSdaiBalance))),
+			sdk.NewCoins(sdk.NewCoin(yieldtypes.SDaiDenom, sdkmath.NewIntFromBigInt(testSdaiBalance))),
 		},
 	)
 
@@ -412,16 +412,16 @@ func (s *BridgeIntegrationTestSuite) sendBridgeAndVerifyEvents(
 
 	for i, withdrawal := range withdrawals {
 		s.Require().Equal(queryWithdrawEventsResponse.Withdrawals[i].Coin.Amount.Uint64(), withdrawal.amount)
-		s.Require().Equal(queryWithdrawEventsResponse.Withdrawals[i].Coin.Denom, ratelimittypes.SDaiDenom)
+		s.Require().Equal(queryWithdrawEventsResponse.Withdrawals[i].Coin.Denom, yieldtypes.SDaiDenom)
 		s.Require().Equal(queryWithdrawEventsResponse.Withdrawals[i].Address, withdrawal.ethAddress)
 		s.Require().Greater(queryWithdrawEventsResponse.Withdrawals[i].BlockHeight, uint64(1))
 		s.Require().False(queryWithdrawEventsResponse.Withdrawals[i].IsDeposit)
 	}
 
-	totalSupplySDai, err := testutil_bank.GetTotalSupplyOfDenom(val, s.cfg.Codec, ratelimittypes.SDaiDenom)
+	totalSupplySDai, err := testutil_bank.GetTotalSupplyOfDenom(val, s.cfg.Codec, yieldtypes.SDaiDenom)
 	s.Require().NoError(err)
 
-	totalSupplyTDai, err := testutil_bank.GetTotalSupplyOfDenom(val, s.cfg.Codec, ratelimittypes.TDaiDenom)
+	totalSupplyTDai, err := testutil_bank.GetTotalSupplyOfDenom(val, s.cfg.Codec, yieldtypes.TDaiDenom)
 	s.Require().NoError(err)
 
 	s.Require().Equal(expectedSDaiSupply, totalSupplySDai)

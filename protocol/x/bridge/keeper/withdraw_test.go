@@ -9,7 +9,7 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
-	ratelimittypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
+	yieldtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 
@@ -84,7 +84,7 @@ func TestHandleSdaiWithdraw(t *testing.T) {
 			expectedBridgeWithdraws: []types.BridgeEvent{
 				{
 					Id:          0,
-					Coin:        sdk.NewCoin(ratelimittypes.SDaiDenom, sdkmath.NewIntFromBigInt(big.NewInt(1))),
+					Coin:        sdk.NewCoin(yieldtypes.SDaiDenom, sdkmath.NewIntFromBigInt(big.NewInt(1))),
 					Address:     mockEthRecipient,
 					BlockHeight: 0,
 					IsDeposit:   false,
@@ -106,20 +106,20 @@ func TestHandleSdaiWithdraw(t *testing.T) {
 
 			sdaiPrice := new(big.Int)
 			sdaiPrice.SetString(tc.sDaiPrice, 10)
-			ks.RatelimitKeeper.SetSDAIPrice(ks.Ctx, sdaiPrice)
+			ks.YieldKeeper.SetSDAIPrice(ks.Ctx, sdaiPrice)
 
-			err := ks.BankKeeper.MintCoins(ks.Ctx, ratelimittypes.TDaiPoolAccount, sdk.NewCoins(sdk.NewCoin(ratelimittypes.TDaiDenom, sdkmath.NewIntFromBigInt(tc.accTdaiBalance))))
+			err := ks.BankKeeper.MintCoins(ks.Ctx, yieldtypes.TDaiPoolAccount, sdk.NewCoins(sdk.NewCoin(yieldtypes.TDaiDenom, sdkmath.NewIntFromBigInt(tc.accTdaiBalance))))
 			require.NoError(t, err)
 
-			err = ks.BankKeeper.SendCoinsFromModuleToAccount(ks.Ctx, ratelimittypes.TDaiPoolAccount, constants.BobAccAddress, sdk.NewCoins(sdk.NewCoin(ratelimittypes.TDaiDenom, sdkmath.NewIntFromBigInt(tc.accTdaiBalance))))
+			err = ks.BankKeeper.SendCoinsFromModuleToAccount(ks.Ctx, yieldtypes.TDaiPoolAccount, constants.BobAccAddress, sdk.NewCoins(sdk.NewCoin(yieldtypes.TDaiDenom, sdkmath.NewIntFromBigInt(tc.accTdaiBalance))))
 			require.NoError(t, err)
 
-			err = ks.BankKeeper.MintCoins(ks.Ctx, ratelimittypes.SDaiPoolAccount, sdk.NewCoins(sdk.NewCoin(ratelimittypes.SDaiDenom, sdkmath.NewIntFromBigInt(tc.sDaiPoolBalance))))
+			err = ks.BankKeeper.MintCoins(ks.Ctx, yieldtypes.SDaiPoolAccount, sdk.NewCoins(sdk.NewCoin(yieldtypes.SDaiDenom, sdkmath.NewIntFromBigInt(tc.sDaiPoolBalance))))
 			require.NoError(t, err)
 
 			ks.MockTimeProvider.On("Now").Return(timeNow).Once()
 
-			totalSupply := ks.BankKeeper.GetSupply(ks.Ctx, ratelimittypes.SDaiDenom)
+			totalSupply := ks.BankKeeper.GetSupply(ks.Ctx, yieldtypes.SDaiDenom)
 			require.Equal(t, 0, tc.sDaiPoolBalance.Cmp(totalSupply.Amount.BigInt()))
 
 			err = ks.BridgeKeeper.HandleSdaiWithdraw(ks.Ctx, tc.withdraw)
@@ -135,17 +135,17 @@ func TestHandleSdaiWithdraw(t *testing.T) {
 				}
 			}
 
-			accBalance := ks.BankKeeper.GetBalance(ks.Ctx, constants.BobAccAddress, ratelimittypes.TDaiDenom)
+			accBalance := ks.BankKeeper.GetBalance(ks.Ctx, constants.BobAccAddress, yieldtypes.TDaiDenom)
 			require.Equal(t, tc.expectedAccTdaiBalance, accBalance.Amount.BigInt())
 
-			accBalanceSDai := ks.BankKeeper.GetBalance(ks.Ctx, constants.BobAccAddress, ratelimittypes.SDaiDenom)
+			accBalanceSDai := ks.BankKeeper.GetBalance(ks.Ctx, constants.BobAccAddress, yieldtypes.SDaiDenom)
 			require.Equal(t, int64(0), accBalanceSDai.Amount.Int64())
 
-			totalSupply = ks.BankKeeper.GetSupply(ks.Ctx, ratelimittypes.SDaiDenom)
+			totalSupply = ks.BankKeeper.GetSupply(ks.Ctx, yieldtypes.SDaiDenom)
 			require.Equal(t, 0, tc.expectedSdaiPoolBalance.Cmp(totalSupply.Amount.BigInt()))
 
-			sdaiPoolAccountAddress := ks.AccountKeeper.GetModuleAddress(ratelimittypes.SDaiPoolAccount)
-			sdaiPoolBalance := ks.BankKeeper.GetBalance(ks.Ctx, sdaiPoolAccountAddress, ratelimittypes.SDaiDenom)
+			sdaiPoolAccountAddress := ks.AccountKeeper.GetModuleAddress(yieldtypes.SDaiPoolAccount)
+			sdaiPoolBalance := ks.BankKeeper.GetBalance(ks.Ctx, sdaiPoolAccountAddress, yieldtypes.SDaiDenom)
 
 			require.Equal(t, tc.expectedSdaiPoolBalance, sdaiPoolBalance.Amount.BigInt())
 		})

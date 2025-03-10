@@ -24,7 +24,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	ratelimitkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/keeper"
+	yieldkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/keeper"
 
 	sdaiservertypes "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/server/types/sdaioracle"
 )
@@ -32,7 +32,7 @@ import (
 type TestExtendedVoteTC struct {
 	expectedResponse  *vetypes.DaemonVoteExtension
 	pricesKeeper      func() *mocks.PreBlockExecPricesKeeper
-	ratelimitKeeper   func() *mocks.VoteExtensionRateLimitKeeper
+	yieldKeeper       func() *mocks.VoteExtensionYieldKeeper
 	sdaiEventManager  sdaiservertypes.SDAIEventManager
 	perpKeeper        func() *mocks.ExtendVotePerpetualsKeeper
 	clobKeeper        func() *mocks.ExtendVoteClobKeeper
@@ -47,9 +47,9 @@ func TestExtendVoteHandler(t *testing.T) {
 				mPricesKeeper := &mocks.PreBlockExecPricesKeeper{}
 				return mPricesKeeper
 			},
-			ratelimitKeeper: func() *mocks.VoteExtensionRateLimitKeeper {
-				mRatelimitKeeper := &mocks.VoteExtensionRateLimitKeeper{}
-				return mRatelimitKeeper
+			yieldKeeper: func() *mocks.VoteExtensionYieldKeeper {
+				mYieldKeeper := &mocks.VoteExtensionYieldKeeper{}
+				return mYieldKeeper
 			},
 			sdaiEventManager: sdaiservertypes.SetupMockEventManager(true),
 			perpKeeper: func() *mocks.ExtendVotePerpetualsKeeper {
@@ -79,11 +79,11 @@ func TestExtendVoteHandler(t *testing.T) {
 
 				return mPricesKeeper
 			},
-			ratelimitKeeper: func() *mocks.VoteExtensionRateLimitKeeper {
-				mRatelimitKeeper := &mocks.VoteExtensionRateLimitKeeper{}
-				mRatelimitKeeper.On("GetSDAILastBlockUpdated", mock.Anything).
+			yieldKeeper: func() *mocks.VoteExtensionYieldKeeper {
+				mYieldKeeper := &mocks.VoteExtensionYieldKeeper{}
+				mYieldKeeper.On("GetSDAILastBlockUpdated", mock.Anything).
 					Return(new(big.Int), false)
-				return mRatelimitKeeper
+				return mYieldKeeper
 			},
 			sdaiEventManager: sdaiservertypes.SetupMockEventManager(true),
 			perpKeeper: func() *mocks.ExtendVotePerpetualsKeeper {
@@ -120,11 +120,11 @@ func TestExtendVoteHandler(t *testing.T) {
 
 				return mPricesKeeper
 			},
-			ratelimitKeeper: func() *mocks.VoteExtensionRateLimitKeeper {
-				mRatelimitKeeper := &mocks.VoteExtensionRateLimitKeeper{}
-				mRatelimitKeeper.On("GetSDAILastBlockUpdated", mock.Anything).
+			yieldKeeper: func() *mocks.VoteExtensionYieldKeeper {
+				mYieldKeeper := &mocks.VoteExtensionYieldKeeper{}
+				mYieldKeeper.On("GetSDAILastBlockUpdated", mock.Anything).
 					Return(new(big.Int), false)
-				return mRatelimitKeeper
+				return mYieldKeeper
 			},
 			sdaiEventManager: sdaiservertypes.SetupMockEventManager(),
 			perpKeeper: func() *mocks.ExtendVotePerpetualsKeeper {
@@ -164,11 +164,11 @@ func TestExtendVoteHandler(t *testing.T) {
 
 				return mpricesKeeper
 			},
-			ratelimitKeeper: func() *mocks.VoteExtensionRateLimitKeeper {
-				mRatelimitKeeper := &mocks.VoteExtensionRateLimitKeeper{}
-				mRatelimitKeeper.On("GetSDAILastBlockUpdated", mock.Anything).
+			yieldKeeper: func() *mocks.VoteExtensionYieldKeeper {
+				mYieldKeeper := &mocks.VoteExtensionYieldKeeper{}
+				mYieldKeeper.On("GetSDAILastBlockUpdated", mock.Anything).
 					Return(new(big.Int), false)
-				return mRatelimitKeeper
+				return mYieldKeeper
 			},
 			sdaiEventManager: sdaiservertypes.SetupMockEventManager(true),
 			perpKeeper: func() *mocks.ExtendVotePerpetualsKeeper {
@@ -226,11 +226,11 @@ func TestExtendVoteHandler(t *testing.T) {
 
 				return mpricesKeeper
 			},
-			ratelimitKeeper: func() *mocks.VoteExtensionRateLimitKeeper {
-				mRatelimitKeeper := &mocks.VoteExtensionRateLimitKeeper{}
-				mRatelimitKeeper.On("GetSDAILastBlockUpdated", mock.Anything).
+			yieldKeeper: func() *mocks.VoteExtensionYieldKeeper {
+				mYieldKeeper := &mocks.VoteExtensionYieldKeeper{}
+				mYieldKeeper.On("GetSDAILastBlockUpdated", mock.Anything).
 					Return(new(big.Int), false)
-				return mRatelimitKeeper
+				return mYieldKeeper
 			},
 			sdaiEventManager: sdaiservertypes.SetupMockEventManager(),
 			perpKeeper: func() *mocks.ExtendVotePerpetualsKeeper {
@@ -319,11 +319,11 @@ func TestExtendVoteHandler(t *testing.T) {
 				)
 				return mPricesKeeper
 			},
-			ratelimitKeeper: func() *mocks.VoteExtensionRateLimitKeeper {
-				mRatelimitKeeper := &mocks.VoteExtensionRateLimitKeeper{}
-				mRatelimitKeeper.On("GetSDAILastBlockUpdated", mock.Anything).
+			yieldKeeper: func() *mocks.VoteExtensionYieldKeeper {
+				mYieldKeeper := &mocks.VoteExtensionYieldKeeper{}
+				mYieldKeeper.On("GetSDAILastBlockUpdated", mock.Anything).
 					Return(new(big.Int), false)
-				return mRatelimitKeeper
+				return mYieldKeeper
 			},
 			sdaiEventManager: sdaiservertypes.SetupMockEventManager(true),
 			perpKeeper: func() *mocks.ExtendVotePerpetualsKeeper {
@@ -543,11 +543,11 @@ func TestExtendVoteHandler(t *testing.T) {
 				)
 				return mPricesKeeper
 			},
-			ratelimitKeeper: func() *mocks.VoteExtensionRateLimitKeeper {
-				mRatelimitKeeper := &mocks.VoteExtensionRateLimitKeeper{}
-				mRatelimitKeeper.On("GetSDAILastBlockUpdated", mock.Anything).
+			yieldKeeper: func() *mocks.VoteExtensionYieldKeeper {
+				mYieldKeeper := &mocks.VoteExtensionYieldKeeper{}
+				mYieldKeeper.On("GetSDAILastBlockUpdated", mock.Anything).
 					Return(new(big.Int), false)
-				return mRatelimitKeeper
+				return mYieldKeeper
 			},
 			sdaiEventManager: sdaiservertypes.SetupMockEventManager(),
 			perpKeeper: func() *mocks.ExtendVotePerpetualsKeeper {
@@ -703,11 +703,11 @@ func TestExtendVoteHandler(t *testing.T) {
 				mPerpKeeper := &mocks.ExtendVotePerpetualsKeeper{}
 				return mPerpKeeper
 			},
-			ratelimitKeeper: func() *mocks.VoteExtensionRateLimitKeeper {
-				mRatelimitKeeper := &mocks.VoteExtensionRateLimitKeeper{}
-				mRatelimitKeeper.On("GetSDAILastBlockUpdated", mock.Anything).
+			yieldKeeper: func() *mocks.VoteExtensionYieldKeeper {
+				mYieldKeeper := &mocks.VoteExtensionYieldKeeper{}
+				mYieldKeeper.On("GetSDAILastBlockUpdated", mock.Anything).
 					Return(new(big.Int), false)
-				return mRatelimitKeeper
+				return mYieldKeeper
 			},
 			sdaiEventManager: sdaiservertypes.SetupMockEventManager(),
 			clobKeeper: func() *mocks.ExtendVoteClobKeeper {
@@ -764,11 +764,11 @@ func TestExtendVoteHandler(t *testing.T) {
 				)
 				return mPricesKeeper
 			},
-			ratelimitKeeper: func() *mocks.VoteExtensionRateLimitKeeper {
-				mRatelimitKeeper := &mocks.VoteExtensionRateLimitKeeper{}
-				mRatelimitKeeper.On("GetSDAILastBlockUpdated", mock.Anything).
+			yieldKeeper: func() *mocks.VoteExtensionYieldKeeper {
+				mYieldKeeper := &mocks.VoteExtensionYieldKeeper{}
+				mYieldKeeper.On("GetSDAILastBlockUpdated", mock.Anything).
 					Return(big.NewInt(1), true) // Note: assumes that test runs with low block height and offset is large
-				return mRatelimitKeeper
+				return mYieldKeeper
 			},
 			sdaiEventManager: sdaiservertypes.SetupMockEventManager(),
 			perpKeeper: func() *mocks.ExtendVotePerpetualsKeeper {
@@ -925,11 +925,11 @@ func TestExtendVoteHandler(t *testing.T) {
 
 				return mPricesKeeper
 			},
-			ratelimitKeeper: func() *mocks.VoteExtensionRateLimitKeeper {
-				mRatelimitKeeper := &mocks.VoteExtensionRateLimitKeeper{}
-				mRatelimitKeeper.On("GetSDAILastBlockUpdated", mock.Anything).
+			yieldKeeper: func() *mocks.VoteExtensionYieldKeeper {
+				mYieldKeeper := &mocks.VoteExtensionYieldKeeper{}
+				mYieldKeeper.On("GetSDAILastBlockUpdated", mock.Anything).
 					Return(big.NewInt(1), true) // Note: assumes that test runs with low block height and offset is large
-				return mRatelimitKeeper
+				return mYieldKeeper
 			},
 			sdaiEventManager: sdaiservertypes.SetupMockEventManager(),
 			perpKeeper: func() *mocks.ExtendVotePerpetualsKeeper {
@@ -968,7 +968,7 @@ func TestExtendVoteHandler(t *testing.T) {
 				tc.pricesKeeper(),
 				tc.perpKeeper(),
 				tc.clobKeeper(),
-				tc.ratelimitKeeper(),
+				tc.yieldKeeper(),
 				tc.sdaiEventManager,
 				mVEApplier,
 			)
@@ -1012,7 +1012,7 @@ func TestExtendVoteHandler(t *testing.T) {
 type TestVerifyExtendedVoteTC struct {
 	getReq           func() *cometabci.RequestVerifyVoteExtension
 	pricesKeeper     func() *mocks.PreBlockExecPricesKeeper
-	ratelimitKeeper  func() *mocks.VoteExtensionRateLimitKeeper
+	yieldKeeper      func() *mocks.VoteExtensionYieldKeeper
 	expectedResponse *cometabci.ResponseVerifyVoteExtension
 	expectedError    bool
 }
@@ -1025,9 +1025,9 @@ func TestVerifyVoteHandler(t *testing.T) {
 				mPricesKeeper := &mocks.PreBlockExecPricesKeeper{}
 				return mPricesKeeper
 			},
-			ratelimitKeeper: func() *mocks.VoteExtensionRateLimitKeeper {
-				mRatelimitKeeper := &mocks.VoteExtensionRateLimitKeeper{}
-				return mRatelimitKeeper
+			yieldKeeper: func() *mocks.VoteExtensionYieldKeeper {
+				mYieldKeeper := &mocks.VoteExtensionYieldKeeper{}
+				return mYieldKeeper
 			},
 			getReq: func() *cometabci.RequestVerifyVoteExtension {
 				return nil
@@ -1040,9 +1040,9 @@ func TestVerifyVoteHandler(t *testing.T) {
 				mPricesKeeper := &mocks.PreBlockExecPricesKeeper{}
 				return mPricesKeeper
 			},
-			ratelimitKeeper: func() *mocks.VoteExtensionRateLimitKeeper {
-				mRatelimitKeeper := &mocks.VoteExtensionRateLimitKeeper{}
-				return mRatelimitKeeper
+			yieldKeeper: func() *mocks.VoteExtensionYieldKeeper {
+				mYieldKeeper := &mocks.VoteExtensionYieldKeeper{}
+				return mYieldKeeper
 			},
 			getReq: func() *cometabci.RequestVerifyVoteExtension {
 				return &cometabci.RequestVerifyVoteExtension{}
@@ -1058,9 +1058,9 @@ func TestVerifyVoteHandler(t *testing.T) {
 				mPricesKeeper.On("GetMaxPairs", mock.Anything).Return(1)
 				return mPricesKeeper
 			},
-			ratelimitKeeper: func() *mocks.VoteExtensionRateLimitKeeper {
-				mRatelimitKeeper := &mocks.VoteExtensionRateLimitKeeper{}
-				return mRatelimitKeeper
+			yieldKeeper: func() *mocks.VoteExtensionYieldKeeper {
+				mYieldKeeper := &mocks.VoteExtensionYieldKeeper{}
+				return mYieldKeeper
 			},
 			getReq: func() *cometabci.RequestVerifyVoteExtension {
 				return &cometabci.RequestVerifyVoteExtension{}
@@ -1075,9 +1075,9 @@ func TestVerifyVoteHandler(t *testing.T) {
 				mPricesKeeper := &mocks.PreBlockExecPricesKeeper{}
 				return mPricesKeeper
 			},
-			ratelimitKeeper: func() *mocks.VoteExtensionRateLimitKeeper {
-				mRatelimitKeeper := &mocks.VoteExtensionRateLimitKeeper{}
-				return mRatelimitKeeper
+			yieldKeeper: func() *mocks.VoteExtensionYieldKeeper {
+				mYieldKeeper := &mocks.VoteExtensionYieldKeeper{}
+				return mYieldKeeper
 			},
 			getReq: func() *cometabci.RequestVerifyVoteExtension {
 				return &cometabci.RequestVerifyVoteExtension{
@@ -1097,9 +1097,9 @@ func TestVerifyVoteHandler(t *testing.T) {
 				)
 				return mPricesKeeper
 			},
-			ratelimitKeeper: func() *mocks.VoteExtensionRateLimitKeeper {
-				mRatelimitKeeper := &mocks.VoteExtensionRateLimitKeeper{}
-				return mRatelimitKeeper
+			yieldKeeper: func() *mocks.VoteExtensionYieldKeeper {
+				mYieldKeeper := &mocks.VoteExtensionYieldKeeper{}
+				return mYieldKeeper
 			},
 			getReq: func() *cometabci.RequestVerifyVoteExtension {
 				prices := []vetypes.PricePair{}
@@ -1129,9 +1129,9 @@ func TestVerifyVoteHandler(t *testing.T) {
 				)
 				return mPricesKeeper
 			},
-			ratelimitKeeper: func() *mocks.VoteExtensionRateLimitKeeper {
-				mRatelimitKeeper := &mocks.VoteExtensionRateLimitKeeper{}
-				return mRatelimitKeeper
+			yieldKeeper: func() *mocks.VoteExtensionYieldKeeper {
+				mYieldKeeper := &mocks.VoteExtensionYieldKeeper{}
+				return mYieldKeeper
 			},
 			getReq: func() *cometabci.RequestVerifyVoteExtension {
 				extBz, err := vetestutils.CreateVoteExtensionBytes(
@@ -1157,11 +1157,11 @@ func TestVerifyVoteHandler(t *testing.T) {
 				)
 				return mPricesKeeper
 			},
-			ratelimitKeeper: func() *mocks.VoteExtensionRateLimitKeeper {
-				mRatelimitKeeper := &mocks.VoteExtensionRateLimitKeeper{}
-				mRatelimitKeeper.On("GetSDAILastBlockUpdated", mock.Anything).Return(new(big.Int), false)
-				mRatelimitKeeper.On("GetSDAIPrice", mock.Anything).Return(new(big.Int), false)
-				return mRatelimitKeeper
+			yieldKeeper: func() *mocks.VoteExtensionYieldKeeper {
+				mYieldKeeper := &mocks.VoteExtensionYieldKeeper{}
+				mYieldKeeper.On("GetSDAILastBlockUpdated", mock.Anything).Return(new(big.Int), false)
+				mYieldKeeper.On("GetSDAIPrice", mock.Anything).Return(new(big.Int), false)
+				return mYieldKeeper
 			},
 			getReq: func() *cometabci.RequestVerifyVoteExtension {
 				extBz, err := vetestutils.CreateVoteExtensionBytes(
@@ -1187,11 +1187,11 @@ func TestVerifyVoteHandler(t *testing.T) {
 				)
 				return mPricesKeeper
 			},
-			ratelimitKeeper: func() *mocks.VoteExtensionRateLimitKeeper {
-				mRatelimitKeeper := &mocks.VoteExtensionRateLimitKeeper{}
-				mRatelimitKeeper.On("GetSDAILastBlockUpdated", mock.Anything).Return(new(big.Int), false)
-				mRatelimitKeeper.On("GetSDAIPrice", mock.Anything).Return(new(big.Int), false)
-				return mRatelimitKeeper
+			yieldKeeper: func() *mocks.VoteExtensionYieldKeeper {
+				mYieldKeeper := &mocks.VoteExtensionYieldKeeper{}
+				mYieldKeeper.On("GetSDAILastBlockUpdated", mock.Anything).Return(new(big.Int), false)
+				mYieldKeeper.On("GetSDAIPrice", mock.Anything).Return(new(big.Int), false)
+				return mYieldKeeper
 			},
 			getReq: func() *cometabci.RequestVerifyVoteExtension {
 				extBz, err := vetestutils.CreateVoteExtensionBytes(
@@ -1217,11 +1217,11 @@ func TestVerifyVoteHandler(t *testing.T) {
 				)
 				return mPricesKeeper
 			},
-			ratelimitKeeper: func() *mocks.VoteExtensionRateLimitKeeper {
-				mRatelimitKeeper := &mocks.VoteExtensionRateLimitKeeper{}
-				mRatelimitKeeper.On("GetSDAILastBlockUpdated", mock.Anything).Return(new(big.Int), false)
-				mRatelimitKeeper.On("GetSDAIPrice", mock.Anything).Return(new(big.Int), false)
-				return mRatelimitKeeper
+			yieldKeeper: func() *mocks.VoteExtensionYieldKeeper {
+				mYieldKeeper := &mocks.VoteExtensionYieldKeeper{}
+				mYieldKeeper.On("GetSDAILastBlockUpdated", mock.Anything).Return(new(big.Int), false)
+				mYieldKeeper.On("GetSDAIPrice", mock.Anything).Return(new(big.Int), false)
+				return mYieldKeeper
 			},
 			getReq: func() *cometabci.RequestVerifyVoteExtension {
 				extBz, err := vetestutils.CreateVoteExtensionBytes(
@@ -1247,11 +1247,11 @@ func TestVerifyVoteHandler(t *testing.T) {
 				)
 				return mPricesKeeper
 			},
-			ratelimitKeeper: func() *mocks.VoteExtensionRateLimitKeeper {
-				mRatelimitKeeper := &mocks.VoteExtensionRateLimitKeeper{}
-				mRatelimitKeeper.On("GetSDAILastBlockUpdated", mock.Anything).Return(new(big.Int), false)
-				mRatelimitKeeper.On("GetSDAIPrice", mock.Anything).Return(new(big.Int), false)
-				return mRatelimitKeeper
+			yieldKeeper: func() *mocks.VoteExtensionYieldKeeper {
+				mYieldKeeper := &mocks.VoteExtensionYieldKeeper{}
+				mYieldKeeper.On("GetSDAILastBlockUpdated", mock.Anything).Return(new(big.Int), false)
+				mYieldKeeper.On("GetSDAIPrice", mock.Anything).Return(new(big.Int), false)
+				return mYieldKeeper
 			},
 			getReq: func() *cometabci.RequestVerifyVoteExtension {
 				extBz, err := vetestutils.CreateVoteExtensionBytes(
@@ -1277,11 +1277,11 @@ func TestVerifyVoteHandler(t *testing.T) {
 				)
 				return mPricesKeeper
 			},
-			ratelimitKeeper: func() *mocks.VoteExtensionRateLimitKeeper {
-				mRatelimitKeeper := &mocks.VoteExtensionRateLimitKeeper{}
-				mRatelimitKeeper.On("GetSDAILastBlockUpdated", mock.Anything).Return(new(big.Int), false)
-				mRatelimitKeeper.On("GetSDAIPrice", mock.Anything).Return(new(big.Int), false)
-				return mRatelimitKeeper
+			yieldKeeper: func() *mocks.VoteExtensionYieldKeeper {
+				mYieldKeeper := &mocks.VoteExtensionYieldKeeper{}
+				mYieldKeeper.On("GetSDAILastBlockUpdated", mock.Anything).Return(new(big.Int), false)
+				mYieldKeeper.On("GetSDAIPrice", mock.Anything).Return(new(big.Int), false)
+				return mYieldKeeper
 			},
 			getReq: func() *cometabci.RequestVerifyVoteExtension {
 				extBz, err := vetestutils.CreateVoteExtensionBytes(
@@ -1307,11 +1307,11 @@ func TestVerifyVoteHandler(t *testing.T) {
 				)
 				return mPricesKeeper
 			},
-			ratelimitKeeper: func() *mocks.VoteExtensionRateLimitKeeper {
-				mRatelimitKeeper := &mocks.VoteExtensionRateLimitKeeper{}
-				mRatelimitKeeper.On("GetSDAILastBlockUpdated", mock.Anything).Return(big.NewInt(1), true)
-				mRatelimitKeeper.On("GetSDAIPrice", mock.Anything).Return(big.NewInt(1000000000000000), true)
-				return mRatelimitKeeper
+			yieldKeeper: func() *mocks.VoteExtensionYieldKeeper {
+				mYieldKeeper := &mocks.VoteExtensionYieldKeeper{}
+				mYieldKeeper.On("GetSDAILastBlockUpdated", mock.Anything).Return(big.NewInt(1), true)
+				mYieldKeeper.On("GetSDAIPrice", mock.Anything).Return(big.NewInt(1000000000000000), true)
+				return mYieldKeeper
 			},
 			getReq: func() *cometabci.RequestVerifyVoteExtension {
 				extBz, err := vetestutils.CreateVoteExtensionBytes(
@@ -1337,9 +1337,9 @@ func TestVerifyVoteHandler(t *testing.T) {
 				)
 				return mPricesKeeper
 			},
-			ratelimitKeeper: func() *mocks.VoteExtensionRateLimitKeeper {
-				mRatelimitKeeper := &mocks.VoteExtensionRateLimitKeeper{}
-				return mRatelimitKeeper
+			yieldKeeper: func() *mocks.VoteExtensionYieldKeeper {
+				mYieldKeeper := &mocks.VoteExtensionYieldKeeper{}
+				return mYieldKeeper
 			},
 			getReq: func() *cometabci.RequestVerifyVoteExtension {
 				extBz, err := vetestutils.CreateVoteExtensionBytes(
@@ -1365,9 +1365,9 @@ func TestVerifyVoteHandler(t *testing.T) {
 				)
 				return mPricesKeeper
 			},
-			ratelimitKeeper: func() *mocks.VoteExtensionRateLimitKeeper {
-				mRatelimitKeeper := &mocks.VoteExtensionRateLimitKeeper{}
-				return mRatelimitKeeper
+			yieldKeeper: func() *mocks.VoteExtensionYieldKeeper {
+				mYieldKeeper := &mocks.VoteExtensionYieldKeeper{}
+				return mYieldKeeper
 			},
 			getReq: func() *cometabci.RequestVerifyVoteExtension {
 				prices := []vetypes.PricePair{
@@ -1402,11 +1402,11 @@ func TestVerifyVoteHandler(t *testing.T) {
 				)
 				return mPricesKeeper
 			},
-			ratelimitKeeper: func() *mocks.VoteExtensionRateLimitKeeper {
-				mRatelimitKeeper := &mocks.VoteExtensionRateLimitKeeper{}
-				mRatelimitKeeper.On("GetSDAILastBlockUpdated", mock.Anything).Return(new(big.Int), false)
-				mRatelimitKeeper.On("GetSDAIPrice", mock.Anything).Return(new(big.Int), false)
-				return mRatelimitKeeper
+			yieldKeeper: func() *mocks.VoteExtensionYieldKeeper {
+				mYieldKeeper := &mocks.VoteExtensionYieldKeeper{}
+				mYieldKeeper.On("GetSDAILastBlockUpdated", mock.Anything).Return(new(big.Int), false)
+				mYieldKeeper.On("GetSDAIPrice", mock.Anything).Return(new(big.Int), false)
+				return mYieldKeeper
 			},
 			getReq: func() *cometabci.RequestVerifyVoteExtension {
 				extBz, err := vetestutils.CreateVoteExtensionBytes(
@@ -1432,12 +1432,12 @@ func TestVerifyVoteHandler(t *testing.T) {
 				)
 				return mPricesKeeper
 			},
-			ratelimitKeeper: func() *mocks.VoteExtensionRateLimitKeeper {
-				mRatelimitKeeper := &mocks.VoteExtensionRateLimitKeeper{}
+			yieldKeeper: func() *mocks.VoteExtensionYieldKeeper {
+				mYieldKeeper := &mocks.VoteExtensionYieldKeeper{}
 				// Note: the below assumes a low block height for the test and larger delay
-				mRatelimitKeeper.On("GetSDAILastBlockUpdated", mock.Anything).Return(big.NewInt(5500), true)
-				mRatelimitKeeper.On("GetSDAIPrice", mock.Anything).Return(new(big.Int), false)
-				return mRatelimitKeeper
+				mYieldKeeper.On("GetSDAILastBlockUpdated", mock.Anything).Return(big.NewInt(5500), true)
+				mYieldKeeper.On("GetSDAIPrice", mock.Anything).Return(new(big.Int), false)
+				return mYieldKeeper
 			},
 			getReq: func() *cometabci.RequestVerifyVoteExtension {
 				extBz, err := vetestutils.CreateVoteExtensionBytes(
@@ -1463,14 +1463,14 @@ func TestVerifyVoteHandler(t *testing.T) {
 				)
 				return mPricesKeeper
 			},
-			ratelimitKeeper: func() *mocks.VoteExtensionRateLimitKeeper {
-				mRatelimitKeeper := &mocks.VoteExtensionRateLimitKeeper{}
-				mRatelimitKeeper.On("GetSDAILastBlockUpdated", mock.Anything).Return(new(big.Int), false)
-				mRatelimitKeeper.On("GetSDAIPrice", mock.Anything).Return(
-					ratelimitkeeper.ConvertStringToBigIntWithPanicOnErr(sdaiservertypes.TestSDAIEventRequest.ConversionRate),
+			yieldKeeper: func() *mocks.VoteExtensionYieldKeeper {
+				mYieldKeeper := &mocks.VoteExtensionYieldKeeper{}
+				mYieldKeeper.On("GetSDAILastBlockUpdated", mock.Anything).Return(new(big.Int), false)
+				mYieldKeeper.On("GetSDAIPrice", mock.Anything).Return(
+					yieldkeeper.ConvertStringToBigIntWithPanicOnErr(sdaiservertypes.TestSDAIEventRequest.ConversionRate),
 					true,
 				)
-				return mRatelimitKeeper
+				return mYieldKeeper
 			},
 			getReq: func() *cometabci.RequestVerifyVoteExtension {
 				extBz, err := vetestutils.CreateVoteExtensionBytes(
@@ -1496,11 +1496,11 @@ func TestVerifyVoteHandler(t *testing.T) {
 				)
 				return mPricesKeeper
 			},
-			ratelimitKeeper: func() *mocks.VoteExtensionRateLimitKeeper {
-				mRatelimitKeeper := &mocks.VoteExtensionRateLimitKeeper{}
-				mRatelimitKeeper.On("GetSDAILastBlockUpdated", mock.Anything).Return(new(big.Int), false)
-				mRatelimitKeeper.On("GetSDAIPrice", mock.Anything).Return(new(big.Int), false)
-				return mRatelimitKeeper
+			yieldKeeper: func() *mocks.VoteExtensionYieldKeeper {
+				mYieldKeeper := &mocks.VoteExtensionYieldKeeper{}
+				mYieldKeeper.On("GetSDAILastBlockUpdated", mock.Anything).Return(new(big.Int), false)
+				mYieldKeeper.On("GetSDAIPrice", mock.Anything).Return(new(big.Int), false)
+				return mYieldKeeper
 			},
 			getReq: func() *cometabci.RequestVerifyVoteExtension {
 				extBz, err := vetestutils.CreateVoteExtensionBytes(
@@ -1526,11 +1526,11 @@ func TestVerifyVoteHandler(t *testing.T) {
 				)
 				return mPricesKeeper
 			},
-			ratelimitKeeper: func() *mocks.VoteExtensionRateLimitKeeper {
-				mRatelimitKeeper := &mocks.VoteExtensionRateLimitKeeper{}
-				mRatelimitKeeper.On("GetSDAILastBlockUpdated", mock.Anything).Return(new(big.Int), false)
-				mRatelimitKeeper.On("GetSDAIPrice", mock.Anything).Return(new(big.Int), false)
-				return mRatelimitKeeper
+			yieldKeeper: func() *mocks.VoteExtensionYieldKeeper {
+				mYieldKeeper := &mocks.VoteExtensionYieldKeeper{}
+				mYieldKeeper.On("GetSDAILastBlockUpdated", mock.Anything).Return(new(big.Int), false)
+				mYieldKeeper.On("GetSDAIPrice", mock.Anything).Return(new(big.Int), false)
+				return mYieldKeeper
 			},
 			getReq: func() *cometabci.RequestVerifyVoteExtension {
 				extBz, err := vetestutils.CreateVoteExtensionBytes(
@@ -1556,11 +1556,11 @@ func TestVerifyVoteHandler(t *testing.T) {
 				)
 				return mPricesKeeper
 			},
-			ratelimitKeeper: func() *mocks.VoteExtensionRateLimitKeeper {
-				mRatelimitKeeper := &mocks.VoteExtensionRateLimitKeeper{}
-				mRatelimitKeeper.On("GetSDAILastBlockUpdated", mock.Anything).Return(new(big.Int), false)
-				mRatelimitKeeper.On("GetSDAIPrice", mock.Anything).Return(new(big.Int), false)
-				return mRatelimitKeeper
+			yieldKeeper: func() *mocks.VoteExtensionYieldKeeper {
+				mYieldKeeper := &mocks.VoteExtensionYieldKeeper{}
+				mYieldKeeper.On("GetSDAILastBlockUpdated", mock.Anything).Return(new(big.Int), false)
+				mYieldKeeper.On("GetSDAIPrice", mock.Anything).Return(new(big.Int), false)
+				return mYieldKeeper
 			},
 			getReq: func() *cometabci.RequestVerifyVoteExtension {
 				extBz, err := vetestutils.CreateVoteExtensionBytes(
@@ -1587,7 +1587,7 @@ func TestVerifyVoteHandler(t *testing.T) {
 			mClobKeeper := &mocks.ExtendVoteClobKeeper{}
 			mPerpKeeper := &mocks.ExtendVotePerpetualsKeeper{}
 			mPricesKeeper := tc.pricesKeeper()
-			mRatelimitKeeper := tc.ratelimitKeeper()
+			mYieldKeeper := tc.yieldKeeper()
 			sdaiEventManager := sdaiservertypes.SetupMockEventManager()
 
 			handler := ve.NewVoteExtensionHandler(
@@ -1596,7 +1596,7 @@ func TestVerifyVoteHandler(t *testing.T) {
 				mPricesKeeper,
 				mPerpKeeper,
 				mClobKeeper,
-				mRatelimitKeeper,
+				mYieldKeeper,
 				sdaiEventManager,
 				mVEApplier,
 			).VerifyVoteExtensionHandler()
@@ -2026,8 +2026,8 @@ func TestGetVEBytes(t *testing.T) {
 			}
 
 			sDaIEventManager := sdaiservertypes.SetupMockEventManager()
-			mRatelimitKeeper := &mocks.VoteExtensionRateLimitKeeper{}
-			mRatelimitKeeper.On("GetSDAILastBlockUpdated", mock.Anything).
+			mYieldKeeper := &mocks.VoteExtensionYieldKeeper{}
+			mYieldKeeper.On("GetSDAILastBlockUpdated", mock.Anything).
 				Return(new(big.Int), false)
 
 			h := ve.NewVoteExtensionHandler(
@@ -2036,7 +2036,7 @@ func TestGetVEBytes(t *testing.T) {
 				mPricesKeeper,
 				mPerpKeeper,
 				mClobKeeper,
-				mRatelimitKeeper,
+				mYieldKeeper,
 				sDaIEventManager,
 				mVEApplier,
 			)

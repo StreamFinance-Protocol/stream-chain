@@ -5,7 +5,7 @@ import (
 
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib/metrics"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
-	ratelimittypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
+	yieldtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types"
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -68,8 +68,8 @@ func (k Keeper) CompleteBridge(
 		return err
 	}
 
-	if bridge.Coin.Denom == ratelimittypes.SDaiDenom {
-		err = k.ratelimitKeeper.MintTradingDAIToUserAccount(
+	if bridge.Coin.Denom == yieldtypes.SDaiDenom {
+		err = k.yieldKeeper.MintTradingDAIToUserAccount(
 			ctx,
 			bridgeAccAddress,
 			bridgedCoins[0].Amount.BigInt(),

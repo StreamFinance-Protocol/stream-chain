@@ -20,7 +20,7 @@ type BankKeeper interface {
 	MintCoins(ctx context.Context, moduleName string, amt sdk.Coins) error
 }
 
-type RateLimitKeeper interface {
+type YieldKeeper interface {
 	WithdrawSDaiFromTDai(
 		ctx sdk.Context,
 		userAddr sdk.AccAddress,

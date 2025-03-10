@@ -34,10 +34,10 @@ import (
 	perpkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices"
 	priceskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/keeper"
-	ratelimitkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/keeper"
 	statskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/stats/keeper"
 	subkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/keeper"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
+	yieldkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/keeper"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -53,7 +53,7 @@ type ClobKeepersTestContext struct {
 	AssetsKeeper      *asskeeper.Keeper
 	BlockTimeKeeper   *blocktimekeeper.Keeper
 	FeeTiersKeeper    *feetierskeeper.Keeper
-	RatelimitKeeper   *ratelimitkeeper.Keeper
+	YieldKeeper       *yieldkeeper.Keeper
 	PerpetualsKeeper  *perpkeeper.Keeper
 	StatsKeeper       *statskeeper.Keeper
 	SubaccountsKeeper *subkeeper.Keeper
@@ -129,7 +129,7 @@ func NewClobKeepersTestContextWithUninitializedMemStore(
 			db,
 			cdc,
 		)
-		ks.RatelimitKeeper, _ = createRatelimitKeeper(
+		ks.YieldKeeper, _ = createYieldKeeper(
 			stateStore,
 			db,
 			cdc,
@@ -145,7 +145,7 @@ func NewClobKeepersTestContextWithUninitializedMemStore(
 			ks.AssetsKeeper,
 			bankKeeper,
 			ks.PerpetualsKeeper,
-			ks.RatelimitKeeper,
+			ks.YieldKeeper,
 			ks.BlockTimeKeeper,
 			indexerEventsTransientStoreKey,
 			true,
@@ -168,7 +168,7 @@ func NewClobKeepersTestContextWithUninitializedMemStore(
 			voteAggregator = veaggregator.NewVeAggregator(
 				log.NewNopLogger(),
 				*ks.PricesKeeper,
-				*ks.RatelimitKeeper,
+				*ks.YieldKeeper,
 				pricesAggregatorFn,
 				conversionRateAggregatorFn,
 			)
@@ -178,7 +178,7 @@ func NewClobKeepersTestContextWithUninitializedMemStore(
 			log.NewNopLogger(),
 			voteAggregator,
 			ks.PricesKeeper,
-			ks.RatelimitKeeper,
+			ks.YieldKeeper,
 			vecodec.NewDefaultVoteExtensionCodec(),
 			vecodec.NewDefaultExtendedCommitCodec(),
 			&pricecache.PriceUpdatesCacheImpl{},

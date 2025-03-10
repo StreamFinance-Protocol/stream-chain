@@ -1,6 +1,0 @@
-syntax = "proto3";
-package klyraprotocol.ratelimit;
-
-option go_package = "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types";
-
- message GenesisState {}

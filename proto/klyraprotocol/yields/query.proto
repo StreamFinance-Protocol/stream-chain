@@ -1,0 +1,42 @@
+syntax = "proto3";
+package klyraprotocol.yields;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+
+option go_package = "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types";
+
+// Query defines the gRPC querier service.
+service Query {
+
+  // Get the price of sDAI.
+  rpc GetSDAIPriceQuery(GetSDAIPriceQueryRequest)
+      returns (GetSDAIPriceQueryResponse) {
+    option (google.api.http).get = "/klyraprotocol/v4/yield/get_sdai_price";
+  }
+
+  // Get the price of sDAI.
+  rpc GetAssetYieldIndexQuery(GetAssetYieldIndexQueryRequest)
+      returns (GetAssetYieldIndexQueryResponse) {
+    option (google.api.http).get = "/klyraprotocol/v4/yield/get_asset_yield_index";
+  }
+}
+
+// GetSDAIPriceRequest is a request type for the GetSDAIPrice RPC method.
+message GetSDAIPriceQueryRequest {}
+
+// GetSDAIPriceResponse is a response type for the GetSDAIPrice RPC method.
+message GetSDAIPriceQueryResponse {
+  string price = 1; // Assuming price is returned as a string
+}
+
+// GetAssetYieldIndexRequest is a request type for the GetAssetYieldIndex RPC
+// method.
+message GetAssetYieldIndexQueryRequest {}
+
+// GetSDAIPriceQueryResponse is a response type for the GetAssetYieldIndex RPC
+// method.
+message GetAssetYieldIndexQueryResponse {
+  string asset_yield_index =
+      1; // Handled as a string, should be converted to big.Rat.
+}

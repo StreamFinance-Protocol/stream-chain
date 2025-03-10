@@ -24,10 +24,10 @@ import (
 	feetierstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
-	ratelimitcli "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/client/cli"
-	ratelimittypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
 	sa_testutil "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/client/testutil"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
+	ratelimitcli "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/client/cli"
+	yieldtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 	networktestutil "github.com/cosmos/cosmos-sdk/testutil/network"
@@ -61,7 +61,7 @@ func GetBalanceAfterYield(clientCtx client.Context, initialBalance *big.Int) (ba
 		return 0, err
 	}
 
-	var resp ratelimittypes.GetSDAIPriceQueryResponse
+	var resp yieldtypes.GetSDAIPriceQueryResponse
 	err = json.Unmarshal(data.Bytes(), &resp)
 	if err != nil {
 		return 0, err
@@ -73,8 +73,8 @@ func GetBalanceAfterYield(clientCtx client.Context, initialBalance *big.Int) (ba
 	}
 
 	precision := new(big.Int).Exp(
-		big.NewInt(ratelimittypes.BASE_10),
-		big.NewInt(ratelimittypes.SDAI_DECIMALS),
+		big.NewInt(yieldtypes.BASE_10),
+		big.NewInt(yieldtypes.SDAI_DECIMALS),
 		nil,
 	)
 
@@ -685,7 +685,7 @@ func (s *CancelOrderIntegrationTestSuite) TestCLICancelMatchingOrders() {
 	// data, _, err = network.QueryCustomNetwork(rateQuery)
 
 	// require.NoError(s.T(), err)
-	// var respSdai ratelimittypes.GetSDAIPriceQueryResponse
+	// var respSdai yieldtypes.GetSDAIPriceQueryResponse
 	// require.NoError(s.T(), cfg.Codec.UnmarshalJSON(data, &respSdai))
 
 	// chiFloat, success := new(big.Float).SetString(chi)

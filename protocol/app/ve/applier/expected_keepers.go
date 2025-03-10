@@ -39,6 +39,6 @@ type VEApplierPricesKeeper interface {
 	)
 }
 
-type VEApplierRatelimitKeeper interface {
+type VEApplierYieldKeeper interface {
 	ProcessNewSDaiConversionRateUpdate(ctx sdk.Context, sDaiConversionRate *big.Int, blockHeight *big.Int) error
 }

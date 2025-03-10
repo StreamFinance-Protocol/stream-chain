@@ -65,7 +65,7 @@ func TestVEInjectionHandling(t *testing.T) {
 			mockClobKeeper.On("RecordMevMetricsIsEnabled").Return(true)
 			mockClobKeeper.On("RecordMevMetrics", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
-			mockRatelimitKeeper := &mocks.VoteExtensionRateLimitKeeper{}
+			mockYieldKeeper := &mocks.VoteExtensionYieldKeeper{}
 
 			mockVEApplier := &mocks.ProcessProposalVEApplier{}
 			mockVEApplier.On("ApplyVE", mock.Anything, mock.Anything, mock.Anything).Return(nil)
@@ -77,7 +77,7 @@ func TestVEInjectionHandling(t *testing.T) {
 				&mocks.ProcessStakingKeeper{},
 				&mocks.ProcessPerpetualKeeper{},
 				pricesKeeper,
-				mockRatelimitKeeper,
+				mockYieldKeeper,
 				vecodec.NewDefaultExtendedCommitCodec(),
 				vecodec.NewDefaultVoteExtensionCodec(),
 				mockVEApplier,

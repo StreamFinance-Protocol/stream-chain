@@ -24,7 +24,7 @@ func (k Keeper) GetChainOutageInfo(
 		return true, previousBlockInfo.Height
 	}
 
-	return k.getOutageHeight(ctx)
+	return k.GetOutageHeight(ctx)
 
 }
 
@@ -33,7 +33,7 @@ func (k Keeper) SetOutageHeight(ctx sdk.Context, height uint32) {
 	store.Set([]byte(types.OutageHeightKey), []byte(fmt.Sprintf("%d", height)))
 }
 
-func (k Keeper) getOutageHeight(ctx sdk.Context) (bool, uint32) {
+func (k Keeper) GetOutageHeight(ctx sdk.Context) (bool, uint32) {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get([]byte(types.OutageHeightKey))
 	if bz == nil {

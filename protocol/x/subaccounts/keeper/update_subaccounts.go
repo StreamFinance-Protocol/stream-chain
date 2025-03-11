@@ -288,7 +288,7 @@ func (k Keeper) isTradingBlocked(ctx sdk.Context, settledUpdates []SettledUpdate
 	}
 
 	// Panic if the current block is less than the last block a chain outage was seen.
-	isChainOutage, chainOutageHeight := k.GetChainOutageInfo(ctx)
+	isChainOutage, chainOutageHeight := k.GetOutageHeight(ctx)
 	if isChainOutage && currentBlock < chainOutageHeight {
 		panic(
 			fmt.Sprintf(

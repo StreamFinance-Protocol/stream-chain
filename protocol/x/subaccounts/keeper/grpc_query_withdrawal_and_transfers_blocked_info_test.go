@@ -108,6 +108,14 @@ func TestQueryWithdrawalAndTransfersBlockedInfo(t *testing.T) {
 					},
 				)
 
+				bk.SetPreviousBlockInfo(
+					ctx,
+					&blocktimetypes.BlockInfo{
+						Height:    25,
+						Timestamp: time.Now(),
+					},
+				)
+
 				sk.SetOutageHeight(
 					ctx,
 					25,

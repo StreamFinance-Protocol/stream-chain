@@ -66,12 +66,14 @@ func TestGetChainOutageInfo(t *testing.T) {
 		t.Run(testName, func(t *testing.T) {
 			ctx, keeper, _, _, _, _, _, _, blocktimeKeeper, _ := keepertest.SubaccountsKeepers(t, true)
 
+			ctx = ctx.WithBlockTime(time.Now())
+
 			// Setup test state
 			tc.setupPreviousBlockInfo(ctx, *blocktimeKeeper)
 			tc.setupOutageHeight(ctx, *keeper)
 
 			// Run the test
-			isChainOutage, blockHeight := keeper.GetChainOutageInfo(ctx)
+			isChainOutage, blockHeight := keeper.GetOutageHeight(ctx)
 
 			// Verify expectations
 			require.Equal(t, tc.expectedIsChainOutage, isChainOutage)

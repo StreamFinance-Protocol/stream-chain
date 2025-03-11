@@ -23,8 +23,8 @@ declare -A services=(
   ["socks"]="Dockerfile.service"
   ["roundtable"]="Dockerfile.service"
   ["comlink"]="Dockerfile.service"
-  ["auxo"]="Dockerfile.auxo.remote"
-  ["bazooka"]="Dockerfile.bazooka.remote"
+  ["auxo"]="Dockerfile.auxo"
+  ["bazooka"]="Dockerfile.bazooka"
 )
 
 for service in "${!services[@]}"; do

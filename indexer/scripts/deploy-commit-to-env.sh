@@ -32,8 +32,8 @@ printf "account: %s\n" $account
 
 dockerfile=Dockerfile.service
 case $service in
-    "bazooka") dockerfile=Dockerfile.bazooka.remote;;
-    "auxo") dockerfile=Dockerfile.auxo.remote;;
+    "bazooka") dockerfile=Dockerfile.bazooka;;
+    "auxo") dockerfile=Dockerfile.auxo;;
 esac
 
 printf "dockerfile: %s\n" $dockerfile

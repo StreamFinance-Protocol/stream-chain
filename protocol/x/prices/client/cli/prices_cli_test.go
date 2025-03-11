@@ -24,8 +24,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/h2non/gock"
 	"github.com/stretchr/testify/suite"
-
-	feetierstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers/types"
 )
 
 var (
@@ -144,15 +142,7 @@ func (s *PricesIntegrationTestSuite) SetupTest() {
 
 	epstate := constants.GenerateEpochGenesisStateWithoutFunding()
 
-	feeTiersState := feetierstypes.GenesisState{}
-
-	feeTiersState.Params = constants.PerpetualFeeParams
-
-	feeTiersBuf, err := s.cfg.Codec.MarshalJSON(&feeTiersState)
-
 	s.Require().NoError(err)
-
-	s.cfg.GenesisState[feetierstypes.ModuleName] = feeTiersBuf
 
 	epbuf, err := s.cfg.Codec.MarshalJSON(&epstate)
 

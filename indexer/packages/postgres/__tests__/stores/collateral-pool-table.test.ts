@@ -4,6 +4,7 @@ import { UniqueViolationError } from 'objection';
 import {
   defaultCollateralPool,
   defaultCollateralPool2,
+  collateralPoolEmptyCumulativeInsuranceFundDeltaPerBlock,
 } from '../helpers/constants';
 import * as CollateralPoolTable from '../../src/stores/collateral-pools-table';
 
@@ -110,6 +111,14 @@ describe('CollateralPool store', () => {
 
     expect(collateralPool).toEqual(
       normalizeCollateralPool(defaultCollateralPool),
+    );
+  });
+
+  it('Successfully inserts a collateral pool with an empty cumulative insurance fund delta per block', async () => {
+    const collateralPool = await CollateralPoolTable.upsert(collateralPoolEmptyCumulativeInsuranceFundDeltaPerBlock);
+
+    expect(collateralPool).toEqual(
+      normalizeCollateralPool(collateralPoolEmptyCumulativeInsuranceFundDeltaPerBlock),
     );
   });
 });

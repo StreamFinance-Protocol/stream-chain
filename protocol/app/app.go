@@ -171,9 +171,6 @@ import (
 	sendingmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending"
 	sendingmodulekeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending/keeper"
 	sendingmoduletypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending/types"
-	statsmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/stats"
-	statsmodulekeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/stats/keeper"
-	statsmoduletypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/stats/types"
 	subaccountsmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts"
 	subaccountsmodulekeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/keeper"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
@@ -262,8 +259,6 @@ type App struct {
 	DelayMsgKeeper delaymsgmodulekeeper.Keeper
 
 	PerpetualsKeeper perpetualsmodulekeeper.Keeper
-
-	StatsKeeper statsmodulekeeper.Keeper
 
 	SubaccountsKeeper subaccountsmodulekeeper.Keeper
 
@@ -366,7 +361,6 @@ func New(
 		bridgemoduletypes.StoreKey,
 		perpetualsmoduletypes.StoreKey,
 		satypes.StoreKey,
-		statsmoduletypes.StoreKey,
 		clobmoduletypes.StoreKey,
 		sendingmoduletypes.StoreKey,
 		delaymsgmoduletypes.StoreKey,
@@ -378,7 +372,6 @@ func New(
 		paramstypes.TStoreKey,
 		bridgemoduletypes.TransientStoreKey,
 		clobmoduletypes.TransientStoreKey,
-		statsmoduletypes.TransientStoreKey,
 		indexer_manager.TransientStoreKey,
 		perpetualsmoduletypes.TransientStoreKey,
 	)
@@ -820,19 +813,6 @@ func New(
 	)
 	perpetualsModule := perpetualsmodule.NewAppModule(appCodec, &app.PerpetualsKeeper)
 
-	app.StatsKeeper = *statsmodulekeeper.NewKeeper(
-		appCodec,
-		app.EpochsKeeper,
-		keys[statsmoduletypes.StoreKey],
-		tkeys[statsmoduletypes.TransientStoreKey],
-		// set the governance and delaymsg module accounts as the authority for conducting upgrades
-		[]string{
-			lib.GovModuleAddress.String(),
-			delaymsgmoduletypes.ModuleAddress.String(),
-		},
-	)
-	statsModule := statsmodule.NewAppModule(appCodec, app.StatsKeeper)
-
 	app.SubaccountsKeeper = *subaccountsmodulekeeper.NewKeeper(
 		appCodec,
 		keys[satypes.StoreKey],
@@ -914,7 +894,6 @@ func New(
 		app.BankKeeper,
 		app.PerpetualsKeeper,
 		app.PricesKeeper,
-		app.StatsKeeper,
 		app.IndexerEventManager,
 		app.GrpcStreamingManager,
 		txConfig.TxDecoder(),
@@ -1025,7 +1004,6 @@ func New(
 		blockTimeModule,
 		bridgeModule,
 		perpetualsModule,
-		statsModule,
 		subaccountsModule,
 		clobModule,
 		sendingModule,
@@ -1063,7 +1041,6 @@ func New(
 		assetsmoduletypes.ModuleName,
 		bridgemoduletypes.ModuleName,
 		perpetualsmoduletypes.ModuleName,
-		statsmoduletypes.ModuleName,
 		satypes.ModuleName,
 		clobmoduletypes.ModuleName,
 		sendingmoduletypes.ModuleName,
@@ -1093,7 +1070,6 @@ func New(
 		assetsmoduletypes.ModuleName,
 		bridgemoduletypes.ModuleName,
 		perpetualsmoduletypes.ModuleName,
-		statsmoduletypes.ModuleName,
 		satypes.ModuleName,
 		clobmoduletypes.ModuleName,
 		sendingmoduletypes.ModuleName,
@@ -1127,7 +1103,6 @@ func New(
 		blocktimemoduletypes.ModuleName,
 		bridgemoduletypes.ModuleName,
 		perpetualsmoduletypes.ModuleName,
-		statsmoduletypes.ModuleName,
 		satypes.ModuleName,
 		clobmoduletypes.ModuleName,
 		sendingmoduletypes.ModuleName,
@@ -1159,7 +1134,6 @@ func New(
 		blocktimemoduletypes.ModuleName,
 		bridgemoduletypes.ModuleName,
 		perpetualsmoduletypes.ModuleName,
-		statsmoduletypes.ModuleName,
 		satypes.ModuleName,
 		clobmoduletypes.ModuleName,
 		sendingmoduletypes.ModuleName,

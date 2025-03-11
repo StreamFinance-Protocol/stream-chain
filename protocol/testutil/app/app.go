@@ -45,7 +45,6 @@ import (
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
 	sendingtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending/types"
-	stattypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/stats/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
 	yieldtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types"
 	abcitypes "github.com/cometbft/cometbft/abci/types"
@@ -192,7 +191,6 @@ type GenesisStates interface {
 	authtypes.GenesisState |
 		banktypes.GenesisState |
 		perptypes.GenesisState |
-		stattypes.GenesisState |
 		blocktimetypes.GenesisState |
 		clobtypes.GenesisState |
 		pricestypes.GenesisState |
@@ -234,8 +232,6 @@ func UpdateGenesisDocWithAppStateForModule[T GenesisStates](genesisDoc *types.Ge
 		moduleName = clobtypes.ModuleName
 	case pricestypes.GenesisState:
 		moduleName = pricestypes.ModuleName
-	case stattypes.GenesisState:
-		moduleName = stattypes.ModuleName
 	case satypes.GenesisState:
 		moduleName = satypes.ModuleName
 	case assettypes.GenesisState:

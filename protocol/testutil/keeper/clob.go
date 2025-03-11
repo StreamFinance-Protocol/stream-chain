@@ -33,7 +33,6 @@ import (
 	perpkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices"
 	priceskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/keeper"
-	statskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/stats/keeper"
 	subkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/keeper"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
 	yieldkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/keeper"
@@ -53,7 +52,6 @@ type ClobKeepersTestContext struct {
 	BlockTimeKeeper   *blocktimekeeper.Keeper
 	YieldKeeper       *yieldkeeper.Keeper
 	PerpetualsKeeper  *perpkeeper.Keeper
-	StatsKeeper       *statskeeper.Keeper
 	SubaccountsKeeper *subkeeper.Keeper
 	EpochsKeeper      *epochskeeper.Keeper
 	StoreKey          storetypes.StoreKey
@@ -115,12 +113,6 @@ func NewClobKeepersTestContextWithUninitializedMemStore(
 			indexerEventsTransientStoreKey,
 		)
 		ks.BlockTimeKeeper, _ = createBlockTimeKeeper(stateStore, db, cdc)
-		ks.StatsKeeper, _ = createStatsKeeper(
-			stateStore,
-			ks.EpochsKeeper,
-			db,
-			cdc,
-		)
 		ks.YieldKeeper, _ = createYieldKeeper(
 			stateStore,
 			db,
@@ -189,7 +181,6 @@ func NewClobKeepersTestContextWithUninitializedMemStore(
 			bankKeeper,
 			ks.PerpetualsKeeper,
 			ks.PricesKeeper,
-			ks.StatsKeeper,
 			ks.SubaccountsKeeper,
 			indexerEventManager,
 			veApplier,
@@ -205,7 +196,6 @@ func NewClobKeepersTestContextWithUninitializedMemStore(
 			ks.AssetsKeeper,
 			ks.SubaccountsKeeper,
 			ks.ClobKeeper,
-			ks.StatsKeeper,
 		}
 	})
 
@@ -229,7 +219,6 @@ func createClobKeeper(
 	bankKeeper types.BankKeeper,
 	perpKeeper *perpkeeper.Keeper,
 	pricesKeeper *priceskeeper.Keeper,
-	statsKeeper *statskeeper.Keeper,
 	saKeeper *subkeeper.Keeper,
 	indexerEventManager indexer_manager.IndexerEventManager,
 	veApplier *veapplier.VEApplier,
@@ -258,7 +247,6 @@ func createClobKeeper(
 		bankKeeper,
 		perpKeeper,
 		pricesKeeper,
-		statsKeeper,
 		indexerEventManager,
 		streaming.NewNoopGrpcStreamingManager(),
 		constants.TestEncodingCfg.TxConfig.TxDecoder(),

@@ -390,15 +390,6 @@ const GenesisStateNoVe = `{
           "name": "funding-tick",
           "next_tick": 0
         },
-        {
-          "current_epoch": 0,
-          "current_epoch_start_block": 0,
-          "duration": 3600,
-          "fast_forward_next_tick": true,
-          "is_initialized": false,
-          "name": "stats-epoch",
-          "next_tick": 0
-        }
       ]
     },
     "feegrant": {
@@ -1294,11 +1285,6 @@ const GenesisStateNoVe = `{
       "redelegations": [],
       "unbonding_delegations": [],
       "validators": []
-    },
-    "stats": {
-      "params": {
-        "window_duration": "2592000s"
-      }
     },
     "subaccounts": {
       "subaccounts": [

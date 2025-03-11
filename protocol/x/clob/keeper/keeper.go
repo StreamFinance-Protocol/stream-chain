@@ -38,7 +38,6 @@ type (
 		blockTimeKeeper   types.BlockTimeKeeper
 		perpetualsKeeper  types.PerpetualsKeeper
 		pricesKeeper      types.PricesKeeper
-		statsKeeper       types.StatsKeeper
 
 		indexerEventManager indexer_manager.IndexerEventManager
 		streamingManager    streamingtypes.GrpcStreamingManager
@@ -81,7 +80,6 @@ func NewKeeper(
 	bankKeeper types.BankKeeper,
 	perpetualsKeeper types.PerpetualsKeeper,
 	pricesKeeper types.PricesKeeper,
-	statsKeeper types.StatsKeeper,
 	indexerEventManager indexer_manager.IndexerEventManager,
 	grpcStreamingManager streamingtypes.GrpcStreamingManager,
 	txDecoder sdk.TxDecoder,
@@ -105,7 +103,6 @@ func NewKeeper(
 		bankKeeper:                   bankKeeper,
 		perpetualsKeeper:             perpetualsKeeper,
 		pricesKeeper:                 pricesKeeper,
-		statsKeeper:                  statsKeeper,
 		indexerEventManager:          indexerEventManager,
 		streamingManager:             grpcStreamingManager,
 		memStoreInitialized:          &atomic.Bool{}, // False by default.

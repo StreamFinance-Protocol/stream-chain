@@ -197,12 +197,6 @@ func (k Keeper) MustGetFundingSampleEpochInfo(
 	return k.mustGetEpochInfo(ctx, types.FundingSampleEpochInfoName)
 }
 
-func (k Keeper) MustGetStatsEpochInfo(
-	ctx sdk.Context,
-) types.EpochInfo {
-	return k.mustGetEpochInfo(ctx, types.StatsEpochInfoName)
-}
-
 func (k Keeper) mustGetEpochInfo(
 	ctx sdk.Context,
 	epochInfoName types.EpochInfoName,

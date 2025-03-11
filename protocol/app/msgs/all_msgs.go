@@ -220,10 +220,6 @@ var (
 		"/klyraprotocol.sending.MsgSendFromModuleToAccount":         {},
 		"/klyraprotocol.sending.MsgSendFromModuleToAccountResponse": {},
 
-		// stats
-		"/klyraprotocol.stats.MsgUpdateParams":         {},
-		"/klyraprotocol.stats.MsgUpdateParamsResponse": {},
-
 		// subaccounts
 		"/klyraprotocol.subaccounts.MsgClaimYieldForSubaccount":         {},
 		"/klyraprotocol.subaccounts.MsgClaimYieldForSubaccountResponse": {},

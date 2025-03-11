@@ -7,7 +7,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// StatsKeeper defines the expected stats keeper
 type StakingKeeper interface {
 	Slash(
 		ctx context.Context,

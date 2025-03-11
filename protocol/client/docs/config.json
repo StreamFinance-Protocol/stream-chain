@@ -71,14 +71,6 @@
       }
     },
     {
-      "url": "./tmp-swagger-gen/klyraprotocol/stats/query.swagger.json",
-      "operationIds": {
-        "rename": {
-          "Params": "StatParams"
-        }
-      }
-    },
-    {
       "url": "./tmp-swagger-gen/klyraprotocol/subaccounts/query.swagger.json",
       "operationIds": {
         "rename": {

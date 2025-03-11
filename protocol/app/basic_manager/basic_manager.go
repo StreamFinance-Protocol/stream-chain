@@ -30,7 +30,6 @@ import (
 	perpetualsmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals"
 	pricesmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices"
 	sendingmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending"
-	statsmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/stats"
 	subaccountsmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts"
 	yieldmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield"
 
@@ -70,7 +69,6 @@ var (
 		blocktimemodule.AppModuleBasic{},
 		bridgemodule.AppModuleBasic{},
 		perpetualsmodule.AppModuleBasic{},
-		statsmodule.AppModuleBasic{},
 		subaccountsmodule.AppModuleBasic{},
 		clobmodule.AppModuleBasic{},
 		delaymsgmodule.AppModuleBasic{},

@@ -143,15 +143,6 @@
         "current_epoch_start_block": 0,
         "is_initialized": false,
         "fast_forward_next_tick": true
-      },
-      {
-        "name": "stats-epoch",
-        "next_tick": 0,
-        "duration": 3600,
-        "current_epoch": 0,
-        "current_epoch_start_block": 0,
-        "is_initialized": false,
-        "fast_forward_next_tick": true
       }
     ]
   },
@@ -302,11 +293,6 @@
     "unbonding_delegations": [],
     "redelegations": [],
     "exported": false
-  },
-  "stats": {
-    "params": {
-      "window_duration": "2592000s"
-    }
   },
   "subaccounts": {
     "subaccounts": []

@@ -10,7 +10,6 @@ import (
 	perpetuals "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	prices "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
 	sending "github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending/types"
-	stats "github.com/StreamFinance-Protocol/stream-chain/protocol/x/stats/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	auth "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bank "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -135,9 +134,5 @@ var (
 		// sending ddd
 		"/klyraprotocol.sending.MsgSendFromModuleToAccount":         &sending.MsgSendFromModuleToAccount{},
 		"/klyraprotocol.sending.MsgSendFromModuleToAccountResponse": nil,
-
-		// stats
-		"/klyraprotocol.stats.MsgUpdateParams":         &stats.MsgUpdateParams{},
-		"/klyraprotocol.stats.MsgUpdateParamsResponse": nil,
 	}
 )

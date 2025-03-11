@@ -9,7 +9,6 @@ import (
 	perpetuals "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	prices "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
 	sending "github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending/types"
-	stats "github.com/StreamFinance-Protocol/stream-chain/protocol/x/stats/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	auth "github.com/cosmos/cosmos-sdk/x/auth/types"
 
@@ -91,10 +90,7 @@ func IsInternalMsg(msg sdk.Msg) bool {
 		*prices.MsgUpdateMarketParam,
 
 		// sending
-		*sending.MsgSendFromModuleToAccount,
-
-		// stats
-		*stats.MsgUpdateParams:
+		*sending.MsgSendFromModuleToAccount:
 
 		return true
 

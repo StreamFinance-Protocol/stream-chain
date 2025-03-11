@@ -114,10 +114,6 @@ func TestInternalMsgSamples_Gov_Key(t *testing.T) {
 		// sending
 		"/klyraprotocol.sending.MsgSendFromModuleToAccount",
 		"/klyraprotocol.sending.MsgSendFromModuleToAccountResponse",
-
-		// stats
-		"/klyraprotocol.stats.MsgUpdateParams",
-		"/klyraprotocol.stats.MsgUpdateParamsResponse",
 	}
 
 	require.Equal(t, expectedMsgs, lib.GetSortedKeys[sort.StringSlice](msgs.InternalMsgSamplesGovAuth))

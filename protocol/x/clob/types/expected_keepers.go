@@ -207,10 +207,6 @@ type PricesKeeper interface {
 	GetMarketPrice(ctx sdk.Context, id uint32) (pricestypes.MarketPrice, error)
 }
 
-type StatsKeeper interface {
-	RecordFill(ctx sdk.Context, takerAddress string, makerAddress string, notional *big.Int)
-}
-
 // AccountKeeper defines the expected account keeper used for simulations.
 type AccountKeeper interface {
 	GetAccount(ctx context.Context, addr sdk.AccAddress) sdk.AccountI

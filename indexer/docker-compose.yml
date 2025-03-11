@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   kafka:
     image: blacktop/kafka:2.6

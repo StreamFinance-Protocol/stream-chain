@@ -3,7 +3,6 @@ package keeper
 import (
 	"fmt"
 	"strconv"
-	"time"
 
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -18,14 +17,7 @@ func (k Keeper) GetChainOutageInfo(
 
 	previousBlockInfo := k.blocktimeKeeper.GetPreviousBlockInfo(ctx)
 
-	// TODO: This is a temporary fix to get around the test setup
-	// We don't just check isZero() because sometimes the timestamp
-	// of a testapp block is a few nanoseconds after the unix epoch
-	if previousBlockInfo.Timestamp.Sub(time.Unix(0, 0)) < time.Second {
-		return false, 0
-	}
-
-	if time.Since(previousBlockInfo.Timestamp) >= types.WITHDRAWAL_AND_TRANSFERS_BLOCKED_AFTER_CHAIN_OUTAGE_DURATION {
+	if ctx.BlockTime().Sub(previousBlockInfo.Timestamp) >= types.WITHDRAWAL_AND_TRANSFERS_BLOCKED_AFTER_CHAIN_OUTAGE_DURATION {
 
 		k.SetOutageHeight(ctx, previousBlockInfo.Height)
 		return true, previousBlockInfo.Height

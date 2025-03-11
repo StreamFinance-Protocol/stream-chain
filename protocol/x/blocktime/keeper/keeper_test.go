@@ -21,13 +21,13 @@ func TestGetPreviousBlockInfo(t *testing.T) {
 	// Create a new keeper instance and context
 	tApp := testapp.NewTestAppBuilder(t).Build()
 	tApp.InitChain()
-	ctx := tApp.AdvanceToBlock(1, testapp.AdvanceToBlockOptions{})
+	ctx := tApp.AdvanceToBlock(2, testapp.AdvanceToBlockOptions{})
 	k := tApp.App.BlockTimeKeeper
 
 	// Create a random BlockInfo object
 	expectedBlockInfo := &types.BlockInfo{
 		Timestamp: time.Now(),
-		Height:    1,
+		Height:    2,
 	}
 
 	// Set the previous block info in the store
@@ -38,6 +38,6 @@ func TestGetPreviousBlockInfo(t *testing.T) {
 
 	// Assertions
 	require.NotNil(t, retrievedBlockInfo)
-	require.Equal(t, expectedBlockInfo.Timestamp, retrievedBlockInfo.Timestamp)
+	require.True(t, expectedBlockInfo.Timestamp.Equal(retrievedBlockInfo.Timestamp), "Timestamps should be equal")
 	require.Equal(t, expectedBlockInfo.Height, retrievedBlockInfo.Height)
 }

@@ -2,6 +2,7 @@ package keeper_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
@@ -12,6 +13,7 @@ import (
 	keepertest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets"
 	btkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/blocktime/keeper"
+	blocktimetypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/blocktime/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices"
 	sakeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
@@ -97,6 +99,15 @@ func TestQueryWithdrawalAndTransfersBlockedInfo(t *testing.T) {
 		},
 		`Chain outage seen in state returns withdrawals and transfers unblocked after the delay`: {
 			setup: func(ctx sdktypes.Context, sk sakeeper.Keeper, bk btkeeper.Keeper) error {
+
+				bk.SetPreviousBlockInfo(
+					ctx,
+					&blocktimetypes.BlockInfo{
+						Height:    25,
+						Timestamp: time.Now(),
+					},
+				)
+
 				sk.SetOutageHeight(
 					ctx,
 					25,
@@ -126,6 +137,13 @@ func TestQueryWithdrawalAndTransfersBlockedInfo(t *testing.T) {
 				if err != nil {
 					return nil
 				}
+				bk.SetPreviousBlockInfo(
+					ctx,
+					&blocktimetypes.BlockInfo{
+						Height:    25,
+						Timestamp: time.Now(),
+					},
+				)
 				sk.SetOutageHeight(
 					ctx,
 					25,
@@ -155,6 +173,13 @@ func TestQueryWithdrawalAndTransfersBlockedInfo(t *testing.T) {
 				if err != nil {
 					return err
 				}
+				bk.SetPreviousBlockInfo(
+					ctx,
+					&blocktimetypes.BlockInfo{
+						Height:    47,
+						Timestamp: time.Now(),
+					},
+				)
 				sk.SetOutageHeight(
 					ctx,
 					47,
@@ -184,6 +209,13 @@ func TestQueryWithdrawalAndTransfersBlockedInfo(t *testing.T) {
 				if err != nil {
 					return err
 				}
+				bk.SetPreviousBlockInfo(
+					ctx,
+					&blocktimetypes.BlockInfo{
+						Height:    3,
+						Timestamp: time.Now(),
+					},
+				)
 				sk.SetOutageHeight(
 					ctx,
 					3,

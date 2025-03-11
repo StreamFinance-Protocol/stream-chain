@@ -13,7 +13,6 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/constants"
 	vetesting "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/ve"
 	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
-	feetiertypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	prices "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
@@ -84,12 +83,6 @@ func TestTimelyPricing(t *testing.T) {
 						}
 						genesisState.LiquidationsConfig = clobtypes.LiquidationsConfig_Default
 						genesisState.EquityTierLimitConfig = clobtypes.EquityTierLimitConfiguration{}
-					},
-				)
-				testapp.UpdateGenesisDocWithAppStateForModule(
-					&genesis,
-					func(genesisState *feetiertypes.GenesisState) {
-						genesisState.Params = constants.PerpetualFeeParamsNoFee
 					},
 				)
 				return genesis

@@ -23,7 +23,6 @@ import (
 	blocktimetypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/blocktime/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/memclob"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
-	feetierstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
 	sakeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/keeper"
@@ -44,7 +43,6 @@ type MatchWithOrdersForTesting struct {
 type processProposerOperationsTestCase struct {
 	// State
 	perpetuals                    []perptypes.Perpetual
-	perpetualFeeParams            *feetierstypes.PerpetualFeeParams
 	clobPairs                     []types.ClobPair
 	subaccounts                   []satypes.Subaccount
 	preExistingStatefulOrders     []types.Order

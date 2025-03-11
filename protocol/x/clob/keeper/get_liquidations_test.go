@@ -26,7 +26,6 @@ import (
 	heap "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/heap"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/memclob"
 	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
-	feetiertypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	prices "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
@@ -148,12 +147,6 @@ func TestChangePriceVE_CauseNegativeTNC(t *testing.T) {
 						genesisState.EquityTierLimitConfig = clobtypes.EquityTierLimitConfiguration{}
 					},
 				)
-				testapp.UpdateGenesisDocWithAppStateForModule(
-					&genesis,
-					func(genesisState *feetiertypes.GenesisState) {
-						genesisState.Params = constants.PerpetualFeeParamsNoFee
-					},
-				)
 				return genesis
 			}).Build()
 
@@ -213,7 +206,6 @@ func TestGetSubaccountCollateralizationInfo(t *testing.T) {
 	tests := map[string]struct {
 		subaccount                  satypes.Subaccount
 		perpetuals                  []perptypes.Perpetual
-		feeParams                   feetiertypes.PerpetualFeeParams
 		expectedIsLiquidatable      bool
 		expectedHasNegativeTnc      bool
 		expectedLiquidationPriority *big.Float
@@ -222,7 +214,6 @@ func TestGetSubaccountCollateralizationInfo(t *testing.T) {
 		`Success: Liquidation priority is 0 and subaccount is liquidatable`: {
 			subaccount:                  constants.Carl_Num0_1BTC_Short_50000USD,
 			perpetuals:                  []perptypes.Perpetual{constants.BtcUsd_SmallMarginRequirement_DangerIndex},
-			feeParams:                   constants.PerpetualFeeParams,
 			expectedIsLiquidatable:      true,
 			expectedHasNegativeTnc:      false,
 			expectedLiquidationPriority: big.NewFloat(0),
@@ -231,7 +222,6 @@ func TestGetSubaccountCollateralizationInfo(t *testing.T) {
 		`Success: Liquidation priority is positive and subaccount is liquidatable`: {
 			subaccount:                  constants.Carl_Num1_99999TDAI_Long_1BTC_Short,
 			perpetuals:                  []perptypes.Perpetual{constants.BtcUsd_100PercentMarginRequirement_Danger_Index},
-			feeParams:                   constants.PerpetualFeeParams,
 			expectedIsLiquidatable:      true,
 			expectedHasNegativeTnc:      false,
 			expectedLiquidationPriority: new(big.Float).Quo(big.NewFloat(49999000000), big.NewFloat(50000000000*50000000000)),
@@ -240,7 +230,6 @@ func TestGetSubaccountCollateralizationInfo(t *testing.T) {
 		`Success: Liquidation priority is positive and subaccount is non liquidatable`: {
 			subaccount:                  constants.Carl_Num1_1BTC_Short,
 			perpetuals:                  []perptypes.Perpetual{constants.BtcUsd_20PercentInitial_10PercentMaintenance_Danger_Index},
-			feeParams:                   constants.PerpetualFeeParams,
 			expectedIsLiquidatable:      false,
 			expectedHasNegativeTnc:      false,
 			expectedLiquidationPriority: new(big.Float).Quo(big.NewFloat(1), big.NewFloat(5000000000)),
@@ -265,7 +254,6 @@ func TestGetSubaccountCollateralizationInfo(t *testing.T) {
 				AssetYieldIndex: big.NewRat(1, 1).String(),
 			},
 			perpetuals:                  []perptypes.Perpetual{constants.BtcUsd_100PercentMarginRequirement_Danger_Index},
-			feeParams:                   constants.PerpetualFeeParams,
 			expectedIsLiquidatable:      true,
 			expectedHasNegativeTnc:      true,
 			expectedLiquidationPriority: largeNegativeLiquidationPriority,
@@ -295,7 +283,6 @@ func TestGetSubaccountCollateralizationInfo(t *testing.T) {
 				AssetYieldIndex: big.NewRat(1, 1).String(),
 			},
 			perpetuals:                  []perptypes.Perpetual{constants.BtcUsd_100PercentMarginRequirement_Danger_Index, constants.EthUsd_100PercentMarginRequirement_DangerIndex},
-			feeParams:                   constants.PerpetualFeeParams,
 			expectedIsLiquidatable:      true,
 			expectedHasNegativeTnc:      false,
 			expectedLiquidationPriority: new(big.Float).Quo(big.NewFloat(1_000_000_000), big.NewFloat(53000000000*53000000000)),
@@ -320,7 +307,6 @@ func TestGetSubaccountCollateralizationInfo(t *testing.T) {
 				AssetYieldIndex: big.NewRat(1, 1).String(),
 			},
 			perpetuals:                  []perptypes.Perpetual{constants.BtcBtc_10_20MarginRequirement_CollatPool1_Id10_DangerIndex1},
-			feeParams:                   constants.PerpetualFeeParams,
 			expectedIsLiquidatable:      true,
 			expectedHasNegativeTnc:      false,
 			expectedLiquidationPriority: big.NewFloat(0),
@@ -345,7 +331,6 @@ func TestGetSubaccountCollateralizationInfo(t *testing.T) {
 				AssetYieldIndex: big.NewRat(1, 1).String(),
 			},
 			perpetuals:                  []perptypes.Perpetual{constants.BtcBtc_100PercentMarginRequirement_CollatPool1_Id8_DangerIndex1},
-			feeParams:                   constants.PerpetualFeeParams,
 			expectedIsLiquidatable:      true,
 			expectedHasNegativeTnc:      false,
 			expectedLiquidationPriority: new(big.Float).Quo(big.NewFloat(50_000_000_000), big.NewFloat(5_000_000_000_000*5_000_000_000_000)),
@@ -370,7 +355,6 @@ func TestGetSubaccountCollateralizationInfo(t *testing.T) {
 				AssetYieldIndex: big.NewRat(1, 1).String(),
 			},
 			perpetuals:                  []perptypes.Perpetual{constants.BtcBtc_100PercentMarginRequirement_CollatPool1_Id8_DangerIndex1},
-			feeParams:                   constants.PerpetualFeeParams,
 			expectedIsLiquidatable:      false,
 			expectedHasNegativeTnc:      false,
 			expectedLiquidationPriority: new(big.Float).Quo(big.NewFloat(5_000_000_000_000), big.NewFloat(5_000_000_000_000*5_000_000_000_000)),
@@ -395,7 +379,6 @@ func TestGetSubaccountCollateralizationInfo(t *testing.T) {
 				AssetYieldIndex: big.NewRat(1, 1).String(),
 			},
 			perpetuals:                  []perptypes.Perpetual{constants.BtcBtc_100PercentMarginRequirement_CollatPool1_Id8_DangerIndex1},
-			feeParams:                   constants.PerpetualFeeParams,
 			expectedIsLiquidatable:      true,
 			expectedHasNegativeTnc:      true,
 			expectedLiquidationPriority: largeNegativeLiquidationPriority2,
@@ -425,7 +408,6 @@ func TestGetSubaccountCollateralizationInfo(t *testing.T) {
 				AssetYieldIndex: big.NewRat(1, 1).String(),
 			},
 			perpetuals:                  []perptypes.Perpetual{constants.BtcBtc_100PercentMarginRequirement_CollatPool1_Id8_DangerIndex1, constants.BtcBtc_10_20MarginRequirement_CollatPool1_Id10_DangerIndex1},
-			feeParams:                   constants.PerpetualFeeParams,
 			expectedIsLiquidatable:      true,
 			expectedHasNegativeTnc:      false,
 			expectedLiquidationPriority: new(big.Float).Quo(big.NewFloat(5_000_000_000_000), big.NewFloat(5_500_000_000_000*10_000_000_000_000)),
@@ -434,7 +416,6 @@ func TestGetSubaccountCollateralizationInfo(t *testing.T) {
 		`Failure: No perp found returns error`: {
 			subaccount: constants.Carl_Num0_1BTC_Short_50000USD,
 			perpetuals: []perptypes.Perpetual{},
-			feeParams:  constants.PerpetualFeeParams,
 			expectedError: errors.New(
 				"0: Perpetual does not exist",
 			),
@@ -462,8 +443,6 @@ func TestGetSubaccountCollateralizationInfo(t *testing.T) {
 			// Create liquidity tiers.
 			keepertest.CreateTestLiquidityTiers(t, ctx, ks.PerpetualsKeeper)
 			keepertest.CreateTestCollateralPools(t, ctx, ks.PerpetualsKeeper)
-
-			require.NoError(t, ks.FeeTiersKeeper.SetPerpetualFeeParams(ctx, tc.feeParams))
 
 			// Create all perpetuals.
 			for _, p := range tc.perpetuals {
@@ -704,7 +683,6 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 	tests := map[string]struct {
 		subaccounts                       []satypes.Subaccount
 		perpetuals                        []perptypes.Perpetual
-		feeParams                         feetiertypes.PerpetualFeeParams
 		expectedLiquidatableSubaccountIds []heap.LiquidationPriority
 		expectedNegativeTncSubaccountIds  map[satypes.SubaccountId]struct{}
 		expectedError                     error
@@ -712,7 +690,6 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 		`Success: Handles no liquidatable subaccounts`: {
 			subaccounts:                       []satypes.Subaccount{constants.Carl_Num0_1BTC_Short_50000USD},
 			perpetuals:                        []perptypes.Perpetual{constants.BtcUsd_NoMarginRequirement},
-			feeParams:                         constants.PerpetualFeeParams,
 			expectedLiquidatableSubaccountIds: []heap.LiquidationPriority{},
 			expectedNegativeTncSubaccountIds:  map[satypes.SubaccountId]struct{}{},
 			expectedError:                     nil,
@@ -720,7 +697,6 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 		`Success: Handles one liquidatable subaccount`: {
 			subaccounts: []satypes.Subaccount{constants.Carl_Num1_99999TDAI_Long_1BTC_Short},
 			perpetuals:  []perptypes.Perpetual{constants.BtcUsd_100PercentMarginRequirement_Danger_Index},
-			feeParams:   constants.PerpetualFeeParams,
 			expectedLiquidatableSubaccountIds: []heap.LiquidationPriority{
 				{
 					SubaccountId: constants.Carl_Num1,
@@ -751,7 +727,6 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 				},
 			},
 			perpetuals: []perptypes.Perpetual{constants.BtcUsd_100PercentMarginRequirement_Danger_Index},
-			feeParams:  constants.PerpetualFeeParams,
 			expectedLiquidatableSubaccountIds: []heap.LiquidationPriority{
 				{
 					SubaccountId: constants.Carl_Num1,
@@ -784,7 +759,6 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 				},
 			},
 			perpetuals: []perptypes.Perpetual{constants.BtcBtc_100PercentMarginRequirement_CollatPool1_Id8_DangerIndex1},
-			feeParams:  constants.PerpetualFeeParams,
 			expectedLiquidatableSubaccountIds: []heap.LiquidationPriority{
 				{
 					SubaccountId: constants.Carl_Num1,
@@ -815,7 +789,6 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 				},
 			},
 			perpetuals: []perptypes.Perpetual{constants.BtcBtc_100PercentMarginRequirement_CollatPool1_Id8_DangerIndex1},
-			feeParams:  constants.PerpetualFeeParams,
 			expectedLiquidatableSubaccountIds: []heap.LiquidationPriority{
 				{
 					SubaccountId: constants.Carl_Num1,
@@ -865,7 +838,6 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 				},
 			},
 			perpetuals: []perptypes.Perpetual{constants.BtcBtc_100PercentMarginRequirement_CollatPool1_Id8_DangerIndex1},
-			feeParams:  constants.PerpetualFeeParams,
 			expectedLiquidatableSubaccountIds: []heap.LiquidationPriority{
 				{
 					SubaccountId: constants.Carl_Num0,
@@ -903,7 +875,6 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 				},
 			},
 			perpetuals: []perptypes.Perpetual{constants.BtcUsd_100PercentMarginRequirement_Danger_Index},
-			feeParams:  constants.PerpetualFeeParams,
 			expectedLiquidatableSubaccountIds: []heap.LiquidationPriority{
 				{
 					SubaccountId: constants.Dave_Num0,
@@ -975,7 +946,6 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 				},
 			},
 			perpetuals: []perptypes.Perpetual{constants.BtcUsd_100PercentMarginRequirement_Danger_Index, constants.BtcBtc_100PercentMarginRequirement_CollatPool1_Id8_DangerIndex1},
-			feeParams:  constants.PerpetualFeeParams,
 			expectedLiquidatableSubaccountIds: []heap.LiquidationPriority{
 				{
 					SubaccountId: constants.Alice_Num0,
@@ -1003,7 +973,6 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 		`Throws error when perpetual does not exist`: {
 			subaccounts: []satypes.Subaccount{constants.Carl_Num0_1BTC_Short_50000USD},
 			perpetuals:  []perptypes.Perpetual{},
-			feeParams:   constants.PerpetualFeeParams,
 			expectedError: errors.New(
 				"Error checking collateralization status: 0: Perpetual does not exist",
 			),
@@ -1031,8 +1000,6 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 			// Create liquidity tiers.
 			keepertest.CreateTestLiquidityTiers(t, ctx, ks.PerpetualsKeeper)
 			keepertest.CreateTestCollateralPools(t, ctx, ks.PerpetualsKeeper)
-
-			require.NoError(t, ks.FeeTiersKeeper.SetPerpetualFeeParams(ctx, tc.feeParams))
 
 			// Create all perpetuals.
 			for _, p := range tc.perpetuals {

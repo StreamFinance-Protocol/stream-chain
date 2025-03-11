@@ -13,7 +13,6 @@ import (
 
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	epochstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/epochs/types"
-	feetierstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers/types"
 	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
 	sa_testutil "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/client/testutil"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
@@ -206,9 +205,6 @@ func (s *DeleveragingIntegrationTestSuite) SetupSuite() {
 	// Ensure that no funding payments will occur during this test.
 	epstate := constants.GenerateEpochGenesisStateWithoutFunding()
 
-	feeTiersState := feetierstypes.GenesisState{}
-	feeTiersState.Params = constants.PerpetualFeeParams
-
 	epbuf, err := s.cfg.Codec.MarshalJSON(&epstate)
 	s.Require().NoError(err)
 	s.cfg.GenesisState[epochstypes.ModuleName] = epbuf
@@ -220,10 +216,6 @@ func (s *DeleveragingIntegrationTestSuite) SetupSuite() {
 	pricesbuf, err := s.cfg.Codec.MarshalJSON(&pricesstate)
 	s.Require().NoError(err)
 	s.cfg.GenesisState[pricestypes.ModuleName] = pricesbuf
-
-	feeTiersBuf, err := s.cfg.Codec.MarshalJSON(&feeTiersState)
-	s.Require().NoError(err)
-	s.cfg.GenesisState[feetierstypes.ModuleName] = feeTiersBuf
 
 	s.network = network.New(s.T(), s.cfg)
 

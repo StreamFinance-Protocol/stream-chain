@@ -20,7 +20,6 @@ import (
 	"gopkg.in/typ.v4/slices"
 
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/dtypes"
-	feetierstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	prices "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
@@ -625,12 +624,6 @@ func TestHydrationWithMatchPreBlocker(t *testing.T) {
 					constants.ClobPair_Btc,
 				}
 				genesisState.LiquidationsConfig = clobtypes.LiquidationsConfig_Default
-			},
-		)
-		testapp.UpdateGenesisDocWithAppStateForModule(
-			&genesis,
-			func(genesisState *feetierstypes.GenesisState) {
-				genesisState.Params = constants.PerpetualFeeParamsNoFee
 			},
 		)
 		return genesis

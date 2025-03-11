@@ -26,7 +26,6 @@ import (
 	blocktimemodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/blocktime"
 	clobmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob"
 	epochsmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/epochs"
-	feetiersmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers"
 	govplusmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/govplus"
 	perpetualsmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals"
 	pricesmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices"
@@ -70,7 +69,6 @@ var (
 		assetsmodule.AppModuleBasic{},
 		blocktimemodule.AppModuleBasic{},
 		bridgemodule.AppModuleBasic{},
-		feetiersmodule.AppModuleBasic{},
 		perpetualsmodule.AppModuleBasic{},
 		statsmodule.AppModuleBasic{},
 		subaccountsmodule.AppModuleBasic{},

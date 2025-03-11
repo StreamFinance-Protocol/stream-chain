@@ -1436,8 +1436,6 @@ func TestPrepareCheckState(t *testing.T) {
 			keepertest.CreateTestLiquidityTiers(t, ctx, ks.PerpetualsKeeper)
 			keepertest.CreateTestCollateralPools(t, ctx, ks.PerpetualsKeeper)
 
-			require.NoError(t, ks.FeeTiersKeeper.SetPerpetualFeeParams(ctx, constants.PerpetualFeeParams))
-
 			// Create all perpetuals.
 			for _, p := range tc.perpetuals {
 				_, err := ks.PerpetualsKeeper.CreatePerpetual(

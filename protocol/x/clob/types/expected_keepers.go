@@ -121,10 +121,6 @@ type BlockTimeKeeper interface {
 	GetPreviousBlockInfo(ctx sdk.Context) blocktimetypes.BlockInfo
 }
 
-type FeeTiersKeeper interface {
-	GetPerpetualFeePpm(ctx sdk.Context, address string, isTaker bool) int32
-}
-
 type PerpetualsKeeper interface {
 	GetNetNotional(
 		ctx sdk.Context,

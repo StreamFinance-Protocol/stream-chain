@@ -36,7 +36,6 @@ type (
 		assetsKeeper      types.AssetsKeeper
 		bankKeeper        types.BankKeeper
 		blockTimeKeeper   types.BlockTimeKeeper
-		feeTiersKeeper    types.FeeTiersKeeper
 		perpetualsKeeper  types.PerpetualsKeeper
 		pricesKeeper      types.PricesKeeper
 		statsKeeper       types.StatsKeeper
@@ -80,7 +79,6 @@ func NewKeeper(
 	assetsKeeper types.AssetsKeeper,
 	blockTimeKeeper types.BlockTimeKeeper,
 	bankKeeper types.BankKeeper,
-	feeTiersKeeper types.FeeTiersKeeper,
 	perpetualsKeeper types.PerpetualsKeeper,
 	pricesKeeper types.PricesKeeper,
 	statsKeeper types.StatsKeeper,
@@ -105,7 +103,6 @@ func NewKeeper(
 		assetsKeeper:                 assetsKeeper,
 		blockTimeKeeper:              blockTimeKeeper,
 		bankKeeper:                   bankKeeper,
-		feeTiersKeeper:               feeTiersKeeper,
 		perpetualsKeeper:             perpetualsKeeper,
 		pricesKeeper:                 pricesKeeper,
 		statsKeeper:                  statsKeeper,

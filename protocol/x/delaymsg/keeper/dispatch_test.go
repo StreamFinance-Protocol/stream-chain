@@ -6,14 +6,11 @@ import (
 
 	"cosmossdk.io/log"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/mocks"
-	testapp "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/app"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/constants"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/encoding"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/delaymsg/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/delaymsg/types"
-	feetierstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers/types"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
-	cometbfttypes "github.com/cometbft/cometbft/types"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/mock"
@@ -277,38 +274,4 @@ func TestDispatchMessagesForBlock_Mixed(t *testing.T) {
 			mock.AssertExpectationsForObjects(t, k, ms, cms)
 		})
 	}
-}
-
-// TestSendDelayedPerpetualFeeParamsUpdate tests that the delayed message testApp genesis state, which contains a
-// message to update the x/feetiers perpetual fee params after ~120 days of blocks, is executed correctly. In this
-// test, we modify the genesis state to apply the parameter update on block 2 to validate that the update is applied
-// correctly.
-func TestSendDelayedPerpetualFeeParamsUpdate(t *testing.T) {
-	// TODO(CORE-858): Re-enable determinism checks once non-determinism issue is found and resolved.
-	tApp := testapp.NewTestAppBuilder(t).WithGenesisDocFn(func() (genesis cometbfttypes.GenesisDoc) {
-		genesis = testapp.DefaultGenesis()
-		// Update the genesis state to execute the perpetual fee params update at block 2.
-		testapp.UpdateGenesisDocWithAppStateForModule(
-			&genesis,
-			func(genesisState *types.GenesisState) {
-				// Update the default state to apply the first delayed message on block 2.
-				// This is the PerpetualFeeParamsUpdate message.
-				genesisState.DelayedMessages[0].BlockHeight = 2
-			},
-		)
-		return genesis
-	}).WithNonDeterminismChecksEnabled(false).Build()
-	ctx := tApp.InitChain()
-
-	resp, err := tApp.App.FeeTiersKeeper.PerpetualFeeParams(ctx, &feetierstypes.QueryPerpetualFeeParamsRequest{})
-	require.NoError(t, err)
-	require.Equal(t, feetierstypes.PromotionalParams(), resp.Params)
-
-	// Advance to block 2 and invoke delayed message to complete bridge. In this context, bridge seems to be
-	// referring to an implicit bridging operation not reliant on the bridge module.
-	ctx = tApp.AdvanceToBlock(3, testapp.AdvanceToBlockOptions{})
-
-	resp, err = tApp.App.FeeTiersKeeper.PerpetualFeeParams(ctx, &feetierstypes.QueryPerpetualFeeParamsRequest{})
-	require.NoError(t, err)
-	require.Equal(t, feetierstypes.StandardParams(), resp.Params)
 }

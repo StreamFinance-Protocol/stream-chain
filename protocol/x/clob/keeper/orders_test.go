@@ -28,7 +28,6 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/memclob"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
-	feetypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	statstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/stats/types"
@@ -52,7 +51,6 @@ func TestPlaceShortTermOrder(t *testing.T) {
 		clobs          []types.ClobPair
 		existingOrders []types.Order
 		// Fee tier params.
-		feeParams feetypes.PerpetualFeeParams
 
 		// Parameters.
 		order types.Order
@@ -73,8 +71,7 @@ func TestPlaceShortTermOrder(t *testing.T) {
 			subaccounts: []satypes.Subaccount{
 				constants.Carl_Num0_1BTC_Short,
 			},
-			clobs:     []types.ClobPair{constants.ClobPair_Btc},
-			feeParams: constants.PerpetualFeeParams,
+			clobs: []types.ClobPair{constants.ClobPair_Btc},
 
 			order: constants.Order_Carl_Num0_Id1_Clob0_Buy1BTC_Price49999,
 
@@ -97,7 +94,6 @@ func TestPlaceShortTermOrder(t *testing.T) {
 				constants.ClobPair_Btc,
 				constants.ClobPair_Eth,
 			},
-			feeParams: constants.PerpetualFeeParams,
 
 			order: constants.Order_Carl_Num0_Id2_Clob1_Buy10ETH_Price3000,
 
@@ -122,7 +118,6 @@ func TestPlaceShortTermOrder(t *testing.T) {
 			existingOrders: []types.Order{
 				constants.Order_Dave_Num0_Id0_Clob0_Sell1BTC_Price50000,
 			},
-			feeParams: constants.PerpetualFeeParams,
 
 			order: constants.Order_Carl_Num0_Id0_Clob0_Buy1BTC_Price50000_GTB10,
 
@@ -171,7 +166,6 @@ func TestPlaceShortTermOrder(t *testing.T) {
 				constants.ClobPair_Btc,
 				constants.ClobPair_Eth,
 			},
-			feeParams: constants.PerpetualFeeParams,
 
 			order: constants.Order_Carl_Num0_Id3_Clob1_Buy1ETH_Price3000,
 
@@ -192,7 +186,6 @@ func TestPlaceShortTermOrder(t *testing.T) {
 			clobs: []types.ClobPair{
 				constants.ClobPair_Btc,
 			},
-			feeParams: constants.PerpetualFeeParamsNoFee,
 
 			order: constants.Order_Carl_Num0_Id0_Clob0_Buy10QtBTC_Price100000QuoteQt,
 
@@ -214,7 +207,6 @@ func TestPlaceShortTermOrder(t *testing.T) {
 				// Exact same set-up as the previous test, except the clob pair has fees.
 				constants.ClobPair_Btc,
 			},
-			feeParams: constants.PerpetualFeeParams,
 
 			order: constants.Order_Carl_Num0_Id0_Clob0_Buy10QtBTC_Price100000QuoteQt,
 
@@ -237,7 +229,6 @@ func TestPlaceShortTermOrder(t *testing.T) {
 			},
 			// Same setup as the above two tests, but the order is for a slightly higher price that
 			// cannot be collateralized without the rebate.
-			feeParams: constants.PerpetualFeeParamsMakerRebate,
 
 			order: constants.Order_Carl_Num0_Id0_Clob0_Buy10QtBTC_Price100001QuoteQt,
 
@@ -259,7 +250,6 @@ func TestPlaceShortTermOrder(t *testing.T) {
 			clobs: []types.ClobPair{
 				constants.ClobPair_Btc,
 			},
-			feeParams: constants.PerpetualFeeParams,
 
 			order: constants.Order_Carl_Num0_Id3_Clob1_Buy1ETH_Price3000,
 
@@ -280,7 +270,6 @@ func TestPlaceShortTermOrder(t *testing.T) {
 			clobs: []types.ClobPair{
 				constants.ClobPair_Btc,
 			},
-			feeParams: constants.PerpetualFeeParams,
 
 			order: types.Order{
 				OrderId: types.OrderId{
@@ -306,7 +295,6 @@ func TestPlaceShortTermOrder(t *testing.T) {
 			clobs: []types.ClobPair{
 				constants.ClobPair_Btc,
 			},
-			feeParams: constants.PerpetualFeeParams,
 
 			order: types.Order{
 				OrderId: types.OrderId{
@@ -332,7 +320,6 @@ func TestPlaceShortTermOrder(t *testing.T) {
 			clobs: []types.ClobPair{
 				constants.ClobPair_Btc,
 			},
-			feeParams: constants.PerpetualFeeParams,
 
 			order: types.Order{
 				OrderId:  types.OrderId{},
@@ -356,7 +343,6 @@ func TestPlaceShortTermOrder(t *testing.T) {
 			clobs: []types.ClobPair{
 				constants.ClobPair_Btc,
 			},
-			feeParams: constants.PerpetualFeeParams,
 
 			order: types.Order{
 				OrderId:      types.OrderId{},
@@ -381,7 +367,6 @@ func TestPlaceShortTermOrder(t *testing.T) {
 			clobs: []types.ClobPair{
 				constants.ClobPair_Btc,
 			},
-			feeParams: constants.PerpetualFeeParams,
 
 			order: types.Order{
 				OrderId:      types.OrderId{},
@@ -420,7 +405,6 @@ func TestPlaceShortTermOrder(t *testing.T) {
 				// The taker subaccount places an order which fully fills the previous order.
 				constants.Order_Carl_Num0_Id0_Clob0_Sell1kQtBTC_Price50000,
 			},
-			feeParams: constants.PerpetualFeeParamsNoFee,
 			// The maker subaccount places a second order identical to the first.
 			// This should fail, because the maker subaccount currently has a balance of $0 tDAI, and a perpetual of size
 			// 0.01 BTC ($500), and the perpetual has a 100% margin requirement.
@@ -450,7 +434,6 @@ func TestPlaceShortTermOrder(t *testing.T) {
 				// The subaccount from the above order now places an order which is added to the book.
 				constants.Order_Carl_Num0_Id1_Clob0_Sell1kQtBTC_Price50000,
 			},
-			feeParams: constants.PerpetualFeeParamsNoFee,
 			// The maker subaccount places a second order identical to the first.
 			// This should fail, because the maker during matching, because subaccount currently has a balance of $0 tDAI,
 			// and a perpetual of size 0.01 BTC ($500), and the perpetual has a 100% margin requirement.
@@ -483,7 +466,6 @@ func TestPlaceShortTermOrder(t *testing.T) {
 				// Alice places another sell order for $500 worth of BTC which now rests on the book.
 				constants.Order_Carl_Num0_Id1_Clob0_Sell1kQtBTC_Price50000,
 			},
-			feeParams: constants.PerpetualFeeParamsNoFee,
 			// Bob places a second order at a lower price than his first.
 			// This should succeed, because Bob currently has a balance of $0 tDAI,
 			// and a perpetual of size 0.01 BTC ($500), and the perpetual has a 50% margin requirement.
@@ -562,7 +544,6 @@ func TestPlaceShortTermOrder(t *testing.T) {
 				// This completely fills Alice's order at the maker price of $3,000.
 				constants.Order_Dave_Num0_Id3_Clob1_Sell1ETH_Price3000,
 			},
-			feeParams: constants.PerpetualFeeParamsNoFee,
 			// Bob places a second buy order at a the same price as the first.
 			// This should bring his total initial margin requirement to $3,300 * 20%, or $660
 			// which is exactly equal to the quote balance.
@@ -587,7 +568,6 @@ func TestPlaceShortTermOrder(t *testing.T) {
 				constants.ClobPair_Btc,
 			},
 			existingOrders: []types.Order{},
-			feeParams:      constants.PerpetualFeeParamsNoFee,
 			order:          constants.Order_Carl_Num0_Id0_Clob0_Buy1BTC_Price5subticks_GTB10,
 			expectedErr:    types.ErrOrderWouldExceedMaxOpenOrdersEquityTierLimit,
 		},
@@ -600,7 +580,6 @@ func TestPlaceShortTermOrder(t *testing.T) {
 				constants.ClobPair_Btc,
 			},
 			existingOrders: []types.Order{},
-			feeParams:      constants.PerpetualFeeParamsNoFee,
 			order:          constants.Order_Carl_Num0_Id0_Clob0_Sell1BTC_Price500000_GTB10,
 			expectedErr:    types.ErrOrderWouldExceedMaxOpenOrdersEquityTierLimit,
 		},
@@ -619,7 +598,6 @@ func TestPlaceShortTermOrder(t *testing.T) {
 				constants.ClobPair_Btc,
 			},
 			existingOrders:           []types.Order{},
-			feeParams:                constants.PerpetualFeeParamsNoFee,
 			order:                    constants.Order_Carl_Num0_Id0_Clob0_Buy1BTC_Price5subticks_GTB10,
 			expectedOrderStatus:      types.Success,
 			expectedFilledSize:       0,
@@ -635,7 +613,6 @@ func TestPlaceShortTermOrder(t *testing.T) {
 				constants.ClobPair_Btc,
 			},
 			existingOrders:           []types.Order{},
-			feeParams:                constants.PerpetualFeeParamsNoFee,
 			order:                    constants.Order_Carl_Num0_Id0_Clob0_Buy1BTC_Price500000_GTB10,
 			expectedOrderStatus:      types.Undercollateralized,
 			expectedFilledSize:       0,
@@ -650,7 +627,6 @@ func TestPlaceShortTermOrder(t *testing.T) {
 				constants.ClobPair_Btc,
 			},
 			existingOrders:           []types.Order{},
-			feeParams:                constants.PerpetualFeeParamsNoFee,
 			order:                    constants.Order_Carl_Num0_Id0_Clob0_Buy1BTC_Price5subticks_GTB10,
 			expectedOrderStatus:      types.Success,
 			expectedFilledSize:       0,
@@ -672,7 +648,6 @@ func TestPlaceShortTermOrder(t *testing.T) {
 				constants.ClobPair_Btc,
 			},
 			existingOrders:           []types.Order{},
-			feeParams:                constants.PerpetualFeeParamsNoFee,
 			order:                    constants.Order_Carl_Num0_Id0_Clob0_Sell1BTC_Price500000_GTB10,
 			expectedOrderStatus:      types.Success,
 			expectedFilledSize:       0,
@@ -688,7 +663,6 @@ func TestPlaceShortTermOrder(t *testing.T) {
 				constants.ClobPair_Btc,
 			},
 			existingOrders:           []types.Order{},
-			feeParams:                constants.PerpetualFeeParamsNoFee,
 			order:                    constants.Order_Carl_Num0_Id0_Clob0_Sell1BTC_Price5000_GTB10,
 			expectedOrderStatus:      types.Undercollateralized,
 			expectedFilledSize:       0,
@@ -703,7 +677,6 @@ func TestPlaceShortTermOrder(t *testing.T) {
 				constants.ClobPair_Btc,
 			},
 			existingOrders:           []types.Order{},
-			feeParams:                constants.PerpetualFeeParamsNoFee,
 			order:                    constants.Order_Carl_Num0_Id0_Clob0_Sell1BTC_Price500000_GTB10,
 			expectedOrderStatus:      types.Success,
 			expectedFilledSize:       0,
@@ -737,8 +710,6 @@ func TestPlaceShortTermOrder(t *testing.T) {
 			// Create liquidity tiers.
 			keepertest.CreateTestLiquidityTiers(t, ctx, ks.PerpetualsKeeper)
 			keepertest.CreateTestCollateralPools(t, ctx, ks.PerpetualsKeeper)
-
-			require.NoError(t, ks.FeeTiersKeeper.SetPerpetualFeeParams(ctx, tc.feeParams))
 
 			// Create all perpetuals.
 			for _, p := range tc.perpetuals {
@@ -988,8 +959,6 @@ func TestAddPreexistingStatefulOrder(t *testing.T) {
 			// Create liquidity tiers.
 			keepertest.CreateTestLiquidityTiers(t, ctx, ks.PerpetualsKeeper)
 			keepertest.CreateTestCollateralPools(t, ctx, ks.PerpetualsKeeper)
-
-			require.NoError(t, ks.FeeTiersKeeper.SetPerpetualFeeParams(ctx, constants.PerpetualFeeParamsNoFee))
 
 			// Create all perpetuals.
 			for _, p := range tc.perpetuals {

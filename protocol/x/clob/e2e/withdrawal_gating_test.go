@@ -19,7 +19,6 @@ import (
 	testapp "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/app"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/constants"
 	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
-	feetiertypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	prices "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
 	sendingtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending/types"
@@ -305,12 +304,6 @@ func TestWithdrawalGating_NegativeTncSubaccount_BlocksThenUnblocks(t *testing.T)
 						genesisState.ClobPairs = tc.clobPairs
 						genesisState.LiquidationsConfig = tc.liquidationConfig
 						genesisState.EquityTierLimitConfig = clobtypes.EquityTierLimitConfiguration{}
-					},
-				)
-				testapp.UpdateGenesisDocWithAppStateForModule(
-					&genesis,
-					func(genesisState *feetiertypes.GenesisState) {
-						genesisState.Params = constants.PerpetualFeeParamsNoFee
 					},
 				)
 				return genesis

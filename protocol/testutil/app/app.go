@@ -42,7 +42,6 @@ import (
 	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	delaymsgtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/delaymsg/types"
 	epochstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/epochs/types"
-	feetiertypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
 	sendingtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending/types"
@@ -193,7 +192,6 @@ type GenesisStates interface {
 	authtypes.GenesisState |
 		banktypes.GenesisState |
 		perptypes.GenesisState |
-		feetiertypes.GenesisState |
 		stattypes.GenesisState |
 		blocktimetypes.GenesisState |
 		clobtypes.GenesisState |
@@ -234,8 +232,6 @@ func UpdateGenesisDocWithAppStateForModule[T GenesisStates](genesisDoc *types.Ge
 		moduleName = perptypes.ModuleName
 	case clobtypes.GenesisState:
 		moduleName = clobtypes.ModuleName
-	case feetiertypes.GenesisState:
-		moduleName = feetiertypes.ModuleName
 	case pricestypes.GenesisState:
 		moduleName = pricestypes.ModuleName
 	case stattypes.GenesisState:

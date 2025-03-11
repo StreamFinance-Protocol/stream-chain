@@ -21,7 +21,6 @@ import (
 	cli_testutil "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/client/testutil"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	epochstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/epochs/types"
-	feetierstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
 	sa_testutil "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/client/testutil"
@@ -226,9 +225,6 @@ func (s *CancelOrderIntegrationTestSuite) SetupTest() {
 
 	epstate := constants.GenerateEpochGenesisStateWithoutFunding()
 
-	feeTiersState := feetierstypes.GenesisState{}
-	feeTiersState.Params = constants.PerpetualFeeParams
-
 	epbuf, err := s.cfg.Codec.MarshalJSON(&epstate)
 	s.Require().NoError(err)
 	s.cfg.GenesisState[epochstypes.ModuleName] = epbuf
@@ -244,10 +240,6 @@ func (s *CancelOrderIntegrationTestSuite) SetupTest() {
 	pricesbuf, err := s.cfg.Codec.MarshalJSON(&pricesstate)
 	s.Require().NoError(err)
 	s.cfg.GenesisState[pricestypes.ModuleName] = pricesbuf
-
-	feeTiersBuf, err := s.cfg.Codec.MarshalJSON(&feeTiersState)
-	s.Require().NoError(err)
-	s.cfg.GenesisState[feetierstypes.ModuleName] = feeTiersBuf
 
 	s.network = network.New(s.T(), s.cfg)
 

@@ -159,9 +159,6 @@ import (
 	epochsmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/epochs"
 	epochsmodulekeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/epochs/keeper"
 	epochsmoduletypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/epochs/types"
-	feetiersmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers"
-	feetiersmodulekeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers/keeper"
-	feetiersmoduletypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers/types"
 	govplusmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/govplus"
 	govplusmodulekeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/govplus/keeper"
 	govplusmoduletypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/govplus/types"
@@ -263,8 +260,6 @@ type App struct {
 	BridgeKeeper bridgemodulekeeper.Keeper
 
 	DelayMsgKeeper delaymsgmodulekeeper.Keeper
-
-	FeeTiersKeeper feetiersmodulekeeper.Keeper
 
 	PerpetualsKeeper perpetualsmodulekeeper.Keeper
 
@@ -369,7 +364,6 @@ func New(
 		assetsmoduletypes.StoreKey,
 		blocktimemoduletypes.StoreKey,
 		bridgemoduletypes.StoreKey,
-		feetiersmoduletypes.StoreKey,
 		perpetualsmoduletypes.StoreKey,
 		satypes.StoreKey,
 		statsmoduletypes.StoreKey,
@@ -839,18 +833,6 @@ func New(
 	)
 	statsModule := statsmodule.NewAppModule(appCodec, app.StatsKeeper)
 
-	app.FeeTiersKeeper = *feetiersmodulekeeper.NewKeeper(
-		appCodec,
-		app.StatsKeeper,
-		keys[feetiersmoduletypes.StoreKey],
-		// set the governance and delaymsg module accounts as the authority for conducting upgrades
-		[]string{
-			lib.GovModuleAddress.String(),
-			delaymsgmoduletypes.ModuleAddress.String(),
-		},
-	)
-	feeTiersModule := feetiersmodule.NewAppModule(appCodec, app.FeeTiersKeeper)
-
 	app.SubaccountsKeeper = *subaccountsmodulekeeper.NewKeeper(
 		appCodec,
 		keys[satypes.StoreKey],
@@ -930,7 +912,6 @@ func New(
 		app.AssetsKeeper,
 		app.BlockTimeKeeper,
 		app.BankKeeper,
-		app.FeeTiersKeeper,
 		app.PerpetualsKeeper,
 		app.PricesKeeper,
 		app.StatsKeeper,
@@ -1043,7 +1024,6 @@ func New(
 		assetsModule,
 		blockTimeModule,
 		bridgeModule,
-		feeTiersModule,
 		perpetualsModule,
 		statsModule,
 		subaccountsModule,
@@ -1082,7 +1062,6 @@ func New(
 		pricesmoduletypes.ModuleName,
 		assetsmoduletypes.ModuleName,
 		bridgemoduletypes.ModuleName,
-		feetiersmoduletypes.ModuleName,
 		perpetualsmoduletypes.ModuleName,
 		statsmoduletypes.ModuleName,
 		satypes.ModuleName,
@@ -1113,7 +1092,6 @@ func New(
 		pricesmoduletypes.ModuleName,
 		assetsmoduletypes.ModuleName,
 		bridgemoduletypes.ModuleName,
-		feetiersmoduletypes.ModuleName,
 		perpetualsmoduletypes.ModuleName,
 		statsmoduletypes.ModuleName,
 		satypes.ModuleName,
@@ -1148,7 +1126,6 @@ func New(
 		assetsmoduletypes.ModuleName,
 		blocktimemoduletypes.ModuleName,
 		bridgemoduletypes.ModuleName,
-		feetiersmoduletypes.ModuleName,
 		perpetualsmoduletypes.ModuleName,
 		statsmoduletypes.ModuleName,
 		satypes.ModuleName,
@@ -1181,7 +1158,6 @@ func New(
 		assetsmoduletypes.ModuleName,
 		blocktimemoduletypes.ModuleName,
 		bridgemoduletypes.ModuleName,
-		feetiersmoduletypes.ModuleName,
 		perpetualsmoduletypes.ModuleName,
 		statsmoduletypes.ModuleName,
 		satypes.ModuleName,

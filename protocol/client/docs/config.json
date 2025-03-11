@@ -47,14 +47,6 @@
       }
     },
     {
-      "url": "./tmp-swagger-gen/klyraprotocol/feetiers/query.swagger.json",
-      "operationIds": {
-        "rename": {
-          "Params": "FeetierParams"
-        }
-      }
-    },
-    {
       "url": "./tmp-swagger-gen/klyraprotocol/perpetuals/query.swagger.json",
       "operationIds": {
         "rename": {

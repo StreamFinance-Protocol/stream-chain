@@ -186,10 +186,6 @@ var (
 		"/klyraprotocol.delaymsg.MsgDelayMessage":         {},
 		"/klyraprotocol.delaymsg.MsgDelayMessageResponse": {},
 
-		// feetiers
-		"/klyraprotocol.feetiers.MsgUpdatePerpetualFeeParams":         {},
-		"/klyraprotocol.feetiers.MsgUpdatePerpetualFeeParamsResponse": {},
-
 		// govplus
 		"/klyraprotocol.govplus.MsgSlashValidator":         {},
 		"/klyraprotocol.govplus.MsgSlashValidatorResponse": {},

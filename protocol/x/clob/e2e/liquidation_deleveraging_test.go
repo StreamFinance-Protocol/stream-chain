@@ -15,7 +15,6 @@ import (
 	clobtest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/clob"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/constants"
 	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
-	feetiertypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	prices "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
@@ -325,12 +324,6 @@ func TestLiquidationConfig(t *testing.T) {
 						genesisState.ClobPairs = tc.clobPairs
 						genesisState.LiquidationsConfig = tc.liquidationConfig
 						genesisState.EquityTierLimitConfig = clobtypes.EquityTierLimitConfiguration{}
-					},
-				)
-				testapp.UpdateGenesisDocWithAppStateForModule(
-					&genesis,
-					func(genesisState *feetiertypes.GenesisState) {
-						genesisState.Params = constants.PerpetualFeeParamsNoFee
 					},
 				)
 				return genesis
@@ -1009,12 +1002,6 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 						genesisState.ClobPairs = tc.clobPairs
 						genesisState.LiquidationsConfig = tc.liquidationConfig
 						genesisState.EquityTierLimitConfig = clobtypes.EquityTierLimitConfiguration{}
-					},
-				)
-				testapp.UpdateGenesisDocWithAppStateForModule(
-					&genesis,
-					func(genesisState *feetiertypes.GenesisState) {
-						genesisState.Params = constants.PerpetualFeeParamsNoFee
 					},
 				)
 				return genesis

@@ -9,7 +9,6 @@ import (
 	clobtestutils "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/clob"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/constants"
 	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
-	feetiertypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers/types"
 	prices "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
 	yieldkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/keeper"
@@ -258,12 +257,6 @@ func TestDeliverTxMatchValidation(t *testing.T) {
 					&genesis,
 					func(genesisState *satypes.GenesisState) {
 						genesisState.Subaccounts = tc.subaccounts
-					},
-				)
-				testapp.UpdateGenesisDocWithAppStateForModule(
-					&genesis,
-					func(genesisState *feetiertypes.GenesisState) {
-						genesisState.Params = constants.PerpetualFeeParamsNoFee
 					},
 				)
 				testapp.UpdateGenesisDocWithAppStateForModule(

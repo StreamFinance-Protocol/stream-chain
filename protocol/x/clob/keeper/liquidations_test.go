@@ -24,7 +24,6 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/memclob"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
-	feetypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
@@ -44,8 +43,7 @@ func TestPlacePerpetualLiquidation(t *testing.T) {
 		// Subaccount state.
 		subaccounts []satypes.Subaccount
 		// CLOB state.
-		clobs     []types.ClobPair
-		feeParams feetypes.PerpetualFeeParams
+		clobs []types.ClobPair
 
 		existingOrders []types.Order
 
@@ -66,8 +64,7 @@ func TestPlacePerpetualLiquidation(t *testing.T) {
 			subaccounts: []satypes.Subaccount{
 				constants.Dave_Num0_1BTC_Long_46000USD_Short,
 			},
-			clobs:     []types.ClobPair{constants.ClobPair_Btc},
-			feeParams: constants.PerpetualFeeParams,
+			clobs: []types.ClobPair{constants.ClobPair_Btc},
 
 			order: constants.LiquidationOrder_Dave_Num0_Clob0_Sell1BTC_Price50000,
 
@@ -85,8 +82,7 @@ func TestPlacePerpetualLiquidation(t *testing.T) {
 				constants.Carl_Num0_1BTC_Short,
 				constants.Dave_Num0_1BTC_Long_46000USD_Short,
 			},
-			clobs:     []types.ClobPair{constants.ClobPair_Btc},
-			feeParams: constants.PerpetualFeeParams,
+			clobs: []types.ClobPair{constants.ClobPair_Btc},
 
 			existingOrders: []types.Order{
 				constants.Order_Carl_Num0_Id0_Clob0_Buy1BTC_Price50000_GTB10,
@@ -128,8 +124,7 @@ func TestPlacePerpetualLiquidation(t *testing.T) {
 				constants.Carl_Num0_1BTC_Short,
 				constants.Dave_Num0_1BTC_Long_46000USD_Short,
 			},
-			clobs:     []types.ClobPair{constants.ClobPair_Btc},
-			feeParams: constants.PerpetualFeeParams,
+			clobs: []types.ClobPair{constants.ClobPair_Btc},
 
 			existingOrders: []types.Order{
 				// Note this order will be removed when matching.
@@ -173,8 +168,7 @@ func TestPlacePerpetualLiquidation(t *testing.T) {
 				constants.Carl_Num0_1BTC_Short,
 				constants.Dave_Num0_1BTC_Long_46000USD_Short,
 			},
-			clobs:     []types.ClobPair{constants.ClobPair_Btc},
-			feeParams: constants.PerpetualFeeParamsMakerRebate,
+			clobs: []types.ClobPair{constants.ClobPair_Btc},
 
 			existingOrders: []types.Order{
 				constants.Order_Carl_Num0_Id0_Clob0_Buy1BTC_Price50000_GTB10,
@@ -216,8 +210,7 @@ func TestPlacePerpetualLiquidation(t *testing.T) {
 				constants.Carl_Num0_1BTC_Short,
 				constants.Dave_Num0_1BTC_Long_46000USD_Short,
 			},
-			clobs:     []types.ClobPair{constants.ClobPair_Btc},
-			feeParams: constants.PerpetualFeeParamsMakerRebate,
+			clobs: []types.ClobPair{constants.ClobPair_Btc},
 			existingOrders: []types.Order{
 				constants.Order_Carl_Num0_Id0_Clob0_Buy1BTC_Price50000_GTB10,
 			},
@@ -319,8 +312,6 @@ func TestPlacePerpetualLiquidation(t *testing.T) {
 			// Create liquidity tiers.
 			keepertest.CreateTestLiquidityTiers(t, ctx, ks.PerpetualsKeeper)
 			keepertest.CreateTestCollateralPools(t, ctx, ks.PerpetualsKeeper)
-
-			require.NoError(t, ks.FeeTiersKeeper.SetPerpetualFeeParams(ctx, tc.feeParams))
 
 			// Create all perpetuals.
 			for _, p := range tc.perpetuals {
@@ -1119,8 +1110,6 @@ func TestPlacePerpetualLiquidation_PreexistingLiquidation(t *testing.T) {
 				)
 				require.NoError(t, err)
 			}
-
-			require.NoError(t, ks.FeeTiersKeeper.SetPerpetualFeeParams(ctx, constants.PerpetualFeeParams))
 
 			testPerps := []perptypes.Perpetual{
 				constants.BtcUsd_100PercentMarginRequirement,
@@ -2551,8 +2540,6 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 			// Create liquidity tiers.
 			keepertest.CreateTestLiquidityTiers(t, ctx, ks.PerpetualsKeeper)
 			keepertest.CreateTestCollateralPools(t, ctx, ks.PerpetualsKeeper)
-
-			require.NoError(t, ks.FeeTiersKeeper.SetPerpetualFeeParams(ctx, constants.PerpetualFeeParamsNoFee))
 
 			perpetuals := []perptypes.Perpetual{
 				constants.BtcUsd_20PercentInitial_10PercentMaintenance,
@@ -4561,8 +4548,6 @@ func TestMaybeGetLiquidationOrder(t *testing.T) {
 			keepertest.CreateTestLiquidityTiers(t, ctx, ks.PerpetualsKeeper)
 			keepertest.CreateTestCollateralPools(t, ctx, ks.PerpetualsKeeper)
 
-			require.NoError(t, ks.FeeTiersKeeper.SetPerpetualFeeParams(ctx, constants.PerpetualFeeParams))
-
 			// Create all perpetuals.
 			for _, p := range tc.perpetuals {
 				_, err := ks.PerpetualsKeeper.CreatePerpetual(
@@ -5138,8 +5123,7 @@ func TestLiquidateSubaccountsAgainstOrderbookInternal(t *testing.T) {
 		// Subaccount state.
 		subaccounts []satypes.Subaccount
 		// CLOB state.
-		clobs     []types.ClobPair
-		feeParams feetypes.PerpetualFeeParams
+		clobs []types.ClobPair
 
 		existingOrders []types.Order
 
@@ -5164,8 +5148,7 @@ func TestLiquidateSubaccountsAgainstOrderbookInternal(t *testing.T) {
 				constants.Carl_Num0_1BTC_Short,
 				constants.Dave_Num0_1BTC_Long_49500USD_Short,
 			},
-			clobs:     []types.ClobPair{constants.ClobPair_Btc},
-			feeParams: constants.PerpetualFeeParams,
+			clobs: []types.ClobPair{constants.ClobPair_Btc},
 
 			existingOrders: []types.Order{
 				constants.Order_Carl_Num0_Id0_Clob0_Buy1BTC_Price45000_GTB10,
@@ -5198,8 +5181,7 @@ func TestLiquidateSubaccountsAgainstOrderbookInternal(t *testing.T) {
 				constants.Carl_Num0_1BTC_Short,
 				constants.Dave_Num0_1BTC_Long_46000USD_Short,
 			},
-			clobs:     []types.ClobPair{constants.ClobPair_Btc},
-			feeParams: constants.PerpetualFeeParams,
+			clobs: []types.ClobPair{constants.ClobPair_Btc},
 
 			existingOrders: []types.Order{
 				constants.Order_Carl_Num0_Id0_Clob0_Buy1BTC_Price49500_GTB10,
@@ -5228,8 +5210,7 @@ func TestLiquidateSubaccountsAgainstOrderbookInternal(t *testing.T) {
 				constants.Carl_Num0_1BTC_Short,
 				constants.Dave_Num0_TinyBTC_Long_1ETH_Long_2900USD_Short,
 			},
-			clobs:     []types.ClobPair{constants.ClobPair_Btc, constants.ClobPair_Eth},
-			feeParams: constants.PerpetualFeeParams,
+			clobs: []types.ClobPair{constants.ClobPair_Btc, constants.ClobPair_Eth},
 
 			existingOrders: []types.Order{
 				constants.Order_Carl_Num0_Id0_Clob0_Buy1BTC_Price49500_GTB10,
@@ -5263,8 +5244,7 @@ func TestLiquidateSubaccountsAgainstOrderbookInternal(t *testing.T) {
 				constants.Carl_Num0_1BTC_Short,
 				constants.Dave_Num0_TinyBTC_Long_1ETH_Long_2900USD_Short,
 			},
-			clobs:     []types.ClobPair{constants.ClobPair_Btc, constants.ClobPair_Eth},
-			feeParams: constants.PerpetualFeeParams,
+			clobs: []types.ClobPair{constants.ClobPair_Btc, constants.ClobPair_Eth},
 
 			existingOrders: []types.Order{
 				constants.Order_Carl_Num0_Id0_Clob0_Buy1BTC_Price49500_GTB10,
@@ -5301,8 +5281,7 @@ func TestLiquidateSubaccountsAgainstOrderbookInternal(t *testing.T) {
 				constants.Dave_Num1_1BTC_Long_46000USD_Short,
 				constants.Dave_Num2_1BTC_Long_46000USD_Short,
 			},
-			clobs:     []types.ClobPair{constants.ClobPair_Btc},
-			feeParams: constants.PerpetualFeeParams,
+			clobs: []types.ClobPair{constants.ClobPair_Btc},
 
 			existingOrders: []types.Order{
 				constants.Order_Carl_Num0_Id0_Clob0_Buy1BTC_Price49500_GTB10,
@@ -5348,8 +5327,7 @@ func TestLiquidateSubaccountsAgainstOrderbookInternal(t *testing.T) {
 				constants.Carl_Num0_1BTC_Short,
 				constants.Dave_Num0_1BTC_Long_46000USD_Short,
 			},
-			clobs:     []types.ClobPair{constants.ClobPair_Btc},
-			feeParams: constants.PerpetualFeeParams,
+			clobs: []types.ClobPair{constants.ClobPair_Btc},
 
 			existingOrders: []types.Order{
 				constants.Order_Carl_Num0_Id0_Clob0_Buy1BTC_Price49500_GTB10,
@@ -5378,8 +5356,7 @@ func TestLiquidateSubaccountsAgainstOrderbookInternal(t *testing.T) {
 				constants.Dave_Num0_1BTC_Long_46000USD_Short,
 				constants.Dave_Num1_1BTC_Long_46000USD_Short,
 			},
-			clobs:     []types.ClobPair{constants.ClobPair_Btc},
-			feeParams: constants.PerpetualFeeParams,
+			clobs: []types.ClobPair{constants.ClobPair_Btc},
 
 			existingOrders: []types.Order{
 				constants.Order_Carl_Num0_Id0_Clob0_Buy1BTC_Price49500_GTB10,
@@ -5417,8 +5394,7 @@ func TestLiquidateSubaccountsAgainstOrderbookInternal(t *testing.T) {
 				constants.Dave_Num0_1BTC_Long_46000USD_Short,
 				constants.Dave_Num1_1BTC_Long_46000USD_Short,
 			},
-			clobs:     []types.ClobPair{constants.ClobPair_Btc},
-			feeParams: constants.PerpetualFeeParams,
+			clobs: []types.ClobPair{constants.ClobPair_Btc},
 
 			existingOrders: []types.Order{
 				constants.Order_Carl_Num0_Id0_Clob0_Buy2BTC_Price49500_GTB10,
@@ -5453,8 +5429,7 @@ func TestLiquidateSubaccountsAgainstOrderbookInternal(t *testing.T) {
 				constants.Dave_Num1_1ETH_Long_2900USD_Short,
 				constants.Dave_Num2_1BTC_Long_46000USD_Short,
 			},
-			clobs:     []types.ClobPair{constants.ClobPair_Btc, constants.ClobPair_Eth},
-			feeParams: constants.PerpetualFeeParams,
+			clobs: []types.ClobPair{constants.ClobPair_Btc, constants.ClobPair_Eth},
 
 			existingOrders: []types.Order{
 				constants.Order_Carl_Num0_Id0_Clob0_Buy2BTC_Price49500_GTB10,
@@ -5503,8 +5478,7 @@ func TestLiquidateSubaccountsAgainstOrderbookInternal(t *testing.T) {
 				constants.Dave_Num1_1ETH_Long_2900USD_Short,
 				constants.Dave_Num2_1BTC_Long_46000USD_Short,
 			},
-			clobs:     []types.ClobPair{constants.ClobPair_Btc, constants.ClobPair_Eth},
-			feeParams: constants.PerpetualFeeParams,
+			clobs: []types.ClobPair{constants.ClobPair_Btc, constants.ClobPair_Eth},
 
 			existingOrders: []types.Order{
 				constants.Order_Carl_Num0_Id0_Clob0_Buy2BTC_Price49500_GTB10,
@@ -5608,8 +5582,6 @@ func TestLiquidateSubaccountsAgainstOrderbookInternal(t *testing.T) {
 			// Create liquidity tiers.
 			keepertest.CreateTestLiquidityTiers(t, ctx, ks.PerpetualsKeeper)
 			keepertest.CreateTestCollateralPools(t, ctx, ks.PerpetualsKeeper)
-
-			require.NoError(t, ks.FeeTiersKeeper.SetPerpetualFeeParams(ctx, tc.feeParams))
 
 			// Create all perpetuals.
 			for _, p := range tc.perpetuals {
@@ -6757,7 +6729,6 @@ func TestPlacePerpetualLiquidation_InLiquidateSubaccountsAgainstOrderbookInterna
 	tests := map[string]struct {
 		perpetuals                             []perptypes.Perpetual
 		subaccounts                            []satypes.Subaccount
-		feeParams                              feetypes.PerpetualFeeParams
 		subaccountIds                          *heap.LiquidationPriorityHeap
 		isolatedPositionsPriorityHeap          *heap.LiquidationPriorityHeap
 		MaxLiquidationAttemptsPerBlock         uint32
@@ -6770,7 +6741,6 @@ func TestPlacePerpetualLiquidation_InLiquidateSubaccountsAgainstOrderbookInterna
 			subaccounts: []satypes.Subaccount{
 				constants.Carl_Num0_1BTC_Short,
 			},
-			feeParams: constants.PerpetualFeeParams,
 			subaccountIds: &heap.LiquidationPriorityHeap{
 				{
 					SubaccountId: constants.Carl_Num0,
@@ -6793,8 +6763,6 @@ func TestPlacePerpetualLiquidation_InLiquidateSubaccountsAgainstOrderbookInterna
 			// Create liquidity tiers.
 			keepertest.CreateTestLiquidityTiers(t, ctx, ks.PerpetualsKeeper)
 			keepertest.CreateTestCollateralPools(t, ctx, ks.PerpetualsKeeper)
-
-			require.NoError(t, ks.FeeTiersKeeper.SetPerpetualFeeParams(ctx, tc.feeParams))
 
 			// Create all perpetuals.
 			for _, p := range tc.perpetuals {
@@ -6909,14 +6877,12 @@ func TestGetValidatorAndLiquidityFee(t *testing.T) {
 func TestGetInsuranceFundDeltaBlockLimit(t *testing.T) {
 	tests := map[string]struct {
 		perpetuals                           []perptypes.Perpetual
-		feeParams                            feetypes.PerpetualFeeParams
 		perpetualId                          uint32
 		expectedInsuranceFundDeltaBlockLimit *big.Int
 		expectedError                        error
 	}{
 		"perpetual does not exist - returns error": {
 			perpetuals:                           []perptypes.Perpetual{},
-			feeParams:                            constants.PerpetualFeeParams,
 			perpetualId:                          0,
 			expectedInsuranceFundDeltaBlockLimit: big.NewInt(0),
 			expectedError:                        errors.New("Perpetual does not exist"),
@@ -6925,7 +6891,6 @@ func TestGetInsuranceFundDeltaBlockLimit(t *testing.T) {
 			perpetuals: []perptypes.Perpetual{
 				constants.BtcUsd_SmallMarginRequirement_Isolated,
 			},
-			feeParams:                            constants.PerpetualFeeParams,
 			perpetualId:                          0,
 			expectedInsuranceFundDeltaBlockLimit: big.NewInt(1_000_000_000_000),
 			expectedError:                        nil,
@@ -6934,7 +6899,6 @@ func TestGetInsuranceFundDeltaBlockLimit(t *testing.T) {
 			perpetuals: []perptypes.Perpetual{
 				constants.BtcUsd_SmallMarginRequirement_DangerIndex,
 			},
-			feeParams:                            constants.PerpetualFeeParams,
 			perpetualId:                          0,
 			expectedInsuranceFundDeltaBlockLimit: big.NewInt(500_000),
 			expectedError:                        nil,
@@ -6960,8 +6924,6 @@ func TestGetInsuranceFundDeltaBlockLimit(t *testing.T) {
 				constants.CollateralPools[0].QuoteAssetId,
 			)
 			require.NoError(t, err)
-
-			require.NoError(t, ks.FeeTiersKeeper.SetPerpetualFeeParams(ctx, tc.feeParams))
 
 			// Create all perpetuals.
 			for _, p := range tc.perpetuals {

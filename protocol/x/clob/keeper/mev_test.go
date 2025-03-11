@@ -15,7 +15,6 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/memclob"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
-	feetierstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
@@ -35,7 +34,6 @@ func TestRecordMevMetrics(t *testing.T) {
 		// Setup.
 		subaccounts       []satypes.Subaccount
 		clobPairs         []types.ClobPair
-		feeParams         feetierstypes.PerpetualFeeParams
 		perpetuals        []perptypes.Perpetual
 		restingOrders     []types.Order
 		liquidationOrders []types.LiquidationOrder
@@ -67,7 +65,6 @@ func TestRecordMevMetrics(t *testing.T) {
 			clobPairs: []types.ClobPair{
 				constants.ClobPair_Btc,
 			},
-			feeParams: constants.PerpetualFeeParamsNoFee,
 			perpetuals: []perptypes.Perpetual{
 				constants.BtcUsd_20PercentInitial_10PercentMaintenance,
 			},
@@ -117,7 +114,6 @@ func TestRecordMevMetrics(t *testing.T) {
 			clobPairs: []types.ClobPair{
 				constants.ClobPair_Btc,
 			},
-			feeParams: constants.PerpetualFeeParamsNoFee,
 			perpetuals: []perptypes.Perpetual{
 				constants.BtcUsd_20PercentInitial_10PercentMaintenance,
 			},
@@ -163,7 +159,6 @@ func TestRecordMevMetrics(t *testing.T) {
 		// 	clobPairs: []types.ClobPair{
 		// 		constants.ClobPair_Btc,
 		// 	},
-		//  feeParams: constants.PerpetualFeeParamsNoFee,
 		// 	perpetuals: []perptypes.Perpetual{
 		// 		constants.BtcUsd_20PercentInitial_10PercentMaintenance,
 		// 	},
@@ -223,7 +218,6 @@ func TestRecordMevMetrics(t *testing.T) {
 		// 	clobPairs: []types.ClobPair{
 		// 		constants.ClobPair_Btc,
 		// 	},
-		//  feeParams: constants.PerpetualFeeParamsNoFee,
 		// 	perpetuals: []perptypes.Perpetual{
 		// 		constants.BtcUsd_20PercentInitial_10PercentMaintenance,
 		// 	},
@@ -284,7 +278,6 @@ func TestRecordMevMetrics(t *testing.T) {
 			clobPairs: []types.ClobPair{
 				constants.ClobPair_Btc,
 			},
-			feeParams: constants.PerpetualFeeParamsNoFee,
 			perpetuals: []perptypes.Perpetual{
 				constants.BtcUsd_20PercentInitial_10PercentMaintenance,
 			},
@@ -348,7 +341,6 @@ func TestRecordMevMetrics(t *testing.T) {
 			clobPairs: []types.ClobPair{
 				constants.ClobPair_Btc,
 			},
-			feeParams: constants.PerpetualFeeParamsNoFee,
 			perpetuals: []perptypes.Perpetual{
 				constants.BtcUsd_20PercentInitial_10PercentMaintenance,
 			},
@@ -412,7 +404,6 @@ func TestRecordMevMetrics(t *testing.T) {
 			clobPairs: []types.ClobPair{
 				constants.ClobPair_Btc,
 			},
-			feeParams: constants.PerpetualFeeParamsNoFee,
 			perpetuals: []perptypes.Perpetual{
 				constants.BtcUsd_20PercentInitial_10PercentMaintenance,
 			},
@@ -466,7 +457,6 @@ func TestRecordMevMetrics(t *testing.T) {
 			clobPairs: []types.ClobPair{
 				constants.ClobPair_Btc,
 			},
-			feeParams: constants.PerpetualFeeParamsNoFee,
 			perpetuals: []perptypes.Perpetual{
 				constants.BtcUsd_20PercentInitial_10PercentMaintenance,
 			},
@@ -521,7 +511,6 @@ func TestRecordMevMetrics(t *testing.T) {
 			clobPairs: []types.ClobPair{
 				constants.ClobPair_Btc,
 			},
-			feeParams: constants.PerpetualFeeParamsNoFee,
 			perpetuals: []perptypes.Perpetual{
 				constants.BtcUsd_20PercentInitial_10PercentMaintenance,
 			},
@@ -576,7 +565,6 @@ func TestRecordMevMetrics(t *testing.T) {
 			clobPairs: []types.ClobPair{
 				constants.ClobPair_Btc,
 			},
-			feeParams: constants.PerpetualFeeParamsNoFee,
 			perpetuals: []perptypes.Perpetual{
 				constants.BtcUsd_20PercentInitial_10PercentMaintenance,
 			},
@@ -618,7 +606,6 @@ func TestRecordMevMetrics(t *testing.T) {
 			clobPairs: []types.ClobPair{
 				constants.ClobPair_Btc,
 			},
-			feeParams: constants.PerpetualFeeParamsNoFee,
 			perpetuals: []perptypes.Perpetual{
 				constants.BtcUsd_20PercentInitial_10PercentMaintenance,
 			},
@@ -660,7 +647,6 @@ func TestRecordMevMetrics(t *testing.T) {
 			clobPairs: []types.ClobPair{
 				constants.ClobPair_Btc, // Non zero fee.
 			},
-			feeParams: constants.PerpetualFeeParams,
 			perpetuals: []perptypes.Perpetual{
 				constants.BtcUsd_20PercentInitial_10PercentMaintenance,
 			},
@@ -714,7 +700,6 @@ func TestRecordMevMetrics(t *testing.T) {
 			clobPairs: []types.ClobPair{
 				constants.ClobPair_Btc,
 			},
-			feeParams: constants.PerpetualFeeParamsNoFee,
 			perpetuals: []perptypes.Perpetual{
 				constants.BtcUsd_20PercentInitial_10PercentMaintenance,
 			},
@@ -879,8 +864,6 @@ func TestRecordMevMetrics(t *testing.T) {
 			// Create liquidity tiers.
 			keepertest.CreateTestLiquidityTiers(t, ctx, ks.PerpetualsKeeper)
 			keepertest.CreateTestCollateralPools(t, ctx, ks.PerpetualsKeeper)
-
-			require.NoError(t, ks.FeeTiersKeeper.SetPerpetualFeeParams(ctx, tc.feeParams))
 
 			// Create all perpetuals.
 			for _, p := range tc.perpetuals {
@@ -1267,8 +1250,6 @@ func TestGetMidPrices(t *testing.T) {
 			// Create liquidity tiers.
 			keepertest.CreateTestLiquidityTiers(t, ctx, ks.PerpetualsKeeper)
 			keepertest.CreateTestCollateralPools(t, ctx, ks.PerpetualsKeeper)
-
-			require.NoError(t, ks.FeeTiersKeeper.SetPerpetualFeeParams(ctx, constants.PerpetualFeeParams))
 
 			// Create all perpetuals.
 			for _, p := range tc.perpetuals {

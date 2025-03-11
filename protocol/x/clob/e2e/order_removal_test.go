@@ -15,7 +15,6 @@ import (
 	testtx "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/tx"
 	vetesting "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/ve"
 	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
-	feetiertypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	prices "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
 	sendingtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending/types"
@@ -325,12 +324,6 @@ func TestConditionalOrderRemoval(t *testing.T) {
 						}
 						genesisState.LiquidationsConfig = clobtypes.LiquidationsConfig_Default
 						genesisState.EquityTierLimitConfig = clobtypes.EquityTierLimitConfiguration{}
-					},
-				)
-				testapp.UpdateGenesisDocWithAppStateForModule(
-					&genesis,
-					func(genesisState *feetiertypes.GenesisState) {
-						genesisState.Params = constants.PerpetualFeeParamsNoFee
 					},
 				)
 				return genesis
@@ -753,12 +746,6 @@ func TestOrderRemoval_Invalid(t *testing.T) {
 						genesisState.EquityTierLimitConfig = clobtypes.EquityTierLimitConfiguration{}
 					},
 				)
-				testapp.UpdateGenesisDocWithAppStateForModule(
-					&genesis,
-					func(genesisState *feetiertypes.GenesisState) {
-						genesisState.Params = constants.PerpetualFeeParamsNoFee
-					},
-				)
 				return genesis
 			}).Build()
 
@@ -1013,12 +1000,6 @@ func TestOrderRemoval(t *testing.T) {
 						}
 						genesisState.LiquidationsConfig = clobtypes.LiquidationsConfig_Default
 						genesisState.EquityTierLimitConfig = clobtypes.EquityTierLimitConfiguration{}
-					},
-				)
-				testapp.UpdateGenesisDocWithAppStateForModule(
-					&genesis,
-					func(genesisState *feetiertypes.GenesisState) {
-						genesisState.Params = constants.PerpetualFeeParamsNoFee
 					},
 				)
 				return genesis

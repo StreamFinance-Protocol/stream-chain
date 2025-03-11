@@ -29,7 +29,6 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	delaymsgmoduletypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/delaymsg/types"
 	epochskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/epochs/keeper"
-	feetierskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals"
 	perpkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices"
@@ -52,7 +51,6 @@ type ClobKeepersTestContext struct {
 	PricesKeeper      *priceskeeper.Keeper
 	AssetsKeeper      *asskeeper.Keeper
 	BlockTimeKeeper   *blocktimekeeper.Keeper
-	FeeTiersKeeper    *feetierskeeper.Keeper
 	YieldKeeper       *yieldkeeper.Keeper
 	PerpetualsKeeper  *perpkeeper.Keeper
 	StatsKeeper       *statskeeper.Keeper
@@ -123,12 +121,6 @@ func NewClobKeepersTestContextWithUninitializedMemStore(
 			db,
 			cdc,
 		)
-		ks.FeeTiersKeeper, _ = createFeeTiersKeeper(
-			stateStore,
-			ks.StatsKeeper,
-			db,
-			cdc,
-		)
 		ks.YieldKeeper, _ = createYieldKeeper(
 			stateStore,
 			db,
@@ -195,7 +187,6 @@ func NewClobKeepersTestContextWithUninitializedMemStore(
 			ks.AssetsKeeper,
 			ks.BlockTimeKeeper,
 			bankKeeper,
-			ks.FeeTiersKeeper,
 			ks.PerpetualsKeeper,
 			ks.PricesKeeper,
 			ks.StatsKeeper,
@@ -214,7 +205,6 @@ func NewClobKeepersTestContextWithUninitializedMemStore(
 			ks.AssetsKeeper,
 			ks.SubaccountsKeeper,
 			ks.ClobKeeper,
-			ks.FeeTiersKeeper,
 			ks.StatsKeeper,
 		}
 	})
@@ -237,7 +227,6 @@ func createClobKeeper(
 	aKeeper *asskeeper.Keeper,
 	blockTimeKeeper types.BlockTimeKeeper,
 	bankKeeper types.BankKeeper,
-	feeTiersKeeper types.FeeTiersKeeper,
 	perpKeeper *perpkeeper.Keeper,
 	pricesKeeper *priceskeeper.Keeper,
 	statsKeeper *statskeeper.Keeper,
@@ -267,7 +256,6 @@ func createClobKeeper(
 		aKeeper,
 		blockTimeKeeper,
 		bankKeeper,
-		feeTiersKeeper,
 		perpKeeper,
 		pricesKeeper,
 		statsKeeper,

@@ -6,7 +6,6 @@ import (
 	bridge "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
 	clob "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	delaymsg "github.com/StreamFinance-Protocol/stream-chain/protocol/x/delaymsg/types"
-	feetiers "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers/types"
 	govplus "github.com/StreamFinance-Protocol/stream-chain/protocol/x/govplus/types"
 	perpetuals "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	prices "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
@@ -110,10 +109,6 @@ var (
 		"/klyraprotocol.bridge.MsgUpdateProposeParamsResponse": nil,
 		"/klyraprotocol.bridge.MsgUpdateSafetyParams":          &bridge.MsgUpdateSafetyParams{},
 		"/klyraprotocol.bridge.MsgUpdateSafetyParamsResponse":  nil,
-
-		// feetiers
-		"/klyraprotocol.feetiers.MsgUpdatePerpetualFeeParams":         &feetiers.MsgUpdatePerpetualFeeParams{},
-		"/klyraprotocol.feetiers.MsgUpdatePerpetualFeeParamsResponse": nil,
 
 		// govplus
 		"/klyraprotocol.govplus.MsgSlashValidator":         &govplus.MsgSlashValidator{},

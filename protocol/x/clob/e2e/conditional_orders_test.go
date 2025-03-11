@@ -17,7 +17,6 @@ import (
 	testapp "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/app"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/constants"
 	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
-	feetiertypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	prices "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
 	yieldkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/keeper"
@@ -1113,12 +1112,6 @@ func TestConditionalOrder(t *testing.T) {
 							constants.ClobPair_LinkBtc,
 						}
 						genesisState.LiquidationsConfig = clobtypes.LiquidationsConfig_Default
-					},
-				)
-				testapp.UpdateGenesisDocWithAppStateForModule(
-					&genesis,
-					func(genesisState *feetiertypes.GenesisState) {
-						genesisState.Params = constants.PerpetualFeeParamsNoFee
 					},
 				)
 				return genesis
@@ -2382,12 +2375,6 @@ func TestConditionalOrder_TriggeringUsingMatchedPrice(t *testing.T) {
 						genesisState.LiquidationsConfig = clobtypes.LiquidationsConfig_Default
 					},
 				)
-				testapp.UpdateGenesisDocWithAppStateForModule(
-					&genesis,
-					func(genesisState *feetiertypes.GenesisState) {
-						genesisState.Params = constants.PerpetualFeeParamsNoFee
-					},
-				)
 				return genesis
 			}).Build()
 
@@ -2620,12 +2607,6 @@ func TestConditionalOrderCancellation(t *testing.T) {
 							constants.ClobPair_LinkBtc,
 						}
 						genesisState.LiquidationsConfig = clobtypes.LiquidationsConfig_Default
-					},
-				)
-				testapp.UpdateGenesisDocWithAppStateForModule(
-					&genesis,
-					func(genesisState *feetiertypes.GenesisState) {
-						genesisState.Params = constants.PerpetualFeeParamsNoFee
 					},
 				)
 				return genesis
@@ -3058,12 +3039,6 @@ func TestConditionalOrderExpiration(t *testing.T) {
 							constants.ClobPair_LinkBtc,
 						}
 						genesisState.LiquidationsConfig = clobtypes.LiquidationsConfig_Default
-					},
-				)
-				testapp.UpdateGenesisDocWithAppStateForModule(
-					&genesis,
-					func(genesisState *feetiertypes.GenesisState) {
-						genesisState.Params = constants.PerpetualFeeParamsNoFee
 					},
 				)
 				return genesis

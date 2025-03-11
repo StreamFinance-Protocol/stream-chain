@@ -4,45 +4,37 @@ import (
 	"testing"
 	"time"
 
+	testapp "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/app"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 
 	keepertest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/keeper"
-	btkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/blocktime/keeper"
-	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/blocktime/types"
 	sakeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/keeper"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
 )
 
-func TestGetChainOutageInfo(t *testing.T) {
+func TestCheckForChainOutage(t *testing.T) {
 	for testName, tc := range map[string]struct {
 		// Setup.
-		setupPreviousBlockInfo func(ctx sdk.Context, bk btkeeper.Keeper)
-		setupOutageHeight      func(ctx sdk.Context, sk sakeeper.Keeper)
+		setupOutageHeight func(ctx sdk.Context, sk sakeeper.Keeper)
+		firstTimestamp    time.Time
+		secondTimestamp   time.Time
 
 		// Expected.
 		expectedIsChainOutage bool
 		expectedBlockHeight   uint32
 	}{
 		"No previous outage and current block within duration returns false": {
-			setupPreviousBlockInfo: func(ctx sdk.Context, bk btkeeper.Keeper) {
-				bk.SetPreviousBlockInfo(ctx, &types.BlockInfo{
-					Height:    100,
-					Timestamp: time.Now(),
-				})
-			},
+			firstTimestamp:    time.Unix(1, 0),
+			secondTimestamp:   time.Unix(1, 0),
 			setupOutageHeight: func(ctx sdk.Context, sk sakeeper.Keeper) {},
 
 			expectedIsChainOutage: false,
 			expectedBlockHeight:   0,
 		},
 		"Previous outage exists returns stored height": {
-			setupPreviousBlockInfo: func(ctx sdk.Context, bk btkeeper.Keeper) {
-				bk.SetPreviousBlockInfo(ctx, &types.BlockInfo{
-					Height:    100,
-					Timestamp: time.Now(),
-				})
-			},
+			firstTimestamp:  time.Unix(1, 0),
+			secondTimestamp: time.Unix(1, 0),
 			setupOutageHeight: func(ctx sdk.Context, sk sakeeper.Keeper) {
 				sk.SetOutageHeight(ctx, 50)
 			},
@@ -51,29 +43,29 @@ func TestGetChainOutageInfo(t *testing.T) {
 			expectedBlockHeight:   50,
 		},
 		"Current block exceeds duration sets and returns new outage": {
-			setupPreviousBlockInfo: func(ctx sdk.Context, bk btkeeper.Keeper) {
-				bk.SetPreviousBlockInfo(ctx, &types.BlockInfo{
-					Height:    100,
-					Timestamp: time.Now().Add(-satypes.WITHDRAWAL_AND_TRANSFERS_BLOCKED_AFTER_CHAIN_OUTAGE_DURATION - time.Second),
-				})
-			},
+			firstTimestamp:    time.Unix(1, 0),
+			secondTimestamp:   time.Unix(1, 0).Add(satypes.WITHDRAWAL_AND_TRANSFERS_BLOCKED_AFTER_CHAIN_OUTAGE_DURATION + time.Second),
 			setupOutageHeight: func(ctx sdk.Context, sk sakeeper.Keeper) {},
 
 			expectedIsChainOutage: true,
-			expectedBlockHeight:   100,
+			expectedBlockHeight:   2,
 		},
 	} {
 		t.Run(testName, func(t *testing.T) {
-			ctx, keeper, _, _, _, _, _, _, blocktimeKeeper, _ := keepertest.SubaccountsKeepers(t, true)
+			tApp := testapp.NewTestAppBuilder(t).Build()
+			tApp.InitChain()
+			ctx := tApp.AdvanceToBlock(2, testapp.AdvanceToBlockOptions{
+				BlockTime: tc.firstTimestamp,
+			})
 
-			ctx = ctx.WithBlockTime(time.Now())
+			ctx = tApp.AdvanceToBlock(3, testapp.AdvanceToBlockOptions{
+				BlockTime: tc.secondTimestamp,
+			})
 
-			// Setup test state
-			tc.setupPreviousBlockInfo(ctx, *blocktimeKeeper)
-			tc.setupOutageHeight(ctx, *keeper)
+			tc.setupOutageHeight(ctx, tApp.App.SubaccountsKeeper)
 
 			// Run the test
-			isChainOutage, blockHeight := keeper.GetOutageHeight(ctx)
+			isChainOutage, blockHeight := tApp.App.SubaccountsKeeper.GetOutageHeight(ctx)
 
 			// Verify expectations
 			require.Equal(t, tc.expectedIsChainOutage, isChainOutage)

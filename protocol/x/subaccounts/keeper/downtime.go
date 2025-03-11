@@ -14,12 +14,7 @@ func (k Keeper) CheckForChainOutage(
 
 	previousBlockInfo := k.blocktimeKeeper.GetPreviousBlockInfo(ctx)
 
-	fmt.Println("previousBlockInfo.Timestamp", previousBlockInfo.Timestamp)
-	fmt.Println("ctx.BlockTime()", ctx.BlockTime())
-	fmt.Println("ctx.BlockTime().After(previousBlockInfo.Timestamp.Add(types.WITHDRAWAL_AND_TRANSFERS_BLOCKED_AFTER_CHAIN_OUTAGE_DURATION))", ctx.BlockTime().After(previousBlockInfo.Timestamp.Add(types.WITHDRAWAL_AND_TRANSFERS_BLOCKED_AFTER_CHAIN_OUTAGE_DURATION)))
-
 	if !ctx.BlockTime().Before(previousBlockInfo.Timestamp.Add(types.WITHDRAWAL_AND_TRANSFERS_BLOCKED_AFTER_CHAIN_OUTAGE_DURATION)) {
-		fmt.Println("Setting outage height", previousBlockInfo.Height)
 		k.SetOutageHeight(ctx, previousBlockInfo.Height)
 	}
 }

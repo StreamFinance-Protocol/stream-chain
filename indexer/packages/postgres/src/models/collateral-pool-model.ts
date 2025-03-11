@@ -25,7 +25,9 @@ export default class CollateralPoolsModel extends BaseModel {
         id: { type: 'integer' },
         maxCumulativeInsuranceFundDeltaPerBlock: {
           type: 'string',
+          default: '0',
           postgresql: { type: 'bigint' },
+          parse: (value: string) => value === '' ? '0' : value,
         },
         multiCollateralAssets: {
           type: 'string',

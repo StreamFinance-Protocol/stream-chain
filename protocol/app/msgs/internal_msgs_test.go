@@ -89,10 +89,6 @@ func TestInternalMsgSamples_Gov_Key(t *testing.T) {
 		"/klyraprotocol.delaymsg.MsgDelayMessage",
 		"/klyraprotocol.delaymsg.MsgDelayMessageResponse",
 
-		// govplus
-		"/klyraprotocol.govplus.MsgSlashValidator",
-		"/klyraprotocol.govplus.MsgSlashValidatorResponse",
-
 		// perpeutals
 		"/klyraprotocol.perpetuals.MsgCreatePerpetual",
 		"/klyraprotocol.perpetuals.MsgCreatePerpetualResponse",

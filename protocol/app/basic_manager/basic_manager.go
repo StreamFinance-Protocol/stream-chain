@@ -26,7 +26,6 @@ import (
 	blocktimemodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/blocktime"
 	clobmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob"
 	epochsmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/epochs"
-	govplusmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/govplus"
 	perpetualsmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals"
 	pricesmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices"
 	sendingmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending"
@@ -75,6 +74,5 @@ var (
 		sendingmodule.AppModuleBasic{},
 		epochsmodule.AppModuleBasic{},
 		yieldmodule.AppModuleBasic{},
-		govplusmodule.AppModuleBasic{},
 	)
 )

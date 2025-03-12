@@ -5,7 +5,6 @@ import (
 	bridge "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
 	clob "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	delaymsg "github.com/StreamFinance-Protocol/stream-chain/protocol/x/delaymsg/types"
-	govplus "github.com/StreamFinance-Protocol/stream-chain/protocol/x/govplus/types"
 	perpetuals "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	prices "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
 	sending "github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending/types"
@@ -74,9 +73,6 @@ func IsInternalMsg(msg sdk.Msg) bool {
 
 		// delaymsg
 		*delaymsg.MsgDelayMessage,
-
-		// govplus
-		*govplus.MsgSlashValidator,
 
 		// perpetuals
 		*perpetuals.MsgCreatePerpetual,

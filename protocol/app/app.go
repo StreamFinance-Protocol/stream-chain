@@ -159,9 +159,6 @@ import (
 	epochsmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/epochs"
 	epochsmodulekeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/epochs/keeper"
 	epochsmoduletypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/epochs/types"
-	govplusmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/govplus"
-	govplusmodulekeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/govplus/keeper"
-	govplusmoduletypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/govplus/types"
 	perpetualsmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals"
 	perpetualsmodulekeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/keeper"
 	perpetualsmoduletypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
@@ -246,7 +243,6 @@ type App struct {
 	YieldKeeper           yieldkeeper.Keeper
 	FeeGrantKeeper        feegrantkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
-	GovPlusKeeper         govplusmodulekeeper.Keeper
 
 	PricesKeeper pricesmodulekeeper.Keeper
 
@@ -365,7 +361,6 @@ func New(
 		sendingmoduletypes.StoreKey,
 		delaymsgmoduletypes.StoreKey,
 		epochsmoduletypes.StoreKey,
-		govplusmoduletypes.StoreKey,
 	)
 	keys[authtypes.StoreKey] = keys[authtypes.StoreKey].WithLocking()
 	tkeys := storetypes.NewTransientStoreKeys(
@@ -932,17 +927,6 @@ func New(
 		app.SubaccountsKeeper,
 	)
 
-	app.GovPlusKeeper = *govplusmodulekeeper.NewKeeper(
-		appCodec,
-		app.StakingKeeper,
-		keys[govplusmoduletypes.StoreKey],
-		[]string{
-			lib.GovModuleAddress.String(),
-			delaymsgmoduletypes.ModuleAddress.String(),
-		},
-	)
-	govPlusModule := govplusmodule.NewAppModule(appCodec, app.GovPlusKeeper)
-
 	app.pricePreBlocker = *daemonpreblocker.NewDaemonPreBlockHandler(
 		logger,
 		veApplier,
@@ -1007,7 +991,6 @@ func New(
 		subaccountsModule,
 		clobModule,
 		sendingModule,
-		govPlusModule,
 		delayMsgModule,
 		epochsModule,
 		rateLimitModule,
@@ -1044,7 +1027,6 @@ func New(
 		satypes.ModuleName,
 		clobmoduletypes.ModuleName,
 		sendingmoduletypes.ModuleName,
-		govplusmoduletypes.ModuleName,
 		delaymsgmoduletypes.ModuleName,
 	)
 
@@ -1074,7 +1056,6 @@ func New(
 		clobmoduletypes.ModuleName,
 		sendingmoduletypes.ModuleName,
 		epochsmoduletypes.ModuleName,
-		govplusmoduletypes.ModuleName,
 		delaymsgmoduletypes.ModuleName,
 		authz.ModuleName,                // No-op.
 		blocktimemoduletypes.ModuleName, // Must be last
@@ -1106,7 +1087,6 @@ func New(
 		satypes.ModuleName,
 		clobmoduletypes.ModuleName,
 		sendingmoduletypes.ModuleName,
-		govplusmoduletypes.ModuleName,
 		delaymsgmoduletypes.ModuleName,
 		authz.ModuleName,
 	)
@@ -1137,7 +1117,6 @@ func New(
 		satypes.ModuleName,
 		clobmoduletypes.ModuleName,
 		sendingmoduletypes.ModuleName,
-		govplusmoduletypes.ModuleName,
 		delaymsgmoduletypes.ModuleName,
 		authz.ModuleName,
 		// Auth must be migrated after staking.

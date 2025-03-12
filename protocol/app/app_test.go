@@ -20,7 +20,6 @@ import (
 	clobmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob"
 	delaymsgmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/delaymsg"
 	epochsmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/epochs"
-	govplusmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/govplus"
 	perpetualsmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals"
 	pricesmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices"
 	sendingmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending"
@@ -190,7 +189,6 @@ func TestModuleBasics(t *testing.T) {
 		subaccountsmodule.AppModuleBasic{},
 		clobmodule.AppModuleBasic{},
 		sendingmodule.AppModuleBasic{},
-		govplusmodule.AppModuleBasic{},
 		delaymsgmodule.AppModuleBasic{},
 		epochsmodule.AppModuleBasic{},
 		yieldmodule.AppModuleBasic{},

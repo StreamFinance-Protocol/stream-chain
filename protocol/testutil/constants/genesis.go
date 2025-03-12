@@ -719,7 +719,6 @@ const GenesisState = `{
       "starting_proposal_id": "1",
       "votes": []
     },
-    "govplus": {},
     "perpetuals": {
       "collateral_pools": [
         {

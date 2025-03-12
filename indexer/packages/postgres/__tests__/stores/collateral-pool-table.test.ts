@@ -118,7 +118,10 @@ describe('CollateralPool store', () => {
     const collateralPool = await CollateralPoolTable.upsert(collateralPoolEmptyCumulativeInsuranceFundDeltaPerBlock);
 
     expect(collateralPool).toEqual(
-      normalizeCollateralPool(collateralPoolEmptyCumulativeInsuranceFundDeltaPerBlock),
+      normalizeCollateralPool({
+        ...collateralPoolEmptyCumulativeInsuranceFundDeltaPerBlock,
+        maxCumulativeInsuranceFundDeltaPerBlock: '0',
+      }),
     );
   });
 });

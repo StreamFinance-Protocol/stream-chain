@@ -170,10 +170,6 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/indexer"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/indexer/indexer_manager"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/indexer/msgsender"
-
-	// Grpc Streaming
-	streaming "github.com/StreamFinance-Protocol/stream-chain/protocol/streaming/grpc"
-	streamingtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/streaming/grpc/types"
 )
 
 var (
@@ -260,9 +256,8 @@ type App struct {
 	// module configurator
 	configurator module.Configurator
 
-	IndexerEventManager  indexer_manager.IndexerEventManager
-	GrpcStreamingManager streamingtypes.GrpcStreamingManager
-	Server               *daemonserver.Server
+	IndexerEventManager indexer_manager.IndexerEventManager
+	Server              *daemonserver.Server
 
 	// startDaemons encapsulates the logic that starts all daemons and daemon services. This function contains a
 	// closure of all relevant data structures that are shared with various keepers. Daemon services startup is
@@ -562,7 +557,6 @@ func New(
 	app.EvidenceKeeper = *evidenceKeeper
 
 	/****  klyra specific modules/setup ****/
-	app.GrpcStreamingManager = getGrpcStreamingManagerFromOptions(appFlags, logger)
 
 	timeProvider := &timelib.TimeProviderImpl{}
 
@@ -1494,19 +1488,6 @@ func getIndexerFromOptions(
 		}
 	}
 	return indexerMessageSender
-}
-
-// getGrpcStreamingManagerFromOptions returns an instance of a streamingtypes.GrpcStreamingManager from the specified
-// options. This function will default to returning a no-op instance.
-func getGrpcStreamingManagerFromOptions(
-	appFlags flags.Flags,
-	logger log.Logger,
-) (manager streamingtypes.GrpcStreamingManager) {
-	if appFlags.GrpcStreamingEnabled {
-		logger.Info("GRPC streaming is enabled")
-		return streaming.NewGrpcStreamingManager()
-	}
-	return streaming.NewNoopGrpcStreamingManager()
 }
 
 // AutoCliOpts returns the autocli options for the app.

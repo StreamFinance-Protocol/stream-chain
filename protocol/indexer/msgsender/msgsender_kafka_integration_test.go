@@ -48,7 +48,7 @@ func TestMain(m *testing.M) {
 		Tag:        "2.6",
 		Env: []string{
 			"KAFKA_ADVERTISED_HOST_NAME=localhost",
-			fmt.Sprintf("KAFKA_CREATE_TOPICS=%s:1:1,%s:1:1", ON_CHAIN_KAFKA_TOPIC, OFF_CHAIN_KAFKA_TOPIC),
+			fmt.Sprintf("KAFKA_CREATE_TOPICS=%s:1:1", ON_CHAIN_KAFKA_TOPIC),
 		},
 		ExposedPorts: []string{fmt.Sprintf("%s/%s", port, protocol)},
 		PortBindings: map[docker.Port][]docker.PortBinding{
@@ -88,7 +88,7 @@ func TestMain(m *testing.M) {
 			return err
 		}
 
-		if !reflect.DeepEqual(topics, []string{ON_CHAIN_KAFKA_TOPIC, OFF_CHAIN_KAFKA_TOPIC}) {
+		if !reflect.DeepEqual(topics, []string{ON_CHAIN_KAFKA_TOPIC}) {
 			return errors.New("waiting for topics to be created")
 		}
 
@@ -135,18 +135,6 @@ func TestIndexerMessageSenderKafka_VerifySend(t *testing.T) {
 		[]byte(messageValueOnchain+"VerifySend"),
 	)
 
-	// Test sending data to off-chain topic.
-	messageSender.SendOffchainData(Message{
-		Key:   []byte(messageKeyOffchain + "VerifySend"),
-		Value: []byte(messageValueOffchain + "VerifySend"),
-	})
-	verifyMessage(
-		t,
-		OFF_CHAIN_KAFKA_TOPIC,
-		[]byte(messageKeyOffchain+"VerifySend"),
-		[]byte(messageValueOffchain+"VerifySend"),
-	)
-
 	messageSender.Close()
 }
 
@@ -166,10 +154,6 @@ func TestIndexerMessageSenderKafka_SendAfterClosed(t *testing.T) {
 	messageSender.SendOnchainData(Message{
 		Key:   []byte(messageKeyOnchain + "SendAfterClosed"),
 		Value: []byte(messageValueOnchain + "SendAfterClosed"),
-	})
-	messageSender.SendOffchainData(Message{
-		Key:   []byte(messageKeyOffchain + "SendAfterClosed"),
-		Value: []byte(messageValueOffchain + "SendAfterClosed"),
 	})
 }
 
@@ -198,14 +182,6 @@ func TestIndexerMessageSenderKafka_ConcurrentSendAndClosed(t *testing.T) {
 			messageSender.SendOnchainData(Message{
 				Key:   []byte(messageKeyOnchain + "ConcurrentSendAndClosed" + strconv.Itoa(i)),
 				Value: []byte(messageValueOnchain + "ConcurrentSendAndClosed" + strconv.Itoa(i)),
-			})
-		}()
-		go func() {
-			defer waitForEnd.Done()
-			waitTillReady.Wait()
-			messageSender.SendOffchainData(Message{
-				Key:   []byte(messageKeyOffchain + "ConcurrentSendAndClosed" + strconv.Itoa(i)),
-				Value: []byte(messageValueOffchain + "ConcurrentSendAndClosed" + strconv.Itoa(i)),
 			})
 		}()
 		go func() {

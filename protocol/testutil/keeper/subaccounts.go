@@ -57,7 +57,7 @@ func SubaccountsKeepers(
 		pricesKeeper, _, _, _, mockTimeProvider = createPricesKeeper(stateStore, db, cdc, transientStoreKey)
 		epochsKeeper, _ := createEpochsKeeper(stateStore, db, cdc)
 		assetsKeeper, _ = createAssetsKeeper(stateStore, db, cdc, pricesKeeper, transientStoreKey, msgSenderEnabled)
-		perpetualsKeeper, _ = createPerpetualsKeeper(stateStore, db, cdc, pricesKeeper, epochsKeeper, assetsKeeper, nil, transientStoreKey)
+		perpetualsKeeper, _ = createPerpetualsKeeper(stateStore, db, cdc, pricesKeeper, epochsKeeper, assetsKeeper, transientStoreKey)
 
 		accountKeeper, _ = createAccountKeeper(stateStore, db, cdc, registry)
 		blocktimeKeeper, _ = createBlockTimeKeeper(stateStore, db, cdc)
@@ -105,7 +105,7 @@ func createSubaccountsKeeper(
 
 	mockMsgSender := &mocks.IndexerMessageSender{}
 	mockMsgSender.On("Enabled").Return(msgSenderEnabled)
-	mockIndexerEventsManager := indexer_manager.NewIndexerEventManager(mockMsgSender, transientStoreKey, true)
+	mockIndexerEventsManager := indexer_manager.NewIndexerEventManager(mockMsgSender, transientStoreKey)
 
 	k := keeper.NewKeeper(
 		cdc,

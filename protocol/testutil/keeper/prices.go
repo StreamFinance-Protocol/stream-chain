@@ -76,9 +76,8 @@ func createPricesKeeper(
 	mockMsgSender := &mocks.IndexerMessageSender{}
 	mockMsgSender.On("Enabled").Return(true)
 	mockMsgSender.On("SendOnchainData", mock.Anything).Return()
-	mockMsgSender.On("SendOffchainData", mock.Anything).Return()
 
-	mockIndexerEventsManager := indexer_manager.NewIndexerEventManager(mockMsgSender, transientStoreKey, true)
+	mockIndexerEventsManager := indexer_manager.NewIndexerEventManager(mockMsgSender, transientStoreKey)
 
 	k := keeper.NewKeeper(
 		cdc,

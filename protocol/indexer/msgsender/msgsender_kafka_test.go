@@ -153,66 +153,6 @@ func TestIndexerMessageSenderKafka_SendOnchainData_WithMockBroker(t *testing.T) 
 	leader.Close()
 }
 
-func TestIndexerMessageSenderKafka_SendOffchainData_WithMockProducer(t *testing.T) {
-	tests := map[string]struct {
-		// Expectations
-		numSuccesses int
-		numErrors    int
-	}{
-		"Only successes": {
-			numSuccesses: 10,
-			numErrors:    0,
-		},
-		"Only errors": {
-			numSuccesses: 0,
-			numErrors:    5,
-		},
-		"Mixed successes and errors": {
-			numSuccesses: 10,
-			numErrors:    5,
-		},
-	}
-
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
-			mockProducer := getMockProducer(t, OFF_CHAIN_KAFKA_TOPIC, tc.numSuccesses, tc.numErrors)
-
-			sender := NewIndexerMessageSenderKafkaWithProducer(mockProducer, log.NewNopLogger())
-			for i := 0; i < tc.numSuccesses+tc.numErrors; i++ {
-				sender.SendOffchainData(Message{Key: []byte(msgKey), Value: []byte(msgValue)})
-			}
-
-			err := sender.Close()
-			require.NoError(t, err)
-
-			require.Equal(t, tc.numSuccesses, sender.successes)
-			require.Equal(t, tc.numErrors, sender.errors)
-		})
-	}
-}
-
-// Tests connecting to and sending data to a Kafka broker, but does not test that the correct data
-// has been sent.
-func TestIndexerMessageSenderKafka_SendOffchainData_WithMockBroker(t *testing.T) {
-	toSend := 10
-	seed, leader, sender := getMockBrokersAndSender(t, OFF_CHAIN_KAFKA_TOPIC, toSend)
-
-	for i := 0; i < toSend; i++ {
-		sender.SendOffchainData(Message{Key: []byte(msgKey), Value: []byte(msgValue)})
-	}
-
-	// Wait for communication between brokers and producer.
-	time.Sleep(time.Second)
-
-	err := sender.Close()
-	require.NoError(t, err)
-	require.Equal(t, toSend, sender.successes)
-	require.Equal(t, 0, sender.errors)
-
-	seed.Close()
-	leader.Close()
-}
-
 func TestIndexerMessageSenderKafka_Close(t *testing.T) {
 	mockProducer := getMockProducer(t, ON_CHAIN_KAFKA_TOPIC, 0, 0)
 	sender := NewIndexerMessageSenderKafkaWithProducer(mockProducer, log.NewNopLogger())

@@ -5,7 +5,6 @@ import (
 
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/indexer/msgsender"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib"
-	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	"github.com/cometbft/cometbft/crypto/tmhash"
 )
 
@@ -15,7 +14,6 @@ var (
 		Key:   []byte("key"),
 		Value: []byte("value"),
 	}
-	testOrderId = Order_Alice_Num0_Id7_Clob0_Sell25_Price15_GTB20.OrderId
 )
 
 var (
@@ -26,15 +24,7 @@ var (
 		Key:   msgsender.TransactionHashHeaderKey,
 		Value: TestTxHashBytes,
 	}
-	TestTxBytes1        = []byte{0x4, 0x5, 0x6}
-	TestTxHashBytes1    = tmhash.Sum(TestTxBytes1)
-	TestTxHashString1   = lib.TxHash(fmt.Sprintf("%X", TestTxHashBytes1))
-	TestOffchainUpdates = &clobtypes.OffchainUpdates{
-		Messages: []clobtypes.OffchainUpdateMessage{
-			{Type: clobtypes.PlaceMessageType, OrderId: testOrderId, Message: testMessage},
-			{Type: clobtypes.UpdateMessageType, OrderId: testOrderId, Message: testMessage},
-			{Type: clobtypes.RemoveMessageType, OrderId: testOrderId, Message: testMessage},
-		},
-	}
-	TestOffchainMessages = TestOffchainUpdates.GetMessages()
+	TestTxBytes1      = []byte{0x4, 0x5, 0x6}
+	TestTxHashBytes1  = tmhash.Sum(TestTxBytes1)
+	TestTxHashString1 = lib.TxHash(fmt.Sprintf("%X", TestTxHashBytes1))
 )

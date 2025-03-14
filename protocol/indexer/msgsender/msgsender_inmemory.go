@@ -10,10 +10,9 @@ func NewIndexerMessageSenderInMemoryCollector() *IndexerMessageSenderInMemoryCol
 }
 
 type IndexerMessageSenderInMemoryCollector struct {
-	mutex            sync.Mutex
-	onchainMessages  []Message
-	offchainMessages []Message
-	closed           bool
+	mutex           sync.Mutex
+	onchainMessages []Message
+	closed          bool
 }
 
 func (i *IndexerMessageSenderInMemoryCollector) Enabled() bool {
@@ -29,15 +28,6 @@ func (i *IndexerMessageSenderInMemoryCollector) SendOnchainData(message Message)
 	i.onchainMessages = append(i.onchainMessages, message)
 }
 
-func (i *IndexerMessageSenderInMemoryCollector) SendOffchainData(message Message) {
-	i.mutex.Lock()
-	defer i.mutex.Unlock()
-	if i.closed {
-		return
-	}
-	i.offchainMessages = append(i.offchainMessages, message)
-}
-
 func (i *IndexerMessageSenderInMemoryCollector) Close() error {
 	i.mutex.Lock()
 	defer i.mutex.Unlock()
@@ -48,14 +38,7 @@ func (i *IndexerMessageSenderInMemoryCollector) Close() error {
 func (i *IndexerMessageSenderInMemoryCollector) Clear() {
 	i.mutex.Lock()
 	defer i.mutex.Unlock()
-	i.offchainMessages = i.offchainMessages[:0]
 	i.onchainMessages = i.onchainMessages[:0]
-}
-
-func (i *IndexerMessageSenderInMemoryCollector) GetOffchainMessages() []Message {
-	i.mutex.Lock()
-	defer i.mutex.Unlock()
-	return i.offchainMessages
 }
 
 func (i *IndexerMessageSenderInMemoryCollector) GetOnchainMessages() []Message {

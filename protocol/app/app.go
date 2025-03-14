@@ -532,11 +532,10 @@ func New(
 	// The in-memory data structure is shared by the x/yield module and sdaioracle daemon.
 	sDAIEventManager := createSDAIEventManager(appFlags, daemonFlags)
 
-	msgSender, indexerFlags := getIndexerFromOptions(appOpts, logger)
+	msgSender := getIndexerFromOptions(appOpts, logger)
 	app.IndexerEventManager = indexer_manager.NewIndexerEventManager(
 		msgSender,
 		tkeys[indexer_manager.TransientStoreKey],
-		indexerFlags.SendOffchainData,
 	)
 
 	app.YieldKeeper = *yieldkeeper.NewKeeper(
@@ -1468,12 +1467,10 @@ func initParamsKeeper(
 func getIndexerFromOptions(
 	appOpts servertypes.AppOptions,
 	logger log.Logger,
-) (msgsender.IndexerMessageSender, indexer.IndexerFlags) {
+) msgsender.IndexerMessageSender {
 	v, ok := appOpts.Get(indexer.MsgSenderInstanceForTest).(msgsender.IndexerMessageSender)
 	if ok {
-		return v, indexer.IndexerFlags{
-			SendOffchainData: true,
-		}
+		return v
 	}
 
 	indexerFlags := indexer.GetIndexerFlagValuesFromOptions(appOpts)
@@ -1496,7 +1493,7 @@ func getIndexerFromOptions(
 			panic(err)
 		}
 	}
-	return indexerMessageSender, indexerFlags
+	return indexerMessageSender
 }
 
 // getGrpcStreamingManagerFromOptions returns an instance of a streamingtypes.GrpcStreamingManager from the specified

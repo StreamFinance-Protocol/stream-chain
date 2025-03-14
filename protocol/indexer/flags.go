@@ -9,9 +9,8 @@ import (
 )
 
 type IndexerFlags struct {
-	KafkaAddrs       []string
-	MaxRetries       int
-	SendOffchainData bool
+	KafkaAddrs []string
+	MaxRetries int
 }
 
 // List of default values
@@ -23,7 +22,6 @@ const (
 const (
 	FlagKafkaConnStr         = "indexer-kafka-conn-str"
 	FlagKafkaMaxRetry        = "indexer-kafka-max-retry"
-	FlagSendOffchainData     = "indexer-send-offchain-data"
 	MsgSenderInstanceForTest = "msgsender-instance-for-test"
 )
 
@@ -48,15 +46,6 @@ func AddIndexerFlagsToCmd(cmd *cobra.Command) {
 			DefaultMaxRetries,
 			"Maximum number of times to retry sending a message to the Indexer",
 		)
-	cmd.
-		Flags().
-		Bool(
-			FlagSendOffchainData,
-			true,
-			"Whether to send offchain data to the Indexer. This should be set to false when the Indexer "+
-				"full node is being restarted from a snapshot and is behind the Indexer's view of the "+
-				"chain during the fast sync process.",
-		)
 }
 
 // GetIndexerFlagValuesFromOptions gets values for connecting to Kafka from the `AppOptions`
@@ -68,14 +57,12 @@ func GetIndexerFlagValuesFromOptions(
 	kafkaConnStr, err := cast.ToStringE(option)
 	if option == nil || err != nil {
 		return IndexerFlags{
-			KafkaAddrs:       []string{},
-			MaxRetries:       DefaultMaxRetries,
-			SendOffchainData: false,
+			KafkaAddrs: []string{},
+			MaxRetries: DefaultMaxRetries,
 		}
 	}
 
 	maxRetries := cast.ToInt(appOpts.Get(FlagKafkaMaxRetry))
-	sendOffchainData := cast.ToBool(appOpts.Get(FlagSendOffchainData))
 
 	var kafkaAddrs []string
 	if kafkaConnStr == "" {
@@ -85,8 +72,7 @@ func GetIndexerFlagValuesFromOptions(
 	}
 
 	return IndexerFlags{
-		KafkaAddrs:       kafkaAddrs,
-		MaxRetries:       maxRetries,
-		SendOffchainData: sendOffchainData,
+		KafkaAddrs: kafkaAddrs,
+		MaxRetries: maxRetries,
 	}
 }

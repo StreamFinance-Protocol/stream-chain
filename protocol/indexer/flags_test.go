@@ -24,9 +24,6 @@ func TestAddIndexerFlagsToCommand(t *testing.T) {
 		fmt.Sprintf("Has %s flag", indexer.FlagKafkaMaxRetry): {
 			flagName: indexer.FlagKafkaMaxRetry,
 		},
-		fmt.Sprintf("Has %s flag", indexer.FlagSendOffchainData): {
-			flagName: indexer.FlagSendOffchainData,
-		},
 	}
 
 	for name, tc := range tests {
@@ -39,67 +36,56 @@ func TestAddIndexerFlagsToCommand(t *testing.T) {
 func TestGetIndexerFlagValuesFromOptions(t *testing.T) {
 	tests := map[string]struct {
 		// Parameters.
-		kafkaConnStr     string
-		maxRetries       int
-		nilConnStr       bool
-		sendOffchainData bool
+		kafkaConnStr string
+		maxRetries   int
+		nilConnStr   bool
 
 		// Expectations.
 		expectedIndexerFlags indexer.IndexerFlags
 	}{
 		"Sets KafkaAddrs to empty slice if kafkaConnStr is empty string": {
-			kafkaConnStr:     "",
-			maxRetries:       0,
-			nilConnStr:       false,
-			sendOffchainData: false,
+			kafkaConnStr: "",
+			maxRetries:   0,
+			nilConnStr:   false,
 			expectedIndexerFlags: indexer.IndexerFlags{
-				KafkaAddrs:       []string{},
-				MaxRetries:       0,
-				SendOffchainData: false,
+				KafkaAddrs: []string{},
+				MaxRetries: 0,
 			},
 		},
 		"Sets KafkaAddrs to slice of 1 string if no commas in kafkaConnStr": {
-			kafkaConnStr:     "kafka:9092",
-			maxRetries:       0,
-			nilConnStr:       false,
-			sendOffchainData: true,
+			kafkaConnStr: "kafka:9092",
+			maxRetries:   0,
+			nilConnStr:   false,
 			expectedIndexerFlags: indexer.IndexerFlags{
-				KafkaAddrs:       []string{"kafka:9092"},
-				MaxRetries:       0,
-				SendOffchainData: true,
+				KafkaAddrs: []string{"kafka:9092"},
+				MaxRetries: 0,
 			},
 		},
 		"Sets KafkaAddrs to slice of multiple strings if commas in kafkaConnStr": {
-			kafkaConnStr:     "kafka:9092,kafka:9093,kafka:9094",
-			maxRetries:       0,
-			nilConnStr:       false,
-			sendOffchainData: true,
+			kafkaConnStr: "kafka:9092,kafka:9093,kafka:9094",
+			maxRetries:   0,
+			nilConnStr:   false,
 			expectedIndexerFlags: indexer.IndexerFlags{
-				KafkaAddrs:       []string{"kafka:9092", "kafka:9093", "kafka:9094"},
-				MaxRetries:       0,
-				SendOffchainData: true,
+				KafkaAddrs: []string{"kafka:9092", "kafka:9093", "kafka:9094"},
+				MaxRetries: 0,
 			},
 		},
 		"Sets MaxRetries": {
-			kafkaConnStr:     "",
-			maxRetries:       5,
-			nilConnStr:       false,
-			sendOffchainData: false,
+			kafkaConnStr: "",
+			maxRetries:   5,
+			nilConnStr:   false,
 			expectedIndexerFlags: indexer.IndexerFlags{
-				KafkaAddrs:       []string{},
-				MaxRetries:       5,
-				SendOffchainData: false,
+				KafkaAddrs: []string{},
+				MaxRetries: 5,
 			},
 		},
 		"Sets KafkaAddrs to empty slice and MaxRetries to default if kafkaConnStr is nil": {
-			kafkaConnStr:     "kafka:9092",
-			maxRetries:       5,
-			nilConnStr:       true,
-			sendOffchainData: false,
+			kafkaConnStr: "kafka:9092",
+			maxRetries:   5,
+			nilConnStr:   true,
 			expectedIndexerFlags: indexer.IndexerFlags{
-				KafkaAddrs:       []string{},
-				MaxRetries:       indexer.DefaultMaxRetries,
-				SendOffchainData: false,
+				KafkaAddrs: []string{},
+				MaxRetries: indexer.DefaultMaxRetries,
 			},
 		},
 	}
@@ -113,7 +99,6 @@ func TestGetIndexerFlagValuesFromOptions(t *testing.T) {
 				optsMap[indexer.FlagKafkaConnStr] = tc.kafkaConnStr
 			}
 			optsMap[indexer.FlagKafkaMaxRetry] = tc.maxRetries
-			optsMap[indexer.FlagSendOffchainData] = tc.sendOffchainData
 			mockOpts := mocks.AppOptions{}
 			mockOpts.On("Get", mock.AnythingOfType("string")).
 				Return(func(key string) interface{} {

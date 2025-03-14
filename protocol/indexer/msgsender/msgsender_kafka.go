@@ -101,26 +101,6 @@ func (msgSender *IndexerMessageSenderKafka) SendOnchainData(message Message) {
 	})
 }
 
-// SendOffchainData sends a key/value pair of byte slices to the off-chain data kafka topic.
-// This method is go-routine safe.
-func (msgSender *IndexerMessageSenderKafka) SendOffchainData(message Message) {
-	defer telemetry.ModuleMeasureSince(
-		types.ModuleName,
-		time.Now(),
-		metrics.SendOffchainData,
-		metrics.Latency,
-	)
-
-	value := sarama.ByteEncoder(message.Value)
-	telemetry.SetGauge(float32(value.Length()), types.ModuleName, metrics.OffchainMessageLength)
-	msgSender.send(&sarama.ProducerMessage{
-		Topic:   OFF_CHAIN_KAFKA_TOPIC,
-		Key:     sarama.ByteEncoder(message.Key),
-		Value:   value,
-		Headers: message.Headers,
-	})
-}
-
 // send sends a message to Kafka. This method is go-routine safe.
 func (msgSender *IndexerMessageSenderKafka) send(message *sarama.ProducerMessage) {
 	msgSender.mutex.Lock()

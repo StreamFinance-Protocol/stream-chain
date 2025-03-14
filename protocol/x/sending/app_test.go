@@ -290,8 +290,6 @@ func TestMsgCreateTransferWithinDummyPool(t *testing.T) {
 				),
 				recipientQuantumsAfterTransfer,
 			)
-			// Verify that there are no offchain messages.
-			require.Empty(t, msgSender.GetOffchainMessages())
 			// Verify expected indexer events.
 			expectedOnchainMessages := []msgsender.Message{indexer_manager.CreateIndexerBlockEventMessage(
 				&indexer_manager.IndexerTendermintBlock{
@@ -535,8 +533,6 @@ func TestMsgDepositToSubaccountWithinDummyPoolAndAccounts(t *testing.T) {
 				subaccountQuantumsAfterDeposit,
 				subaccountQuantumsBeforeDeposit.Add(subaccountQuantumsBeforeDeposit, tc.quantums),
 			)
-			// Check that there are no offchain messages.
-			require.Empty(t, msgSender.GetOffchainMessages())
 			// Check for expected indexer events.
 			expectedOnchainMessages := []msgsender.Message{indexer_manager.CreateIndexerBlockEventMessage(
 				&indexer_manager.IndexerTendermintBlock{
@@ -782,8 +778,6 @@ func TestMsgWithdrawFromSubaccountWithinDummyPoolAndAccounts(t *testing.T) {
 				subaccountQuantumsBeforeWithdraw.Sub(subaccountQuantumsBeforeWithdraw, tc.quantums),
 			)
 
-			// Check that there are no offchain messages.
-			require.Empty(t, msgSender.GetOffchainMessages())
 			// Check for expected indexer events.
 			expectedOnchainMessages := []msgsender.Message{indexer_manager.CreateIndexerBlockEventMessage(
 				&indexer_manager.IndexerTendermintBlock{

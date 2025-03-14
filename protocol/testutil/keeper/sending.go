@@ -75,7 +75,6 @@ func SendingKeepersWithSubaccountsKeeper(t testing.TB, saKeeper types.Subaccount
 			ks.PricesKeeper,
 			epochsKeeper,
 			ks.AssetsKeeper,
-			nil,
 			transientStoreKey,
 		)
 		ks.AccountKeeper, _ = createAccountKeeper(stateStore, db, cdc, registry)
@@ -140,7 +139,7 @@ func createSendingKeeper(
 
 	mockMsgSender := &mocks.IndexerMessageSender{}
 	mockMsgSender.On("Enabled").Return(true)
-	mockIndexerEventsManager := indexer_manager.NewIndexerEventManager(mockMsgSender, transientStoreKey, true)
+	mockIndexerEventsManager := indexer_manager.NewIndexerEventManager(mockMsgSender, transientStoreKey)
 
 	k := keeper.NewKeeper(
 		cdc,

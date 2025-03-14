@@ -23,8 +23,6 @@ func (msgSender *IndexerMessageSenderNoop) Enabled() bool {
 
 func (msgSender *IndexerMessageSenderNoop) SendOnchainData(message Message) {}
 
-func (msgSender *IndexerMessageSenderNoop) SendOffchainData(message Message) {}
-
 func (msgSender *IndexerMessageSenderNoop) Close() error {
 	return nil
 }

@@ -242,12 +242,10 @@ const (
 	UpdatePrice = "update_price"
 
 	// msgsender
-	MessageSendSuccess    = "message_send_success"
-	MessageSendError      = "message_send_error"
-	SendOffchainData      = "send_offchain_data"
-	SendOnchainData       = "send_onchain_data"
-	OnchainMessageLength  = "onchain_message_length"
-	OffchainMessageLength = "offchain_message_length"
+	MessageSendSuccess   = "message_send_success"
+	MessageSendError     = "message_send_error"
+	SendOnchainData      = "send_onchain_data"
+	OnchainMessageLength = "onchain_message_length"
 
 	// Indexer events.
 	TotalNumIndexerBlockEvents = "total_num_block_events"

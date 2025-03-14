@@ -94,10 +94,8 @@ func (msgSender *IndexerMessageSenderKafka) SendOnchainData(message Message) {
 	value := sarama.ByteEncoder(message.Value)
 	telemetry.SetGauge(float32(value.Length()), types.ModuleName, metrics.OnchainMessageLength)
 	msgSender.send(&sarama.ProducerMessage{
-		Topic:   ON_CHAIN_KAFKA_TOPIC,
-		Key:     sarama.ByteEncoder(message.Key),
-		Value:   value,
-		Headers: message.Headers,
+		Topic: ON_CHAIN_KAFKA_TOPIC,
+		Value: value,
 	})
 }
 

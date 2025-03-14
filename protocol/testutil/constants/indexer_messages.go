@@ -17,13 +17,9 @@ var (
 )
 
 var (
-	TestTxBytes      = []byte{0x1, 0x2, 0x3}
-	TestTxHashBytes  = tmhash.Sum(TestTxBytes)
-	TestTxHashString = lib.TxHash(fmt.Sprintf("%X", TestTxHashBytes))
-	TestTxHashHeader = msgsender.MessageHeader{
-		Key:   msgsender.TransactionHashHeaderKey,
-		Value: TestTxHashBytes,
-	}
+	TestTxBytes       = []byte{0x1, 0x2, 0x3}
+	TestTxHashBytes   = tmhash.Sum(TestTxBytes)
+	TestTxHashString  = lib.TxHash(fmt.Sprintf("%X", TestTxHashBytes))
 	TestTxBytes1      = []byte{0x4, 0x5, 0x6}
 	TestTxHashBytes1  = tmhash.Sum(TestTxBytes1)
 	TestTxHashString1 = lib.TxHash(fmt.Sprintf("%X", TestTxHashBytes1))

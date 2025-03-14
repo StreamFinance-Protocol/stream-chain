@@ -13,7 +13,6 @@ func TestIndexerMessageSenderInMemoryCollector(t *testing.T) {
 	i := 0
 	for ; i < 3; i++ {
 		expectedOnchainMessages = append(expectedOnchainMessages, Message{
-			Key:   []byte("onchainKey" + strconv.Itoa(i)),
 			Value: []byte("onchainValue" + strconv.Itoa(i)),
 		})
 	}

@@ -119,7 +119,7 @@ func TestIndexerMessageSenderKafka_SendOnchainData_WithMockProducer(t *testing.T
 
 			sender := NewIndexerMessageSenderKafkaWithProducer(mockProducer, log.NewNopLogger())
 			for i := 0; i < tc.numSuccesses+tc.numErrors; i++ {
-				sender.SendOnchainData(Message{Key: []byte(msgKey), Value: []byte(msgValue)})
+				sender.SendOnchainData(Message{Value: []byte(msgValue)})
 			}
 
 			err := sender.Close()
@@ -138,7 +138,7 @@ func TestIndexerMessageSenderKafka_SendOnchainData_WithMockBroker(t *testing.T) 
 	seed, leader, sender := getMockBrokersAndSender(t, ON_CHAIN_KAFKA_TOPIC, toSend)
 
 	for i := 0; i < toSend; i++ {
-		sender.SendOnchainData(Message{Key: []byte(msgKey), Value: []byte(msgValue)})
+		sender.SendOnchainData(Message{Value: []byte(msgValue)})
 	}
 
 	// Wait for communication between brokers and producer.

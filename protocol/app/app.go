@@ -527,11 +527,18 @@ func New(
 	// The in-memory data structure is shared by the x/yield module and sdaioracle daemon.
 	sDAIEventManager := createSDAIEventManager(appFlags, daemonFlags)
 
+	// Initialize the indexer event manager
 	msgSender := getIndexerFromOptions(appOpts, logger)
-	app.IndexerEventManager = indexer_manager.NewIndexerEventManager(
-		msgSender,
+	var initialSenders []indexer_manager.SenderWithKey
+	if msgSender.Sender != nil {
+		initialSenders = []indexer_manager.SenderWithKey{msgSender}
+	}
+	indexerEventManager := indexer_manager.NewIndexerEventManager(
 		tkeys[indexer_manager.TransientStoreKey],
+		initialSenders,
 	)
+
+	app.IndexerEventManager = indexerEventManager
 
 	app.YieldKeeper = *yieldkeeper.NewKeeper(
 		appCodec,
@@ -1455,16 +1462,20 @@ func initParamsKeeper(
 	return paramsKeeper
 }
 
-// getIndexerFromOptions returns an instance of a msgsender.IndexerMessageSender from the specified options.
-// This function will default to try to use any instance that is configured for test execution followed by loading
-// an instance from command line flags and finally returning a no-op instance.
+// getIndexerFromOptions returns a SenderWithKey from the specified options.
+// This function will default to try to use any instance that is configured for test execution
+// followed by loading an instance from command line flags.
+// If no Kafka addresses are provided, it returns an empty SenderWithKey.
 func getIndexerFromOptions(
 	appOpts servertypes.AppOptions,
 	logger log.Logger,
-) msgsender.IndexerMessageSender {
-	v, ok := appOpts.Get(indexer.MsgSenderInstanceForTest).(msgsender.IndexerMessageSender)
-	if ok {
-		return v
+) indexer_manager.SenderWithKey {
+	// Check for test instance first
+	if v, ok := appOpts.Get(indexer.MsgSenderInstanceForTest).(msgsender.IndexerMessageSender); ok {
+		return indexer_manager.SenderWithKey{
+			Key:    "test",
+			Sender: v,
+		}
 	}
 
 	indexerFlags := indexer.GetIndexerFlagValuesFromOptions(appOpts)
@@ -1473,21 +1484,25 @@ func getIndexerFromOptions(
 		"Flags", indexerFlags,
 	)
 
-	var indexerMessageSender msgsender.IndexerMessageSender
+	// If no Kafka addresses provided, return empty SenderWithKey
 	if len(indexerFlags.KafkaAddrs) == 0 {
-		indexerMessageSender = msgsender.NewIndexerMessageSenderNoop()
-	} else {
-		var err error
-		indexerMessageSender, err = msgsender.NewIndexerMessageSenderKafka(
-			indexerFlags,
-			nil,
-			logger,
-		)
-		if err != nil {
-			panic(err)
-		}
+		return indexer_manager.SenderWithKey{}
 	}
-	return indexerMessageSender
+
+	// Create Kafka sender
+	sender, err := msgsender.NewIndexerMessageSenderKafka(
+		indexerFlags,
+		nil,
+		logger,
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	return indexer_manager.SenderWithKey{
+		Key:    "kafka",
+		Sender: sender,
+	}
 }
 
 // AutoCliOpts returns the autocli options for the app.

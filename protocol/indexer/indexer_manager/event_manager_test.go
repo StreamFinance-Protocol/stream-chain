@@ -87,15 +87,62 @@ var ExpectedEvent6 = indexer_manager.IndexerTendermintEvent{
 
 var EventVersion uint32 = 1
 
+func createMockSender(enabled bool) *mocks.IndexerMessageSender {
+	mockSender := &mocks.IndexerMessageSender{}
+	mockSender.On("Enabled").Return(enabled)
+	mockSender.On("SendOnchainData", mock.Anything).Return(nil)
+	return mockSender
+}
+
 func TestSendOnchainData(t *testing.T) {
 	storeKey := storetypes.NewTransientStoreKey(indexer_manager.TransientStoreKey)
 	indexerTendermintBlock := &indexer_manager.IndexerTendermintBlock{}
-	mockMsgSender := &mocks.IndexerMessageSender{}
-	mockMsgSender.On("Enabled").Return(true)
-	mockMsgSender.On("SendOnchainData", mock.Anything).Return(nil)
-	indexerEventManager := indexer_manager.NewIndexerEventManager(mockMsgSender, storeKey)
+
+	mockSender1 := createMockSender(true)
+	mockSender2 := createMockSender(true)
+
+	indexerEventManager := indexer_manager.NewIndexerEventManager(
+		storeKey,
+		[]indexer_manager.SenderWithKey{
+			{Key: "sender1", Sender: mockSender1},
+			{Key: "sender2", Sender: mockSender2},
+		},
+	)
+
 	indexerEventManager.SendOnchainData(indexerTendermintBlock)
-	mockMsgSender.AssertExpectations(t)
+	mockSender1.AssertExpectations(t)
+	mockSender2.AssertExpectations(t)
+}
+
+func TestSubscriptionManagement(t *testing.T) {
+	storeKey := storetypes.NewTransientStoreKey(indexer_manager.TransientStoreKey)
+	indexerEventManager := indexer_manager.NewIndexerEventManager(storeKey, nil)
+
+	mockSender1 := createMockSender(true)
+	mockSender2 := createMockSender(false)
+
+	// Test Subscribe
+	err := indexerEventManager.Subscribe("sender1", mockSender1)
+	require.NoError(t, err)
+	require.True(t, indexerEventManager.IsEnabled("sender1"))
+
+	// Test duplicate subscription
+	err = indexerEventManager.Subscribe("sender1", mockSender1)
+	require.Error(t, err)
+
+	// Test second subscription
+	err = indexerEventManager.Subscribe("sender2", mockSender2)
+	require.NoError(t, err)
+	require.False(t, indexerEventManager.IsEnabled("sender2"))
+
+	// Test Unsubscribe
+	err = indexerEventManager.Unsubscribe("sender1")
+	require.NoError(t, err)
+	require.False(t, indexerEventManager.IsEnabled("sender1"))
+
+	// Test unsubscribe non-existent
+	err = indexerEventManager.Unsubscribe("non-existent")
+	require.Error(t, err)
 }
 
 func TestProduceBlockBasicTxnEvent(t *testing.T) {
@@ -105,16 +152,18 @@ func TestProduceBlockBasicTxnEvent(t *testing.T) {
 	ctx = ctx.WithBlockTime(BlockTime).WithBlockHeight(BlockHeight).WithTxBytes(constants.TestTxBytes)
 	ctx.GasMeter().ConsumeGas(ConsumedGas, "beforeWrite")
 	require.NoError(t, stateStore.LoadLatestVersion())
-	mockMsgSender := &mocks.IndexerMessageSender{}
-	mockMsgSender.On("Enabled").Return(true)
-	indexerEventManager := indexer_manager.NewIndexerEventManager(mockMsgSender, storeKey)
+
+	mockSender := createMockSender(true)
+	indexerEventManager := indexer_manager.NewIndexerEventManager(
+		storeKey,
+		[]indexer_manager.SenderWithKey{{Key: "sender1", Sender: mockSender}},
+	)
+
 	indexerEventManager.AddTxnEvent(
 		ctx,
 		indexerevents.SubtypeSubaccountUpdate,
 		EventVersion,
-		indexer_manager.GetBytes(
-			&SubaccountEvent,
-		),
+		indexer_manager.GetBytes(&SubaccountEvent),
 	)
 
 	block := indexerEventManager.ProduceBlock(ctx)
@@ -126,6 +175,44 @@ func TestProduceBlockBasicTxnEvent(t *testing.T) {
 	require.Equal(t, ConsumedGas, ctx.GasMeter().GasConsumed())
 }
 
+func TestProduceBlockWithMultipleSenders(t *testing.T) {
+	ctx, stateStore, db := sdk.NewSdkContextWithMultistore()
+	storeKey := storetypes.NewTransientStoreKey(indexer_manager.TransientStoreKey)
+	stateStore.MountStoreWithDB(storeKey, storetypes.StoreTypeTransient, db)
+	ctx = ctx.WithBlockTime(BlockTime).WithBlockHeight(BlockHeight).WithTxBytes(constants.TestTxBytes)
+	ctx.GasMeter().ConsumeGas(ConsumedGas, "beforeWrite")
+	require.NoError(t, stateStore.LoadLatestVersion())
+
+	mockSender1 := createMockSender(true)
+	mockSender2 := createMockSender(false)
+
+	indexerEventManager := indexer_manager.NewIndexerEventManager(
+		storeKey,
+		[]indexer_manager.SenderWithKey{
+			{Key: "sender1", Sender: mockSender1},
+			{Key: "sender2", Sender: mockSender2},
+		},
+	)
+
+	indexerEventManager.AddTxnEvent(
+		ctx,
+		indexerevents.SubtypeSubaccountUpdate,
+		EventVersion,
+		indexer_manager.GetBytes(&SubaccountEvent),
+	)
+
+	block := indexerEventManager.ProduceBlock(ctx)
+	require.Len(t, block.Events, 1)
+	require.Equal(t, ExpectedEvent1, *block.Events[0])
+	require.Equal(t, []string{string(constants.TestTxHashString)}, block.TxHashes)
+	require.Equal(t, uint32(BlockHeight), block.Height)
+	require.Equal(t, BlockTime, block.Time)
+	require.Equal(t, ConsumedGas, ctx.GasMeter().GasConsumed())
+
+	mockSender1.AssertExpectations(t)
+	mockSender2.AssertExpectations(t)
+}
+
 func TestProduceBlockBasicBlockEvent(t *testing.T) {
 	ctx, stateStore, db := sdk.NewSdkContextWithMultistore()
 	storeKey := storetypes.NewTransientStoreKey(indexer_manager.TransientStoreKey)
@@ -133,17 +220,19 @@ func TestProduceBlockBasicBlockEvent(t *testing.T) {
 	ctx = ctx.WithBlockTime(BlockTime).WithBlockHeight(BlockHeight)
 	ctx.GasMeter().ConsumeGas(ConsumedGas, "beforeWrite")
 	require.NoError(t, stateStore.LoadLatestVersion())
-	mockMsgSender := &mocks.IndexerMessageSender{}
-	mockMsgSender.On("Enabled").Return(true)
-	indexerEventManager := indexer_manager.NewIndexerEventManager(mockMsgSender, storeKey)
+
+	mockSender := createMockSender(true)
+	indexerEventManager := indexer_manager.NewIndexerEventManager(
+		storeKey,
+		[]indexer_manager.SenderWithKey{{Key: "sender1", Sender: mockSender}},
+	)
+
 	indexerEventManager.AddBlockEvent(
 		ctx,
 		indexerevents.SubtypeFundingValues,
 		indexer_manager.IndexerTendermintEvent_BLOCK_EVENT_END_BLOCK,
 		EventVersion,
-		indexer_manager.GetBytes(
-			&FundingRateAndIndexEvent,
-		),
+		indexer_manager.GetBytes(&FundingRateAndIndexEvent),
 	)
 
 	block := indexerEventManager.ProduceBlock(ctx)
@@ -162,33 +251,31 @@ func TestProduceBlockMultipleTxnEvents(t *testing.T) {
 	ctx = ctx.WithBlockTime(BlockTime).WithBlockHeight(BlockHeight).WithTxBytes(constants.TestTxBytes)
 	ctx.GasMeter().ConsumeGas(ConsumedGas, "beforeWrite")
 	require.NoError(t, stateStore.LoadLatestVersion())
-	mockMsgSender := &mocks.IndexerMessageSender{}
-	mockMsgSender.On("Enabled").Return(true)
-	indexerEventManager := indexer_manager.NewIndexerEventManager(mockMsgSender, storeKey)
+
+	mockSender := createMockSender(true)
+	indexerEventManager := indexer_manager.NewIndexerEventManager(
+		storeKey,
+		[]indexer_manager.SenderWithKey{{Key: "sender1", Sender: mockSender}},
+	)
+
 	indexerEventManager.AddTxnEvent(
 		ctx,
 		indexerevents.SubtypeSubaccountUpdate,
 		EventVersion,
-		indexer_manager.GetBytes(
-			&SubaccountEvent,
-		),
+		indexer_manager.GetBytes(&SubaccountEvent),
 	)
 	indexerEventManager.AddTxnEvent(
 		ctx,
 		indexerevents.SubtypeSubaccountUpdate,
 		EventVersion,
-		indexer_manager.GetBytes(
-			&SubaccountEvent,
-		),
+		indexer_manager.GetBytes(&SubaccountEvent),
 	)
 	ctx = ctx.WithTxBytes(constants.TestTxBytes1)
 	indexerEventManager.AddTxnEvent(
 		ctx,
 		indexerevents.SubtypeTransfer,
 		EventVersion,
-		indexer_manager.GetBytes(
-			&TransferEvent,
-		),
+		indexer_manager.GetBytes(&TransferEvent),
 	)
 
 	block := indexerEventManager.ProduceBlock(ctx)
@@ -212,69 +299,59 @@ func TestProduceBlockMultipleTxnAndBlockEvents(t *testing.T) {
 	ctx = ctx.WithBlockTime(BlockTime).WithBlockHeight(BlockHeight).WithTxBytes(constants.TestTxBytes)
 	ctx.GasMeter().ConsumeGas(ConsumedGas, "beforeWrite")
 	require.NoError(t, stateStore.LoadLatestVersion())
-	mockMsgSender := &mocks.IndexerMessageSender{}
-	mockMsgSender.On("Enabled").Return(true)
-	indexerEventManager := indexer_manager.NewIndexerEventManager(mockMsgSender, storeKey)
+
+	mockSender := createMockSender(true)
+	indexerEventManager := indexer_manager.NewIndexerEventManager(
+		storeKey,
+		[]indexer_manager.SenderWithKey{{Key: "sender1", Sender: mockSender}},
+	)
+
 	indexerEventManager.AddTxnEvent(
 		ctx,
 		indexerevents.SubtypeSubaccountUpdate,
 		EventVersion,
-		indexer_manager.GetBytes(
-			&SubaccountEvent,
-		),
+		indexer_manager.GetBytes(&SubaccountEvent),
 	)
 	indexerEventManager.AddTxnEvent(
 		ctx,
 		indexerevents.SubtypeSubaccountUpdate,
 		EventVersion,
-		indexer_manager.GetBytes(
-			&SubaccountEvent,
-		),
+		indexer_manager.GetBytes(&SubaccountEvent),
 	)
 	ctx = ctx.WithTxBytes(constants.TestTxBytes1)
 	indexerEventManager.AddTxnEvent(
 		ctx,
 		indexerevents.SubtypeTransfer,
 		EventVersion,
-		indexer_manager.GetBytes(
-			&TransferEvent,
-		),
+		indexer_manager.GetBytes(&TransferEvent),
 	)
 	indexerEventManager.AddBlockEvent(
 		ctx,
 		indexerevents.SubtypeFundingValues,
 		indexer_manager.IndexerTendermintEvent_BLOCK_EVENT_END_BLOCK,
 		EventVersion,
-		indexer_manager.GetBytes(
-			&FundingRateAndIndexEvent,
-		),
+		indexer_manager.GetBytes(&FundingRateAndIndexEvent),
 	)
 	indexerEventManager.AddBlockEvent(
 		ctx,
 		indexerevents.SubtypeFundingValues,
 		indexer_manager.IndexerTendermintEvent_BLOCK_EVENT_END_BLOCK,
 		EventVersion,
-		indexer_manager.GetBytes(
-			&FundingPremiumSampleEvent,
-		),
+		indexer_manager.GetBytes(&FundingPremiumSampleEvent),
 	)
 	indexerEventManager.AddBlockEvent(
 		ctx,
 		indexerevents.SubtypeFundingValues,
 		indexer_manager.IndexerTendermintEvent_BLOCK_EVENT_BEGIN_BLOCK,
 		EventVersion,
-		indexer_manager.GetBytes(
-			&FundingPremiumSampleEvent,
-		),
+		indexer_manager.GetBytes(&FundingPremiumSampleEvent),
 	)
 	indexerEventManager.AddBlockEvent(
 		ctx,
 		indexerevents.SubtypeFundingValues,
 		indexer_manager.IndexerTendermintEvent_BLOCK_EVENT_BEGIN_BLOCK,
 		EventVersion,
-		indexer_manager.GetBytes(
-			&FundingRateAndIndexEvent,
-		),
+		indexer_manager.GetBytes(&FundingRateAndIndexEvent),
 	)
 
 	block := indexerEventManager.ProduceBlock(ctx)
@@ -302,16 +379,18 @@ func TestClearEvents(t *testing.T) {
 	ctx = ctx.WithBlockTime(BlockTime).WithBlockHeight(BlockHeight).WithTxBytes(constants.TestTxBytes)
 	ctx.GasMeter().ConsumeGas(ConsumedGas, "beforeWrite")
 	require.NoError(t, stateStore.LoadLatestVersion())
-	mockMsgSender := &mocks.IndexerMessageSender{}
-	mockMsgSender.On("Enabled").Return(true)
-	indexerEventManager := indexer_manager.NewIndexerEventManager(mockMsgSender, storeKey)
+
+	mockSender := createMockSender(true)
+	indexerEventManager := indexer_manager.NewIndexerEventManager(
+		storeKey,
+		[]indexer_manager.SenderWithKey{{Key: "sender1", Sender: mockSender}},
+	)
+
 	indexerEventManager.AddTxnEvent(
 		ctx,
 		indexerevents.SubtypeSubaccountUpdate,
 		EventVersion,
-		indexer_manager.GetBytes(
-			&SubaccountEvent,
-		),
+		indexer_manager.GetBytes(&SubaccountEvent),
 	)
 
 	block := indexerEventManager.ProduceBlock(ctx)

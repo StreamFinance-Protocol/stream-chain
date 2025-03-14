@@ -17,13 +17,13 @@ func TestIndexerMessageSenderInMemoryCollector(t *testing.T) {
 		})
 	}
 
-	v.SendOnchainData(Message{Key: []byte("onChainThatIsCleared")})
+	v.SendOnchainData(Message{Value: []byte("onChainThatIsCleared")})
 	v.Clear()
 	for _, msg := range expectedOnchainMessages {
 		v.SendOnchainData(msg)
 	}
 
 	v.Close()
-	v.SendOnchainData(Message{Key: []byte("onChainAfterClose")})
+	v.SendOnchainData(Message{Value: []byte("onChainAfterClose")})
 	require.Equal(t, expectedOnchainMessages, v.GetOnchainMessages())
 }

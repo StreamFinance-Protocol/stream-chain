@@ -150,7 +150,7 @@ export interface OrderQueryConfig extends QueryConfig {
   [QueryableField.CLIENT_METADATA]?: string;
   [QueryableField.TRIGGER_PRICE]?: string;
   [QueryableField.ROUTER_FEE_PPM]?: string;
-  [QueryableField.router_fee_owner]?: string;
+  [QueryableField.ROUTER_FEE_OWNER]?: string;
 }
 
 export interface PerpetualMarketQueryConfig extends QueryConfig {

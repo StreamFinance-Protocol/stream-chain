@@ -146,79 +146,6 @@ message TransferEventV1 {
   SourceOfFunds recipient = 6;
 }
 
-// OrderFillEvent message contains all the information from an order match in
-// the Klyra chain. This includes the maker/taker orders that matched and the
-// amount filled.
-message OrderFillEventV1 {
-  klyraprotocol.indexer.protocol.v1.IndexerOrder maker_order = 1
-      [ (gogoproto.nullable) = false ];
-  // The type of order fill this event represents.
-  oneof taker_order {
-    klyraprotocol.indexer.protocol.v1.IndexerOrder order = 2;
-    LiquidationOrderV1 liquidation_order = 4;
-  }
-  // Fill amount in base quantums.
-  uint64 fill_amount = 3;
-  // Maker fee in TDAI quantums.
-  sint64 maker_fee = 5;
-  // Taker fee in TDAI quantums. If the taker order is a liquidation, then this
-  // represents the special liquidation fee, not the standard taker fee.
-  sint64 taker_fee = 6;
-  // Total filled of the maker order in base quantums.
-  uint64 total_filled_maker = 7;
-  // Total filled of the taker order in base quantums.
-  uint64 total_filled_taker = 8;
-}
-
-// DeleveragingEvent message contains all the information for a deleveraging
-// on the Klyra chain. This includes the liquidated/offsetting subaccounts and
-// the amount filled.
-message DeleveragingEventV1 {
-  // ID of the subaccount that was liquidated.
-  klyraprotocol.indexer.protocol.v1.IndexerSubaccountId liquidated = 1
-      [ (gogoproto.nullable) = false ];
-  // ID of the subaccount that was used to offset the position.
-  klyraprotocol.indexer.protocol.v1.IndexerSubaccountId offsetting = 2
-      [ (gogoproto.nullable) = false ];
-  // The ID of the perpetual that was liquidated.
-  uint32 perpetual_id = 3;
-  // The amount filled between the liquidated and offsetting position, in
-  // base quantums.
-  uint64 fill_amount = 4;
-  // Total quote quantums filled.
-  uint64 total_quote_quantums = 5;
-  // `true` if liquidating a short position, `false` otherwise.
-  bool is_buy = 6;
-  // `true` if the deleveraging event is for final settlement, indicating
-  // the match occurred at the oracle price rather than bankruptcy price.
-  // When this flag is `false`, the fill price is the bankruptcy price
-  // of the liquidated subaccount.
-  bool is_final_settlement = 7;
-}
-
-// LiquidationOrder represents the liquidation taker order to be included in a
-// liquidation order fill event.
-message LiquidationOrderV1 {
-  // ID of the subaccount that was liquidated.
-  klyraprotocol.indexer.protocol.v1.IndexerSubaccountId liquidated = 1
-      [ (gogoproto.nullable) = false ];
-  // The ID of the clob pair involved in the liquidation.
-  uint32 clob_pair_id = 2;
-  // The ID of the perpetual involved in the liquidation.
-  uint32 perpetual_id = 3;
-  // The total size of the liquidation order including any unfilled size,
-  // in base quantums.
-  uint64 total_size = 4;
-  // `true` if liquidating a short position, `false` otherwise.
-  bool is_buy = 5;
-  // The fillable price in subticks.
-  // This represents the lower-price-bound for liquidating longs
-  // and the upper-price-bound for liquidating shorts.
-  // Must be a multiple of ClobPair.SubticksPerTick
-  // (where `ClobPair.Id = orderId.ClobPairId`).
-  uint64 subticks = 6;
-}
-
 // SubaccountUpdateEvent message contains information about an update to a
 // subaccount in the Klyra chain. This includes the list of updated perpetual
 // and asset positions for the subaccount.
@@ -236,52 +163,6 @@ message SubaccountUpdateEventV1 {
   repeated klyraprotocol.indexer.protocol.v1.IndexerAssetPosition
       updated_asset_positions = 4;
   string yield_index = 5;
-}
-
-// StatefulOrderEvent message contains information about a change to a stateful
-// order. Currently, this is either the placement of a long-term order, the
-// placement or triggering of a conditional order, or the removal of a
-// stateful order.
-message StatefulOrderEventV1 {
-  reserved 2, 3;
-
-  // The type of event that this StatefulOrderEvent contains.
-  oneof event {
-    StatefulOrderPlacementV1 order_place = 1;
-    StatefulOrderRemovalV1 order_removal = 4;
-    ConditionalOrderPlacementV1 conditional_order_placement = 5;
-    ConditionalOrderTriggeredV1 conditional_order_triggered = 6;
-    LongTermOrderPlacementV1 long_term_order_placement = 7;
-  }
-
-  // A stateful order placement contains an order.
-  message StatefulOrderPlacementV1 {
-    klyraprotocol.indexer.protocol.v1.IndexerOrder order = 1;
-  }
-
-  // A stateful order removal contains the id of an order that was already
-  // placed and is now removed and the reason for the removal.
-  message StatefulOrderRemovalV1 {
-    klyraprotocol.indexer.protocol.v1.IndexerOrderId removed_order_id = 1;
-    klyraprotocol.indexer.shared.OrderRemovalReason reason = 2;
-  }
-
-  // A conditional order placement contains an order. The order is newly-placed
-  // and untriggered when this event is emitted.
-  message ConditionalOrderPlacementV1 {
-    klyraprotocol.indexer.protocol.v1.IndexerOrder order = 1;
-  }
-
-  // A conditional order trigger event contains an order id and is emitted when
-  // an order is triggered.
-  message ConditionalOrderTriggeredV1 {
-    klyraprotocol.indexer.protocol.v1.IndexerOrderId triggered_order_id = 1;
-  }
-
-  // A long term order placement contains an order.
-  message LongTermOrderPlacementV1 {
-    klyraprotocol.indexer.protocol.v1.IndexerOrder order = 1;
-  }
 }
 
 // AssetCreateEventV1 message contains all the information about an new Asset on

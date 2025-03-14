@@ -13,18 +13,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var ExpectedEvent0 = indexer_manager.IndexerTendermintEvent{
-	Subtype: indexerevents.SubtypeOrderFill,
-	OrderingWithinBlock: &indexer_manager.IndexerTendermintEvent_TransactionIndex{
-		TransactionIndex: 0,
-	},
-	EventIndex: 0,
-	Version:    indexerevents.OrderFillEventVersion,
-	DataBytes: indexer_manager.GetBytes(
-		&OrderFillEvent,
-	),
-}
-
 var ExpectedEvent1 = indexer_manager.IndexerTendermintEvent{
 	Subtype: indexerevents.SubtypeSubaccountUpdate,
 	OrderingWithinBlock: &indexer_manager.IndexerTendermintEvent_TransactionIndex{
@@ -122,16 +110,16 @@ func TestProduceBlockBasicTxnEvent(t *testing.T) {
 	indexerEventManager := indexer_manager.NewIndexerEventManager(mockMsgSender, storeKey)
 	indexerEventManager.AddTxnEvent(
 		ctx,
-		indexerevents.SubtypeOrderFill,
+		indexerevents.SubtypeSubaccountUpdate,
 		EventVersion,
 		indexer_manager.GetBytes(
-			&OrderFillEvent,
+			&SubaccountEvent,
 		),
 	)
 
 	block := indexerEventManager.ProduceBlock(ctx)
 	require.Len(t, block.Events, 1)
-	require.Equal(t, ExpectedEvent0, *block.Events[0])
+	require.Equal(t, ExpectedEvent1, *block.Events[0])
 	require.Equal(t, []string{string(constants.TestTxHashString)}, block.TxHashes)
 	require.Equal(t, uint32(BlockHeight), block.Height)
 	require.Equal(t, BlockTime, block.Time)
@@ -179,10 +167,10 @@ func TestProduceBlockMultipleTxnEvents(t *testing.T) {
 	indexerEventManager := indexer_manager.NewIndexerEventManager(mockMsgSender, storeKey)
 	indexerEventManager.AddTxnEvent(
 		ctx,
-		indexerevents.SubtypeOrderFill,
+		indexerevents.SubtypeSubaccountUpdate,
 		EventVersion,
 		indexer_manager.GetBytes(
-			&OrderFillEvent,
+			&SubaccountEvent,
 		),
 	)
 	indexerEventManager.AddTxnEvent(
@@ -205,7 +193,7 @@ func TestProduceBlockMultipleTxnEvents(t *testing.T) {
 
 	block := indexerEventManager.ProduceBlock(ctx)
 	require.Len(t, block.Events, 3)
-	require.Equal(t, ExpectedEvent0, *block.Events[0])
+	require.Equal(t, ExpectedEvent1, *block.Events[0])
 	require.Equal(t, ExpectedEvent1, *block.Events[1])
 	require.Equal(t, ExpectedEvent2, *block.Events[2])
 	require.Equal(t, []string{
@@ -229,10 +217,10 @@ func TestProduceBlockMultipleTxnAndBlockEvents(t *testing.T) {
 	indexerEventManager := indexer_manager.NewIndexerEventManager(mockMsgSender, storeKey)
 	indexerEventManager.AddTxnEvent(
 		ctx,
-		indexerevents.SubtypeOrderFill,
+		indexerevents.SubtypeSubaccountUpdate,
 		EventVersion,
 		indexer_manager.GetBytes(
-			&OrderFillEvent,
+			&SubaccountEvent,
 		),
 	)
 	indexerEventManager.AddTxnEvent(
@@ -291,7 +279,7 @@ func TestProduceBlockMultipleTxnAndBlockEvents(t *testing.T) {
 
 	block := indexerEventManager.ProduceBlock(ctx)
 	require.Len(t, block.Events, 7)
-	require.Equal(t, ExpectedEvent0, *block.Events[0])
+	require.Equal(t, ExpectedEvent1, *block.Events[0])
 	require.Equal(t, ExpectedEvent1, *block.Events[1])
 	require.Equal(t, ExpectedEvent2, *block.Events[2])
 	require.Equal(t, ExpectedEvent3, *block.Events[3])
@@ -319,10 +307,10 @@ func TestClearEvents(t *testing.T) {
 	indexerEventManager := indexer_manager.NewIndexerEventManager(mockMsgSender, storeKey)
 	indexerEventManager.AddTxnEvent(
 		ctx,
-		indexerevents.SubtypeOrderFill,
+		indexerevents.SubtypeSubaccountUpdate,
 		EventVersion,
 		indexer_manager.GetBytes(
-			&OrderFillEvent,
+			&SubaccountEvent,
 		),
 	)
 

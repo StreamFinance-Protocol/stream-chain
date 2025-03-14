@@ -23,15 +23,6 @@ const (
 
 var BlockTime = time.Unix(1650000000, 0).UTC()
 
-var OrderFillTendermintEvent = indexer_manager.IndexerTendermintEvent{
-	Subtype: indexerevents.SubtypeOrderFill,
-	OrderingWithinBlock: &indexer_manager.IndexerTendermintEvent_TransactionIndex{
-		TransactionIndex: 0,
-	},
-	EventIndex: 0,
-	DataBytes:  []byte(Data3),
-}
-
 var TransferTendermintEvent = indexer_manager.IndexerTendermintEvent{
 	Subtype: indexerevents.SubtypeTransfer,
 	OrderingWithinBlock: &indexer_manager.IndexerTendermintEvent_TransactionIndex{
@@ -48,16 +39,6 @@ var SubaccountTendermintEvent = indexer_manager.IndexerTendermintEvent{
 	},
 	EventIndex: 0,
 	DataBytes:  []byte(Data2),
-}
-
-var makerOrder = v1.OrderToIndexerOrder(constants.Order_Alice_Num0_Id0_Clob0_Buy5_Price10_GTB15)
-var takerOrder = v1.OrderToIndexerOrder(constants.Order_Alice_Num0_Id2_Clob1_Sell5_Price10_GTB15)
-var OrderFillEvent = indexerevents.OrderFillEventV1{
-	MakerOrder: makerOrder,
-	TakerOrder: &indexerevents.OrderFillEventV1_Order{
-		Order: &takerOrder,
-	},
-	FillAmount: 5,
 }
 
 var FundingRateAndIndexEvent = indexerevents.FundingEventV1{

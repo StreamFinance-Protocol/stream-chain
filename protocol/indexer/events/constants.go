@@ -5,12 +5,10 @@ const (
 	// Keep these constants in sync with:
 	// https://github.com/StreamFinance-Protocol/indexer/blob/master/services/ender/src/lib/types.ts.
 	// Ender uses these to maintain a mapping between event type and event proto.
-	SubtypeOrderFill          = "order_fill"
 	SubtypeSubaccountUpdate   = "subaccount_update"
 	SubtypeTransfer           = "transfer"
 	SubtypeMarket             = "market"
 	SubtypeFundingValues      = "funding_values"
-	SubtypeStatefulOrder      = "stateful_order"
 	SubtypeAsset              = "asset"
 	SubtypePerpetualMarket    = "perpetual_market"
 	SubtypeCollateralPool     = "collateral_pool"
@@ -24,12 +22,10 @@ const (
 
 const (
 	// Indexer event versions.
-	OrderFillEventVersion         uint32 = 1
 	SubaccountUpdateEventVersion  uint32 = 1
 	TransferEventVersion          uint32 = 1
 	MarketEventVersion            uint32 = 1
 	FundingValuesEventVersion     uint32 = 1
-	StatefulOrderEventVersion     uint32 = 1
 	AssetEventVersion             uint32 = 1
 	PerpetualMarketEventVersion   uint32 = 2
 	CollateralPoolEventVersion    uint32 = 1
@@ -42,12 +38,10 @@ const (
 )
 
 var OnChainEventSubtypes = []string{
-	SubtypeOrderFill,
 	SubtypeSubaccountUpdate,
 	SubtypeTransfer,
 	SubtypeMarket,
 	SubtypeFundingValues,
-	SubtypeStatefulOrder,
 	SubtypeAsset,
 	SubtypePerpetualMarket,
 	SubtypeCollateralPool,

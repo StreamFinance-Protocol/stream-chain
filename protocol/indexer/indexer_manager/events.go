@@ -26,6 +26,11 @@ const (
 	ModuleName = "indexer_events"
 )
 
+type transactionData struct {
+	txHashes    []string
+	txEventsMap map[string][]*IndexerTendermintEvent
+}
+
 func getIndexerEventsCount(noGasCtx sdk.Context, store storetypes.KVStore) uint32 {
 	countsBytes := store.Get([]byte(IndexerEventsCountKey))
 	if countsBytes == nil {
@@ -135,35 +140,80 @@ func clearEvents(
 // transient store contains all onchain events from a ready-to-be-committed block.
 func produceBlock(ctx sdk.Context, storeKey storetypes.StoreKey) *IndexerTendermintBlock {
 	noGasCtx := ctx.WithGasMeter(ante_types.NewFreeInfiniteGasMeter())
-	txHashes := []string{}
-	txEventsMap := make(map[string][]*IndexerTendermintEvent)
-	blockEvents := []*IndexerTendermintEvent{}
 	blockHeight := lib.MustConvertIntegerToUint32(noGasCtx.BlockHeight())
 	blockTime := noGasCtx.BlockTime()
+
+	// Process all events
 	events := getIndexerEvents(noGasCtx, storeKey)
+	txData, blockEvents := separateEvents(events)
+
+	// Process transaction events
+	allEvents := processTransactionEvents(txData)
+
+	// Process block events
+	processedBlockEvents := processBlockEvents(blockEvents)
+	allEvents = append(allEvents, processedBlockEvents...)
+
+	recordMetrics(len(allEvents)-len(processedBlockEvents), len(processedBlockEvents))
+
+	return &IndexerTendermintBlock{
+		Height:   blockHeight,
+		Time:     blockTime,
+		Events:   allEvents,
+		TxHashes: txData.txHashes,
+	}
+}
+
+func separateEvents(events []*IndexerTendermintEventWrapper) (transactionData, []*IndexerTendermintEvent) {
+	txData := transactionData{
+		txHashes:    []string{},
+		txEventsMap: make(map[string][]*IndexerTendermintEvent),
+	}
+	blockEvents := []*IndexerTendermintEvent{}
 
 	for _, event := range events {
 		switch event.Event.OrderingWithinBlock.(type) {
 		case *IndexerTendermintEvent_BlockEvent_:
 			blockEvents = append(blockEvents, event.Event)
 		case *IndexerTendermintEvent_TransactionIndex:
-			txHash := event.TxnHash
-			if txEvents, ok := txEventsMap[txHash]; ok {
-				txEventsMap[txHash] = append(txEvents, event.Event)
-			} else {
-				txHashes = append(txHashes, txHash)
-				txEventsMap[txHash] = []*IndexerTendermintEvent{event.Event}
-			}
+			processTxEvent(&txData, event)
 		}
 	}
-	// create map from txHash to index
+	return txData, blockEvents
+}
+
+func processTxEvent(txData *transactionData, event *IndexerTendermintEventWrapper) {
+	txHash := event.TxnHash
+	if txEvents, ok := txData.txEventsMap[txHash]; ok {
+		txData.txEventsMap[txHash] = append(txEvents, event.Event)
+	} else {
+		txData.txHashes = append(txData.txHashes, txHash)
+		txData.txEventsMap[txHash] = []*IndexerTendermintEvent{event.Event}
+	}
+}
+
+func processTransactionEvents(txData transactionData) []*IndexerTendermintEvent {
+	// Create hash to index mapping
 	txHashesMap := make(map[string]int)
-	for i, txHash := range txHashes {
+	for i, txHash := range txData.txHashes {
 		txHashesMap[txHash] = i
 	}
-	// iterate through txEventsMap and add transaction/event indices to each event
+
+	// Update event indices
+	numTxnEvents := updateEventIndices(txData, txHashesMap)
+
+	// Collect all transaction events in order
+	allEvents := make([]*IndexerTendermintEvent, 0, numTxnEvents)
+	for _, txHash := range txData.txHashes {
+		allEvents = append(allEvents, txData.txEventsMap[txHash]...)
+	}
+
+	return allEvents
+}
+
+func updateEventIndices(txData transactionData, txHashesMap map[string]int) int {
 	numTxnEvents := 0
-	for txHash, events := range txEventsMap {
+	for txHash, events := range txData.txEventsMap {
 		for i, event := range events {
 			event.OrderingWithinBlock = &IndexerTendermintEvent_TransactionIndex{
 				TransactionIndex: uint32(txHashesMap[txHash]),
@@ -172,14 +222,12 @@ func produceBlock(ctx sdk.Context, storeKey storetypes.StoreKey) *IndexerTenderm
 			events[i] = event
 			numTxnEvents++
 		}
-		txEventsMap[txHash] = events
+		txData.txEventsMap[txHash] = events
 	}
-	// build list of all events
-	allEvents := make([]*IndexerTendermintEvent, 0, numTxnEvents+len(blockEvents))
-	for _, txHash := range txHashes {
-		allEvents = append(allEvents, txEventsMap[txHash]...)
-	}
-	// set the event index of block events
+	return numTxnEvents
+}
+
+func processBlockEvents(blockEvents []*IndexerTendermintEvent) []*IndexerTendermintEvent {
 	numBeginBlockerEvents, numEndBlockerEvents := 0, 0
 	for i, event := range blockEvents {
 		switch event.GetBlockEvent() {
@@ -191,16 +239,7 @@ func produceBlock(ctx sdk.Context, storeKey storetypes.StoreKey) *IndexerTenderm
 			numEndBlockerEvents++
 		}
 	}
-	// append block events
-	allEvents = append(allEvents, blockEvents...)
-	recordMetrics(numTxnEvents, len(blockEvents))
-
-	return &IndexerTendermintBlock{
-		Height:   blockHeight,
-		Time:     blockTime,
-		Events:   allEvents,
-		TxHashes: txHashes,
-	}
+	return blockEvents
 }
 
 func recordMetrics(

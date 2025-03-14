@@ -15,7 +15,6 @@ func TestCreateIndexerBlockEventMessage(t *testing.T) {
 		Height: uint32(BlockHeight),
 		Time:   BlockTime,
 		Events: []*indexer_manager.IndexerTendermintEvent{
-			&OrderFillTendermintEvent,
 			&TransferTendermintEvent,
 			&SubaccountTendermintEvent,
 		},

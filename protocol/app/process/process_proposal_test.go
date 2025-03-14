@@ -249,10 +249,6 @@ func TestProcessProposalHandler_Error(t *testing.T) {
 			keepertest.CreateTestMarkets(t, ctx, pricesKeeper)
 			daemonPriceCache.UpdatePrices(constants.AtTimeTSingleExchangePriceUpdate)
 
-			mockClobKeeper := &mocks.ProcessClobKeeper{}
-			mockClobKeeper.On("RecordMevMetricsIsEnabled").Return(true)
-			mockClobKeeper.On("RecordMevMetrics", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
-
 			mockVEApplier := &mocks.ProcessProposalVEApplier{}
 			mockVEApplier.On("ApplyVE", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
@@ -272,7 +268,6 @@ func TestProcessProposalHandler_Error(t *testing.T) {
 			handler := process.ProcessProposalHandler(
 				constants.TestEncodingCfg.TxConfig,
 				mockBridgeKeeper,
-				mockClobKeeper,
 				&mocks.ProcessStakingKeeper{},
 				&mocks.ProcessPerpetualKeeper{},
 				pricesKeeper,

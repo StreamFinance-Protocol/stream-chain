@@ -5,7 +5,6 @@ import (
 
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib/metrics"
 	bridgetypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
-	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	"github.com/cosmos/cosmos-sdk/telemetry"
@@ -57,14 +56,6 @@ func recordSuccessMetrics(ctx sdk.Context, txs *ProcessProposalTxs, totalNumTxs 
 		ctx.Logger().Error("ProcessProposal: expected MsgAcknowledgeBridges")
 	}
 
-	// Order tx.
-	msgProposedOperations, ok := txs.ProposedOperationsTx.GetMsg().(*clobtypes.MsgProposedOperations)
-	if ok {
-		recordMsgProposedOperationsMetrics(ctx, msgProposedOperations)
-	} else {
-		ctx.Logger().Error("ProcessProposal: expected MsgProposedOperations")
-	}
-
 	// Other txs.
 	telemetry.SetGauge(
 		float32(len(txs.OtherTxs)),
@@ -78,11 +69,4 @@ func recordSuccessMetrics(ctx sdk.Context, txs *ProcessProposalTxs, totalNumTxs 
 		ModuleName,
 		metrics.TotalNumTxs,
 	)
-}
-
-// recordMsgProposedOperationsMetrics reports metrics on a `MsgProposedOperations`
-// object. It is used in the process_proposal module.
-func recordMsgProposedOperationsMetrics(ctx sdk.Context, msg *clobtypes.MsgProposedOperations) {
-	operationsStats := clobtypes.StatMsgProposedOperations(msg.GetOperationsQueue())
-	operationsStats.EmitStats(metrics.ProcessProposal)
 }

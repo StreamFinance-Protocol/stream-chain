@@ -17,7 +17,6 @@ import (
 	bigintcache "github.com/StreamFinance-Protocol/stream-chain/protocol/caches/bigintcache"
 	pricecache "github.com/StreamFinance-Protocol/stream-chain/protocol/caches/pricecache"
 	vecache "github.com/StreamFinance-Protocol/stream-chain/protocol/caches/vecache"
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
 	reflectionv1 "cosmossdk.io/api/cosmos/reflection/v1"
@@ -110,7 +109,6 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib/metrics"
 	timelib "github.com/StreamFinance-Protocol/stream-chain/protocol/lib/time"
-	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/rate_limit"
 
 	// VE
 	veaggregator "github.com/StreamFinance-Protocol/stream-chain/protocol/app/ve/aggregator"
@@ -123,7 +121,6 @@ import (
 
 	// Daemons
 	bridgeclient "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/bridge/client"
-	deleveragingclient "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/deleveraging/client"
 	daemonflags "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/flags"
 	metricsclient "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/metrics/client"
 	pricefeedclient "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/pricefeed/client"
@@ -133,7 +130,6 @@ import (
 	daemonserver "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/server"
 	daemonservertypes "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/server/types"
 	bridgedaemontypes "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/server/types/bridge"
-	deleveragingtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/server/types/deleveraging"
 	pricefeedtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/server/types/pricefeed"
 	sdaidaemontypes "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/server/types/sdaioracle"
 	daemontypes "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/types"
@@ -148,11 +144,6 @@ import (
 	bridgemodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge"
 	bridgemodulekeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/keeper"
 	bridgemoduletypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
-	clobmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob"
-	clobflags "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/flags"
-	clobmodulekeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/keeper"
-	clobmodulememclob "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/memclob"
-	clobmoduletypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	delaymsgmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/delaymsg"
 	delaymsgmodulekeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/delaymsg/keeper"
 	delaymsgmoduletypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/delaymsg/types"
@@ -258,8 +249,6 @@ type App struct {
 
 	SubaccountsKeeper subaccountsmodulekeeper.Keeper
 
-	ClobKeeper clobmodulekeeper.Keeper
-
 	SendingKeeper sendingmodulekeeper.Keeper
 
 	EpochsKeeper epochsmodulekeeper.Keeper
@@ -281,9 +270,8 @@ type App struct {
 	// can correctly operate.
 	startDaemons func()
 
-	PriceFeedClient    *pricefeedclient.Client
-	SDAIClient         *sdaiclient.Client
-	DeleveragingClient *deleveragingclient.Client
+	PriceFeedClient *pricefeedclient.Client
+	SDAIClient      *sdaiclient.Client
 
 	DaemonHealthMonitor *daemonservertypes.HealthMonitor
 
@@ -357,7 +345,6 @@ func New(
 		bridgemoduletypes.StoreKey,
 		perpetualsmoduletypes.StoreKey,
 		satypes.StoreKey,
-		clobmoduletypes.StoreKey,
 		sendingmoduletypes.StoreKey,
 		delaymsgmoduletypes.StoreKey,
 		epochsmoduletypes.StoreKey,
@@ -366,11 +353,9 @@ func New(
 	tkeys := storetypes.NewTransientStoreKeys(
 		paramstypes.TStoreKey,
 		bridgemoduletypes.TransientStoreKey,
-		clobmoduletypes.TransientStoreKey,
 		indexer_manager.TransientStoreKey,
 		perpetualsmoduletypes.TransientStoreKey,
 	)
-	memKeys := storetypes.NewMemoryStoreKeys(clobmoduletypes.MemStoreKey)
 
 	app := &App{
 		BaseApp:           bApp,
@@ -380,7 +365,6 @@ func New(
 		interfaceRegistry: interfaceRegistry,
 		keys:              keys,
 		tkeys:             tkeys,
-		memKeys:           memKeys,
 	}
 	app.closeOnce = sync.OnceValue[error](
 		func() error {
@@ -608,13 +592,6 @@ func New(
 	daemonPriceCache := pricefeedtypes.NewMarketToExchangePrices(pricefeed_types.MaxPriceAge)
 	app.Server.WithPriceFeedMarketToExchangePrices(daemonPriceCache)
 
-	// Setup server for deleveraging messages. The server will wait for gRPC messages containing
-	// subaccounts with open perp positions and then encode them into an in-memory slice shared by
-	// the deleveraging module.
-	// The in-memory data structure is shared by the x/clob module and deleveraging daemon.
-	daemonDeleveragingInfo := deleveragingtypes.NewDaemonDeleveragingInfo()
-	app.Server.WithDaemonDeleveragingInfo(daemonDeleveragingInfo)
-
 	// Setup server for bridge messages.
 	// The in-memory data structure is shared by the x/bridge module and bridge daemon.
 	bridgeEventManager := bridgedaemontypes.NewBridgeEventManager(timeProvider)
@@ -635,24 +612,6 @@ func New(
 		maxDaemonUnhealthyDuration := time.Duration(daemonFlags.Shared.MaxDaemonUnhealthySeconds) * time.Second
 		// Start server for handling gRPC messages from daemons.
 		go app.Server.Start()
-
-		// Start deleveraging client for sending subaccounts with open positions to the application.
-		if daemonFlags.Deleveraging.Enabled {
-			app.DeleveragingClient = deleveragingclient.NewClient(logger)
-			go func() {
-				app.RegisterDaemonWithHealthMonitor(app.DeleveragingClient, maxDaemonUnhealthyDuration)
-				if err := app.DeleveragingClient.Start(
-					// The client will use `context.Background` so that it can have a different context from
-					// the main application.
-					context.Background(),
-					daemonFlags,
-					appFlags,
-					&daemontypes.GrpcClientImpl{},
-				); err != nil {
-					panic(err)
-				}
-			}()
-		}
 
 		// Non-validating full-nodes have no need to run the price daemon.
 		if !appFlags.NonValidatingFullNode {
@@ -866,46 +825,6 @@ func New(
 		veCache,
 	)
 
-	clobFlags := clobflags.GetClobFlagValuesFromOptions(appOpts)
-	logger.Info("Parsed CLOB flags", "Flags", clobFlags)
-
-	memClob := clobmodulememclob.NewMemClobPriceTimePriority(app.IndexerEventManager.Enabled())
-	memClob.SetGenerateOrderbookUpdates(app.GrpcStreamingManager.Enabled())
-
-	app.ClobKeeper = *clobmodulekeeper.NewKeeper(
-		appCodec,
-		keys[clobmoduletypes.StoreKey],
-		memKeys[clobmoduletypes.MemStoreKey],
-		tkeys[clobmoduletypes.TransientStoreKey],
-		// set the governance and delaymsg module accounts as the authority for conducting upgrades
-		[]string{
-			lib.GovModuleAddress.String(),
-			delaymsgmoduletypes.ModuleAddress.String(),
-		},
-		memClob,
-		app.SubaccountsKeeper,
-		app.AssetsKeeper,
-		app.BlockTimeKeeper,
-		app.BankKeeper,
-		app.PerpetualsKeeper,
-		app.PricesKeeper,
-		app.IndexerEventManager,
-		app.GrpcStreamingManager,
-		txConfig.TxDecoder(),
-		clobFlags,
-		rate_limit.NewPanicRateLimiter[sdk.Msg](),
-		daemonDeleveragingInfo,
-		veApplier,
-	)
-	clobModule := clobmodule.NewAppModule(
-		appCodec,
-		&app.ClobKeeper,
-		app.AccountKeeper,
-		app.BankKeeper,
-		app.SubaccountsKeeper,
-	)
-	app.PerpetualsKeeper.SetClobKeeper(&app.ClobKeeper)
-
 	app.SendingKeeper = *sendingmodulekeeper.NewKeeper(
 		appCodec,
 		keys[sendingmoduletypes.StoreKey],
@@ -933,7 +852,7 @@ func New(
 	)
 
 	if !appFlags.NonValidatingFullNode {
-		app.InitVoteExtensions(logger, app.voteCodec, app.PricesKeeper, &app.PerpetualsKeeper, &app.ClobKeeper, &app.YieldKeeper, sDAIEventManager, veApplier)
+		app.InitVoteExtensions(logger, app.voteCodec, app.PricesKeeper, &app.PerpetualsKeeper, &app.YieldKeeper, sDAIEventManager, veApplier)
 	}
 
 	/****  Module Options ****/
@@ -989,7 +908,6 @@ func New(
 		bridgeModule,
 		perpetualsModule,
 		subaccountsModule,
-		clobModule,
 		sendingModule,
 		delayMsgModule,
 		epochsModule,
@@ -998,7 +916,6 @@ func New(
 
 	app.ModuleManager.SetOrderPreBlockers(
 		upgradetypes.ModuleName, // Must be first since upgrades may be state schema breaking.
-		clobmoduletypes.ModuleName,
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -1025,13 +942,8 @@ func New(
 		bridgemoduletypes.ModuleName,
 		perpetualsmoduletypes.ModuleName,
 		satypes.ModuleName,
-		clobmoduletypes.ModuleName,
 		sendingmoduletypes.ModuleName,
 		delaymsgmoduletypes.ModuleName,
-	)
-
-	app.ModuleManager.SetOrderPrepareCheckStaters(
-		clobmoduletypes.ModuleName,
 	)
 
 	app.ModuleManager.SetOrderEndBlockers(
@@ -1053,7 +965,6 @@ func New(
 		bridgemoduletypes.ModuleName,
 		perpetualsmoduletypes.ModuleName,
 		satypes.ModuleName,
-		clobmoduletypes.ModuleName,
 		sendingmoduletypes.ModuleName,
 		epochsmoduletypes.ModuleName,
 		delaymsgmoduletypes.ModuleName,
@@ -1085,7 +996,6 @@ func New(
 		bridgemoduletypes.ModuleName,
 		perpetualsmoduletypes.ModuleName,
 		satypes.ModuleName,
-		clobmoduletypes.ModuleName,
 		sendingmoduletypes.ModuleName,
 		delaymsgmoduletypes.ModuleName,
 		authz.ModuleName,
@@ -1115,7 +1025,6 @@ func New(
 		bridgemoduletypes.ModuleName,
 		perpetualsmoduletypes.ModuleName,
 		satypes.ModuleName,
-		clobmoduletypes.ModuleName,
 		sendingmoduletypes.ModuleName,
 		delaymsgmoduletypes.ModuleName,
 		authz.ModuleName,
@@ -1148,7 +1057,6 @@ func New(
 	// initialize stores
 	app.MountKVStores(keys)
 	app.MountTransientStores(tkeys)
-	app.MountMemoryStores(memKeys)
 
 	// initialize BaseApp
 	app.SetInitChainer(app.InitChainer)
@@ -1170,7 +1078,6 @@ func New(
 			prepare.PrepareProposalHandler(
 				txConfig,
 				app.BridgeKeeper,
-				&app.ClobKeeper,
 				app.PerpetualsKeeper,
 				app.PricesKeeper,
 				app.YieldKeeper,
@@ -1190,7 +1097,6 @@ func New(
 			process.FullNodeProcessProposalHandler(
 				txConfig,
 				app.BridgeKeeper,
-				&app.ClobKeeper,
 				app.StakingKeeper,
 				app.PerpetualsKeeper,
 				app.PricesKeeper,
@@ -1201,7 +1107,6 @@ func New(
 			process.ProcessProposalHandler(
 				txConfig,
 				app.BridgeKeeper,
-				&app.ClobKeeper,
 				app.StakingKeeper,
 				app.PerpetualsKeeper,
 				app.PricesKeeper,
@@ -1237,7 +1142,6 @@ func New(
 			tmos.Exit(err.Error())
 		}
 	}
-	app.initializeRateLimiters()
 
 	// Report out app version and git commit. This will be run when validators restart.
 	version := version.NewInfo()
@@ -1288,15 +1192,6 @@ func (app *App) DisableHealthMonitorForTesting() {
 	app.DaemonHealthMonitor.DisableForTesting()
 }
 
-// initializeRateLimiters initializes the rate limiters from state if the application is
-// not started from genesis.
-func (app *App) initializeRateLimiters() {
-	// Create an `uncachedCtx` where the underlying MultiStore is the `rootMultiStore`.
-	// We use this to hydrate the `orderRateLimiter` with values from the underlying `rootMultiStore`.
-	uncachedCtx := app.BaseApp.NewUncachedContext(true, tmproto.Header{})
-	app.ClobKeeper.InitalizeBlockRateLimitFromStateIfExists(uncachedCtx)
-}
-
 // GetBaseApp returns the base app of the application
 func (app *App) GetBaseApp() *baseapp.BaseApp { return app.BaseApp }
 
@@ -1321,7 +1216,6 @@ func (app *App) InitVoteExtensions(
 	veCodec vecodec.VoteExtensionCodec,
 	pricesKeeper pricesmodulekeeper.Keeper,
 	perpetualsKeeper *perpetualsmodulekeeper.Keeper,
-	clobKeeper *clobmodulekeeper.Keeper,
 	yieldKeeper *yieldkeeper.Keeper,
 	sDAIEventManager sdaidaemontypes.SDAIEventManager,
 	veApplier *veapplier.VEApplier,
@@ -1331,7 +1225,6 @@ func (app *App) InitVoteExtensions(
 		veCodec,
 		pricesKeeper,
 		perpetualsKeeper,
-		clobKeeper,
 		yieldKeeper,
 		sDAIEventManager,
 		veApplier,
@@ -1515,7 +1408,6 @@ func (app *App) buildAnteHandler(txConfig client.TxConfig) sdk.AnteHandler {
 				FeegrantKeeper:  app.FeeGrantKeeper,
 				SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
 			},
-			ClobKeeper:   &app.ClobKeeper,
 			Codec:        app.appCodec,
 			AuthStoreKey: app.keys[authtypes.StoreKey],
 		},
@@ -1530,8 +1422,6 @@ func (app *App) buildAnteHandler(txConfig client.TxConfig) sdk.AnteHandler {
 // setAnteHandler creates a new AnteHandler and sets it on the base app and clob keeper.
 func (app *App) setAnteHandler(txConfig client.TxConfig) {
 	anteHandler := app.buildAnteHandler(txConfig)
-	// Prevent a cycle between when we create the clob keeper and the ante handler.
-	app.ClobKeeper.SetAnteHandler(anteHandler)
 	app.SetAnteHandler(anteHandler)
 }
 

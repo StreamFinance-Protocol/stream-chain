@@ -4,7 +4,6 @@ import (
 	upgrade "cosmossdk.io/x/upgrade/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib"
 	bridge "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
-	clob "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	delaymsg "github.com/StreamFinance-Protocol/stream-chain/protocol/x/delaymsg/types"
 	perpetuals "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	prices "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
@@ -81,18 +80,6 @@ var (
 
 	// Custom modules
 	InternalMsgSamplesKlyraCustom = map[string]sdk.Msg{
-
-		// clob
-		"/klyraprotocol.clob.MsgCreateClobPair":                             &clob.MsgCreateClobPair{},
-		"/klyraprotocol.clob.MsgCreateClobPairResponse":                     nil,
-		"/klyraprotocol.clob.MsgUpdateBlockRateLimitConfiguration":          &clob.MsgUpdateBlockRateLimitConfiguration{},
-		"/klyraprotocol.clob.MsgUpdateBlockRateLimitConfigurationResponse":  nil,
-		"/klyraprotocol.clob.MsgUpdateClobPair":                             &clob.MsgUpdateClobPair{},
-		"/klyraprotocol.clob.MsgUpdateClobPairResponse":                     nil,
-		"/klyraprotocol.clob.MsgUpdateEquityTierLimitConfiguration":         &clob.MsgUpdateEquityTierLimitConfiguration{},
-		"/klyraprotocol.clob.MsgUpdateEquityTierLimitConfigurationResponse": nil,
-		"/klyraprotocol.clob.MsgUpdateLiquidationsConfig":                   &clob.MsgUpdateLiquidationsConfig{},
-		"/klyraprotocol.clob.MsgUpdateLiquidationsConfigResponse":           nil,
 
 		// delaymsg
 		"/klyraprotocol.delaymsg.MsgDelayMessage":         &delaymsg.MsgDelayMessage{},

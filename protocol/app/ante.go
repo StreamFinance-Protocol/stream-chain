@@ -10,8 +10,6 @@ import (
 
 	customante "github.com/StreamFinance-Protocol/stream-chain/protocol/app/ante"
 	libante "github.com/StreamFinance-Protocol/stream-chain/protocol/lib/ante"
-	clobante "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/ante"
-	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 
 	"sync"
 
@@ -20,18 +18,17 @@ import (
 )
 
 // HandlerOptions are the options required for constructing an SDK AnteHandler.
-// Note: This struct is defined here in order to add `ClobKeeper`. We use
+// Note: This struct is defined here in order to ad. We use
 // struct embedding to include the normal cosmos-sdk `HandlerOptions`.
 type HandlerOptions struct {
 	ante.HandlerOptions
 	Codec        codec.Codec
 	AuthStoreKey storetypes.StoreKey
-	ClobKeeper   clobtypes.ClobKeeper
 }
 
 // NewAnteHandler returns an AnteHandler that checks and increments sequence
 // numbers, checks signatures & account numbers, deducts fees from the first
-// signer, and handles in-memory clob messages.
+// signer.
 //
 // Note that the contract for the forked version of Cosmos SDK is that during `checkTx` the ante handler
 // is responsible for branching and writing the state store. During this time the forked Cosmos SDK has
@@ -64,10 +61,6 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 
 	if options.BankKeeper == nil {
 		return nil, errorsmod.Wrap(sdkerrors.ErrLogic, "bank keeper is required for ante builder")
-	}
-
-	if options.ClobKeeper == nil {
-		return nil, errorsmod.Wrap(sdkerrors.ErrLogic, "clob keeper is required for ante builder")
 	}
 
 	if options.SignModeHandler == nil {
@@ -103,8 +96,6 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		),
 		setPubKey:     ante.NewSetPubKeyDecorator(options.AccountKeeper),
 		sigGasConsume: ante.NewSigGasConsumeDecorator(options.AccountKeeper, options.SigGasConsumer),
-		clobRateLimit: clobante.NewRateLimitDecorator(options.ClobKeeper),
-		clob:          clobante.NewClobDecorator(options.ClobKeeper),
 	}
 	return h.AnteHandle, nil
 }
@@ -131,119 +122,14 @@ type lockingAnteHandler struct {
 	deductFee                ante.DeductFeeDecorator
 	setPubKey                ante.SetPubKeyDecorator
 	sigGasConsume            ante.SigGasConsumeDecorator
-	clobRateLimit            clobante.ClobRateLimitDecorator
-	clob                     clobante.ClobDecorator
 }
 
 func (h *lockingAnteHandler) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool) (sdk.Context, error) {
-	isClob, err := clobante.IsSingleClobMsgTx(tx)
-	if err != nil {
-		return ctx, err
-	} else if isClob {
-		return h.clobAnteHandle(ctx, tx, simulate)
-	}
 	if libante.IsSingleAppInjectedMsg(tx.GetMsgs()) {
 		return h.appInjectedMsgAnteHandle(ctx, tx, simulate)
 	}
 
 	return h.otherMsgAnteHandle(ctx, tx, simulate)
-}
-
-func (h *lockingAnteHandler) clobAnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool) (
-	newCtx sdk.Context,
-	err error,
-) {
-	// These ante decorators access state but only state that is mutated during `deliverTx`. The Cosmos SDK
-	// is responsible for linearizing the reads and writes during `deliverTx`.
-	if ctx, err = h.freeInfiniteGasDecorator.AnteHandle(ctx, tx, simulate, noOpAnteHandle); err != nil {
-		return ctx, err
-	}
-	if ctx, err = h.extensionOptionsChecker.AnteHandle(ctx, tx, simulate, noOpAnteHandle); err != nil {
-		return ctx, err
-	}
-	if ctx, err = h.validateMsgType.AnteHandle(ctx, tx, simulate, noOpAnteHandle); err != nil {
-		return ctx, err
-	}
-	if ctx, err = h.validateBasic.AnteHandle(ctx, tx, simulate, noOpAnteHandle); err != nil {
-		return ctx, err
-	}
-	if ctx, err = h.txTimeoutHeight.AnteHandle(ctx, tx, simulate, noOpAnteHandle); err != nil {
-		return ctx, err
-	}
-	if ctx, err = h.validateMemo.AnteHandle(ctx, tx, simulate, noOpAnteHandle); err != nil {
-		return ctx, err
-	}
-
-	// During `deliverTx` and simulation the Cosmos SDK is responsible for branching and writing the state store.
-	// During `checkTx` we acquire a per account lock to prevent stale reads of state that can be mutated during
-	// `checkTx`. Note that these messages are common so we use a row level like lock for each account and branch
-	// the state store to support writes in the ante decorators that follow.
-	var cacheMs storetypes.CacheMultiStore
-	if !simulate && (ctx.IsCheckTx() || ctx.IsReCheckTx()) {
-		sigTx, ok := tx.(authsigning.SigVerifiableTx)
-		if !ok {
-			return ctx, errorsmod.Wrap(sdkerrors.ErrTxDecode, "Tx must be a sigTx")
-		}
-		var signers [][]byte
-		signers, err = sigTx.GetSigners()
-		if err != nil {
-			return ctx, err
-		}
-
-		cacheMs = ctx.MultiStore().(cachemulti.Store).CacheMultiStoreWithLocking(map[storetypes.StoreKey][][]byte{
-			h.authStoreKey: signers,
-		})
-		defer cacheMs.(storetypes.LockingStore).Unlock()
-		ctx = ctx.WithMultiStore(cacheMs)
-	}
-
-	if ctx, err = h.consumeTxSizeGas.AnteHandle(ctx, tx, simulate, noOpAnteHandle); err != nil {
-		return ctx, err
-	}
-	if ctx, err = h.setPubKey.AnteHandle(ctx, tx, simulate, noOpAnteHandle); err != nil {
-		return ctx, err
-	}
-	if ctx, err = h.validateSigCount.AnteHandle(ctx, tx, simulate, noOpAnteHandle); err != nil {
-		return ctx, err
-	}
-	if ctx, err = h.sigGasConsume.AnteHandle(ctx, tx, simulate, noOpAnteHandle); err != nil {
-		return ctx, err
-	}
-	if ctx, err = h.sigVerification.AnteHandle(ctx, tx, simulate, noOpAnteHandle); err != nil {
-		return ctx, err
-	}
-
-	var isShortTerm bool
-	if isShortTerm, err = clobante.IsShortTermClobMsgTx(ctx, tx); err != nil {
-		return ctx, err
-	}
-	if !isShortTerm {
-		if ctx, err = h.incrementSequence.AnteHandle(ctx, tx, simulate, noOpAnteHandle); err != nil {
-			return ctx, err
-		}
-	}
-
-	// We now acquire the global ante handler since the clob decorator is not thread safe and performs
-	// several reads and writes across many stores.
-	if !simulate && (ctx.IsCheckTx() || ctx.IsReCheckTx()) {
-		h.globalLock.Lock()
-		defer h.globalLock.Unlock()
-	}
-
-	if ctx, err = h.clobRateLimit.AnteHandle(ctx, tx, simulate, noOpAnteHandle); err != nil {
-		return ctx, err
-	}
-	if ctx, err = h.clob.AnteHandle(ctx, tx, simulate, noOpAnteHandle); err != nil {
-		return ctx, err
-	}
-
-	// During non-simulated `checkTx` we must write the store since we own branching and writing.
-	// During `deliverTx` and simulation the Cosmos SDK is responsible for branching and writing.
-	if err == nil && !simulate && (ctx.IsCheckTx() || ctx.IsReCheckTx()) {
-		cacheMs.Write()
-	}
-
-	return ctx, err
 }
 
 // appInjectedMsgAnteHandle processes app injected messages through the necessary and sufficient set
@@ -257,7 +143,6 @@ func (h *lockingAnteHandler) clobAnteHandle(ctx sdk.Context, tx sdk.Tx, simulate
 //   - consume gas.
 //   - deduct fees.
 //   - increment the sequence number.
-//   - rate limit or handle through the clob decorator since this isn't a clob message.
 func (h *lockingAnteHandler) appInjectedMsgAnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool) (
 	newCtx sdk.Context,
 	err error,
@@ -289,10 +174,8 @@ func (h *lockingAnteHandler) appInjectedMsgAnteHandle(ctx sdk.Context, tx sdk.Tx
 	return ctx, err
 }
 
-// otherMsgAnteHandle processes all non-clob and non-app injected messages through the necessary and sufficient
+// otherMsgAnteHandle processes all non-app injected messages through the necessary and sufficient
 // set of ante decorators.
-//
-// Note that these messages will never need to use the clob ante decorators so they are omitted.
 func (h *lockingAnteHandler) otherMsgAnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool) (
 	newCtx sdk.Context,
 	err error,

@@ -10,7 +10,6 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/app/ve/types"
 	veutils "github.com/StreamFinance-Protocol/stream-chain/protocol/app/ve/utils"
 	sdaiserver "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/server/types/sdaioracle"
-	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
 	yieldtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types"
 	abci "github.com/cometbft/cometbft/abci/types"
@@ -28,9 +27,6 @@ type VoteExtensionHandler struct {
 
 	// fetching last funding rates for price calc
 	perpetualsKeeper ExtendVotePerpetualsKeeper
-
-	// fetching mid price for price calc
-	clobKeeper ExtendVoteClobKeeper
 
 	yieldKeeper VoteExtensionYieldKeeper
 
@@ -56,7 +52,6 @@ func NewVoteExtensionHandler(
 	voteCodec codec.VoteExtensionCodec,
 	pricesKeeper PreBlockExecPricesKeeper,
 	perpetualsKeeper ExtendVotePerpetualsKeeper,
-	clobKeeper ExtendVoteClobKeeper,
 	yieldKeeper VoteExtensionYieldKeeper,
 	sDAIEventManager sdaiserver.SDAIEventManager,
 	veApplier VEApplierInterface,
@@ -66,7 +61,6 @@ func NewVoteExtensionHandler(
 		voteCodec:        voteCodec,
 		pricesKeeper:     pricesKeeper,
 		perpetualsKeeper: perpetualsKeeper,
-		clobKeeper:       clobKeeper,
 		yieldKeeper:      yieldKeeper,
 		sDAIEventManager: sDAIEventManager,
 		veApplier:        veApplier,

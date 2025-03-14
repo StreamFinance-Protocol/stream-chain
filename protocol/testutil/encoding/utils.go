@@ -9,7 +9,6 @@ import (
 	"cosmossdk.io/x/upgrade"
 	custommodule "github.com/StreamFinance-Protocol/stream-chain/protocol/app/module"
 	bridgemodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge"
-	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	perpetualtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	sendingtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending/types"
 	subaccountsmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts"
@@ -46,11 +45,6 @@ func GetTestEncodingCfg() testutil.TestEncodingConfig {
 		subaccountsmodule.AppModuleBasic{})
 
 	msgInterfacesToRegister := []sdk.Msg{
-		// Clob.
-		&clobtypes.MsgProposedOperations{},
-		&clobtypes.MsgPlaceOrder{},
-		&clobtypes.MsgCancelOrder{},
-		&clobtypes.MsgBatchCancel{},
 
 		// Perpetuals.
 		&perpetualtypes.MsgAddPremiumVotes{},

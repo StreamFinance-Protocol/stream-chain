@@ -23,10 +23,6 @@ func TestAppInjectedMsgSamples_Key(t *testing.T) {
 		"/klyraprotocol.bridge.MsgAcknowledgeBridges",
 		"/klyraprotocol.bridge.MsgAcknowledgeBridgesResponse",
 
-		// clob
-		"/klyraprotocol.clob.MsgProposedOperations",
-		"/klyraprotocol.clob.MsgProposedOperationsResponse",
-
 		// perpetuals
 		"/klyraprotocol.perpetuals.MsgAddPremiumVotes",
 		"/klyraprotocol.perpetuals.MsgAddPremiumVotesResponse",

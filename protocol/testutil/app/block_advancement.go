@@ -8,7 +8,6 @@ import (
 	ve "github.com/StreamFinance-Protocol/stream-chain/protocol/app/ve"
 	testtx "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/tx"
 	vetesting "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/ve"
-	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	abcitypes "github.com/cometbft/cometbft/abci/types"
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"

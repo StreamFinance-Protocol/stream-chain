@@ -42,15 +42,6 @@ func DecodeOtherMsgsTx(decoder sdk.TxDecoder, txBytes []byte) (*OtherMsgsTx, err
 					msg,
 				)
 		}
-
-		if IsDisallowClobOrderMsgInOtherTxs(msg) {
-			return nil,
-				errorsmod.Wrapf(
-					ErrUnexpectedMsgType,
-					"Msg type %T is not allowed in OtherTxs",
-					msg,
-				)
-		}
 	}
 
 	return &OtherMsgsTx{msgs: allMsgs}, nil

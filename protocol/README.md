@@ -102,28 +102,6 @@ To run the below commands, you'll want to import the private keys of the test ac
 ./build/klyraprotocold keys add bob --recover
 ```
 
-### Send a test transaction locally
-It's occasionally helpful to send a transaction to the local chain to observe Cosmos behavior through the API such as events. Until `clob` `v0.1` is complete, you can use the default Cosmos `bank` module to transfer assets between two accounts defined at genesis in the `genesis.sh` file.
-
-```sh
-./build/klyraprotocold tx bank send klyra199tqg4wdlnu4qjlxchpd7seg454937hju8xa57 klyra10fx7sy6ywd5senxae9dwytf8jxek3t2g8gx9ym 100usdc
-```
-
-### Placing a test order locally
-
-It's occasionally helpful to send a transaction to the local chain to test order placement and matching. Run the following two commands in succession in order to match an order between two accounts.
-
-```sh
-./build/klyraprotocold tx clob place-order klyra199tqg4wdlnu4qjlxchpd7seg454937hju8xa57 0 0 0 1 10 10000 20 --from alice --chain-id localklyraprotocol
-./build/klyraprotocold tx clob place-order klyra10fx7sy6ywd5senxae9dwytf8jxek3t2g8gx9ym 0 0 0 2 10 10000 20 --from bob --chain-id localklyraprotocol
-```
-
-Run the following command to cancel an order.
-
-```sh
-./build/klyraprotocold tx clob cancel-order klyra199tqg4wdlnu4qjlxchpd7seg454937hju8xa57 10 0 20 --from alice
-```
-
 ### Querying the chain locally
 
 While running the development server via `make localnet-start`, you can make queries locally using the Tendermint API. All endpoints listed [here](https://docs.tendermint.com/v0.37/rpc/#/Info/block) are supported. For example to get the block at height 2: `curl -X GET "localhost:26657/block?height=2"`.

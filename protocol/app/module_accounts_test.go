@@ -74,7 +74,7 @@ func TestModuleAccountAddrs(t *testing.T) {
 		"klyra1tygms3xhhs3yv487phx3dw4a95jn7t7lhnw48l": true, // x/staking.notBondedPool
 		"klyra10d07y265gmmuvt4z0w9aw880jnsr700jv2gw70": true, // x/ gov
 		"klyra1v88c3xv9xyv3eetdx0tvcmq7ung3dywptd5ps3": true, // x/subaccount
-		"klyra1c7ptc87hkd54e3r7zjy92q29xkq7t79w9y9stt": true, // x/clob.insuranceFund
+		"klyra1c7ptc87hkd54e3r7zjy92q29xkq7t79w9y9stt": true, // x/perpetuals.insuranceFund
 		"klyra1r3fsd6humm0ghyq0te5jf8eumklmclyaw0hs3y": true, // x/yield.SDAIPoolAccount
 		"klyra1lv0pg8fqarvuwekkp6xuv64nt9yn7fd4q0kgn3": true, // x/yield.TDAIPoolAccount
 		"klyra1l4fct6xefgds6tsslrluwy2juuyaet366dl234": true, // x/subaccount.LiquidityFeeModuleAddress

@@ -13,7 +13,6 @@ import (
 func FullNodeProcessProposalHandler(
 	txConfig client.TxConfig,
 	bridgeKeeper ProcessBridgeKeeper,
-	clobKeeper ProcessClobKeeper,
 	stakingKeeper ProcessStakingKeeper,
 	perpetualKeeper ProcessPerpetualKeeper,
 	pricesKeeper ve.PreBlockExecPricesKeeper,
@@ -22,22 +21,9 @@ func FullNodeProcessProposalHandler(
 		// Always return `abci.ResponseProcessProposal_ACCEPT`
 		response := &abci.ResponseProcessProposal{Status: abci.ResponseProcessProposal_ACCEPT}
 
-		txs, err := DecodeProcessProposalTxs(ctx, txConfig.TxDecoder(), req, bridgeKeeper, pricesKeeper)
+		_, err := DecodeProcessProposalTxs(ctx, txConfig.TxDecoder(), req, bridgeKeeper, pricesKeeper)
 		if err != nil {
 			return response, nil
-		}
-
-		// Only validate the `ProposedOperationsTx` since full nodes don't have
-		// pricefeed enabled by default and therefore, stateful validation of `UpdateMarketPricesTx`
-		// would fail due to missing daemon prices.
-		err = txs.ProposedOperationsTx.Validate()
-		if err != nil {
-			return response, nil
-		}
-
-		// Measure MEV metrics if enabled.
-		if clobKeeper.RecordMevMetricsIsEnabled() {
-			clobKeeper.RecordMevMetrics(ctx, stakingKeeper, perpetualKeeper, txs.ProposedOperationsTx.msg)
 		}
 
 		return response, nil

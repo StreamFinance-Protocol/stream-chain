@@ -17,7 +17,6 @@ import (
 	testapp "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/app"
 	assetsmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets"
 	blocktimemodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/blocktime"
-	clobmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob"
 	delaymsgmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/delaymsg"
 	epochsmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/epochs"
 	perpetualsmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals"
@@ -187,7 +186,6 @@ func TestModuleBasics(t *testing.T) {
 		bridgemodule.AppModuleBasic{},
 		perpetualsmodule.AppModuleBasic{},
 		subaccountsmodule.AppModuleBasic{},
-		clobmodule.AppModuleBasic{},
 		sendingmodule.AppModuleBasic{},
 		delaymsgmodule.AppModuleBasic{},
 		epochsmodule.AppModuleBasic{},

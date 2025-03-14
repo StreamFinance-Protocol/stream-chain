@@ -20,10 +20,6 @@ func TestAddDaemonFlagsToCmd(t *testing.T) {
 		flags.FlagPanicOnDaemonFailureEnabled,
 		flags.FlagMaxDaemonUnhealthySeconds,
 
-		flags.FlagDeleveragingDaemonEnabled,
-		flags.FlagDeleveragingDaemonLoopDelayMs,
-		flags.FlagDeleveragingDaemonQueryPageLimit,
-
 		flags.FlagBridgeDaemonEnabled,
 		flags.FlagBridgeDaemonLoopDelayMs,
 		flags.FlagBridgeDaemonEthRpcEndpoint,
@@ -49,10 +45,6 @@ func TestGetDaemonFlagValuesFromOptions_Custom(t *testing.T) {
 	optsMap[flags.FlagUnixSocketAddress] = "test-socket-address"
 	optsMap[flags.FlagPanicOnDaemonFailureEnabled] = false
 	optsMap[flags.FlagMaxDaemonUnhealthySeconds] = uint32(1234)
-
-	optsMap[flags.FlagDeleveragingDaemonEnabled] = true
-	optsMap[flags.FlagDeleveragingDaemonLoopDelayMs] = uint32(2222)
-	optsMap[flags.FlagDeleveragingDaemonQueryPageLimit] = uint64(3333)
 
 	optsMap[flags.FlagBridgeDaemonEnabled] = true
 	optsMap[flags.FlagBridgeDaemonLoopDelayMs] = uint32(1111)
@@ -86,11 +78,6 @@ func TestGetDaemonFlagValuesFromOptions_Custom(t *testing.T) {
 		optsMap[flags.FlagMaxDaemonUnhealthySeconds],
 		r.Shared.MaxDaemonUnhealthySeconds,
 	)
-
-	// Deleveraging Daemon.
-	require.Equal(t, optsMap[flags.FlagDeleveragingDaemonEnabled], r.Deleveraging.Enabled)
-	require.Equal(t, optsMap[flags.FlagDeleveragingDaemonLoopDelayMs], r.Deleveraging.LoopDelayMs)
-	require.Equal(t, optsMap[flags.FlagDeleveragingDaemonQueryPageLimit], r.Deleveraging.QueryPageLimit)
 
 	// SDAI Daemon.
 	require.Equal(t, optsMap[flags.FlagSDAIDaemonEnabled], r.SDAI.Enabled)

@@ -24,7 +24,6 @@ import (
 	custommodule "github.com/StreamFinance-Protocol/stream-chain/protocol/app/module"
 	assetsmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets"
 	blocktimemodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/blocktime"
-	clobmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob"
 	epochsmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/epochs"
 	perpetualsmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals"
 	pricesmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices"
@@ -69,7 +68,6 @@ var (
 		bridgemodule.AppModuleBasic{},
 		perpetualsmodule.AppModuleBasic{},
 		subaccountsmodule.AppModuleBasic{},
-		clobmodule.AppModuleBasic{},
 		delaymsgmodule.AppModuleBasic{},
 		sendingmodule.AppModuleBasic{},
 		epochsmodule.AppModuleBasic{},

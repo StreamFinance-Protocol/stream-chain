@@ -43,22 +43,7 @@ const (
 
 // Tag values
 const (
-	// Module tag values are prefixed with `x/`
-	Clob = "x/clob"
-
 	CheckTx   = "check_tx"
 	RecheckTx = "recheck_tx"
 	DeliverTx = "deliver_tx"
-)
-
-// Special tag values that should be PascalCased (i.e function names)
-const (
-	AnteHandler        = "AnteHandler"
-	PlaceOrder         = "PlaceOrder"
-	CancelOrder        = "CancelOrder"
-	MsgBatchCancel     = "MsgBatchCancel"
-	ProposedOperations = "ProposedOperations"
-	BeginBlocker       = "BeginBlocker"
-	EndBlocker         = "EndBlocker"
-	PrepareCheckState  = "PrepareCheckState"
 )

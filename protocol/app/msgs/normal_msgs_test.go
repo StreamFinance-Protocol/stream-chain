@@ -122,14 +122,6 @@ func TestNormalMsgs_Key(t *testing.T) {
 		"/klyraprotocol.bridge.MsgBridgeWithdraw",
 		"/klyraprotocol.bridge.MsgBridgeWithdrawResponse",
 
-		// clob
-		"/klyraprotocol.clob.MsgBatchCancel",
-		"/klyraprotocol.clob.MsgBatchCancelResponse",
-		"/klyraprotocol.clob.MsgCancelOrder",
-		"/klyraprotocol.clob.MsgCancelOrderResponse",
-		"/klyraprotocol.clob.MsgPlaceOrder",
-		"/klyraprotocol.clob.MsgPlaceOrderResponse",
-
 		// perpetuals
 
 		// prices

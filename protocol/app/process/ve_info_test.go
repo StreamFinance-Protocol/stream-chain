@@ -61,10 +61,6 @@ func TestVEInjectionHandling(t *testing.T) {
 			keepertest.CreateTestMarkets(t, ctx, pricesKeeper)
 			daemonPriceCache.UpdatePrices(constants.AtTimeTSingleExchangePriceUpdate)
 
-			mockClobKeeper := &mocks.ProcessClobKeeper{}
-			mockClobKeeper.On("RecordMevMetricsIsEnabled").Return(true)
-			mockClobKeeper.On("RecordMevMetrics", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
-
 			mockYieldKeeper := &mocks.VoteExtensionYieldKeeper{}
 
 			mockVEApplier := &mocks.ProcessProposalVEApplier{}
@@ -73,7 +69,6 @@ func TestVEInjectionHandling(t *testing.T) {
 			handler := process.ProcessProposalHandler(
 				constants.TestEncodingCfg.TxConfig,
 				ks.BridgeKeeper,
-				mockClobKeeper,
 				&mocks.ProcessStakingKeeper{},
 				&mocks.ProcessPerpetualKeeper{},
 				pricesKeeper,

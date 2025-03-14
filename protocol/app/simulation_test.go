@@ -19,7 +19,6 @@ import (
 	daemonflags "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/flags"
 	assetstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets/types"
 	blocktimetypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/blocktime/types"
-	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	epochstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/epochs/types"
 	perpetualstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
@@ -111,7 +110,6 @@ var genesisModuleOrder = []string{
 	assetstypes.ModuleName,
 	perpetualstypes.ModuleName,
 	satypes.ModuleName,
-	clobtypes.ModuleName,
 	sendingtypes.ModuleName,
 	epochstypes.ModuleName,
 	blocktimetypes.ModuleName,

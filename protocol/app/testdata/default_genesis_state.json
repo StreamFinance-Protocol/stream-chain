@@ -72,28 +72,6 @@
       "klyra_block_height": "0"
     }
   },
-  "clob": {
-    "clob_pairs": [],
-    "liquidations_config": {
-      "insurance_fund_fee_ppm": 5000,
-      "validator_fee_ppm": 200000,
-      "liquidity_fee_ppm": 800000,
-      "fillable_price_config": {
-        "bankruptcy_adjustment_ppm": 1000000,
-        "spread_to_maintenance_margin_ratio_ppm": 100000
-      }
-    },
-    "block_rate_limit_config": {
-      "max_short_term_order_cancellations_per_n_blocks": [],
-      "max_short_term_orders_per_n_blocks": [],
-      "max_short_term_orders_and_cancels_per_n_blocks": [],
-      "max_stateful_orders_per_n_blocks": []
-    },
-    "equity_tier_limit_config": {
-      "short_term_order_equity_tiers": [],
-      "stateful_order_equity_tiers": []
-    }
-  },
   "consensus": null,
   "crisis": {
     "constant_fee": {

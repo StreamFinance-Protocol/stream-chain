@@ -6,7 +6,6 @@ import (
 
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/constants"
 	bridgetypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
-	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 )
 
@@ -27,11 +26,6 @@ var (
 			},
 		},
 		"/klyraprotocol.bridge.MsgAcknowledgeBridgesResponse": nil,
-		// clob
-		"/klyraprotocol.clob.MsgProposedOperations": &clobtypes.MsgProposedOperations{
-			OperationsQueue: make([]clobtypes.OperationRaw, 0),
-		},
-		"/klyraprotocol.clob.MsgProposedOperationsResponse": nil,
 
 		// perpetuals
 		"/klyraprotocol.perpetuals.MsgAddPremiumVotes": &perptypes.MsgAddPremiumVotes{

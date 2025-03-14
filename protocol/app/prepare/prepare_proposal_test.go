@@ -19,7 +19,6 @@ import (
 	keepertest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/keeper"
 	vetesting "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/ve"
 	bridgetypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
-	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	perpetualtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
 	cometabci "github.com/cometbft/cometbft/abci/types"
@@ -55,9 +54,6 @@ type PerpareProposalHandlerTC struct {
 
 	fundingResp    *perpetualtypes.MsgAddPremiumVotes
 	fundingEncoder sdktypes.TxEncoder
-
-	clobResp    *clobtypes.MsgProposedOperations
-	clobEncoder sdktypes.TxEncoder
 
 	pricesParamsResp              []pricestypes.MarketParam
 	pricesMarketPriceFromByesResp *pricestypes.MarketPriceUpdate
@@ -242,9 +238,6 @@ func TestPrepareProposalHandler(t *testing.T) {
 			fundingResp:    &perpetualtypes.MsgAddPremiumVotes{},
 			fundingEncoder: passingTxEncoderFour,
 
-			clobResp:    &clobtypes.MsgProposedOperations{},
-			clobEncoder: passingTxEncoderFour,
-
 			bridgeResp:    &bridgetypes.MsgAcknowledgeBridges{},
 			bridgeEncoder: passingTxEncoderFour,
 
@@ -267,9 +260,6 @@ func TestPrepareProposalHandler(t *testing.T) {
 			fundingResp:    &perpetualtypes.MsgAddPremiumVotes{},
 			fundingEncoder: passingTxEncoderFour,
 
-			clobResp:    &clobtypes.MsgProposedOperations{},
-			clobEncoder: passingTxEncoderFour,
-
 			bridgeResp:    &bridgetypes.MsgAcknowledgeBridges{},
 			bridgeEncoder: passingTxEncoderFour,
 
@@ -291,9 +281,6 @@ func TestPrepareProposalHandler(t *testing.T) {
 
 			fundingResp:    &perpetualtypes.MsgAddPremiumVotes{},
 			fundingEncoder: passingTxEncoderFour,
-
-			clobResp:    &clobtypes.MsgProposedOperations{},
-			clobEncoder: passingTxEncoderFour,
 
 			bridgeResp:    &bridgetypes.MsgAcknowledgeBridges{},
 			bridgeEncoder: passingTxEncoderFour,
@@ -354,8 +341,6 @@ func TestPrepareProposalHandler(t *testing.T) {
 
 			expectedPrices: constants.ValidVEPrices,
 
-			clobResp:    &clobtypes.MsgProposedOperations{},
-			clobEncoder: passingTxEncoderFour,
 			expectedTxs: [][]byte{
 				{1, 2, 3, 4},                          // order.
 				constants.Msg_Send_TxBytes,            // others.
@@ -395,9 +380,6 @@ func TestPrepareProposalHandler(t *testing.T) {
 			fundingResp:    &perpetualtypes.MsgAddPremiumVotes{},
 			fundingEncoder: passingTxEncoderFour,
 
-			clobResp:    &clobtypes.MsgProposedOperations{},
-			clobEncoder: passingTxEncoderFour,
-
 			bridgeResp:    &bridgetypes.MsgAcknowledgeBridges{},
 			bridgeEncoder: passingTxEncoderFour,
 
@@ -425,9 +407,6 @@ func TestPrepareProposalHandler(t *testing.T) {
 		"Valid: single VE with no other txs": {
 			fundingResp:    &perpetualtypes.MsgAddPremiumVotes{},
 			fundingEncoder: passingTxEncoderFour,
-
-			clobResp:    &clobtypes.MsgProposedOperations{},
-			clobEncoder: passingTxEncoderFour,
 
 			bridgeResp:    &bridgetypes.MsgAcknowledgeBridges{},
 			bridgeEncoder: passingTxEncoderFour,
@@ -472,9 +451,6 @@ func TestPrepareProposalHandler(t *testing.T) {
 		"Valid: single VE with other txs": {
 			fundingResp:    &perpetualtypes.MsgAddPremiumVotes{},
 			fundingEncoder: passingTxEncoderFour,
-
-			clobResp:    &clobtypes.MsgProposedOperations{},
-			clobEncoder: passingTxEncoderFour,
 
 			bridgeResp:    &bridgetypes.MsgAcknowledgeBridges{},
 			bridgeEncoder: passingTxEncoderFour,
@@ -526,9 +502,6 @@ func TestPrepareProposalHandler(t *testing.T) {
 		"Valid: Multiple VE's with other tx, both seen": {
 			fundingResp:    &perpetualtypes.MsgAddPremiumVotes{},
 			fundingEncoder: passingTxEncoderFour,
-
-			clobResp:    &clobtypes.MsgProposedOperations{},
-			clobEncoder: passingTxEncoderFour,
 
 			bridgeResp:    &bridgetypes.MsgAcknowledgeBridges{},
 			bridgeEncoder: passingTxEncoderFour,
@@ -584,9 +557,6 @@ func TestPrepareProposalHandler(t *testing.T) {
 			fundingResp:    &perpetualtypes.MsgAddPremiumVotes{},
 			fundingEncoder: passingTxEncoderFour,
 
-			clobResp:    &clobtypes.MsgProposedOperations{},
-			clobEncoder: passingTxEncoderFour,
-
 			bridgeResp:    &bridgetypes.MsgAcknowledgeBridges{},
 			bridgeEncoder: passingTxEncoderFour,
 
@@ -640,9 +610,6 @@ func TestPrepareProposalHandler(t *testing.T) {
 			fundingResp:    &perpetualtypes.MsgAddPremiumVotes{},
 			fundingEncoder: passingTxEncoderFour,
 
-			clobResp:    &clobtypes.MsgProposedOperations{},
-			clobEncoder: passingTxEncoderFour,
-
 			bridgeResp:    &bridgetypes.MsgAcknowledgeBridges{},
 			bridgeEncoder: passingTxEncoderFour,
 
@@ -694,9 +661,6 @@ func TestPrepareProposalHandler(t *testing.T) {
 		"Valid: Multiple VE's with other tx, but seen cache has wrong height (-1) - accepts all": {
 			fundingResp:    &perpetualtypes.MsgAddPremiumVotes{},
 			fundingEncoder: passingTxEncoderFour,
-
-			clobResp:    &clobtypes.MsgProposedOperations{},
-			clobEncoder: passingTxEncoderFour,
 
 			pricesParamsResp:              constants.TestMarketParams,
 			pricesMarketPriceFromByesResp: constants.ValidMarketPriceUpdates[0],
@@ -751,9 +715,6 @@ func TestPrepareProposalHandler(t *testing.T) {
 			fundingResp:    &perpetualtypes.MsgAddPremiumVotes{},
 			fundingEncoder: passingTxEncoderFour,
 
-			clobResp:    &clobtypes.MsgProposedOperations{},
-			clobEncoder: passingTxEncoderFour,
-
 			bridgeResp:    &bridgetypes.MsgAcknowledgeBridges{},
 			bridgeEncoder: passingTxEncoderFour,
 
@@ -807,9 +768,6 @@ func TestPrepareProposalHandler(t *testing.T) {
 		"Valid: Multiple VE's with other tx, cache is empty - accepts all": {
 			fundingResp:    &perpetualtypes.MsgAddPremiumVotes{},
 			fundingEncoder: passingTxEncoderFour,
-
-			clobResp:    &clobtypes.MsgProposedOperations{},
-			clobEncoder: passingTxEncoderFour,
 
 			bridgeResp:    &bridgetypes.MsgAcknowledgeBridges{},
 			bridgeEncoder: passingTxEncoderFour,
@@ -866,14 +824,13 @@ func TestPrepareProposalHandler(t *testing.T) {
 				[]sdktypes.TxEncoder{
 					tc.fundingEncoder,
 					tc.bridgeEncoder,
-					tc.clobEncoder,
 				},
 			)
 
 			// necessary mock keepers
-			mPricesKeeper, mClobKeeper, mPerpKeeper, mYieldKeeper, mBridgeKeeper := buildMockKeepers()
+			mPricesKeeper, mPerpKeeper, mYieldKeeper, mBridgeKeeper := buildMockKeepers()
 
-			setMockResponses(mBridgeKeeper, mPricesKeeper, mYieldKeeper, mClobKeeper, mPerpKeeper, tc)
+			setMockResponses(mBridgeKeeper, mPricesKeeper, mYieldKeeper, mPerpKeeper, tc)
 
 			ctx, _, _, _, _, _ := keepertest.PricesKeepers(t)
 
@@ -890,7 +847,6 @@ func TestPrepareProposalHandler(t *testing.T) {
 			handler := prepare.PrepareProposalHandler(
 				mockTxConfig,
 				mBridgeKeeper,
-				mClobKeeper,
 				mPerpKeeper,
 				mPricesKeeper,
 				mYieldKeeper,
@@ -991,10 +947,6 @@ func TestPrepareProposalHandler_OtherTxs(t *testing.T) {
 			mockPerpKeeper.On("GetAddPremiumVotes", mock.Anything).
 				Return(constants.ValidMsgAddPremiumVotes)
 
-			mockClobKeeper := mocks.PrepareClobKeeper{}
-			mockClobKeeper.On("GetOperations", mock.Anything, mock.Anything).
-				Return(constants.ValidEmptyMsgProposedOperations)
-
 			ctx, _, _, _, _, _ := keepertest.PricesKeepers(t)
 
 			if tc.veEnabled {
@@ -1006,7 +958,6 @@ func TestPrepareProposalHandler_OtherTxs(t *testing.T) {
 			handler := prepare.PrepareProposalHandler(
 				encodingCfg.TxConfig,
 				&mockBridgeKeeper,
-				&mockClobKeeper,
 				&mockPerpKeeper,
 				&mockPricesKeeper,
 				&mockYieldKeeper,
@@ -1088,111 +1039,6 @@ func TestGetAddPremiumVotesTx(t *testing.T) {
 			}
 			require.Equal(t, tc.expectedTx, resp.Tx)
 			require.Equal(t, tc.expectedNumVotes, resp.NumVotes)
-		})
-	}
-}
-
-func TestGetProposedOperationsTx(t *testing.T) {
-	tests := map[string]struct {
-		keeperResp *clobtypes.MsgProposedOperations
-		txEncoder  sdktypes.TxEncoder
-
-		expectedTx               []byte
-		expectedNumPlaceOrders   int
-		expectedNumMatchedOrders int
-		expectedErr              error
-	}{
-		"nil message fails": {
-			keeperResp: nil,
-
-			expectedErr: fmt.Errorf("MsgProposedOperations cannot be nil"),
-		},
-		"empty message": {
-			keeperResp: &clobtypes.MsgProposedOperations{}, // empty
-			txEncoder:  passingTxEncoderOne,
-
-			expectedTx:               []byte{1},
-			expectedNumMatchedOrders: 0,
-			expectedNumPlaceOrders:   0,
-		},
-		"empty tx": {
-			keeperResp: &clobtypes.MsgProposedOperations{},
-			txEncoder:  emptyTxEncoder, // returns empty tx.
-
-			expectedErr: fmt.Errorf("invalid tx: []"),
-		},
-		"valid message, but encoding fails": {
-			keeperResp: &clobtypes.MsgProposedOperations{}, // empty
-			txEncoder:  failingTxEncoder,
-
-			expectedErr: fmt.Errorf("encoder failed"),
-		},
-		"valid message": {
-			keeperResp: &clobtypes.MsgProposedOperations{
-				OperationsQueue: []clobtypes.OperationRaw{{}, {}},
-			},
-			txEncoder: passingTxEncoderOne,
-
-			expectedTx:               []byte{1},
-			expectedNumPlaceOrders:   2,
-			expectedNumMatchedOrders: 1,
-		},
-	}
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
-			mockTxConfig := createMockTxConfig(nil, []sdktypes.TxEncoder{tc.txEncoder})
-			mockClobKeeper := mocks.PrepareClobKeeper{}
-			mockClobKeeper.On("GetOperations", mock.Anything, mock.Anything).Return(tc.keeperResp)
-			txSetterParams := prepare.TxSetterUtils{
-				Ctx:      ctx,
-				TxConfig: mockTxConfig,
-			}
-			resp, err := prepare.GetProposedOperationsTx(txSetterParams, &mockClobKeeper)
-			if tc.expectedErr != nil {
-				require.Equal(t, err, tc.expectedErr)
-			} else {
-				require.NoError(t, err)
-			}
-			require.Equal(t, tc.expectedTx, resp.Tx)
-		})
-	}
-}
-
-func TestEncodeMsgsIntoTxBytes(t *testing.T) {
-	tests := map[string]struct {
-		setMsgErr error
-		txEncoder sdktypes.TxEncoder
-
-		expectedTx  []byte
-		expectedErr error
-	}{
-		"set message fails": {
-			setMsgErr:   errors.New("unexpected SetMsgs error"),
-			expectedErr: errors.New("unexpected SetMsgs error"),
-		},
-		"tx encoder fails": {
-			setMsgErr:   nil,
-			txEncoder:   failingTxEncoder,
-			expectedErr: errors.New("encoder failed"),
-		},
-		"valid": {
-			setMsgErr:  nil,
-			txEncoder:  passingTxEncoderOne,
-			expectedTx: []byte{1},
-		},
-	}
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
-			mockTxConfig := createMockTxConfig(tc.setMsgErr, []sdktypes.TxEncoder{tc.txEncoder})
-
-			tx, err := prepare.EncodeMsgsIntoTxBytes(mockTxConfig, &clobtypes.MsgProposedOperations{})
-
-			if tc.expectedErr != nil {
-				require.Equal(t, err, tc.expectedErr)
-			} else {
-				require.NoError(t, err)
-			}
-			require.Equal(t, tc.expectedTx, tx)
 		})
 	}
 }
@@ -1290,21 +1136,19 @@ func createRequestPrepareProposal(
 	}
 }
 
-func buildMockKeepers() (*mocks.PreBlockExecPricesKeeper, *mocks.PrepareClobKeeper, *mocks.PreparePerpetualsKeeper, *mocks.VoteExtensionYieldKeeper, *mocks.PrepareBridgeKeeper) {
+func buildMockKeepers() (*mocks.PreBlockExecPricesKeeper, *mocks.PreparePerpetualsKeeper, *mocks.VoteExtensionYieldKeeper, *mocks.PrepareBridgeKeeper) {
 	mPricesk := &mocks.PreBlockExecPricesKeeper{}
-	mClobk := &mocks.PrepareClobKeeper{}
 	mPerpk2 := &mocks.PreparePerpetualsKeeper{}
 	mYieldk := &mocks.VoteExtensionYieldKeeper{}
 	mBridgek := &mocks.PrepareBridgeKeeper{}
 
-	return mPricesk, mClobk, mPerpk2, mYieldk, mBridgek
+	return mPricesk, mPerpk2, mYieldk, mBridgek
 }
 
 func setMockResponses(
 	mBridgeKeeper *mocks.PrepareBridgeKeeper,
 	mPricesKeeper *mocks.PreBlockExecPricesKeeper,
 	mYieldKeeper *mocks.VoteExtensionYieldKeeper,
-	mClobKeeper *mocks.PrepareClobKeeper,
 	mPerpKeeper *mocks.PreparePerpetualsKeeper,
 	tc PerpareProposalHandlerTC,
 ) {
@@ -1314,8 +1158,6 @@ func setMockResponses(
 		Return(nil)
 	mPerpKeeper.On("GetAddPremiumVotes", mock.Anything).
 		Return(tc.fundingResp)
-	mClobKeeper.On("GetOperations", mock.Anything, mock.Anything).
-		Return(tc.clobResp)
 	mYieldKeeper.On("GetSDAILastBlockUpdated", mock.Anything).
 		Return(new(big.Int), false)
 	mYieldKeeper.On("GetSDAIPrice", mock.Anything).

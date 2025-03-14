@@ -70,10 +70,6 @@ func (svd SigVerificationDecorator) AnteHandle(
 		return ctx, err
 	}
 
-	// Sequence number validation can be skipped if the given transaction consists of
-	// only messages that use `GoodTilBlock` for replay protection.
-	skipSequenceValidation := ShouldSkipSequenceValidation(tx.GetMsgs())
-
 	for i, sig := range sigs {
 		acc, err := sdkante.GetSignerAcc(ctx, svd.ak, signers[i])
 		if err != nil {
@@ -89,7 +85,7 @@ func (svd SigVerificationDecorator) AnteHandle(
 		// Check account sequence number.
 		// Skip individual sequence number validation since this transaction use
 		// `GoodTilBlock` for replay protection.
-		if !skipSequenceValidation && sig.Sequence != acc.GetSequence() {
+		if sig.Sequence != acc.GetSequence() {
 			labels := make([]gometrics.Label, 0)
 			if len(tx.GetMsgs()) > 0 {
 				labels = append(

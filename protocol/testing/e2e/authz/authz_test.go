@@ -13,7 +13,6 @@ import (
 	testapp "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/app"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/constants"
 	assetstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets/types"
-	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
 	abcitypes "github.com/cometbft/cometbft/abci/types"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -146,30 +145,6 @@ func TestAuthz(t *testing.T) {
 			expectedMsgExecDeliverTxSuccess: false,
 			expectedMsgExecDeliverTxCode:    authz.ErrNoAuthorizationFound.ABCICode(),
 		},
-
-		//
-		// Below tests fail during CheckTx since the ante handler would reject these transactions.
-		//
-		"Fail (app injected): Bob tries to propose operations": {
-			subaccounts: []satypes.Subaccount{
-				constants.Alice_Num0_100_000USD,
-				constants.Bob_Num0_100_000USD,
-			},
-
-			msgGrant: nil,
-
-			msgExec: &authz.MsgExec{
-				Grantee: constants.BobAccAddress.String(),
-				Msgs: []*codectypes.Any{
-					newAny(
-						&clobtypes.MsgProposedOperations{},
-					),
-				},
-			},
-
-			expectedMsgExecCheckTxSuccess: false,
-			expectedMsgExecCheckTxCode:    sdkerrors.ErrInvalidRequest.ABCICode(),
-		},
 		"Fail (double nested): Bob wraps another nested message": {
 			subaccounts: []satypes.Subaccount{
 				constants.Alice_Num0_100_000USD,
@@ -202,7 +177,7 @@ func TestAuthz(t *testing.T) {
 				Grantee: constants.BobAccAddress.String(),
 				Msgs: []*codectypes.Any{
 					newAny(
-						&clobtypes.MsgPlaceOrder{},
+						&satypes.MsgClaimYieldForSubaccount{},
 					),
 				},
 			},
@@ -226,19 +201,6 @@ func TestAuthz(t *testing.T) {
 					&genesis,
 					func(genesisState *satypes.GenesisState) {
 						genesisState.Subaccounts = tc.subaccounts
-					},
-				)
-				testapp.UpdateGenesisDocWithAppStateForModule(
-					&genesis,
-					func(genesisState *clobtypes.GenesisState) {
-						genesisState.BlockRateLimitConfig = clobtypes.BlockRateLimitConfiguration{
-							MaxStatefulOrdersPerNBlocks: []clobtypes.MaxPerNBlocksRateLimit{
-								{
-									NumBlocks: 10,
-									Limit:     1,
-								},
-							},
-						}
 					},
 				)
 				return genesis

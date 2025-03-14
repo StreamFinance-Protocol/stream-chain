@@ -8,7 +8,6 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/constants"
 	keepertest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/keeper"
 	abci "github.com/cometbft/cometbft/abci/types"
-	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
 
@@ -64,14 +63,9 @@ func TestFullNodeProcessProposalHandler(t *testing.T) {
 			keepertest.CreateTestMarkets(t, ctx, pricesKeeper)
 			daemonPriceCache.UpdatePrices(constants.AtTimeTSingleExchangePriceUpdate)
 
-			mockClobKeeper := &mocks.ProcessClobKeeper{}
-			mockClobKeeper.On("RecordMevMetricsIsEnabled").Return(true)
-			mockClobKeeper.On("RecordMevMetrics", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
-
 			handler := process.FullNodeProcessProposalHandler(
 				constants.TestEncodingCfg.TxConfig,
 				ks.BridgeKeeper,
-				mockClobKeeper,
 				&mocks.ProcessStakingKeeper{},
 				&mocks.ProcessPerpetualKeeper{},
 				pricesKeeper,

@@ -5,7 +5,6 @@ import (
 	feegrant "cosmossdk.io/x/feegrant"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib"
 	bridge "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
-	clob "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	sending "github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -138,14 +137,6 @@ var (
 		// bridge
 		"/klyraprotocol.bridge.MsgBridgeWithdraw":         &bridge.MsgBridgeWithdraw{},
 		"/klyraprotocol.bridge.MsgBridgeWithdrawResponse": nil,
-
-		// clob
-		"/klyraprotocol.clob.MsgBatchCancel":         &clob.MsgBatchCancel{},
-		"/klyraprotocol.clob.MsgBatchCancelResponse": nil,
-		"/klyraprotocol.clob.MsgCancelOrder":         &clob.MsgCancelOrder{},
-		"/klyraprotocol.clob.MsgCancelOrderResponse": nil,
-		"/klyraprotocol.clob.MsgPlaceOrder":          &clob.MsgPlaceOrder{},
-		"/klyraprotocol.clob.MsgPlaceOrderResponse":  nil,
 
 		// perpetuals
 

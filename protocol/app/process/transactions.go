@@ -50,7 +50,6 @@ func init() {
 // for `ProcessProposal`.
 type ProcessProposalTxs struct {
 	// Single msg txs.
-	ProposedOperationsTx *ProposedOperationsTx
 	AcknowledgeBridgesTx *AcknowledgeBridgesTx
 	AddPremiumVotesTx    *AddPremiumVotesTx
 
@@ -69,12 +68,6 @@ func DecodeProcessProposalTxs(
 	// Check len.
 	numTxs := len(req.Txs)
 	if err := validateNumTxs(numTxs); err != nil {
-		return nil, err
-	}
-
-	// Operations.
-	operationsTx, err := DecodeProposedOperationsTx(decoder, req.Txs[constants.ProposedOperationsTxIndex])
-	if err != nil {
 		return nil, err
 	}
 
@@ -105,7 +98,6 @@ func DecodeProcessProposalTxs(
 		allOtherTxs[i] = otherTx
 	}
 	return &ProcessProposalTxs{
-		ProposedOperationsTx: operationsTx,
 		AcknowledgeBridgesTx: acknowledgeBridgesTx,
 		AddPremiumVotesTx:    addPremiumVotesTx,
 		OtherTxs:             allOtherTxs,
@@ -120,7 +112,6 @@ func DecodeProcessProposalTxs(
 func (ppt *ProcessProposalTxs) Validate() error {
 	// Validate single msg txs.
 	singleTxs := []SingleMsgTx{
-		ppt.ProposedOperationsTx,
 		ppt.AddPremiumVotesTx,
 		ppt.AcknowledgeBridgesTx,
 	}

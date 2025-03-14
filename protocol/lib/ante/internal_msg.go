@@ -3,7 +3,6 @@ package ante
 import (
 	upgrade "cosmossdk.io/x/upgrade/types"
 	bridge "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
-	clob "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	delaymsg "github.com/StreamFinance-Protocol/stream-chain/protocol/x/delaymsg/types"
 	perpetuals "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	prices "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
@@ -63,13 +62,6 @@ func IsInternalMsg(msg sdk.Msg) bool {
 		*bridge.MsgUpdateEventParams,
 		*bridge.MsgUpdateProposeParams,
 		*bridge.MsgUpdateSafetyParams,
-
-		// clob
-		*clob.MsgCreateClobPair,
-		*clob.MsgUpdateBlockRateLimitConfiguration,
-		*clob.MsgUpdateClobPair,
-		*clob.MsgUpdateEquityTierLimitConfiguration,
-		*clob.MsgUpdateLiquidationsConfig,
 
 		// delaymsg
 		*delaymsg.MsgDelayMessage,

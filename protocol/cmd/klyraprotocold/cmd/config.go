@@ -4,7 +4,6 @@ import (
 	"time"
 
 	assettypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets/types"
-	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	tmcfg "github.com/cometbft/cometbft/config"
 	serverconfig "github.com/cosmos/cosmos-sdk/server/config"
 )
@@ -20,6 +19,8 @@ const (
 	minGasPriceStakeToken = "25000000000adv4tnt"
 	// `minGasPrice` defines the default `minimum-gas-prices` attribute in validator's `app.toml` file.
 	MinGasPrice = minGasPriceUtdai + "," + minGasPriceStakeToken
+
+	ShortBlockWindow uint32 = 20
 )
 
 // KlyraAppConfig specifies klyra app specific config.
@@ -95,7 +96,7 @@ func initTendermintConfig() *tmcfg.Config {
 	// a replay attack that is possible with short-term order placements and cancellations. The attack would consume
 	// a users rate limit if the entry is evicted from the mempool cache as it would be possible for the transaction
 	// to go through `CheckTx` again causing it to hit rate limit code against the users account.
-	cfg.Mempool.CacheSize = 5000 * int(clobtypes.ShortBlockWindow)
+	cfg.Mempool.CacheSize = 5000 * int(ShortBlockWindow)
 	cfg.Mempool.Size = 50000
 	cfg.Mempool.TTLNumBlocks = 20 //nolint:staticcheck
 	cfg.Mempool.KeepInvalidTxsInCache = true

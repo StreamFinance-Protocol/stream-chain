@@ -62,7 +62,6 @@ type TxSetterUtils struct {
 func PrepareProposalHandler(
 	txConfig client.TxConfig,
 	bridgeKeeper PrepareBridgeKeeper,
-	clobKeeper PrepareClobKeeper,
 	perpetualKeeper PreparePerpetualsKeeper,
 	pricesKeeper ve.PreBlockExecPricesKeeper,
 	yieldKeeper ve.VoteExtensionYieldKeeper,
@@ -159,18 +158,6 @@ func PrepareProposalHandler(
 			return &EmptyPrepareProposalResponse, nil
 		}
 
-		//------------------------ PROPOSED OPERATIONS ------------------------
-		operationsTxResp, err := SetProposedOperationsTx(
-			txSetterUtils,
-			clobKeeper,
-		)
-
-		if err != nil {
-			ctx.Logger().Error(fmt.Sprintf("GetProposedOperationsTx error: %v", err))
-			recordErrorMetricsWithLabel(metrics.OperationsTx)
-			return &EmptyPrepareProposalResponse, nil
-		}
-
 		//------------------------ REMAINDER TXS ------------------------
 		if err := FillRemainderWithOtherTxs(
 			txSetterUtils,
@@ -194,7 +181,6 @@ func PrepareProposalHandler(
 				txs:                 txs,
 				fundingTx:           fundingTxResp,
 				bridgeTx:            bridgeTxResp,
-				operationsTx:        operationsTxResp,
 				numTxsToReturn:      len(finalTxs),
 				numTxsInOriginalReq: len(request.Txs),
 			},
@@ -278,26 +264,6 @@ func SetPremiumVotesTx(
 	}
 
 	return fundingTxResp, nil
-}
-
-func SetProposedOperationsTx(
-	txSetterUtils TxSetterUtils,
-	clobKeeper PrepareClobKeeper,
-) (OperationsTxResponse, error) {
-	// Gather "OperationsRelated" group messages.
-	// TODO(DEC-1237): ensure ProposedOperations is within a certain size.
-	operationsTxResp, err := GetProposedOperationsTx(
-		txSetterUtils,
-		clobKeeper,
-	)
-	if err != nil {
-		return operationsTxResp, err
-	}
-	if err := txSetterUtils.Txs.SetProposedOperationsTx(operationsTxResp.Tx); err != nil {
-		return operationsTxResp, err
-	}
-
-	return operationsTxResp, nil
 }
 
 func SetAcknowledgeBridgesTx(
@@ -384,31 +350,6 @@ func GetAcknowledgeBridgesTx(
 	return BridgeTxResponse{
 		Tx:         tx,
 		NumBridges: len(msgAcknowledgeBridges.Events),
-	}, nil
-}
-
-// GetProposedOperationsTx returns a tx containing `MsgProposedOperations`.
-func GetProposedOperationsTx(
-	txSetterUtils TxSetterUtils,
-	clobKeeper PrepareClobKeeper,
-) (OperationsTxResponse, error) {
-	// Get the order and fill messages from the CLOB keeper.
-	msgOperations := clobKeeper.GetOperations(txSetterUtils.Ctx)
-	if msgOperations == nil {
-		return OperationsTxResponse{}, fmt.Errorf("MsgProposedOperations cannot be nil")
-	}
-
-	tx, err := EncodeMsgsIntoTxBytes(txSetterUtils.TxConfig, msgOperations)
-	if err != nil {
-		return OperationsTxResponse{}, err
-	}
-	if len(tx) == 0 {
-		return OperationsTxResponse{}, fmt.Errorf("invalid tx: %v", tx)
-	}
-
-	return OperationsTxResponse{
-		Tx:            tx,
-		NumOperations: len(msgOperations.GetOperationsQueue()),
 	}, nil
 }
 

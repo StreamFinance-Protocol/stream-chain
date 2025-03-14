@@ -74,16 +74,6 @@ type BridgeFlags struct {
 	EthBridgeContractAddress string
 }
 
-// DeleveragingFlags contains configuration flags for the Deleveraging Daemon.
-type DeleveragingFlags struct {
-	// Enabled toggles the deleveraging daemon on or off.
-	Enabled bool
-	// LoopDelayMs configures the update frequency of the deleveraging daemon.
-	LoopDelayMs uint32
-	// QueryPageLimit configures the pagination limit for fetching subaccounts.
-	QueryPageLimit uint64
-}
-
 // PriceFlags contains configuration flags for the Price Daemon.
 type PriceFlags struct {
 	// Enabled toggles the price daemon on or off.
@@ -94,11 +84,10 @@ type PriceFlags struct {
 
 // DaemonFlags contains the collected configuration flags for all daemons.
 type DaemonFlags struct {
-	Shared       SharedFlags
-	SDAI         SDAIFlags
-	Bridge       BridgeFlags
-	Price        PriceFlags
-	Deleveraging DeleveragingFlags
+	Shared SharedFlags
+	SDAI   SDAIFlags
+	Bridge BridgeFlags
+	Price  PriceFlags
 }
 
 var defaultDaemonFlags *DaemonFlags
@@ -118,11 +107,6 @@ func GetDefaultDaemonFlags() DaemonFlags {
 				MockNoYield:    false,
 				LoopDelayMs:    30_000,
 				EthRpcEndpoint: "https://eth-mainnet.g.alchemy.com/v2/-IfChTcasSLaAOyyJMXRe5BbTT3uHG6I",
-			},
-			Deleveraging: DeleveragingFlags{
-				Enabled:        false,
-				LoopDelayMs:    1_600,
-				QueryPageLimit: 1_000,
 			},
 			Bridge: BridgeFlags{
 				Enabled:                  false,
@@ -195,22 +179,6 @@ func AddDaemonFlagsToCmd(
 		"Ethereum Node Rpc Endpoint",
 	)
 
-	// Deleveraging Daemon.
-	cmd.Flags().Bool(
-		FlagDeleveragingDaemonEnabled,
-		df.Deleveraging.Enabled,
-		"Enable Deleveraging Daemon. Set to false for non-validator nodes.",
-	)
-	cmd.Flags().Uint32(
-		FlagDeleveragingDaemonLoopDelayMs,
-		df.Deleveraging.LoopDelayMs,
-		"Delay in milliseconds between running the Deleveraging Daemon task loop.",
-	)
-	cmd.Flags().Uint64(
-		FlagDeleveragingDaemonQueryPageLimit,
-		df.Deleveraging.QueryPageLimit,
-		"Limit on the number of items to fetch per query in the Deleveraging Daemon task loop.",
-	)
 	// Bridge Daemon.
 	cmd.Flags().Bool(
 		FlagBridgeDaemonEnabled,
@@ -335,23 +303,6 @@ func GetDaemonFlagValuesFromOptions(
 	if option := appOpts.Get(FlagBridgeDaemonEthBridgeContractAddress); option != nil {
 		if v, err := cast.ToStringE(option); err == nil && len(v) > 0 {
 			result.Bridge.EthBridgeContractAddress = v
-		}
-	}
-
-	// Deleveraging Daemon.
-	if option := appOpts.Get(FlagDeleveragingDaemonEnabled); option != nil {
-		if v, err := cast.ToBoolE(option); err == nil {
-			result.Deleveraging.Enabled = v
-		}
-	}
-	if option := appOpts.Get(FlagDeleveragingDaemonLoopDelayMs); option != nil {
-		if v, err := cast.ToUint32E(option); err == nil {
-			result.Deleveraging.LoopDelayMs = v
-		}
-	}
-	if option := appOpts.Get(FlagDeleveragingDaemonQueryPageLimit); option != nil {
-		if v, err := cast.ToUint64E(option); err == nil {
-			result.Deleveraging.QueryPageLimit = v
 		}
 	}
 

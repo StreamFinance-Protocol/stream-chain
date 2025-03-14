@@ -162,26 +162,6 @@ var (
 		"/klyraprotocol.bridge.MsgUpdateSafetyParams":          {},
 		"/klyraprotocol.bridge.MsgUpdateSafetyParamsResponse":  {},
 
-		// clob
-		"/klyraprotocol.clob.MsgBatchCancel":                                {},
-		"/klyraprotocol.clob.MsgBatchCancelResponse":                        {},
-		"/klyraprotocol.clob.MsgCancelOrder":                                {},
-		"/klyraprotocol.clob.MsgCancelOrderResponse":                        {},
-		"/klyraprotocol.clob.MsgCreateClobPair":                             {},
-		"/klyraprotocol.clob.MsgCreateClobPairResponse":                     {},
-		"/klyraprotocol.clob.MsgPlaceOrder":                                 {},
-		"/klyraprotocol.clob.MsgPlaceOrderResponse":                         {},
-		"/klyraprotocol.clob.MsgProposedOperations":                         {},
-		"/klyraprotocol.clob.MsgProposedOperationsResponse":                 {},
-		"/klyraprotocol.clob.MsgUpdateBlockRateLimitConfiguration":          {},
-		"/klyraprotocol.clob.MsgUpdateBlockRateLimitConfigurationResponse":  {},
-		"/klyraprotocol.clob.MsgUpdateClobPair":                             {},
-		"/klyraprotocol.clob.MsgUpdateClobPairResponse":                     {},
-		"/klyraprotocol.clob.MsgUpdateEquityTierLimitConfiguration":         {},
-		"/klyraprotocol.clob.MsgUpdateEquityTierLimitConfigurationResponse": {},
-		"/klyraprotocol.clob.MsgUpdateLiquidationsConfig":                   {},
-		"/klyraprotocol.clob.MsgUpdateLiquidationsConfigResponse":           {},
-
 		// delaymsg
 		"/klyraprotocol.delaymsg.MsgDelayMessage":         {},
 		"/klyraprotocol.delaymsg.MsgDelayMessageResponse": {},

@@ -7,8 +7,6 @@ import (
 	storetypes "cosmossdk.io/store/types"
 	customante "github.com/StreamFinance-Protocol/stream-chain/protocol/app/ante"
 	testante "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/ante"
-	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
-	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
@@ -158,46 +156,6 @@ func TestSigVerification(t *testing.T) {
 			true,
 		},
 		{
-			"wrong sequences but skip validation - place order",
-			[]sdk.Msg{newPlaceOrderMessageForAddr(addr1)},
-			[]cryptotypes.PrivKey{priv1},
-			[]uint64{accs[0].GetAccountNumber()},
-			[]uint64{3},
-			validSigs,
-			false,
-			false,
-		},
-		{
-			"wrong sequences but skip validation - cancel order",
-			[]sdk.Msg{newPlaceOrderMessageForAddr(addr2)},
-			[]cryptotypes.PrivKey{priv2},
-			[]uint64{accs[1].GetAccountNumber()},
-			[]uint64{4},
-			validSigs,
-			false,
-			false,
-		},
-		{
-			"wrong sequences but skip validation - transfer",
-			[]sdk.Msg{newPlaceOrderMessageForAddr(addr3)},
-			[]cryptotypes.PrivKey{priv3},
-			[]uint64{accs[2].GetAccountNumber()},
-			[]uint64{5},
-			validSigs,
-			false,
-			false,
-		},
-		{
-			"wrong sequences - mixed messages",
-			[]sdk.Msg{newPlaceOrderMessageForAddr(addr1), testdata.NewTestMsg(addr2)},
-			[]cryptotypes.PrivKey{priv1, priv2},
-			[]uint64{accs[0].GetAccountNumber(), accs[1].GetAccountNumber()},
-			[]uint64{3, 4},
-			validSigs,
-			false,
-			true,
-		},
-		{
 			"valid tx",
 			testMsgs,
 			[]cryptotypes.PrivKey{priv1, priv2, priv3},
@@ -334,16 +292,4 @@ func runSigDecorators(t *testing.T, params types.Params, _ bool, privs ...crypto
 	after := ctx.GasMeter().GasConsumed()
 
 	return after - before, err
-}
-
-func newPlaceOrderMessageForAddr(addr sdk.AccAddress) sdk.Msg {
-	return &clobtypes.MsgPlaceOrder{
-		Order: clobtypes.Order{
-			OrderId: clobtypes.OrderId{
-				SubaccountId: satypes.SubaccountId{
-					Owner: addr.String(),
-				},
-			},
-		},
-	}
 }

@@ -39,7 +39,6 @@ import (
 	vetestutil "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/ve"
 	assettypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets/types"
 	blocktimetypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/blocktime/types"
-	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	delaymsgtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/delaymsg/types"
 	epochstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/epochs/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
@@ -192,7 +191,6 @@ type GenesisStates interface {
 		banktypes.GenesisState |
 		perptypes.GenesisState |
 		blocktimetypes.GenesisState |
-		clobtypes.GenesisState |
 		pricestypes.GenesisState |
 		satypes.GenesisState |
 		assettypes.GenesisState |
@@ -228,8 +226,6 @@ func UpdateGenesisDocWithAppStateForModule[T GenesisStates](genesisDoc *types.Ge
 		moduleName = delaymsgtypes.ModuleName
 	case perptypes.GenesisState:
 		moduleName = perptypes.ModuleName
-	case clobtypes.GenesisState:
-		moduleName = clobtypes.ModuleName
 	case pricestypes.GenesisState:
 		moduleName = pricestypes.ModuleName
 	case satypes.GenesisState:
@@ -1311,8 +1307,6 @@ func launchValidatorInDir(
 
 		"--price-daemon-enabled",
 		"false",
-		"--deleveraging-daemon-enabled",
-		"false",
 	})
 
 	ctx := svrcmd.CreateExecuteContext(parentCtx)
@@ -1347,44 +1341,6 @@ func launchValidatorInDir(
 		done <- err
 		return nil, nil, err
 	}
-}
-
-// MustMakeCheckTxsWithClobMsg creates one signed RequestCheckTx for each msg passed in.
-// The messsage must use one of the hard-coded well known subaccount owners otherwise this will panic.
-func MustMakeCheckTxsWithClobMsg[T clobtypes.MsgPlaceOrder | clobtypes.MsgCancelOrder | clobtypes.MsgBatchCancel](
-	ctx sdk.Context,
-	app *app.App,
-	messages ...T,
-) []abcitypes.RequestCheckTx {
-	sdkMessages := make([]sdk.Msg, len(messages))
-	var signerAddress string
-	for i, msg := range messages {
-		var m sdk.Msg
-		switch v := any(msg).(type) {
-		case clobtypes.MsgPlaceOrder:
-			signerAddress = v.Order.OrderId.SubaccountId.Owner
-			m = &v
-		case clobtypes.MsgCancelOrder:
-			signerAddress = v.OrderId.SubaccountId.Owner
-			m = &v
-		case clobtypes.MsgBatchCancel:
-			signerAddress = v.SubaccountId.Owner
-			m = &v
-		default:
-			panic(fmt.Errorf("MustMakeCheckTxsWithClobMsg: Unknown message type %T", msg))
-		}
-
-		sdkMessages[i] = m
-	}
-
-	return MustMakeCheckTxsWithSdkMsg(
-		ctx,
-		app,
-		MustMakeCheckTxOptions{
-			AccAddressForSigning: signerAddress,
-		},
-		sdkMessages...,
-	)
 }
 
 // MustMakeCheckTxsWithSdkMsg creates one signed RequestCheckTx for each msg passed in.

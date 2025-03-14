@@ -7,8 +7,6 @@ import (
 	"cosmossdk.io/log"
 	bridgeapi "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/bridge/api"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/constants"
-
-	deleveragingapi "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/deleveraging/api"
 	pricefeedapi "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/pricefeed/api"
 	sdaioracleapi "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/sdaioracle/api"
 	daemontypes "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/types"
@@ -30,7 +28,6 @@ type Server struct {
 	BridgeServer
 	SDAIServer
 	PriceFeedServer
-	DeleveragingServer
 }
 
 // NewServer creates a single gRPC server that's shared across multiple daemons for communication.
@@ -101,9 +98,6 @@ func (server *Server) Start() {
 
 	// Register Server to ingest gRPC requests from price feed daemon and update market prices.
 	pricefeedapi.RegisterPriceFeedServiceServer(server.gsrv, server)
-
-	// Register Server to ingest gRPC requests from deleveraging daemon.
-	deleveragingapi.RegisterDeleveragingServiceServer(server.gsrv, server)
 
 	// Register Server to ingest gRPC request from sdaioracle daemon.
 	sdaioracleapi.RegisterSDAIServiceServer(server.gsrv, server)

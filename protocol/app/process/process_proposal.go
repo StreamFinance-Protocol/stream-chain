@@ -40,7 +40,6 @@ var (
 func ProcessProposalHandler(
 	txConfig client.TxConfig,
 	bridgeKeeper ProcessBridgeKeeper,
-	clobKeeper ProcessClobKeeper,
 	stakingKeeper ProcessStakingKeeper,
 	perpetualKeeper ProcessPerpetualKeeper,
 	pricesKeeper ve.PreBlockExecPricesKeeper,
@@ -115,11 +114,6 @@ func ProcessProposalHandler(
 			recordErrorMetricsWithLabel(metrics.Validate)
 			return rejectResponse, nil
 		}
-
-		// Measure MEV metrics if enabled.
-		// if clobKeeper.RecordMevMetricsIsEnabled() {
-		// 	clobKeeper.RecordMevMetrics(ctx, stakingKeeper, perpetualKeeper, txs.ProposedOperationsTx.msg)
-		// }
 
 		// Record a success metric.
 		recordSuccessMetrics(ctx, txs, len(request.Txs))

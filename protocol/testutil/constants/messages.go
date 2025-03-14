@@ -4,7 +4,6 @@ import (
 	sdkmath "cosmossdk.io/math"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/app/config"
 	assettypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets/types"
-	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	sendingtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -14,15 +13,6 @@ func init() {
 	// This package does not contain the `app/config` package in its import chain, and therefore needs to call
 	// SetAddressPrefixes() explicitly in order to set the `klyra` address prefixes.
 	config.SetAddressPrefixes()
-
-	_ = TestTxBuilder.SetMsgs(Msg_PlaceOrder)
-	Msg_PlaceOrder_TxBtyes, _ = TestEncodingCfg.TxConfig.TxEncoder()(TestTxBuilder.GetTx())
-
-	_ = TestTxBuilder.SetMsgs(Msg_CancelOrder)
-	Msg_CancelOrder_TxBtyes, _ = TestEncodingCfg.TxConfig.TxEncoder()(TestTxBuilder.GetTx())
-
-	_ = TestTxBuilder.SetMsgs(Msg_BatchCancel)
-	Msg_BatchCancel_TxBtyes, _ = TestEncodingCfg.TxConfig.TxEncoder()(TestTxBuilder.GetTx())
 
 	_ = TestTxBuilder.SetMsgs(Msg_Send)
 	Msg_Send_TxBytes, _ = TestEncodingCfg.TxConfig.TxEncoder()(TestTxBuilder.GetTx())
@@ -35,46 +25,6 @@ func init() {
 }
 
 var (
-	Msg_CancelOrder = &clobtypes.MsgCancelOrder{
-		OrderId: clobtypes.OrderId{
-			ClientId:     0,
-			SubaccountId: Alice_Num0,
-		},
-		GoodTilOneof: &clobtypes.MsgCancelOrder_GoodTilBlock{GoodTilBlock: 10},
-	}
-	Msg_CancelOrder_TxBtyes  []byte
-	Msg_CancelOrder_LongTerm = &clobtypes.MsgCancelOrder{
-		OrderId:      LongTermOrder_Alice_Num0_Id0_Clob0_Buy5_Price10_GTBT15.GetOrderId(),
-		GoodTilOneof: &clobtypes.MsgCancelOrder_GoodTilBlockTime{GoodTilBlockTime: 20},
-	}
-	Msg_CancelOrder_Conditional = &clobtypes.MsgCancelOrder{
-		OrderId:      ConditionalOrder_Alice_Num0_Id0_Clob0_Buy5_Price10_GTBT15_StopLoss20.GetOrderId(),
-		GoodTilOneof: &clobtypes.MsgCancelOrder_GoodTilBlockTime{GoodTilBlockTime: 20},
-	}
-
-	Msg_BatchCancel = &clobtypes.MsgBatchCancel{
-		SubaccountId: Alice_Num0,
-		ShortTermCancels: []clobtypes.OrderBatch{
-			{
-				ClobPairId: 0,
-				ClientIds:  []uint32{0},
-			},
-		},
-		GoodTilBlock: 5,
-	}
-	Msg_BatchCancel_TxBtyes []byte
-
-	Msg_PlaceOrder = &clobtypes.MsgPlaceOrder{
-		Order: Order_Alice_Num0_Id0_Clob0_Buy5_Price10_GTB15,
-	}
-	Msg_PlaceOrder_TxBtyes []byte
-
-	Msg_PlaceOrder_LongTerm = &clobtypes.MsgPlaceOrder{
-		Order: LongTermOrder_Alice_Num0_Id0_Clob0_Buy5_Price10_GTBT15,
-	}
-	Msg_PlaceOrder_Conditional = &clobtypes.MsgPlaceOrder{
-		Order: ConditionalOrder_Alice_Num0_Id0_Clob0_Buy5_Price10_GTBT15_StopLoss20,
-	}
 	Msg_Transfer = &sendingtypes.MsgCreateTransfer{
 		Transfer: &sendingtypes.Transfer{
 			Sender:    Carl_Num0,

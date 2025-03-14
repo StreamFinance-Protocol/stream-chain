@@ -23,14 +23,6 @@
       }
     },
     {
-      "url": "./tmp-swagger-gen/klyraprotocol/clob/query.swagger.json",
-      "operationIds": {
-        "rename": {
-          "Params": "ClobParams"
-        }
-      }
-    },
-    {
       "url": "./tmp-swagger-gen/klyraprotocol/delaymsg/query.swagger.json",
       "operationIds": {
         "rename": {

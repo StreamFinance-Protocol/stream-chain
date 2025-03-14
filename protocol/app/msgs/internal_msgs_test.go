@@ -73,18 +73,6 @@ func TestInternalMsgSamples_Gov_Key(t *testing.T) {
 		"/klyraprotocol.bridge.MsgUpdateSafetyParams",
 		"/klyraprotocol.bridge.MsgUpdateSafetyParamsResponse",
 
-		// clob
-		"/klyraprotocol.clob.MsgCreateClobPair",
-		"/klyraprotocol.clob.MsgCreateClobPairResponse",
-		"/klyraprotocol.clob.MsgUpdateBlockRateLimitConfiguration",
-		"/klyraprotocol.clob.MsgUpdateBlockRateLimitConfigurationResponse",
-		"/klyraprotocol.clob.MsgUpdateClobPair",
-		"/klyraprotocol.clob.MsgUpdateClobPairResponse",
-		"/klyraprotocol.clob.MsgUpdateEquityTierLimitConfiguration",
-		"/klyraprotocol.clob.MsgUpdateEquityTierLimitConfigurationResponse",
-		"/klyraprotocol.clob.MsgUpdateLiquidationsConfig",
-		"/klyraprotocol.clob.MsgUpdateLiquidationsConfigResponse",
-
 		// delaymsg
 		"/klyraprotocol.delaymsg.MsgDelayMessage",
 		"/klyraprotocol.delaymsg.MsgDelayMessageResponse",

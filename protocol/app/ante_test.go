@@ -23,7 +23,6 @@ func newHandlerOptions() app.HandlerOptions {
 			FeegrantKeeper:  klyraApp.FeeGrantKeeper,
 			SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
 		},
-		ClobKeeper:   &klyraApp.ClobKeeper,
 		Codec:        encodingConfig.Codec,
 		AuthStoreKey: klyraApp.CommitMultiStore().(*rootmulti.Store).StoreKeysByName()[authtypes.StoreKey],
 	}
@@ -52,10 +51,6 @@ func TestNewAnteHandler_Error(t *testing.T) {
 		"nil handlerOptions.SignModeHandler": {
 			handlerMutation: func(options *app.HandlerOptions) { options.SignModeHandler = nil },
 			errorMsg:        "sign mode handler is required for ante builder",
-		},
-		"nil ClobKeeper": {
-			handlerMutation: func(options *app.HandlerOptions) { options.ClobKeeper = nil },
-			errorMsg:        "clob keeper is required for ante builder",
 		},
 		"nil Codec": {
 			handlerMutation: func(options *app.HandlerOptions) { options.Codec = nil },

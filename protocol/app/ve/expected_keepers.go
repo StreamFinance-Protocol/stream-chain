@@ -3,7 +3,6 @@ package ve
 import (
 	"math/big"
 
-	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
 
@@ -34,11 +33,6 @@ type PreBlockExecPricesKeeper interface {
 type VoteExtensionYieldKeeper interface {
 	GetSDAIPrice(ctx sdk.Context) (price *big.Int, found bool)
 	GetSDAILastBlockUpdated(ctx sdk.Context) (blockHeight *big.Int, found bool)
-}
-
-type ExtendVoteClobKeeper interface {
-	GetSingleMarketClobMetadata(ctx sdk.Context, clobPair clobtypes.ClobPair) clobtypes.ClobMetadata
-	GetClobPair(ctx sdk.Context, id clobtypes.ClobPairId) (val clobtypes.ClobPair, found bool)
 }
 
 type ExtendVotePerpetualsKeeper interface {

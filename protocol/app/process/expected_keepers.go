@@ -5,23 +5,11 @@ import (
 	"math/big"
 
 	bridgetypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
-	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
-
-// ProcessClobKeeper defines the expected clob keeper used for `ProcessProposal`.
-type ProcessClobKeeper interface {
-	RecordMevMetricsIsEnabled() bool
-	RecordMevMetrics(
-		ctx sdk.Context,
-		stakingKeeper ProcessStakingKeeper,
-		perpetualKeeper ProcessPerpetualKeeper,
-		msgProposedOperations *types.MsgProposedOperations,
-	)
-}
 
 type ProcessProposalVEApplier interface {
 	ApplyVE(ctx sdk.Context, txs [][]byte, writeToCache bool) error

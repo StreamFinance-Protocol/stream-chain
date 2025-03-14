@@ -3,12 +3,11 @@ package ante
 import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/app/ante/types"
 	libante "github.com/StreamFinance-Protocol/stream-chain/protocol/lib/ante"
-	clobante "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/ante"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // FreeInfiniteGasDecorator is an AnteHandler that sets `GasMeter` to
-// `FreeInfiniteGasMeter` for off-chain single clob msg transactions, and app-injected transactions.
+// `FreeInfiniteGasMeter` for app-injected transactions.
 // These transactions should not use any gas, and the sender should not be charged any gas.
 // Using this meter means gas will never be consumed for these transactions.
 // Also note that not explicitly setting a `gasMeter` means that the `gasMeter` from the previous transaction
@@ -27,14 +26,10 @@ func (dec FreeInfiniteGasDecorator) AnteHandle(
 	simulate bool,
 	next sdk.AnteHandler,
 ) (newCtx sdk.Context, err error) {
-	isSingleClobMsgTx, err := clobante.IsSingleClobMsgTx(tx)
-	if err != nil {
-		return ctx, err
-	}
 
-	// If this is a single clob msg tx, or a single app-injected msg tx, then set the gas meter to
+	// If this is a single app-injected msg tx, then set the gas meter to
 	// FreeInfiniteGasMeter.
-	if isSingleClobMsgTx || libante.IsSingleAppInjectedMsg(tx.GetMsgs()) {
+	if libante.IsSingleAppInjectedMsg(tx.GetMsgs()) {
 		newCtx = ctx.WithGasMeter(types.NewFreeInfiniteGasMeter())
 		return next(newCtx, tx, simulate)
 	}

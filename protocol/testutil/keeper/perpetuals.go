@@ -16,7 +16,6 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/constants"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets"
 	assetskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets/keeper"
-	clobkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/keeper"
 	delaymsgmoduletypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/delaymsg/types"
 	epochskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/epochs/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals"
@@ -49,13 +48,11 @@ func PerpetualsKeepers(
 ) (pc PerpKeepersTestContext) {
 	return PerpetualsKeepersWithClobHelpers(
 		t,
-		nil,
 	)
 }
 
 func PerpetualsKeepersWithClobHelpers(
 	t testing.TB,
-	clobKeeper types.PerpetualsClobKeeper,
 ) (pc PerpKeepersTestContext) {
 	pc.Ctx = initKeepers(t, func(
 		db *dbm.MemDB,
@@ -80,7 +77,6 @@ func PerpetualsKeepersWithClobHelpers(
 			pc.PricesKeeper,
 			pc.EpochsKeeper,
 			pc.AssetsKeeper,
-			clobKeeper,
 			transientStoreKey,
 		)
 		pc.TransientStoreKey = transientStoreKey
@@ -105,7 +101,6 @@ func createPerpetualsKeeperWithClobHelpers(
 	pk *priceskeeper.Keeper,
 	ek *epochskeeper.Keeper,
 	ak *assetskeeper.Keeper,
-	pck types.PerpetualsClobKeeper,
 	transientStoreKey storetypes.StoreKey,
 ) (*keeper.Keeper, storetypes.StoreKey) {
 	storeKey := storetypes.NewKVStoreKey(types.StoreKey)
@@ -130,8 +125,6 @@ func createPerpetualsKeeperWithClobHelpers(
 		transientStoreKey,
 	)
 
-	k.SetClobKeeper(pck)
-
 	return k, storeKey
 }
 
@@ -142,10 +135,9 @@ func createPerpetualsKeeper(
 	pk *priceskeeper.Keeper,
 	ek *epochskeeper.Keeper,
 	ak *assetskeeper.Keeper,
-	clobKeeper *clobkeeper.Keeper,
 	transientStoreKey storetypes.StoreKey,
 ) (*keeper.Keeper, storetypes.StoreKey) {
-	return createPerpetualsKeeperWithClobHelpers(stateStore, db, cdc, pk, ek, ak, clobKeeper, transientStoreKey)
+	return createPerpetualsKeeperWithClobHelpers(stateStore, db, cdc, pk, ek, ak, transientStoreKey)
 }
 
 // PopulateTestPremiumStore populates either `PremiumVotes` (`isVote` is true) or

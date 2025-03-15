@@ -29,15 +29,15 @@ func (gs GenesisState) Validate() error {
 		}
 		includedAccounts[*subaccountId] = true
 
-		// Validate Asset Yield Index
-		if sa.AssetYieldIndex != "" {
-			yieldIndexRat, ok := new(big.Rat).SetString(sa.AssetYieldIndex)
+		// Validate Asset Yields Index
+		if sa.AssetYieldsIndex != "" {
+			yieldsIndexRat, ok := new(big.Rat).SetString(sa.AssetYieldsIndex)
 			if !ok {
 				return errors.New("could not convert string to big.Rat")
 			}
 
-			if yieldIndexRat.Cmp(big.NewRat(0, 1)) == -1 {
-				return ErrNegativeAssetYieldIndexNotSupported
+			if yieldsIndexRat.Cmp(big.NewRat(0, 1)) == -1 {
+				return ErrNegativeAssetYieldsIndexNotSupported
 			}
 		}
 

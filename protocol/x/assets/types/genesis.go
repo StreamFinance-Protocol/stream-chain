@@ -19,7 +19,7 @@ var (
 		Denom:            TDaiDenom,
 		HasMarket:        false,
 		AtomicResolution: lib.TDAIAtomicResolution,
-		AssetYieldIndex:  "1/1",
+		AssetYieldsIndex: "1/1",
 		MaxSlippagePpm:   uint32(0),
 	}
 	AssetBtc = Asset{

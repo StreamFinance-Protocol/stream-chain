@@ -2,12 +2,12 @@ package events
 
 // NewUpdatePerpetualEventV1 creates a UpdatePerpetualEventV1 representing
 // update of a perpetual.
-func NewUpdateYieldParamsEventV1(
+func NewUpdateYieldsParamsEventV1(
 	sdaiPrice string,
-	assetYieldIndex string,
-) *UpdateYieldParamsEventV1 {
-	return &UpdateYieldParamsEventV1{
-		SdaiPrice:       sdaiPrice,
-		AssetYieldIndex: assetYieldIndex,
+	assetYieldsIndex string,
+) *UpdateYieldsParamsEventV1 {
+	return &UpdateYieldsParamsEventV1{
+		SdaiPrice:        sdaiPrice,
+		AssetYieldsIndex: assetYieldsIndex,
 	}
 }

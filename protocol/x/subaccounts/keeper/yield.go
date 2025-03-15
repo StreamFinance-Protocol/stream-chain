@@ -8,12 +8,12 @@ import (
 	assettypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
-	yieldtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types"
+	yieldstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // TODO: [YBCP-89]
-func (k Keeper) ClaimYieldForSubaccountFromIdAndSetNewState(
+func (k Keeper) ClaimYieldsForSubaccountFromIdAndSetNewState(
 	ctx sdk.Context,
 	subaccountId *types.SubaccountId,
 ) (
@@ -25,21 +25,21 @@ func (k Keeper) ClaimYieldForSubaccountFromIdAndSetNewState(
 
 	subaccount := k.GetSubaccount(ctx, *subaccountId)
 
-	perpIdToPerp, assetYieldIndex, availableYield, earnsTdaiYield, _, err := k.fetchParamsToSettleSubaccount(ctx, subaccount)
+	perpIdToPerp, assetYieldsIndex, availableYields, earnsTdaiYields, _, err := k.fetchParamsToSettleSubaccount(ctx, subaccount)
 	if err != nil {
 		return err
 	}
 
-	if !earnsTdaiYield {
-		return types.ErrNoYieldToClaim
+	if !earnsTdaiYields {
+		return types.ErrNoYieldsToClaim
 	}
 
-	settledSubaccount, totalYieldInQuantums, err := AddYieldToSubaccount(subaccount, perpIdToPerp, assetYieldIndex, availableYield)
+	settledSubaccount, totalYieldsInQuantums, err := AddYieldsToSubaccount(subaccount, perpIdToPerp, assetYieldsIndex, availableYields)
 	if err != nil {
 		return err
 	}
 
-	err = k.DepositYieldToSubaccount(ctx, *settledSubaccount.Id, totalYieldInQuantums)
+	err = k.DepositYieldsToSubaccount(ctx, *settledSubaccount.Id, totalYieldsInQuantums)
 	if err != nil {
 		return err
 	}
@@ -49,11 +49,11 @@ func (k Keeper) ClaimYieldForSubaccountFromIdAndSetNewState(
 	return nil
 }
 
-func (k Keeper) DoesSubaccountEarnTDaiYield(
+func (k Keeper) DoesSubaccountEarnTDaiYields(
 	ctx sdk.Context,
 	subaccount types.Subaccount,
 ) (
-	earnsTdaiYield bool,
+	earnsTdaiYields bool,
 	err error,
 ) {
 	if len(subaccount.PerpetualPositions) == 0 {
@@ -68,71 +68,71 @@ func (k Keeper) DoesSubaccountEarnTDaiYield(
 	return quoteAssetId == assettypes.AssetTDai.Id, nil
 }
 
-func AddYieldToSubaccount(
+func AddYieldsToSubaccount(
 	subaccount types.Subaccount,
 	perpIdToPerp map[uint32]perptypes.Perpetual,
-	assetYieldIndex *big.Rat,
-	availableYieldInQuantums *big.Int,
+	assetYieldsIndex *big.Rat,
+	availableYieldsInQuantums *big.Int,
 ) (
 	settledSubaccount types.Subaccount,
-	totalNewYieldInQuantums *big.Int,
+	totalNewYieldsInQuantums *big.Int,
 	err error,
 ) {
-	assetYield, err := getYieldFromAssetPositions(subaccount, assetYieldIndex)
+	assetYields, err := getYieldsFromAssetPositions(subaccount, assetYieldsIndex)
 	if err != nil {
 		return types.Subaccount{}, nil, err
 	}
 
-	totalNewPerpYield, updatedYieldIndexPerpPosition, err := getYieldFromPerpPositions(subaccount, perpIdToPerp)
+	totalNewPerpYields, updatedYieldsIndexPerpPosition, err := getYieldsFromPerpPositions(subaccount, perpIdToPerp)
 	if err != nil {
 		return types.Subaccount{}, nil, err
 	}
 
-	totalNewYieldInQuantums = new(big.Int).Add(assetYield, totalNewPerpYield)
+	totalNewYieldsInQuantums = new(big.Int).Add(assetYields, totalNewPerpYields)
 
-	totalNewYieldInQuantums = handleInsufficientYieldDueToNegativeTNC(totalNewYieldInQuantums, availableYieldInQuantums)
+	totalNewYieldsInQuantums = handleInsufficientYieldsDueToNegativeTNC(totalNewYieldsInQuantums, availableYieldsInQuantums)
 
-	assetYieldIndexString := assetYieldIndex.String()
+	assetYieldsIndexString := assetYieldsIndex.String()
 	newSubaccount := types.Subaccount{
 		Id:                 subaccount.Id,
 		AssetPositions:     subaccount.AssetPositions,
-		PerpetualPositions: updatedYieldIndexPerpPosition,
+		PerpetualPositions: updatedYieldsIndexPerpPosition,
 		MarginEnabled:      subaccount.MarginEnabled,
-		AssetYieldIndex:    assetYieldIndexString,
+		AssetYieldsIndex:   assetYieldsIndexString,
 	}
 
-	if totalNewYieldInQuantums.Cmp(big.NewInt(0)) < 0 {
-		totalNewYieldInQuantums = big.NewInt(0)
+	if totalNewYieldsInQuantums.Cmp(big.NewInt(0)) < 0 {
+		totalNewYieldsInQuantums = big.NewInt(0)
 	}
 
-	newTDaiPosition := new(big.Int).Add(subaccount.GetTDaiPosition(), totalNewYieldInQuantums)
+	newTDaiPosition := new(big.Int).Add(subaccount.GetTDaiPosition(), totalNewYieldsInQuantums)
 
 	// TODO(CLOB-993): Remove this function and use `UpdateAssetPositions` instead.
 	newSubaccount.SetTDaiAssetPosition(newTDaiPosition)
-	return newSubaccount, totalNewYieldInQuantums, nil
+	return newSubaccount, totalNewYieldsInQuantums, nil
 }
 
-func handleInsufficientYieldDueToNegativeTNC(
-	totalNewYield *big.Int,
-	availableYield *big.Int,
+func handleInsufficientYieldsDueToNegativeTNC(
+	totalNewYields *big.Int,
+	availableYields *big.Int,
 ) (
-	yieldToTransfer *big.Int,
+	yieldsToTransfer *big.Int,
 ) {
-	yieldToTransfer = new(big.Int).Set(totalNewYield)
-	if availableYield.Cmp(totalNewYield) < 0 {
-		yieldToTransfer.Set(availableYield)
+	yieldsToTransfer = new(big.Int).Set(totalNewYields)
+	if availableYields.Cmp(totalNewYields) < 0 {
+		yieldsToTransfer.Set(availableYields)
 	}
 
-	return yieldToTransfer
+	return yieldsToTransfer
 }
 
-// -------------------ASSET YIELD --------------------------
+// -------------------ASSET YIELDS --------------------------
 
-func getYieldFromAssetPositions(
+func getYieldsFromAssetPositions(
 	subaccount types.Subaccount,
-	assetYieldIndex *big.Rat,
+	assetYieldsIndex *big.Rat,
 ) (
-	newAssetYield *big.Int,
+	newAssetYields *big.Int,
 	err error,
 ) {
 	for _, assetPosition := range subaccount.AssetPositions {
@@ -140,69 +140,69 @@ func getYieldFromAssetPositions(
 			continue
 		}
 
-		newAssetYield, err := calculateAssetYieldInQuoteQuantums(subaccount, assetYieldIndex, assetPosition)
+		newAssetYields, err := calculateAssetYieldsInQuoteQuantums(subaccount, assetYieldsIndex, assetPosition)
 		if err != nil {
 			return nil, err
 		} else {
-			return newAssetYield, err
+			return newAssetYields, err
 		}
 	}
 	return big.NewInt(0), nil
 }
 
-func calculateAssetYieldInQuoteQuantums(
+func calculateAssetYieldsInQuoteQuantums(
 	subaccount types.Subaccount,
-	generalYieldIndex *big.Rat,
+	generalYieldsIndex *big.Rat,
 	assetPosition *types.AssetPosition,
 ) (
-	newYield *big.Int,
+	newYields *big.Int,
 	err error,
 ) {
 
-	if generalYieldIndex.Cmp(big.NewRat(0, 1)) < 0 {
-		return nil, types.ErrGlobalYieldIndexNegative
+	if generalYieldsIndex.Cmp(big.NewRat(0, 1)) < 0 {
+		return nil, types.ErrGlobalYieldsIndexNegative
 	}
 
-	// required because of how calculation handles when currentYieldIndex is 0
-	if generalYieldIndex.Cmp(big.NewRat(0, 1)) == 0 {
+	// required because of how calculation handles when currentYieldsIndex is 0
+	if generalYieldsIndex.Cmp(big.NewRat(0, 1)) == 0 {
 		return big.NewInt(0), nil
 	}
 
-	currentYieldIndex, success := new(big.Rat).SetString(subaccount.AssetYieldIndex)
+	currentYieldsIndex, success := new(big.Rat).SetString(subaccount.AssetYieldsIndex)
 	if !success {
 		return nil, types.ErrRatConversion
 	}
 
-	if generalYieldIndex.Cmp(currentYieldIndex) < 0 {
-		return nil, types.ErrGeneralYieldIndexSmallerThanYieldIndexInSubaccount
+	if generalYieldsIndex.Cmp(currentYieldsIndex) < 0 {
+		return nil, types.ErrGeneralYieldsIndexSmallerThanYieldsIndexInSubaccount
 	}
 
 	assetAmount := new(big.Rat).SetInt(assetPosition.GetBigQuantums())
-	currYieldIndexdivisor := currentYieldIndex
-	if currYieldIndexdivisor.Cmp(big.NewRat(0, 1)) == 0 {
-		currYieldIndexdivisor = big.NewRat(1, 1)
+	currYieldsIndexdivisor := currentYieldsIndex
+	if currYieldsIndexdivisor.Cmp(big.NewRat(0, 1)) == 0 {
+		currYieldsIndexdivisor = big.NewRat(1, 1)
 	}
 
-	yieldIndexQuotient := new(big.Rat).Quo(generalYieldIndex, currYieldIndexdivisor)
-	newAssetAmount := new(big.Rat).Mul(assetAmount, yieldIndexQuotient)
-	newYieldRat := new(big.Rat).Sub(newAssetAmount, assetAmount)
+	yieldsIndexQuotient := new(big.Rat).Quo(generalYieldsIndex, currYieldsIndexdivisor)
+	newAssetAmount := new(big.Rat).Mul(assetAmount, yieldsIndexQuotient)
+	newYieldsRat := new(big.Rat).Sub(newAssetAmount, assetAmount)
 
-	newYield = lib.BigRatRound(newYieldRat, false)
+	newYields = lib.BigRatRound(newYieldsRat, false)
 
-	return newYield, nil
+	return newYields, nil
 }
 
-// -------------------PERP YIELD --------------------------
+// -------------------PERP YIELDS --------------------------
 
-func getYieldFromPerpPositions(
+func getYieldsFromPerpPositions(
 	subaccount types.Subaccount,
 	perpIdToPerp map[uint32]perptypes.Perpetual,
 ) (
-	totalNewPerpYield *big.Int,
+	totalNewPerpYields *big.Int,
 	newPerpetualPositions []*types.PerpetualPosition,
 	err error,
 ) {
-	totalNewPerpYield = big.NewInt(0)
+	totalNewPerpYields = big.NewInt(0)
 	newPerpetualPositions = []*types.PerpetualPosition{}
 
 	for _, perpetualPosition := range subaccount.PerpetualPositions {
@@ -215,122 +215,122 @@ func getYieldFromPerpPositions(
 				)
 		}
 
-		perpYield, perpYieldIndex, err := calculateNewPerpYield(perpetual, perpetualPosition)
+		perpYields, perpYieldsIndex, err := calculateNewPerpYields(perpetual, perpetualPosition)
 		if err != nil {
 			return nil, nil, err
 		}
-		totalNewPerpYield = new(big.Int).Add(totalNewPerpYield, perpYield)
+		totalNewPerpYields = new(big.Int).Add(totalNewPerpYields, perpYields)
 
 		newPerpetualPosition := types.PerpetualPosition{
 			PerpetualId:  perpetualPosition.PerpetualId,
 			Quantums:     perpetualPosition.Quantums,
 			FundingIndex: perpetualPosition.FundingIndex,
-			YieldIndex:   perpYieldIndex.String(),
+			YieldsIndex:  perpYieldsIndex.String(),
 		}
 		newPerpetualPositions = append(newPerpetualPositions, &newPerpetualPosition)
 	}
-	return totalNewPerpYield, newPerpetualPositions, nil
+	return totalNewPerpYields, newPerpetualPositions, nil
 }
 
-func calculateNewPerpYield(
+func calculateNewPerpYields(
 	perpetual perptypes.Perpetual,
 	perpetualPosition *types.PerpetualPosition,
 ) (
-	newPerpYield *big.Int,
-	perpYieldIndex *big.Rat,
+	newPerpYields *big.Int,
+	perpYieldsIndex *big.Rat,
 	err error,
 ) {
-	perpYieldIndex, err = GetCurrentYieldIndexForPerp(perpetual)
+	perpYieldsIndex, err = GetCurrentYieldsIndexForPerp(perpetual)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	newPerpYield, err = calculatePerpetualYieldInQuoteQuantums(perpetualPosition, perpYieldIndex)
+	newPerpYields, err = calculatePerpetualYieldsInQuoteQuantums(perpetualPosition, perpYieldsIndex)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	return newPerpYield, perpYieldIndex, nil
+	return newPerpYields, perpYieldsIndex, nil
 }
 
-func GetCurrentYieldIndexForPerp(
+func GetCurrentYieldsIndexForPerp(
 	perp perptypes.Perpetual,
 ) (
-	yieldIndex *big.Rat,
+	yieldsIndex *big.Rat,
 	err error,
 ) {
-	if perp.YieldIndex == "" {
-		return nil, types.ErrPerpYieldIndexUninitialized
+	if perp.YieldsIndex == "" {
+		return nil, types.ErrPerpYieldsIndexUninitialized
 	}
 
-	generalYieldIndex, success := new(big.Rat).SetString(perp.YieldIndex)
+	generalYieldsIndex, success := new(big.Rat).SetString(perp.YieldsIndex)
 	if !success {
 		return nil, types.ErrRatConversion
 	}
-	return generalYieldIndex, nil
+	return generalYieldsIndex, nil
 }
 
-func calculatePerpetualYieldInQuoteQuantums(
+func calculatePerpetualYieldsInQuoteQuantums(
 	perpPosition *types.PerpetualPosition,
-	generalYieldIndex *big.Rat,
+	generalYieldsIndex *big.Rat,
 ) (
-	newYield *big.Int,
+	newYields *big.Int,
 	err error,
 ) {
 
-	if generalYieldIndex.Cmp(big.NewRat(0, 1)) < 0 {
-		return nil, types.ErrGlobalYieldIndexNegative
+	if generalYieldsIndex.Cmp(big.NewRat(0, 1)) < 0 {
+		return nil, types.ErrGlobalYieldsIndexNegative
 	}
 
-	// required because of how calculation handles when currentYieldIndex is 0
-	if generalYieldIndex.Cmp(big.NewRat(0, 1)) == 0 {
+	// required because of how calculation handles when currentYieldsIndex is 0
+	if generalYieldsIndex.Cmp(big.NewRat(0, 1)) == 0 {
 		return big.NewInt(0), nil
 	}
 
-	if perpPosition.YieldIndex == "" {
-		return nil, types.ErrPerpYieldIndexUninitialized
+	if perpPosition.YieldsIndex == "" {
+		return nil, types.ErrPerpYieldsIndexUninitialized
 	}
 
-	currentYieldIndex, success := new(big.Rat).SetString(perpPosition.YieldIndex)
+	currentYieldsIndex, success := new(big.Rat).SetString(perpPosition.YieldsIndex)
 	if !success {
 		return nil, types.ErrRatConversion
 	}
 
-	if generalYieldIndex.Cmp(currentYieldIndex) < 0 {
-		return nil, types.ErrGeneralYieldIndexSmallerThanYieldIndexInSubaccount
+	if generalYieldsIndex.Cmp(currentYieldsIndex) < 0 {
+		return nil, types.ErrGeneralYieldsIndexSmallerThanYieldsIndexInSubaccount
 	}
 
-	yieldIndexDifference := new(big.Rat).Sub(generalYieldIndex, currentYieldIndex)
+	yieldsIndexDifference := new(big.Rat).Sub(generalYieldsIndex, currentYieldsIndex)
 	perpAmount := new(big.Rat).SetInt(perpPosition.GetBigQuantums())
-	newYieldRat := new(big.Rat).Mul(perpAmount, yieldIndexDifference)
-	newYield = lib.BigRatRound(newYieldRat, false)
+	newYieldsRat := new(big.Rat).Mul(perpAmount, yieldsIndexDifference)
+	newYields = lib.BigRatRound(newYieldsRat, false)
 
-	return newYield, nil
+	return newYields, nil
 }
 
-// -------------------YIELD ON BANK LEVEL --------------------------
+// -------------------YIELDS ON BANK LEVEL --------------------------
 
-func (k Keeper) DepositYieldToSubaccount(
+func (k Keeper) DepositYieldsToSubaccount(
 	ctx sdk.Context,
 	subaccountId types.SubaccountId,
-	totalYieldInQuantums *big.Int,
+	totalYieldsInQuantums *big.Int,
 ) error {
-	if totalYieldInQuantums == nil {
+	if totalYieldsInQuantums == nil {
 		return nil
 	}
 
-	if totalYieldInQuantums.Cmp(big.NewInt(0)) == 0 {
+	if totalYieldsInQuantums.Cmp(big.NewInt(0)) == 0 {
 		return nil
 	}
 
-	if totalYieldInQuantums.Cmp(big.NewInt(0)) == -1 {
-		return types.ErrTryingToDepositNegativeYield
+	if totalYieldsInQuantums.Cmp(big.NewInt(0)) == -1 {
+		return types.ErrTryingToDepositNegativeYields
 	}
 
 	_, coinToTransfer, err := k.assetsKeeper.ConvertAssetToCoin(
 		ctx,
 		assettypes.AssetTDai.Id,
-		totalYieldInQuantums,
+		totalYieldsInQuantums,
 	)
 	if err != nil {
 		return err
@@ -343,7 +343,7 @@ func (k Keeper) DepositYieldToSubaccount(
 
 	if err := k.bankKeeper.SendCoinsFromModuleToAccount(
 		ctx,
-		yieldtypes.TDaiPoolAccount,
+		yieldstypes.TDaiPoolAccount,
 		collateralPoolAddr,
 		[]sdk.Coin{coinToTransfer},
 	); err != nil {

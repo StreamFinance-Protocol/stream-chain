@@ -66,7 +66,7 @@ func (k Keeper) CreatePerpetual(
 	liquidityTier uint32,
 	dangerIndexPpm uint32,
 	collateralPoolId uint32,
-	yieldIndex string,
+	yieldsIndex string,
 ) (types.Perpetual, error) {
 	// Check if perpetual exists.
 	if k.HasPerpetual(ctx, id) {
@@ -90,7 +90,7 @@ func (k Keeper) CreatePerpetual(
 		},
 		FundingIndex:    dtypes.ZeroInt(),
 		OpenInterest:    dtypes.ZeroInt(),
-		YieldIndex:      yieldIndex,
+		YieldsIndex:     yieldsIndex,
 		LastFundingRate: dtypes.ZeroInt(),
 	}
 
@@ -161,7 +161,7 @@ func (k Keeper) ModifyPerpetual(
 				perpetual.Params.AtomicResolution,
 				perpetual.Params.LiquidityTier,
 				perpetual.Params.DangerIndexPpm,
-				perpetual.YieldIndex,
+				perpetual.YieldsIndex,
 			),
 		),
 	)
@@ -612,7 +612,7 @@ func (k Keeper) GetRemoveSampleTailsFunc(
 	}
 }
 
-func (k Keeper) UpdateYieldIndexToNewMint(
+func (k Keeper) UpdateYieldsIndexToNewMint(
 	ctx sdk.Context,
 	totalTDaiPreMint *big.Int,
 	totalTDaiMinted *big.Int,
@@ -645,7 +645,7 @@ func (k Keeper) UpdateYieldIndexToNewMint(
 			continue
 		}
 
-		modifiedPerp, err := k.GeneratePerpetualWithUpdatedYieldIndex(
+		modifiedPerp, err := k.GeneratePerpetualWithUpdatedYieldsIndex(
 			ctx,
 			totalTDaiPreMint,
 			totalTDaiMinted,
@@ -672,7 +672,7 @@ func (k Keeper) UpdateYieldIndexToNewMint(
 					modifiedPerp.Params.AtomicResolution,
 					modifiedPerp.Params.LiquidityTier,
 					modifiedPerp.Params.DangerIndexPpm,
-					modifiedPerp.YieldIndex,
+					modifiedPerp.YieldsIndex,
 				),
 			),
 		)
@@ -681,7 +681,7 @@ func (k Keeper) UpdateYieldIndexToNewMint(
 	return nil
 }
 
-func (k Keeper) GeneratePerpetualWithUpdatedYieldIndex(
+func (k Keeper) GeneratePerpetualWithUpdatedYieldsIndex(
 	ctx sdk.Context,
 	totalTDaiPreMint *big.Int,
 	totalTDaiMinted *big.Int,
@@ -695,33 +695,33 @@ func (k Keeper) GeneratePerpetualWithUpdatedYieldIndex(
 		return types.Perpetual{}, err
 	}
 
-	// Calculate yield index for this epoch
-	currEpochYieldIndex, err := k.CalculateYieldIndexForEpoch(ctx, totalTDaiPreMint, totalTDaiMinted, marketPrice, perp)
+	// Calculate yields index for this epoch
+	currEpochYieldsIndex, err := k.CalculateYieldsIndexForEpoch(ctx, totalTDaiPreMint, totalTDaiMinted, marketPrice, perp)
 	if err != nil {
 		return types.Perpetual{}, err
 	}
 
-	// Get current cumulative yield index
-	cumulativeYieldIndex, err := perp.GetYieldIndexAsRat()
+	// Get current cumulative yields index
+	cumulativeYieldsIndex, err := perp.GetYieldsIndexAsRat()
 	if err != nil {
 		return types.Perpetual{}, err
 	}
 
-	newYieldIndex := new(big.Rat).Add(cumulativeYieldIndex, currEpochYieldIndex)
+	newYieldsIndex := new(big.Rat).Add(cumulativeYieldsIndex, currEpochYieldsIndex)
 
-	perp.YieldIndex = newYieldIndex.String()
+	perp.YieldsIndex = newYieldsIndex.String()
 
 	return perp, nil
 }
 
-func (k Keeper) CalculateYieldIndexForEpoch(
+func (k Keeper) CalculateYieldsIndexForEpoch(
 	ctx sdk.Context,
 	totalTDaiPreMint *big.Int,
 	totalTDaiMinted *big.Int,
 	marketPrice pricestypes.MarketPrice,
 	perpetual types.Perpetual,
 ) (
-	yieldIndex *big.Rat,
+	yieldsIndex *big.Rat,
 	err error,
 ) {
 	if totalTDaiPreMint == nil || totalTDaiPreMint.Cmp(big.NewInt(0)) == 0 {
@@ -753,9 +753,9 @@ func (k Keeper) CalculateYieldIndexForEpoch(
 
 	totalDaiMintedTimesPrice := new(big.Int).Mul(totalTDaiMinted, priceForOneBaseQuantum)
 
-	yieldIndex = new(big.Rat).SetFrac(totalDaiMintedTimesPrice, totalTDaiPreMint)
+	yieldsIndex = new(big.Rat).SetFrac(totalDaiMintedTimesPrice, totalTDaiPreMint)
 
-	return yieldIndex, nil
+	return yieldsIndex, nil
 }
 
 // MaybeProcessNewFundingTickEpoch processes funding ticks if the current block
@@ -1431,8 +1431,8 @@ func (k Keeper) setPerpetual(
 	ctx sdk.Context,
 	perpetual types.Perpetual,
 ) {
-	if perpetual.YieldIndex == "" {
-		perpetual.YieldIndex = "0/1"
+	if perpetual.YieldsIndex == "" {
+		perpetual.YieldsIndex = "0/1"
 	}
 
 	b := k.cdc.MustMarshal(&perpetual)
@@ -1445,8 +1445,8 @@ func (k Keeper) ValidateAndSetPerpetual(
 	ctx sdk.Context,
 	perpetual types.Perpetual,
 ) error {
-	if perpetual.YieldIndex == "" {
-		perpetual.YieldIndex = "0/1"
+	if perpetual.YieldsIndex == "" {
+		perpetual.YieldsIndex = "0/1"
 	}
 
 	if err := k.validatePerpetual(
@@ -1536,18 +1536,18 @@ func (k Keeper) validatePerpetual(
 		return errorsmod.Wrap(types.ErrCollateralPoolDoesNotExist, lib.UintToString(perpetual.Params.CollateralPoolId))
 	}
 
-	if perpetual.YieldIndex == "" {
-		return types.ErrYieldIndexDoesNotExist
+	if perpetual.YieldsIndex == "" {
+		return types.ErrYieldsIndexDoesNotExist
 	}
 
-	yieldIndex, err := perpetual.GetYieldIndexAsRat()
+	yieldsIndex, err := perpetual.GetYieldsIndexAsRat()
 
 	if err != nil {
 		return err
 	}
 
-	if yieldIndex.Cmp(big.NewRat(0, 1)) == -1 {
-		return types.ErrYieldIndexNegative
+	if yieldsIndex.Cmp(big.NewRat(0, 1)) == -1 {
+		return types.ErrYieldsIndexNegative
 	}
 
 	return nil

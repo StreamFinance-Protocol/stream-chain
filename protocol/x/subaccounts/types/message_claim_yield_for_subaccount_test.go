@@ -9,15 +9,15 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestMsgClaimYieldForSubaccount_ValidateBasic(t *testing.T) {
+func TestMsgClaimYieldsForSubaccount_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  types.MsgClaimYieldForSubaccount
+		msg  types.MsgClaimYieldsForSubaccount
 		err  error
 	}{
 		{
 			name: "Invalid subaccount owner",
-			msg: types.MsgClaimYieldForSubaccount{
+			msg: types.MsgClaimYieldsForSubaccount{
 				Id: &types.SubaccountId{
 					Owner:  "invalid_owner",
 					Number: uint32(0),
@@ -27,7 +27,7 @@ func TestMsgClaimYieldForSubaccount_ValidateBasic(t *testing.T) {
 		},
 		{
 			name: "Invalid subaccount number",
-			msg: types.MsgClaimYieldForSubaccount{
+			msg: types.MsgClaimYieldsForSubaccount{
 				Id: &types.SubaccountId{
 					Owner:  sample.AccAddress(),
 					Number: uint32(999_999),
@@ -37,13 +37,13 @@ func TestMsgClaimYieldForSubaccount_ValidateBasic(t *testing.T) {
 		},
 		{
 			name: "Valid address 1",
-			msg: types.MsgClaimYieldForSubaccount{
+			msg: types.MsgClaimYieldsForSubaccount{
 				Id: &constants.Carl_Num0,
 			},
 		},
 		{
 			name: "Valid address 2",
-			msg: types.MsgClaimYieldForSubaccount{
+			msg: types.MsgClaimYieldsForSubaccount{
 				Id: &constants.Dave_Num0,
 			},
 		},

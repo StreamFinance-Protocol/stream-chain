@@ -29,7 +29,7 @@ import (
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
-	yieldtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types"
+	yieldstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -307,12 +307,12 @@ func TestPlacePerpetualLiquidation(t *testing.T) {
 			mockBankKeeper.On(
 				"GetBalance",
 				mock.Anything,
-				authtypes.NewModuleAddress(yieldtypes.TDaiPoolAccount),
+				authtypes.NewModuleAddress(yieldstypes.TDaiPoolAccount),
 				constants.TDai.Denom,
 			).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, mockBankKeeper, indexer_manager.NewIndexerEventManagerNoop(), nil)
-			ks.YieldKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+			ks.YieldsKeeper.SetAssetYieldsIndex(ks.Ctx, big.NewRat(1, 1))
 
 			ctx := ks.Ctx.WithIsCheckTx(true)
 
@@ -334,7 +334,7 @@ func TestPlacePerpetualLiquidation(t *testing.T) {
 					p.Params.LiquidityTier,
 					p.Params.DangerIndexPpm,
 					p.Params.CollateralPoolId,
-					p.YieldIndex,
+					p.YieldsIndex,
 				)
 				require.NoError(t, err)
 			}
@@ -430,7 +430,7 @@ func TestPlacePerpetualLiquidation_validateLiquidationAgainstClobPairStatus(t *t
 			memClob := memclob.NewMemClobPriceTimePriority(false)
 			mockBankKeeper := &mocks.BankKeeper{}
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, mockBankKeeper, indexer_manager.NewIndexerEventManagerNoop(), nil)
-			ks.YieldKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+			ks.YieldsKeeper.SetAssetYieldsIndex(ks.Ctx, big.NewRat(1, 1))
 			ctx := ks.Ctx.WithIsCheckTx(true)
 
 			// Create liquidity tiers.
@@ -451,7 +451,7 @@ func TestPlacePerpetualLiquidation_validateLiquidationAgainstClobPairStatus(t *t
 					p.Params.LiquidityTier,
 					p.Params.DangerIndexPpm,
 					p.Params.CollateralPoolId,
-					p.YieldIndex,
+					p.YieldsIndex,
 				)
 				require.NoError(t, err)
 			}
@@ -515,15 +515,15 @@ func TestPlacePerpetualLiquidation_PreexistingLiquidation(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(-100_000_000), // -1 BTC
-							YieldIndex:  big.NewRat(0, 1).String(),
+							YieldsIndex: big.NewRat(0, 1).String(),
 						},
 						{
 							PerpetualId: 1,
 							Quantums:    dtypes.NewInt(-1_000_000_000), // -1 ETH
-							YieldIndex:  big.NewRat(0, 1).String(),
+							YieldsIndex: big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: "1/1",
+					AssetYieldsIndex: "1/1",
 				},
 				constants.Dave_Num0_1BTC_Long_50000USD,
 			},
@@ -603,15 +603,15 @@ func TestPlacePerpetualLiquidation_PreexistingLiquidation(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(-100_000_000), // -1 BTC
-							YieldIndex:  big.NewRat(0, 1).String(),
+							YieldsIndex: big.NewRat(0, 1).String(),
 						},
 						{
 							PerpetualId: 1,
 							Quantums:    dtypes.NewInt(-1_000_000_000), // -1 ETH
-							YieldIndex:  big.NewRat(0, 1).String(),
+							YieldsIndex: big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: "1/1",
+					AssetYieldsIndex: "1/1",
 				},
 				constants.Dave_Num0_1BTC_Long_50000USD,
 			},
@@ -742,7 +742,7 @@ func TestPlacePerpetualLiquidation_PreexistingLiquidation(t *testing.T) {
 				bk.On(
 					"GetBalance",
 					mock.Anything,
-					authtypes.NewModuleAddress(yieldtypes.TDaiPoolAccount),
+					authtypes.NewModuleAddress(yieldstypes.TDaiPoolAccount),
 					constants.TDai.Denom,
 				).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 				bk.On(
@@ -796,7 +796,7 @@ func TestPlacePerpetualLiquidation_PreexistingLiquidation(t *testing.T) {
 				bk.On(
 					"GetBalance",
 					mock.Anything,
-					authtypes.NewModuleAddress(yieldtypes.TDaiPoolAccount),
+					authtypes.NewModuleAddress(yieldstypes.TDaiPoolAccount),
 					constants.TDai.Denom,
 				).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 				bk.On(
@@ -850,7 +850,7 @@ func TestPlacePerpetualLiquidation_PreexistingLiquidation(t *testing.T) {
 				bk.On(
 					"GetBalance",
 					mock.Anything,
-					authtypes.NewModuleAddress(yieldtypes.TDaiPoolAccount),
+					authtypes.NewModuleAddress(yieldstypes.TDaiPoolAccount),
 					constants.TDai.Denom,
 				).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 				bk.On(
@@ -945,7 +945,7 @@ func TestPlacePerpetualLiquidation_PreexistingLiquidation(t *testing.T) {
 				bk.On(
 					"GetBalance",
 					mock.Anything,
-					authtypes.NewModuleAddress(yieldtypes.TDaiPoolAccount),
+					authtypes.NewModuleAddress(yieldstypes.TDaiPoolAccount),
 					constants.TDai.Denom,
 				).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 				bk.On(
@@ -1031,15 +1031,15 @@ func TestPlacePerpetualLiquidation_PreexistingLiquidation(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(-100_000_000), // -1 BTC
-							YieldIndex:  big.NewRat(0, 1).String(),
+							YieldsIndex: big.NewRat(0, 1).String(),
 						},
 						{
 							PerpetualId: 1,
 							Quantums:    dtypes.NewInt(-2_000_000_000), // -2 ETH
-							YieldIndex:  big.NewRat(0, 1).String(),
+							YieldsIndex: big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: "1/1",
+					AssetYieldsIndex: "1/1",
 				},
 				constants.Dave_Num0_1BTC_Long_50000USD,
 			},
@@ -1087,7 +1087,7 @@ func TestPlacePerpetualLiquidation_PreexistingLiquidation(t *testing.T) {
 				bankKeeper.On(
 					"GetBalance",
 					mock.Anything,
-					authtypes.NewModuleAddress(yieldtypes.TDaiPoolAccount),
+					authtypes.NewModuleAddress(yieldstypes.TDaiPoolAccount),
 					constants.TDai.Denom,
 				).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 				bankKeeper.On(
@@ -1101,7 +1101,7 @@ func TestPlacePerpetualLiquidation_PreexistingLiquidation(t *testing.T) {
 			mockIndexerEventManager := &mocks.IndexerEventManager{}
 			mockIndexerEventManager.On("Enabled").Return(false)
 			ks := keepertest.NewClobKeepersTestContext(t, memclob, bankKeeper, mockIndexerEventManager, nil)
-			ks.YieldKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+			ks.YieldsKeeper.SetAssetYieldsIndex(ks.Ctx, big.NewRat(1, 1))
 
 			ctx := ks.Ctx.WithIsCheckTx(true)
 
@@ -1137,7 +1137,7 @@ func TestPlacePerpetualLiquidation_PreexistingLiquidation(t *testing.T) {
 					perpetual.Params.LiquidityTier,
 					perpetual.Params.DangerIndexPpm,
 					perpetual.Params.CollateralPoolId,
-					perpetual.YieldIndex,
+					perpetual.YieldsIndex,
 				)
 				require.NoError(t, err)
 			}
@@ -1680,7 +1680,7 @@ func TestGetFillablePrice(t *testing.T) {
 			)
 
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, mockBankKeeper, &mocks.IndexerEventManager{}, nil)
-			ks.YieldKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+			ks.YieldsKeeper.SetAssetYieldsIndex(ks.Ctx, big.NewRat(1, 1))
 
 			// Initialize the liquidations config.
 			if tc.liquidationConfig != nil {
@@ -1709,7 +1709,7 @@ func TestGetFillablePrice(t *testing.T) {
 					p.Params.LiquidityTier,
 					p.Params.DangerIndexPpm,
 					p.Params.CollateralPoolId,
-					p.YieldIndex,
+					p.YieldsIndex,
 				)
 				require.NoError(t, err)
 			}
@@ -1793,7 +1793,7 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 							Quantums: dtypes.NewInt(50_499_000_000 - 50_000_000_000 - 250_000_000),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Dave_Num0,
@@ -1803,7 +1803,7 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 							Quantums: dtypes.NewInt(100_000_000_000), // $100,000
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 			},
 			expectedOperationsQueue: []types.OperationRaw{
@@ -1859,10 +1859,10 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 							PerpetualId:  0,
 							Quantums:     dtypes.NewInt(-75_000_000), // -0.75 BTC
 							FundingIndex: dtypes.NewInt(0),
-							YieldIndex:   big.NewRat(0, 1).String(),
+							YieldsIndex:  big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Dave_Num0,
@@ -1877,10 +1877,10 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 							PerpetualId:  0,
 							Quantums:     dtypes.NewInt(75_000_000), // 0.75 BTC
 							FundingIndex: dtypes.NewInt(0),
-							YieldIndex:   big.NewRat(0, 1).String(),
+							YieldsIndex:  big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 			},
 			expectedOperationsQueue: []types.OperationRaw{
@@ -1929,8 +1929,8 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 			},
 			expectedSubaccounts: []satypes.Subaccount{
 				{
-					Id:              &constants.Carl_Num0,
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					Id:               &constants.Carl_Num0,
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Dave_Num0,
@@ -1940,7 +1940,7 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 							Quantums: dtypes.NewInt(50_000_000_000 + 50_499_000_000),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 			},
 			expectedOperationsQueue: []types.OperationRaw{
@@ -2003,10 +2003,10 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 							PerpetualId:  0,
 							Quantums:     dtypes.NewInt(-75_000_000), // -0.75 BTC
 							FundingIndex: dtypes.NewInt(0),
-							YieldIndex:   big.NewRat(0, 1).String(),
+							YieldsIndex:  big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Dave_Num0,
@@ -2021,10 +2021,10 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 							PerpetualId:  0,
 							Quantums:     dtypes.NewInt(75_000_000), // 0.75 BTC
 							FundingIndex: dtypes.NewInt(0),
-							YieldIndex:   big.NewRat(0, 1).String(),
+							YieldsIndex:  big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 			},
 			expectedOperationsQueue: []types.OperationRaw{
@@ -2078,14 +2078,14 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 					AssetPositions:     constants.Carl_Num0_1BTC_Short_49999USD.AssetPositions,
 					PerpetualPositions: constants.Carl_Num0_1BTC_Short_49999USD.PerpetualPositions,
 					MarginEnabled:      constants.Carl_Num0_1BTC_Short_49999USD.MarginEnabled,
-					AssetYieldIndex:    big.NewRat(1, 1).String(),
+					AssetYieldsIndex:   big.NewRat(1, 1).String(),
 				},
 				{
 					Id:                 constants.Dave_Num0_1BTC_Long_50000USD_Short.Id,
 					AssetPositions:     constants.Dave_Num0_1BTC_Long_50000USD_Short.AssetPositions,
 					PerpetualPositions: constants.Dave_Num0_1BTC_Long_50000USD_Short.PerpetualPositions,
 					MarginEnabled:      constants.Dave_Num0_1BTC_Long_50000USD_Short.MarginEnabled,
-					AssetYieldIndex:    big.NewRat(1, 1).String(),
+					AssetYieldsIndex:   big.NewRat(1, 1).String(),
 				},
 			},
 			expectedOperationsQueue: []types.OperationRaw{},
@@ -2134,10 +2134,10 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 							PerpetualId:  0,
 							Quantums:     dtypes.NewInt(-75_000_000), // -0.75 BTC
 							FundingIndex: dtypes.NewInt(0),
-							YieldIndex:   big.NewRat(0, 1).String(),
+							YieldsIndex:  big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 				// Dave's bankruptcy price to close 1 BTC long is $50,000, and deleveraging can not be
 				// performed due to non overlapping bankruptcy prices.
@@ -2147,7 +2147,7 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 					AssetPositions:     constants.Dave_Num0_1BTC_Long_50000USD_Short.AssetPositions,
 					PerpetualPositions: constants.Dave_Num0_1BTC_Long_50000USD_Short.PerpetualPositions,
 					MarginEnabled:      constants.Dave_Num0_1BTC_Long_50000USD_Short.MarginEnabled,
-					AssetYieldIndex:    big.NewRat(1, 1).String(),
+					AssetYieldsIndex:   big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Dave_Num1,
@@ -2157,7 +2157,7 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 							Quantums: dtypes.NewInt(50_000_000_000 + 12_499_750_000),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 			},
 			expectedOperationsQueue: []types.OperationRaw{
@@ -2218,10 +2218,10 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 							// Deleveraging fails for remaining amount.
 							Quantums:     dtypes.NewInt(-50_000_000), // -0.5 BTC
 							FundingIndex: dtypes.NewInt(0),
-							YieldIndex:   big.NewRat(0, 1).String(),
+							YieldsIndex:  big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 				// Dave_Num0 does not change since deleveraging against this subaccount failed.
 				{
@@ -2229,7 +2229,7 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 					AssetPositions:     constants.Dave_Num0_1BTC_Long_50000USD_Short.AssetPositions,
 					PerpetualPositions: constants.Dave_Num0_1BTC_Long_50000USD_Short.PerpetualPositions,
 					MarginEnabled:      constants.Dave_Num0_1BTC_Long_50000USD_Short.MarginEnabled,
-					AssetYieldIndex:    big.NewRat(1, 1).String(),
+					AssetYieldsIndex:   big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Dave_Num1,
@@ -2239,7 +2239,7 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 							Quantums: dtypes.NewInt(50_000_000_000 + 24_999_500_000),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 			},
 			expectedOperationsQueue: []types.OperationRaw{
@@ -2303,10 +2303,10 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 							PerpetualId:  0,
 							Quantums:     dtypes.NewInt(-75_000_000), // -0.75 BTC
 							FundingIndex: dtypes.NewInt(0),
-							YieldIndex:   big.NewRat(0, 1).String(),
+							YieldsIndex:  big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Dave_Num0,
@@ -2321,10 +2321,10 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 							PerpetualId:  0,
 							Quantums:     dtypes.NewInt(75_000_000), // 0.75 BTC
 							FundingIndex: dtypes.NewInt(0),
-							YieldIndex:   big.NewRat(0, 1).String(),
+							YieldsIndex:  big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 			},
 			expectedOperationsQueue: []types.OperationRaw{
@@ -2375,8 +2375,8 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 			},
 			expectedSubaccounts: []satypes.Subaccount{
 				{
-					Id:              &constants.Carl_Num0,
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					Id:               &constants.Carl_Num0,
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Dave_Num0,
@@ -2386,7 +2386,7 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 							Quantums: dtypes.NewInt(50_000_000_000 + 50_499_500_000),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 			},
 			expectedOperationsQueue: []types.OperationRaw{
@@ -2467,10 +2467,10 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 							PerpetualId:  0,
 							Quantums:     dtypes.NewInt(-75_000_000), // -0.75 BTC
 							FundingIndex: dtypes.NewInt(0),
-							YieldIndex:   big.NewRat(0, 1).String(),
+							YieldsIndex:  big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Dave_Num0,
@@ -2485,10 +2485,10 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 							PerpetualId:  0,
 							Quantums:     dtypes.NewInt(75_000_000), // 0.75 BTC
 							FundingIndex: dtypes.NewInt(0),
-							YieldIndex:   big.NewRat(0, 1).String(),
+							YieldsIndex:  big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 			},
 			expectedOperationsQueue: []types.OperationRaw{
@@ -2531,7 +2531,7 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 			bankKeeper.On(
 				"GetBalance",
 				mock.Anything,
-				authtypes.NewModuleAddress(yieldtypes.TDaiPoolAccount),
+				authtypes.NewModuleAddress(yieldstypes.TDaiPoolAccount),
 				constants.TDai.Denom,
 			).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 			bankKeeper.On(
@@ -2544,7 +2544,7 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 			mockIndexerEventManager := &mocks.IndexerEventManager{}
 			mockIndexerEventManager.On("Enabled").Return(false)
 			ks := keepertest.NewClobKeepersTestContext(t, memclob, bankKeeper, mockIndexerEventManager, nil)
-			ks.YieldKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+			ks.YieldsKeeper.SetAssetYieldsIndex(ks.Ctx, big.NewRat(1, 1))
 
 			ctx := ks.Ctx.WithIsCheckTx(true)
 
@@ -2569,7 +2569,7 @@ func TestPlacePerpetualLiquidation_Deleveraging(t *testing.T) {
 					perpetual.Params.LiquidityTier,
 					perpetual.Params.DangerIndexPpm,
 					perpetual.Params.CollateralPoolId,
-					perpetual.YieldIndex,
+					perpetual.YieldsIndex,
 				)
 				require.NoError(t, err)
 			}
@@ -2730,13 +2730,13 @@ func TestPlacePerpetualLiquidation_SendOffchainMessages(t *testing.T) {
 	bankMock.On(
 		"GetBalance",
 		mock.Anything,
-		authtypes.NewModuleAddress(yieldtypes.TDaiPoolAccount),
+		authtypes.NewModuleAddress(yieldstypes.TDaiPoolAccount),
 		constants.TDai.Denom,
 	).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 
 	ks := keepertest.NewClobKeepersTestContext(t, memClob, bankMock, indexerEventManager, nil)
 	perpetuals.InitGenesis(ks.Ctx, *ks.PerpetualsKeeper, constants.Perpetuals_DefaultGenesisState)
-	ks.YieldKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+	ks.YieldsKeeper.SetAssetYieldsIndex(ks.Ctx, big.NewRat(1, 1))
 
 	ctx := ks.Ctx.WithTxBytes(constants.TestTxBytes)
 	// CheckTx mode set correctly
@@ -2826,7 +2826,7 @@ func TestIsLiquidatable(t *testing.T) {
 				{
 					PerpetualId: uint32(0),
 					Quantums:    dtypes.NewInt(10_000_000), // 0.1 BTC, $5,000 notional.
-					YieldIndex:  big.NewRat(0, 1).String(),
+					YieldsIndex: big.NewRat(0, 1).String(),
 				},
 			},
 			assetPositions: keepertest.CreateTDaiAssetPosition(
@@ -2843,7 +2843,7 @@ func TestIsLiquidatable(t *testing.T) {
 				{
 					PerpetualId: uint32(0),
 					Quantums:    dtypes.NewInt(10_000_000), // 0.1 BTC, $5,000 notional.
-					YieldIndex:  big.NewRat(0, 1).String(),
+					YieldsIndex: big.NewRat(0, 1).String(),
 				},
 			},
 			assetPositions: keepertest.CreateTDaiAssetPosition(
@@ -2860,7 +2860,7 @@ func TestIsLiquidatable(t *testing.T) {
 				{
 					PerpetualId: uint32(0),
 					Quantums:    dtypes.NewInt(10_000_000), // 0.1 BTC, $5,000 notional.
-					YieldIndex:  big.NewRat(0, 1).String(),
+					YieldsIndex: big.NewRat(0, 1).String(),
 				},
 			},
 			assetPositions: keepertest.CreateTDaiAssetPosition(
@@ -2876,12 +2876,12 @@ func TestIsLiquidatable(t *testing.T) {
 			memClob := memclob.NewMemClobPriceTimePriority(false)
 			bankMock := &mocks.BankKeeper{}
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, bankMock, &mocks.IndexerEventManager{}, nil)
-			ks.YieldKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+			ks.YieldsKeeper.SetAssetYieldsIndex(ks.Ctx, big.NewRat(1, 1))
 
 			bankMock.On(
 				"GetBalance",
 				mock.Anything,
-				authtypes.NewModuleAddress(yieldtypes.TDaiPoolAccount),
+				authtypes.NewModuleAddress(yieldstypes.TDaiPoolAccount),
 				constants.TDai.Denom,
 			).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 
@@ -2901,7 +2901,7 @@ func TestIsLiquidatable(t *testing.T) {
 					p.Params.LiquidityTier,
 					p.Params.DangerIndexPpm,
 					p.Params.CollateralPoolId,
-					p.YieldIndex,
+					p.YieldsIndex,
 				)
 				require.NoError(t, err)
 			}
@@ -3303,12 +3303,12 @@ func TestGetBankruptcyPriceInQuoteQuantums(t *testing.T) {
 			memClob := memclob.NewMemClobPriceTimePriority(false)
 			bankMock := &mocks.BankKeeper{}
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, bankMock, &mocks.IndexerEventManager{}, nil)
-			ks.YieldKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+			ks.YieldsKeeper.SetAssetYieldsIndex(ks.Ctx, big.NewRat(1, 1))
 
 			bankMock.On(
 				"GetBalance",
 				mock.Anything,
-				authtypes.NewModuleAddress(yieldtypes.TDaiPoolAccount),
+				authtypes.NewModuleAddress(yieldstypes.TDaiPoolAccount),
 				constants.TDai.Denom,
 			).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 
@@ -3328,7 +3328,7 @@ func TestGetBankruptcyPriceInQuoteQuantums(t *testing.T) {
 					p.Params.LiquidityTier,
 					p.Params.DangerIndexPpm,
 					p.Params.CollateralPoolId,
-					p.YieldIndex,
+					p.YieldsIndex,
 				)
 				require.NoError(t, err)
 			}
@@ -3780,12 +3780,12 @@ func TestGetLiquidationInsuranceFundFeeAndRemainingAvailableCollateral(t *testin
 			mockIndexerEventManager := &mocks.IndexerEventManager{}
 			bankMock := &mocks.BankKeeper{}
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, bankMock, mockIndexerEventManager, nil)
-			ks.YieldKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+			ks.YieldsKeeper.SetAssetYieldsIndex(ks.Ctx, big.NewRat(1, 1))
 
 			bankMock.On(
 				"GetBalance",
 				mock.Anything,
-				authtypes.NewModuleAddress(yieldtypes.TDaiPoolAccount),
+				authtypes.NewModuleAddress(yieldstypes.TDaiPoolAccount),
 				constants.TDai.Denom,
 			).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 
@@ -3805,7 +3805,7 @@ func TestGetLiquidationInsuranceFundFeeAndRemainingAvailableCollateral(t *testin
 					p.Params.LiquidityTier,
 					p.Params.DangerIndexPpm,
 					p.Params.CollateralPoolId,
-					p.YieldIndex,
+					p.YieldsIndex,
 				)
 				require.NoError(t, err)
 			}
@@ -4313,7 +4313,7 @@ func TestGetBestPerpetualPositionToLiquidate(t *testing.T) {
 			mockIndexerEventManager := &mocks.IndexerEventManager{}
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, &mocks.BankKeeper{}, mockIndexerEventManager, nil)
 
-			ks.YieldKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+			ks.YieldsKeeper.SetAssetYieldsIndex(ks.Ctx, big.NewRat(1, 1))
 
 			// Create liquidity tiers.
 			keepertest.CreateTestLiquidityTiers(t, ks.Ctx, ks.PerpetualsKeeper)
@@ -4331,7 +4331,7 @@ func TestGetBestPerpetualPositionToLiquidate(t *testing.T) {
 					p.Params.LiquidityTier,
 					p.Params.DangerIndexPpm,
 					p.Params.CollateralPoolId,
-					p.YieldIndex,
+					p.YieldsIndex,
 				)
 				require.NoError(t, err)
 			}
@@ -4531,7 +4531,7 @@ func TestMaybeGetLiquidationOrder(t *testing.T) {
 			mockBankKeeper.On(
 				"GetBalance",
 				mock.Anything,
-				authtypes.NewModuleAddress(yieldtypes.TDaiPoolAccount),
+				authtypes.NewModuleAddress(yieldstypes.TDaiPoolAccount),
 				constants.TDai.Denom,
 			).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 			mockBankKeeper.On(
@@ -4554,7 +4554,7 @@ func TestMaybeGetLiquidationOrder(t *testing.T) {
 				),
 			)
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, mockBankKeeper, indexer_manager.NewIndexerEventManagerNoop(), nil)
-			ks.YieldKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+			ks.YieldsKeeper.SetAssetYieldsIndex(ks.Ctx, big.NewRat(1, 1))
 			ctx := ks.Ctx.WithIsCheckTx(true)
 
 			// Create liquidity tiers.
@@ -4575,7 +4575,7 @@ func TestMaybeGetLiquidationOrder(t *testing.T) {
 					p.Params.LiquidityTier,
 					p.Params.DangerIndexPpm,
 					p.Params.CollateralPoolId,
-					p.YieldIndex,
+					p.YieldsIndex,
 				)
 				require.NoError(t, err)
 			}
@@ -4726,7 +4726,7 @@ func TestGetNextSubaccountToLiquidate(t *testing.T) {
 			// Setup keeper state.
 			memClob := memclob.NewMemClobPriceTimePriority(false)
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, &mocks.BankKeeper{}, &mocks.IndexerEventManager{}, nil)
-			ks.YieldKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+			ks.YieldsKeeper.SetAssetYieldsIndex(ks.Ctx, big.NewRat(1, 1))
 
 			subaccountIds := heap.NewLiquidationPriorityHeap()
 			for _, priority := range tc.subaccountIds {
@@ -5601,7 +5601,7 @@ func TestLiquidateSubaccountsAgainstOrderbookInternal(t *testing.T) {
 			)
 
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, mockBankKeeper, indexer_manager.NewIndexerEventManagerNoop(), nil)
-			ks.YieldKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+			ks.YieldsKeeper.SetAssetYieldsIndex(ks.Ctx, big.NewRat(1, 1))
 
 			ctx := ks.Ctx.WithIsCheckTx(true)
 
@@ -5623,7 +5623,7 @@ func TestLiquidateSubaccountsAgainstOrderbookInternal(t *testing.T) {
 					p.Params.LiquidityTier,
 					p.Params.DangerIndexPpm,
 					p.Params.CollateralPoolId,
-					p.YieldIndex,
+					p.YieldsIndex,
 				)
 				require.NoError(t, err)
 			}
@@ -5738,15 +5738,15 @@ func TestGetBestPerpetualPositionToLiquidateMultiplePositions(t *testing.T) {
 					{
 						PerpetualId: 0,
 						Quantums:    dtypes.NewInt(1), // tiny BTC
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 					{
 						PerpetualId: 1,
 						Quantums:    dtypes.NewInt(100_000_000), // 0.1 ETH
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 				},
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 
 			expectedPerpetualId: 1,
@@ -5769,15 +5769,15 @@ func TestGetBestPerpetualPositionToLiquidateMultiplePositions(t *testing.T) {
 					{
 						PerpetualId: 0,
 						Quantums:    dtypes.NewInt(1), // tiny BTC
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 					{
 						PerpetualId: 1,
 						Quantums:    dtypes.NewInt(1_000_000_000), // 1 ETH
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 				},
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 
 			expectedPerpetualId: 1,
@@ -5800,20 +5800,20 @@ func TestGetBestPerpetualPositionToLiquidateMultiplePositions(t *testing.T) {
 					{
 						PerpetualId: 0,
 						Quantums:    dtypes.NewInt(1), // tiny BTC
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 					{
 						PerpetualId: 1,
 						Quantums:    dtypes.NewInt(1_000_000_000), // 1 ETH
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 					{
 						PerpetualId: 2,
 						Quantums:    dtypes.NewInt(10), // tiny SOL
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 				},
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 
 			expectedPerpetualId: 1,
@@ -5836,20 +5836,20 @@ func TestGetBestPerpetualPositionToLiquidateMultiplePositions(t *testing.T) {
 					{
 						PerpetualId: 0,
 						Quantums:    dtypes.NewInt(1), // tiny BTC
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 					{
 						PerpetualId: 2,
 						Quantums:    dtypes.NewInt(10), // tiny SOL
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 					{
 						PerpetualId: 1,
 						Quantums:    dtypes.NewInt(1_000_000_000), // 1 ETH
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 				},
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 
 			expectedPerpetualId: 1,
@@ -5872,20 +5872,20 @@ func TestGetBestPerpetualPositionToLiquidateMultiplePositions(t *testing.T) {
 					{
 						PerpetualId: 1,
 						Quantums:    dtypes.NewInt(1_000_000_000), // 1 ETH
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 					{
 						PerpetualId: 0,
 						Quantums:    dtypes.NewInt(1), // tiny BTC
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 					{
 						PerpetualId: 2,
 						Quantums:    dtypes.NewInt(10), // tiny SOL
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 				},
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 
 			expectedPerpetualId: 1,
@@ -5908,20 +5908,20 @@ func TestGetBestPerpetualPositionToLiquidateMultiplePositions(t *testing.T) {
 					{
 						PerpetualId: 1,
 						Quantums:    dtypes.NewInt(1_000_000_000), // 1 ETH
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 					{
 						PerpetualId: 2,
 						Quantums:    dtypes.NewInt(10), // tiny SOL
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 					{
 						PerpetualId: 0,
 						Quantums:    dtypes.NewInt(1), // tiny BTC
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 				},
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 
 			expectedPerpetualId: 1,
@@ -5944,20 +5944,20 @@ func TestGetBestPerpetualPositionToLiquidateMultiplePositions(t *testing.T) {
 					{
 						PerpetualId: 2,
 						Quantums:    dtypes.NewInt(10), // tiny SOL
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 					{
 						PerpetualId: 0,
 						Quantums:    dtypes.NewInt(1), // tiny BTC
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 					{
 						PerpetualId: 1,
 						Quantums:    dtypes.NewInt(1_000_000_000), // 1 ETH
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 				},
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 
 			expectedPerpetualId: 1,
@@ -5980,20 +5980,20 @@ func TestGetBestPerpetualPositionToLiquidateMultiplePositions(t *testing.T) {
 					{
 						PerpetualId: 2,
 						Quantums:    dtypes.NewInt(10), // tiny SOL
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 					{
 						PerpetualId: 1,
 						Quantums:    dtypes.NewInt(1_000_000_000), // 1 ETH
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 					{
 						PerpetualId: 0,
 						Quantums:    dtypes.NewInt(1), // tiny BTC
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 				},
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 
 			expectedPerpetualId: 1,
@@ -6084,20 +6084,20 @@ func TestGetBestPerpetualPositionToLiquidateMultiplePositions(t *testing.T) {
 					{
 						PerpetualId: constants.IsoBtc_20PercentInitial_10PercentMaintenance_CollatPool1_Id5_DangerIndex1.Params.Id,
 						Quantums:    dtypes.NewInt(1),
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 					{
 						PerpetualId: constants.Iso2Btc_20PercentInitial_10PercentMaintenance_CollatPool1_Id7_DangerIndex1.Params.Id,
 						Quantums:    dtypes.NewInt(1_000_000_000),
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 					{
 						PerpetualId: constants.BtcBtc_10_20MarginRequirement_CollatPool1_Id10_DangerIndex1.Params.Id,
 						Quantums:    dtypes.NewInt(1),
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 				},
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 
 			expectedPerpetualId: 7,
@@ -6120,20 +6120,20 @@ func TestGetBestPerpetualPositionToLiquidateMultiplePositions(t *testing.T) {
 					{
 						PerpetualId: constants.IsoBtc_20PercentInitial_10PercentMaintenance_CollatPool1_Id5_DangerIndex1.Params.Id,
 						Quantums:    dtypes.NewInt(1),
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 					{
 						PerpetualId: constants.BtcBtc_10_20MarginRequirement_CollatPool1_Id10_DangerIndex1.Params.Id,
 						Quantums:    dtypes.NewInt(1),
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 					{
 						PerpetualId: constants.Iso2Btc_20PercentInitial_10PercentMaintenance_CollatPool1_Id7_DangerIndex1.Params.Id,
 						Quantums:    dtypes.NewInt(1_000_000_000),
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 				},
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 
 			expectedPerpetualId: 7,
@@ -6156,20 +6156,20 @@ func TestGetBestPerpetualPositionToLiquidateMultiplePositions(t *testing.T) {
 					{
 						PerpetualId: constants.Iso2Btc_20PercentInitial_10PercentMaintenance_CollatPool1_Id7_DangerIndex1.Params.Id,
 						Quantums:    dtypes.NewInt(1_000_000_000),
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 					{
 						PerpetualId: constants.IsoBtc_20PercentInitial_10PercentMaintenance_CollatPool1_Id5_DangerIndex1.Params.Id,
 						Quantums:    dtypes.NewInt(1),
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 					{
 						PerpetualId: constants.BtcBtc_10_20MarginRequirement_CollatPool1_Id10_DangerIndex1.Params.Id,
 						Quantums:    dtypes.NewInt(1),
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 				},
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 
 			expectedPerpetualId: 7,
@@ -6192,20 +6192,20 @@ func TestGetBestPerpetualPositionToLiquidateMultiplePositions(t *testing.T) {
 					{
 						PerpetualId: constants.Iso2Btc_20PercentInitial_10PercentMaintenance_CollatPool1_Id7_DangerIndex1.Params.Id,
 						Quantums:    dtypes.NewInt(1_000_000_000),
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 					{
 						PerpetualId: constants.BtcBtc_10_20MarginRequirement_CollatPool1_Id10_DangerIndex1.Params.Id,
 						Quantums:    dtypes.NewInt(1),
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 					{
 						PerpetualId: constants.IsoBtc_20PercentInitial_10PercentMaintenance_CollatPool1_Id5_DangerIndex1.Params.Id,
 						Quantums:    dtypes.NewInt(1),
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 				},
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 
 			expectedPerpetualId: 7,
@@ -6228,20 +6228,20 @@ func TestGetBestPerpetualPositionToLiquidateMultiplePositions(t *testing.T) {
 					{
 						PerpetualId: constants.BtcBtc_10_20MarginRequirement_CollatPool1_Id10_DangerIndex1.Params.Id,
 						Quantums:    dtypes.NewInt(1),
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 					{
 						PerpetualId: constants.IsoBtc_20PercentInitial_10PercentMaintenance_CollatPool1_Id5_DangerIndex1.Params.Id,
 						Quantums:    dtypes.NewInt(1),
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 					{
 						PerpetualId: constants.Iso2Btc_20PercentInitial_10PercentMaintenance_CollatPool1_Id7_DangerIndex1.Params.Id,
 						Quantums:    dtypes.NewInt(1_000_000_000),
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 				},
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 
 			expectedPerpetualId: 7,
@@ -6264,20 +6264,20 @@ func TestGetBestPerpetualPositionToLiquidateMultiplePositions(t *testing.T) {
 					{
 						PerpetualId: constants.BtcBtc_10_20MarginRequirement_CollatPool1_Id10_DangerIndex1.Params.Id,
 						Quantums:    dtypes.NewInt(1),
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 					{
 						PerpetualId: constants.Iso2Btc_20PercentInitial_10PercentMaintenance_CollatPool1_Id7_DangerIndex1.Params.Id,
 						Quantums:    dtypes.NewInt(1_000_000_000),
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 					{
 						PerpetualId: constants.IsoBtc_20PercentInitial_10PercentMaintenance_CollatPool1_Id5_DangerIndex1.Params.Id,
 						Quantums:    dtypes.NewInt(1),
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 				},
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 
 			expectedPerpetualId: 7,
@@ -6298,7 +6298,7 @@ func TestGetBestPerpetualPositionToLiquidateMultiplePositions(t *testing.T) {
 			)
 
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, mockBankKeeper, indexer_manager.NewIndexerEventManagerNoop(), nil)
-			ks.YieldKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+			ks.YieldsKeeper.SetAssetYieldsIndex(ks.Ctx, big.NewRat(1, 1))
 
 			ctx := ks.Ctx.WithIsCheckTx(true)
 
@@ -6318,7 +6318,7 @@ func TestGetBestPerpetualPositionToLiquidateMultiplePositions(t *testing.T) {
 					p.Params.LiquidityTier,
 					p.Params.DangerIndexPpm,
 					p.Params.CollateralPoolId,
-					p.YieldIndex,
+					p.YieldsIndex,
 				)
 				require.NoError(t, err)
 			}
@@ -6420,7 +6420,7 @@ func TestEnsurePerpetualNotAlreadyLiquidated(t *testing.T) {
 					p.Params.LiquidityTier,
 					p.Params.DangerIndexPpm,
 					p.Params.CollateralPoolId,
-					p.YieldIndex,
+					p.YieldsIndex,
 				)
 				require.NoError(t, err)
 			}
@@ -6635,7 +6635,7 @@ func TestCheckInsuranceFundLimits(t *testing.T) {
 					p.Params.LiquidityTier,
 					p.Params.DangerIndexPpm,
 					p.Params.CollateralPoolId,
-					p.YieldIndex,
+					p.YieldsIndex,
 				)
 				require.NoError(t, err)
 			}
@@ -6702,7 +6702,7 @@ func TestIsMainCollateralPoolError_InLiquidateSubaccountsAgainstOrderbookInterna
 			memClob := memclob.NewMemClobPriceTimePriority(false)
 			mockBankKeeper := &mocks.BankKeeper{}
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, mockBankKeeper, indexer_manager.NewIndexerEventManagerNoop(), nil)
-			ks.YieldKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+			ks.YieldsKeeper.SetAssetYieldsIndex(ks.Ctx, big.NewRat(1, 1))
 
 			ctx := ks.Ctx.WithIsCheckTx(true)
 

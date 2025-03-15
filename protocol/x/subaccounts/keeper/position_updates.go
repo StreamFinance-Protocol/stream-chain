@@ -10,11 +10,11 @@ import (
 func UpdateSubaccountPositions(
 	settledUpdates []SettledUpdate,
 	perpIdToFundingIndex map[uint32]dtypes.SerializableInt,
-	perpIdToYieldIndex map[uint32]string,
+	perpIdToYieldsIndex map[uint32]string,
 ) {
 	for i := range settledUpdates {
 		update := &settledUpdates[i]
-		updatePerpetualPositions(update, perpIdToFundingIndex, perpIdToYieldIndex)
+		updatePerpetualPositions(update, perpIdToFundingIndex, perpIdToYieldsIndex)
 		updateAssetPositions(update)
 	}
 }
@@ -22,13 +22,13 @@ func UpdateSubaccountPositions(
 func updatePerpetualPositions(
 	update *SettledUpdate,
 	perpIdToFundingIndex map[uint32]dtypes.SerializableInt,
-	perpIdToYieldIndex map[uint32]string,
+	perpIdToYieldsIndex map[uint32]string,
 ) {
 	for _, perpUpdate := range update.PerpetualUpdates {
 		if idx := findPosition(update.SettledSubaccount.PerpetualPositions, perpUpdate.PerpetualId); idx >= 0 {
 			updateExistingPerpPosition(update, idx, perpUpdate)
 		} else if perpUpdate.BigQuantumsDelta.Sign() != 0 {
-			createNewPerpPosition(update, perpUpdate, perpIdToFundingIndex, perpIdToYieldIndex)
+			createNewPerpPosition(update, perpUpdate, perpIdToFundingIndex, perpIdToYieldsIndex)
 		}
 	}
 }
@@ -74,15 +74,15 @@ func createNewPerpPosition(
 	update *SettledUpdate,
 	perpUpdate types.PerpetualUpdate,
 	perpIdToFundingIndex map[uint32]dtypes.SerializableInt,
-	perpIdToYieldIndex map[uint32]string,
+	perpIdToYieldsIndex map[uint32]string,
 ) {
 	fundingIndex, exists := perpIdToFundingIndex[perpUpdate.PerpetualId]
 	if !exists {
 		panic(fmt.Sprintf("perpetual id %d not found in perpIdToFundingIndex", perpUpdate.PerpetualId))
 	}
-	yieldIndex, exists := perpIdToYieldIndex[perpUpdate.PerpetualId]
+	yieldsIndex, exists := perpIdToYieldsIndex[perpUpdate.PerpetualId]
 	if !exists {
-		panic(fmt.Sprintf("perpetual id %d not found in perpIdToYieldIndex", perpUpdate.PerpetualId))
+		panic(fmt.Sprintf("perpetual id %d not found in perpIdToYieldsIndex", perpUpdate.PerpetualId))
 	}
 
 	update.SettledSubaccount.PerpetualPositions = append(
@@ -91,7 +91,7 @@ func createNewPerpPosition(
 			PerpetualId:  perpUpdate.PerpetualId,
 			Quantums:     dtypes.NewIntFromBigInt(perpUpdate.BigQuantumsDelta),
 			FundingIndex: fundingIndex,
-			YieldIndex:   yieldIndex,
+			YieldsIndex:  yieldsIndex,
 		},
 	)
 }

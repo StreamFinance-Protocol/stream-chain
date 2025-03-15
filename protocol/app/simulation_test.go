@@ -25,7 +25,7 @@ import (
 	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
 	sendingtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
-	yieldmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types"
+	yieldsmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/types"
 	tmjson "github.com/cometbft/cometbft/libs/json"
 	tmtypes "github.com/cometbft/cometbft/types"
 	dbm "github.com/cosmos/cosmos-db"
@@ -106,7 +106,7 @@ var genesisModuleOrder = []string{
 	slashingtypes.ModuleName,
 	paramstypes.ModuleName,
 	evidencetypes.ModuleName,
-	yieldmodule.ModuleName,
+	yieldsmodule.ModuleName,
 	pricestypes.ModuleName,
 	assetstypes.ModuleName,
 	perpetualstypes.ModuleName,

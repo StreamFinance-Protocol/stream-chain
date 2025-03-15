@@ -23,7 +23,7 @@ func TestNewUpdatePerpetualEventV1_Success(t *testing.T) {
 		AtomicResolution: -8,
 		LiquidityTier:    2,
 		DangerIndexPpm:   1000000,
-		PerpYieldIndex:   "0/1",
+		PerpYieldsIndex:  "0/1",
 	}
 	require.Equal(t, expectedUpdatePerpetualEventV1Proto, updatePerpetualEventV1)
 }

@@ -12,7 +12,7 @@ import (
 	sdaiserver "github.com/StreamFinance-Protocol/stream-chain/protocol/daemons/server/types/sdaioracle"
 	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
-	yieldtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types"
+	yieldstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/types"
 	abci "github.com/cometbft/cometbft/abci/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -32,7 +32,7 @@ type VoteExtensionHandler struct {
 	// fetching mid price for price calc
 	clobKeeper ExtendVoteClobKeeper
 
-	yieldKeeper VoteExtensionYieldKeeper
+	yieldsKeeper VoteExtensionYieldsKeeper
 
 	sDAIEventManager sdaiserver.SDAIEventManager
 
@@ -57,7 +57,7 @@ func NewVoteExtensionHandler(
 	pricesKeeper PreBlockExecPricesKeeper,
 	perpetualsKeeper ExtendVotePerpetualsKeeper,
 	clobKeeper ExtendVoteClobKeeper,
-	yieldKeeper VoteExtensionYieldKeeper,
+	yieldsKeeper VoteExtensionYieldsKeeper,
 	sDAIEventManager sdaiserver.SDAIEventManager,
 	veApplier VEApplierInterface,
 ) *VoteExtensionHandler {
@@ -67,7 +67,7 @@ func NewVoteExtensionHandler(
 		pricesKeeper:     pricesKeeper,
 		perpetualsKeeper: perpetualsKeeper,
 		clobKeeper:       clobKeeper,
-		yieldKeeper:      yieldKeeper,
+		yieldsKeeper:     yieldsKeeper,
 		sDAIEventManager: sDAIEventManager,
 		veApplier:        veApplier,
 	}
@@ -169,7 +169,7 @@ func (h *VoteExtensionHandler) ValidateVE(
 		return rejectResponse, err
 	}
 
-	if err := ValidateVeSDaiConversionRate(ctx, h.yieldKeeper, veBytes, h.voteCodec); err != nil {
+	if err := ValidateVeSDaiConversionRate(ctx, h.yieldsKeeper, veBytes, h.voteCodec); err != nil {
 		h.logger.Error(
 			"failed to validate sDAI conversion rate in vote extension",
 			"height", blockHeight,
@@ -196,9 +196,9 @@ func (h *VoteExtensionHandler) GetVEBytes(ctx sdk.Context) ([]byte, error) {
 }
 
 func (h *VoteExtensionHandler) getSDAIPriceUpdate(ctx sdk.Context) string {
-	lastBlockUpdated, found := h.yieldKeeper.GetSDAILastBlockUpdated(ctx)
+	lastBlockUpdated, found := h.yieldsKeeper.GetSDAILastBlockUpdated(ctx)
 	if found {
-		if ctx.BlockHeight()-lastBlockUpdated.Int64() < yieldtypes.SDAI_UPDATE_BLOCK_DELAY {
+		if ctx.BlockHeight()-lastBlockUpdated.Int64() < yieldstypes.SDAI_UPDATE_BLOCK_DELAY {
 			return ""
 		}
 	}

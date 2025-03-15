@@ -19,7 +19,7 @@ import (
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
-	yieldtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types"
+	yieldstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
@@ -841,7 +841,7 @@ func TestRecordMevMetrics(t *testing.T) {
 			mockBankKeeper.On(
 				"GetBalance",
 				mock.Anything,
-				authtypes.NewModuleAddress(yieldtypes.TDaiPoolAccount),
+				authtypes.NewModuleAddress(yieldstypes.TDaiPoolAccount),
 				constants.TDai.Denom,
 			).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 			mockBankKeeper.On(
@@ -861,7 +861,7 @@ func TestRecordMevMetrics(t *testing.T) {
 			)
 
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, mockBankKeeper, indexer_manager.NewIndexerEventManagerNoop(), nil)
-			ks.YieldKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+			ks.YieldsKeeper.SetAssetYieldsIndex(ks.Ctx, big.NewRat(1, 1))
 			ctx := ks.Ctx.WithIsCheckTx(true)
 
 			// Create the default markets.
@@ -894,7 +894,7 @@ func TestRecordMevMetrics(t *testing.T) {
 					p.Params.LiquidityTier,
 					p.Params.DangerIndexPpm,
 					p.Params.CollateralPoolId,
-					p.YieldIndex,
+					p.YieldsIndex,
 				)
 				require.NoError(t, err)
 			}
@@ -1249,7 +1249,7 @@ func TestGetMidPrices(t *testing.T) {
 			mockBankKeeper.On(
 				"GetBalance",
 				mock.Anything,
-				authtypes.NewModuleAddress(yieldtypes.TDaiPoolAccount),
+				authtypes.NewModuleAddress(yieldstypes.TDaiPoolAccount),
 				constants.TDai.Denom,
 			).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 			mockBankKeeper.On(
@@ -1261,7 +1261,7 @@ func TestGetMidPrices(t *testing.T) {
 			).Return(nil)
 
 			ks := keepertest.NewClobKeepersTestContext(t, memclob, mockBankKeeper, indexer_manager.NewIndexerEventManagerNoop(), nil)
-			ks.YieldKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+			ks.YieldsKeeper.SetAssetYieldsIndex(ks.Ctx, big.NewRat(1, 1))
 			ctx := ks.Ctx.WithIsCheckTx(true)
 
 			// Create liquidity tiers.
@@ -1282,7 +1282,7 @@ func TestGetMidPrices(t *testing.T) {
 					p.Params.LiquidityTier,
 					p.Params.DangerIndexPpm,
 					p.Params.CollateralPoolId,
-					p.YieldIndex,
+					p.YieldsIndex,
 				)
 				require.NoError(t, err)
 			}

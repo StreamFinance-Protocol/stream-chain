@@ -48,7 +48,7 @@ import (
 	sendingtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending/types"
 	stattypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/stats/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
-	yieldtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types"
+	yieldstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/types"
 	abcitypes "github.com/cometbft/cometbft/abci/types"
 	tmjson "github.com/cometbft/cometbft/libs/json"
 	"github.com/cometbft/cometbft/mempool"
@@ -204,7 +204,7 @@ type GenesisStates interface {
 		sendingtypes.GenesisState |
 		delaymsgtypes.GenesisState |
 		bridgetypes.GenesisState |
-		yieldtypes.GenesisState
+		yieldstypes.GenesisState
 }
 
 // UpdateGenesisDocWithAppStateForModule updates the supplied genesis doc using the provided function. The function
@@ -248,8 +248,8 @@ func UpdateGenesisDocWithAppStateForModule[T GenesisStates](genesisDoc *types.Ge
 		moduleName = epochstypes.ModuleName
 	case sendingtypes.GenesisState:
 		moduleName = sendingtypes.ModuleName
-	case yieldtypes.GenesisState:
-		moduleName = yieldtypes.ModuleName
+	case yieldstypes.GenesisState:
+		moduleName = yieldstypes.ModuleName
 	default:
 		panic(fmt.Errorf("Unsupported type %T", t))
 	}

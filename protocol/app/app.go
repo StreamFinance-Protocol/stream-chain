@@ -180,9 +180,9 @@ import (
 	subaccountsmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts"
 	subaccountsmodulekeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/keeper"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
-	yieldmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield"
-	yieldkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/keeper"
-	yieldtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types"
+	yieldsmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields"
+	yieldskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/keeper"
+	yieldstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/types"
 
 	// Indexer
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/indexer"
@@ -249,7 +249,7 @@ type App struct {
 	UpgradeKeeper         *upgradekeeper.Keeper
 	ParamsKeeper          paramskeeper.Keeper
 	EvidenceKeeper        evidencekeeper.Keeper
-	YieldKeeper           yieldkeeper.Keeper
+	YieldsKeeper          yieldskeeper.Keeper
 	FeeGrantKeeper        feegrantkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
 	GovPlusKeeper         govplusmodulekeeper.Keeper
@@ -363,7 +363,7 @@ func New(
 		consensusparamtypes.StoreKey,
 		upgradetypes.StoreKey,
 		feegrant.StoreKey,
-		yieldtypes.StoreKey,
+		yieldstypes.StoreKey,
 		evidencetypes.StoreKey,
 		pricesmoduletypes.StoreKey,
 		assetsmoduletypes.StoreKey,
@@ -568,7 +568,7 @@ func New(
 	logger.Info("Parsed Daemon flags", "Flags", daemonFlags)
 
 	// Setup server for sDAI oracle prices.
-	// The in-memory data structure is shared by the x/yield module and sdaioracle daemon.
+	// The in-memory data structure is shared by the x/yields module and sdaioracle daemon.
 	sDAIEventManager := createSDAIEventManager(appFlags, daemonFlags)
 
 	msgSender, indexerFlags := getIndexerFromOptions(appOpts, logger)
@@ -578,15 +578,15 @@ func New(
 		indexerFlags.SendOffchainData,
 	)
 
-	app.YieldKeeper = *yieldkeeper.NewKeeper(
+	app.YieldsKeeper = *yieldskeeper.NewKeeper(
 		appCodec,
-		keys[yieldtypes.StoreKey],
+		keys[yieldstypes.StoreKey],
 		sDAIEventManager,
 		app.IndexerEventManager,
 		app.BankKeeper,
 		&app.PerpetualsKeeper,
 	)
-	rateLimitModule := yieldmodule.NewAppModule(appCodec, app.YieldKeeper)
+	rateLimitModule := yieldsmodule.NewAppModule(appCodec, app.YieldsKeeper)
 
 	// create evidence keeper with router
 	evidenceKeeper := evidencekeeper.NewKeeper(
@@ -804,7 +804,7 @@ func New(
 		keys[bridgemoduletypes.StoreKey],
 		tkeys[bridgemoduletypes.TransientStoreKey],
 		bridgeEventManager,
-		app.YieldKeeper,
+		app.YieldsKeeper,
 		app.BankKeeper,
 		app.DelayMsgKeeper,
 		// gov module and delayMsg module accounts are allowed to send messages to the bridge module.
@@ -862,7 +862,7 @@ func New(
 		app.AssetsKeeper,
 		app.BankKeeper,
 		app.PerpetualsKeeper,
-		app.YieldKeeper,
+		app.YieldsKeeper,
 		app.BlockTimeKeeper,
 		app.IndexerEventManager,
 	)
@@ -892,7 +892,7 @@ func New(
 	aggregator := veaggregator.NewVeAggregator(
 		logger,
 		app.PricesKeeper,
-		app.YieldKeeper,
+		app.YieldsKeeper,
 		pricesAggregatorFn,
 		conversionRateAggregatorFn,
 	)
@@ -905,7 +905,7 @@ func New(
 		logger,
 		aggregator,
 		app.PricesKeeper,
-		app.YieldKeeper,
+		app.YieldsKeeper,
 		app.voteCodec,
 		app.extCodec,
 		&spotPriceUpdateCache,
@@ -994,7 +994,7 @@ func New(
 	)
 
 	if !appFlags.NonValidatingFullNode {
-		app.InitVoteExtensions(logger, app.voteCodec, app.PricesKeeper, &app.PerpetualsKeeper, &app.ClobKeeper, &app.YieldKeeper, sDAIEventManager, veApplier)
+		app.InitVoteExtensions(logger, app.voteCodec, app.PricesKeeper, &app.PerpetualsKeeper, &app.ClobKeeper, &app.YieldsKeeper, sDAIEventManager, veApplier)
 	}
 
 	/****  Module Options ****/
@@ -1077,7 +1077,7 @@ func New(
 		slashingtypes.ModuleName,
 		evidencetypes.ModuleName,
 		stakingtypes.ModuleName,
-		yieldtypes.ModuleName,
+		yieldstypes.ModuleName,
 		authtypes.ModuleName,
 		banktypes.ModuleName,
 		govtypes.ModuleName,
@@ -1116,7 +1116,7 @@ func New(
 		feegrant.ModuleName,
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
-		yieldtypes.ModuleName,
+		yieldstypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		pricesmoduletypes.ModuleName,
 		assetsmoduletypes.ModuleName,
@@ -1149,7 +1149,7 @@ func New(
 		evidencetypes.ModuleName,
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
-		yieldtypes.ModuleName,
+		yieldstypes.ModuleName,
 		feegrant.ModuleName,
 		consensusparamtypes.ModuleName,
 		pricesmoduletypes.ModuleName,
@@ -1182,7 +1182,7 @@ func New(
 		evidencetypes.ModuleName,
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
-		yieldtypes.ModuleName,
+		yieldstypes.ModuleName,
 		feegrant.ModuleName,
 		consensusparamtypes.ModuleName,
 		pricesmoduletypes.ModuleName,
@@ -1252,7 +1252,7 @@ func New(
 				&app.ClobKeeper,
 				app.PerpetualsKeeper,
 				app.PricesKeeper,
-				app.YieldKeeper,
+				app.YieldsKeeper,
 				veCache,
 				app.voteCodec,
 				app.extCodec,
@@ -1284,7 +1284,7 @@ func New(
 				app.StakingKeeper,
 				app.PerpetualsKeeper,
 				app.PricesKeeper,
-				app.YieldKeeper,
+				app.YieldsKeeper,
 				app.extCodec,
 				app.voteCodec,
 				veApplier,
@@ -1353,9 +1353,9 @@ func (app *App) RegisterDaemonWithHealthMonitor(
 
 func createSDAIEventManager(appFlags flags.Flags, daemonFlags daemonflags.DaemonFlags) sdaidaemontypes.SDAIEventManager {
 	if daemonFlags.SDAI.MockEnabled {
-		return sdaidaemontypes.SetupMockFixedYieldEventManager()
-	} else if daemonFlags.SDAI.MockNoYield {
-		return sdaidaemontypes.SetupMockEventManagerNoYield()
+		return sdaidaemontypes.SetupMockFixedYieldsEventManager()
+	} else if daemonFlags.SDAI.MockNoYields {
+		return sdaidaemontypes.SetupMockEventManagerNoYields()
 	} else if !appFlags.NonValidatingFullNode && daemonFlags.SDAI.Enabled {
 		return sdaidaemontypes.NewsDAIEventManager()
 	}
@@ -1401,7 +1401,7 @@ func (app *App) InitVoteExtensions(
 	pricesKeeper pricesmodulekeeper.Keeper,
 	perpetualsKeeper *perpetualsmodulekeeper.Keeper,
 	clobKeeper *clobmodulekeeper.Keeper,
-	yieldKeeper *yieldkeeper.Keeper,
+	yieldsKeeper *yieldskeeper.Keeper,
 	sDAIEventManager sdaidaemontypes.SDAIEventManager,
 	veApplier *veapplier.VEApplier,
 ) {
@@ -1411,7 +1411,7 @@ func (app *App) InitVoteExtensions(
 		pricesKeeper,
 		perpetualsKeeper,
 		clobKeeper,
-		yieldKeeper,
+		yieldsKeeper,
 		sDAIEventManager,
 		veApplier,
 	)

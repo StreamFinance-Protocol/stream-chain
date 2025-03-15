@@ -33,7 +33,7 @@ import (
 	sendingmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending"
 	statsmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/stats"
 	subaccountsmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts"
-	yieldmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield"
+	yieldsmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields"
 
 	// Upgrades
 	"github.com/cosmos/cosmos-sdk/x/staking"
@@ -78,7 +78,7 @@ var (
 		delaymsgmodule.AppModuleBasic{},
 		sendingmodule.AppModuleBasic{},
 		epochsmodule.AppModuleBasic{},
-		yieldmodule.AppModuleBasic{},
+		yieldsmodule.AppModuleBasic{},
 		govplusmodule.AppModuleBasic{},
 	)
 )

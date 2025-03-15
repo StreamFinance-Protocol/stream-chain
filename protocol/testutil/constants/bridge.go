@@ -3,7 +3,7 @@ package constants
 import (
 	sdkmath "cosmossdk.io/math"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
-	yieldtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types"
+	yieldstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ethereum/go-ethereum/common"
 	ethcoretypes "github.com/ethereum/go-ethereum/core/types"
@@ -492,7 +492,7 @@ var (
 
 	BridgeWithdrawalEvent1 = types.BridgeEvent{
 		Id:          1,
-		Coin:        sdk.NewCoin(yieldtypes.SDaiDenom, sdkmath.NewInt(123456789012345)),
+		Coin:        sdk.NewCoin(yieldstypes.SDaiDenom, sdkmath.NewInt(123456789012345)),
 		Address:     "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
 		BlockHeight: 4139349,
 		IsDeposit:   false,
@@ -500,7 +500,7 @@ var (
 
 	BridgeWithdrawalEvent2 = types.BridgeEvent{
 		Id:          2,
-		Coin:        sdk.NewCoin(yieldtypes.SDaiDenom, sdkmath.NewInt(987654321098765)),
+		Coin:        sdk.NewCoin(yieldstypes.SDaiDenom, sdkmath.NewInt(987654321098765)),
 		Address:     "0x9F27d6a5781e88c996AFe56AA357268E04364a1d",
 		BlockHeight: 4139349,
 		IsDeposit:   false,
@@ -508,7 +508,7 @@ var (
 
 	BridgeWithdrawalEvent2_CoinDenomNotSDai = types.BridgeEvent{
 		Id:          2,
-		Coin:        sdk.NewCoin(yieldtypes.TDaiDenom, sdkmath.NewInt(987654321098765)),
+		Coin:        sdk.NewCoin(yieldstypes.TDaiDenom, sdkmath.NewInt(987654321098765)),
 		Address:     "0x9F27d6a5781e88c996AFe56AA357268E04364a1d",
 		BlockHeight: 4139349,
 		IsDeposit:   false,

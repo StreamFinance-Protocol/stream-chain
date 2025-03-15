@@ -6,18 +6,18 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/indexer/indexer_manager"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/mocks"
 	perpskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/keeper"
-	yieldkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/keeper"
+	yieldskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/keeper"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/gogoproto/proto"
 
 	storetypes "cosmossdk.io/store/types"
-	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types"
+	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 )
 
-func createYieldKeeper(
+func createYieldsKeeper(
 	stateStore storetypes.CommitMultiStore,
 	db *dbm.MemDB,
 	cdc *codec.ProtoCodec,
@@ -25,7 +25,7 @@ func createYieldKeeper(
 	perpk *perpskeeper.Keeper,
 	transientStoreKey storetypes.StoreKey,
 	msgSenderEnabled bool,
-) (*yieldkeeper.Keeper, storetypes.StoreKey) {
+) (*yieldskeeper.Keeper, storetypes.StoreKey) {
 	storeKey := storetypes.NewKVStoreKey(types.StoreKey)
 	stateStore.MountStoreWithDB(storeKey, storetypes.StoreTypeIAVL, db)
 
@@ -36,7 +36,7 @@ func createYieldKeeper(
 	mockMsgSender.On("Enabled").Return(msgSenderEnabled)
 	mockIndexerEventsManager := indexer_manager.NewIndexerEventManager(mockMsgSender, transientStoreKey, true)
 
-	k := yieldkeeper.NewKeeper(
+	k := yieldskeeper.NewKeeper(
 		cdc,
 		storeKey,
 		sDAIEventManager,
@@ -48,25 +48,25 @@ func createYieldKeeper(
 	return k, storeKey
 }
 
-func GetUpdateYieldParamsFromIndexerBlock(
+func GetUpdateYieldsParamsFromIndexerBlock(
 	ctx sdk.Context,
-	keeper *yieldkeeper.Keeper,
-) []*indexerevents.UpdateYieldParamsEventV1 {
-	var updateYieldParamsEvents []*indexerevents.UpdateYieldParamsEventV1
+	keeper *yieldskeeper.Keeper,
+) []*indexerevents.UpdateYieldsParamsEventV1 {
+	var updateYieldsParamsEvents []*indexerevents.UpdateYieldsParamsEventV1
 	block := keeper.GetIndexerEventManager().ProduceBlock(ctx)
 	if block == nil {
-		return updateYieldParamsEvents
+		return updateYieldsParamsEvents
 	}
 	for _, event := range block.Events {
-		if event.Subtype != indexerevents.SubtypeYieldParams {
+		if event.Subtype != indexerevents.SubtypeYieldsParams {
 			continue
 		}
-		var updateYieldParamsEvent indexerevents.UpdateYieldParamsEventV1
-		err := proto.Unmarshal(event.DataBytes, &updateYieldParamsEvent)
+		var updateYieldsParamsEvent indexerevents.UpdateYieldsParamsEventV1
+		err := proto.Unmarshal(event.DataBytes, &updateYieldsParamsEvent)
 		if err != nil {
 			panic(err)
 		}
-		updateYieldParamsEvents = append(updateYieldParamsEvents, &updateYieldParamsEvent)
+		updateYieldsParamsEvents = append(updateYieldsParamsEvents, &updateYieldsParamsEvent)
 	}
-	return updateYieldParamsEvents
+	return updateYieldsParamsEvents
 }

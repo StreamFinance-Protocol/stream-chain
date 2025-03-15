@@ -18,7 +18,7 @@ type (
 		assetsKeeper        types.AssetsKeeper
 		bankKeeper          types.BankKeeper
 		perpetualsKeeper    types.PerpetualsKeeper
-		yieldKeeper         types.YieldKeeper
+		yieldsKeeper        types.YieldsKeeper
 		blocktimeKeeper     types.BlocktimeKeeper
 		indexerEventManager indexer_manager.IndexerEventManager
 	}
@@ -30,7 +30,7 @@ func NewKeeper(
 	assetsKeeper types.AssetsKeeper,
 	bankKeeper types.BankKeeper,
 	perpetualsKeeper types.PerpetualsKeeper,
-	yieldKeeper types.YieldKeeper,
+	yieldsKeeper types.YieldsKeeper,
 	blocktimeKeeper types.BlocktimeKeeper,
 	indexerEventManager indexer_manager.IndexerEventManager,
 ) *Keeper {
@@ -40,7 +40,7 @@ func NewKeeper(
 		assetsKeeper:        assetsKeeper,
 		bankKeeper:          bankKeeper,
 		perpetualsKeeper:    perpetualsKeeper,
-		yieldKeeper:         yieldKeeper,
+		yieldsKeeper:        yieldsKeeper,
 		blocktimeKeeper:     blocktimeKeeper,
 		indexerEventManager: indexerEventManager,
 	}

@@ -17,8 +17,8 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 
 	// Set all the subaccounts
 	for _, elem := range genState.Subaccounts {
-		if elem.AssetYieldIndex == "" {
-			elem.AssetYieldIndex = big.NewRat(1, 1).String()
+		if elem.AssetYieldsIndex == "" {
+			elem.AssetYieldsIndex = big.NewRat(1, 1).String()
 		}
 
 		k.SetSubaccount(ctx, elem)
@@ -32,7 +32,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 					elem.PerpetualPositions,
 					elem.AssetPositions,
 					nil,
-					elem.AssetYieldIndex,
+					elem.AssetYieldsIndex,
 				),
 			),
 		)

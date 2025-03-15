@@ -15,7 +15,7 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/mocks"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
-	yieldkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/keeper"
+	yieldskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/keeper"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -31,7 +31,7 @@ type BridgeKeepersTestContext struct {
 	PricesKeeper       *priceskeeper.Keeper
 	PerpetualsKeeper   *perpkeeper.Keeper
 	AssetsKeeper       *assetskeeper.Keeper
-	YieldKeeper        *yieldkeeper.Keeper
+	YieldsKeeper       *yieldskeeper.Keeper
 	BridgeEventManager *bridgeserver_types.BridgeEventManager
 	MockDelayMsgKeeper *mocks.DelayMsgKeeper
 	MockTimeProvider   *mocks.TimeProvider
@@ -72,7 +72,7 @@ func BridgeKeepers(
 		)
 		ks.AccountKeeper, _ = createAccountKeeper(stateStore, db, cdc, registry)
 		ks.BankKeeper, _ = createBankKeeper(stateStore, db, cdc, ks.AccountKeeper)
-		ks.YieldKeeper, _ = createYieldKeeper(
+		ks.YieldsKeeper, _ = createYieldsKeeper(
 			stateStore,
 			db,
 			cdc,
@@ -86,11 +86,11 @@ func BridgeKeepers(
 			db,
 			cdc,
 			transientStoreKey,
-			ks.YieldKeeper,
+			ks.YieldsKeeper,
 			ks.BankKeeper,
 		)
 
-		return []GenesisInitializer{ks.YieldKeeper, ks.PricesKeeper, ks.BridgeKeeper, ks.PerpetualsKeeper, ks.AssetsKeeper}
+		return []GenesisInitializer{ks.YieldsKeeper, ks.PricesKeeper, ks.BridgeKeeper, ks.PerpetualsKeeper, ks.AssetsKeeper}
 	})
 
 	return ks
@@ -101,7 +101,7 @@ func createBridgeKeeper(
 	db *dbm.MemDB,
 	cdc *codec.ProtoCodec,
 	transientStoreKey storetypes.StoreKey,
-	yieldKeeper types.YieldKeeper,
+	yieldsKeeper types.YieldsKeeper,
 	bankKeeper types.BankKeeper,
 ) (
 	*keeper.Keeper,
@@ -126,7 +126,7 @@ func createBridgeKeeper(
 		storeKey,
 		transientStoreKey,
 		bridgeEventManager,
-		yieldKeeper,
+		yieldsKeeper,
 		bankKeeper,
 		mockDelayMsgKeeper,
 		[]string{

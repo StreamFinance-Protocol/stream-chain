@@ -160,7 +160,7 @@ var (
 		"/klyraprotocol.sending.MsgWithdrawFromSubaccountResponse": nil,
 
 		// subaccounts
-		"/klyraprotocol.subaccounts.MsgClaimYieldForSubaccount":         &satypes.MsgClaimYieldForSubaccount{},
-		"/klyraprotocol.subaccounts.MsgClaimYieldForSubaccountResponse": nil,
+		"/klyraprotocol.subaccounts.MsgClaimYieldsForSubaccount":         &satypes.MsgClaimYieldsForSubaccount{},
+		"/klyraprotocol.subaccounts.MsgClaimYieldsForSubaccountResponse": nil,
 	}
 )

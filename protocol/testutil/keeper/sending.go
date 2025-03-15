@@ -18,7 +18,7 @@ import (
 	priceskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending/types"
-	yieldkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/keeper"
+	yieldskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/keeper"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -35,7 +35,7 @@ type SendingKeepersTestContext struct {
 	PerpetualsKeeper  *perpkeeper.Keeper
 	AssetsKeeper      *assetskeeper.Keeper
 	SubaccountsKeeper types.SubaccountsKeeper
-	YieldKeeper       *yieldkeeper.Keeper
+	YieldsKeeper      *yieldskeeper.Keeper
 	StoreKey          storetypes.StoreKey
 }
 
@@ -80,7 +80,7 @@ func SendingKeepersWithSubaccountsKeeper(t testing.TB, saKeeper types.Subaccount
 		)
 		ks.AccountKeeper, _ = createAccountKeeper(stateStore, db, cdc, registry)
 		ks.BankKeeper, _ = createBankKeeper(stateStore, db, cdc, ks.AccountKeeper)
-		ks.YieldKeeper, _ = createYieldKeeper(
+		ks.YieldsKeeper, _ = createYieldsKeeper(
 			stateStore,
 			db,
 			cdc,
@@ -98,7 +98,7 @@ func SendingKeepersWithSubaccountsKeeper(t testing.TB, saKeeper types.Subaccount
 				ks.AssetsKeeper,
 				ks.BankKeeper,
 				ks.PerpetualsKeeper,
-				ks.YieldKeeper,
+				ks.YieldsKeeper,
 				blockTimeKeeper,
 				transientStoreKey,
 				true,

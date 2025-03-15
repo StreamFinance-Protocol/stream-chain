@@ -129,7 +129,7 @@ func runProcessTransferTest(t *testing.T, tc TransferTestCase) {
 	keepertest.CreateTestLiquidityTiers(t, ks.Ctx, ks.PerpetualsKeeper)
 	keepertest.CreateTestCollateralPools(t, ks.Ctx, ks.PerpetualsKeeper)
 
-	ks.YieldKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+	ks.YieldsKeeper.SetAssetYieldsIndex(ks.Ctx, big.NewRat(1, 1))
 
 	for _, p := range tc.perpetuals {
 		_, err := ks.PerpetualsKeeper.CreatePerpetual(
@@ -142,7 +142,7 @@ func runProcessTransferTest(t *testing.T, tc TransferTestCase) {
 			p.Params.LiquidityTier,
 			p.Params.DangerIndexPpm,
 			p.Params.CollateralPoolId,
-			p.YieldIndex,
+			p.YieldsIndex,
 		)
 		require.NoError(t, err)
 	}
@@ -370,7 +370,7 @@ func TestProcessTransfer_CreateRecipientAccount(t *testing.T) {
 	keepertest.CreateTestLiquidityTiers(t, ks.Ctx, ks.PerpetualsKeeper)
 	keepertest.CreateTestCollateralPools(t, ks.Ctx, ks.PerpetualsKeeper)
 
-	ks.YieldKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+	ks.YieldsKeeper.SetAssetYieldsIndex(ks.Ctx, big.NewRat(1, 1))
 
 	perpetuals := []perptypes.Perpetual{
 		constants.BtcUsd_100PercentMarginRequirement,
@@ -387,7 +387,7 @@ func TestProcessTransfer_CreateRecipientAccount(t *testing.T) {
 			p.Params.LiquidityTier,
 			p.Params.DangerIndexPpm,
 			p.Params.CollateralPoolId,
-			p.YieldIndex,
+			p.YieldsIndex,
 		)
 		require.NoError(t, err)
 	}
@@ -437,7 +437,7 @@ func TestProcessTransfer_CreateRecipientAccount_NonTdai(t *testing.T) {
 	keepertest.CreateTestLiquidityTiers(t, ks.Ctx, ks.PerpetualsKeeper)
 	keepertest.CreateTestCollateralPools(t, ks.Ctx, ks.PerpetualsKeeper)
 
-	ks.YieldKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+	ks.YieldsKeeper.SetAssetYieldsIndex(ks.Ctx, big.NewRat(1, 1))
 
 	perpetuals := []perptypes.Perpetual{
 		constants.Iso2Btc_20PercentInitial_10PercentMaintenance_CollatPool1_Id7,
@@ -454,7 +454,7 @@ func TestProcessTransfer_CreateRecipientAccount_NonTdai(t *testing.T) {
 			p.Params.LiquidityTier,
 			p.Params.DangerIndexPpm,
 			p.Params.CollateralPoolId,
-			p.YieldIndex,
+			p.YieldsIndex,
 		)
 		require.NoError(t, err)
 	}

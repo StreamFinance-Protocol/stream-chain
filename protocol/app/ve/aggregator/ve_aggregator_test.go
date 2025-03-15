@@ -15,7 +15,7 @@ import (
 	keepertest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/keeper"
 	valutils "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/staking"
 	vetesting "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/ve"
-	yieldkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/keeper"
+	yieldskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/keeper"
 	cometabci "github.com/cometbft/cometbft/abci/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
@@ -32,10 +32,10 @@ func SetupTest(t *testing.T, vals []string, errorString string, initialSDAIPrice
 	// ctx, pk, _, _, _, mTimeProvider := keepertest.PricesKeepers(t)
 	// mTimeProvider.On("Now").Return(constants.TimeT)
 
-	ctx, _, pk, _, _, _, _, yieldKeeper, _, _ := keepertest.SubaccountsKeepers(t, true)
+	ctx, _, pk, _, _, _, _, yieldsKeeper, _, _ := keepertest.SubaccountsKeepers(t, true)
 
 	if initialSDAIPrice != nil {
-		yieldKeeper.SetSDAIPrice(ctx, initialSDAIPrice)
+		yieldsKeeper.SetSDAIPrice(ctx, initialSDAIPrice)
 	}
 
 	mTimeProvider := &mocks.TimeProvider{}
@@ -74,7 +74,7 @@ func SetupTest(t *testing.T, vals []string, errorString string, initialSDAIPrice
 	handler := veaggregator.NewVeAggregator(
 		ctx.Logger(),
 		*pk,
-		*yieldKeeper,
+		*yieldsKeeper,
 		pricesAggregatorFn,
 		conversionRateAggregatorFn,
 	)
@@ -262,7 +262,7 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
-			expectedSDaiConversionRate: yieldkeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000000"),
+			expectedSDaiConversionRate: yieldskeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000000"),
 			expectedError:              nil,
 		},
 		"Success: Single price update, from two validators, without conversion rate": {
@@ -340,7 +340,7 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
-			expectedSDaiConversionRate: yieldkeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000000"),
+			expectedSDaiConversionRate: yieldskeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000000"),
 			expectedError:              nil,
 		},
 		"Success: Single price update, from two validators with same conversion rate": {
@@ -379,7 +379,7 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
-			expectedSDaiConversionRate: yieldkeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000000"),
+			expectedSDaiConversionRate: yieldskeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000000"),
 			expectedError:              nil,
 		},
 		"Success: Multiple price updates, from two validators with no conversion rate": {
@@ -496,7 +496,7 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
-			expectedSDaiConversionRate: yieldkeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000001"),
+			expectedSDaiConversionRate: yieldskeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000001"),
 			expectedError:              nil,
 		},
 		"Success: Multiple price updates, from two validators with same conversion rate": {
@@ -535,7 +535,7 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
-			expectedSDaiConversionRate: yieldkeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000000"),
+			expectedSDaiConversionRate: yieldskeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000000"),
 			expectedError:              nil,
 		},
 		"Success: Single price update, from multiple validators, without conversion rate": {
@@ -615,7 +615,7 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
-			expectedSDaiConversionRate: yieldkeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000001"),
+			expectedSDaiConversionRate: yieldskeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000001"),
 			expectedError:              nil,
 		},
 		"Success: Single price update, from multiple validators two out of three conversion rates the same": {
@@ -655,7 +655,7 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
-			expectedSDaiConversionRate: yieldkeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000001"),
+			expectedSDaiConversionRate: yieldskeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000001"),
 			expectedError:              nil,
 		},
 		"Success: Single price update, from multiple validators all conversion rates the same": {
@@ -695,7 +695,7 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
-			expectedSDaiConversionRate: yieldkeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000001"),
+			expectedSDaiConversionRate: yieldskeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000001"),
 			expectedError:              nil,
 		},
 		"Success: Multiple price updates, from multiple validators with all empty conversion rates": {
@@ -815,7 +815,7 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
-			expectedSDaiConversionRate: yieldkeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000001"),
+			expectedSDaiConversionRate: yieldskeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000001"),
 			expectedError:              nil,
 		},
 		"Success: Single price update from multiple validators with no conversion rate but not enough voting power": {
@@ -991,7 +991,7 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
-			expectedSDaiConversionRate: yieldkeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000001"),
+			expectedSDaiConversionRate: yieldskeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000001"),
 			expectedError:              nil,
 		},
 		"Success: Continues when the validator's prices are malformed with no conversion rate": {
@@ -1232,7 +1232,7 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
-			expectedSDaiConversionRate: yieldkeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000002"),
+			expectedSDaiConversionRate: yieldskeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000002"),
 			expectedError:              nil,
 		},
 		"Success: Multiple price updates from >2/3 but not all validators with some different conversion rates": {
@@ -1272,7 +1272,7 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
-			expectedSDaiConversionRate: yieldkeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000002"),
+			expectedSDaiConversionRate: yieldskeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000002"),
 			expectedError:              nil,
 		},
 		"Success: Multiple price updates from >2/3 but not all validators with all different conversion rates": {
@@ -1312,7 +1312,7 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
-			expectedSDaiConversionRate: yieldkeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000001"),
+			expectedSDaiConversionRate: yieldskeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000001"),
 			expectedError:              nil,
 		},
 		"Success: No prices from multiple validators but all conversion rates valid": {
@@ -1352,7 +1352,7 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
-			expectedSDaiConversionRate: yieldkeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000001"),
+			expectedSDaiConversionRate: yieldskeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000001"),
 			expectedError:              nil,
 		},
 		"Success: No prices from multiple validators but >2/3 conversion rates valid": {
@@ -1392,7 +1392,7 @@ func TestAggregateDaemonVEIntoFinalPricesAndConversionRate(t *testing.T) {
 					PnlPrice:  new(big.Int).SetUint64(constants.ThreeMillion),
 				},
 			},
-			expectedSDaiConversionRate: yieldkeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000000"),
+			expectedSDaiConversionRate: yieldskeeper.ConvertStringToBigIntWithPanicOnErr("1000000000000000000000000000"),
 			expectedError:              nil,
 		},
 		// Note: in the below tests, the failure stems from a mock aggregator function returning an error

@@ -312,7 +312,7 @@ func TestAppModule_InitExportGenesis(t *testing.T) {
 				 "danger_index_ppm": 0,
 				 "collateral_pool_id": 0
 			  },
-			  "yield_index": "0/1"
+			  "yields_index": "0/1"
 		   }
 		],
 		"liquidity_tiers":[
@@ -358,7 +358,7 @@ func TestAppModule_InitExportGenesis(t *testing.T) {
 			  "funding_index":"0",
 			  "open_interest":"0",
 			  "last_funding_rate":"0",
-			  "yield_index": "0/1"
+			  "yields_index": "0/1"
 		   }
 		],
 		"liquidity_tiers":[

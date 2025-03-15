@@ -65,7 +65,7 @@ func PrepareProposalHandler(
 	clobKeeper PrepareClobKeeper,
 	perpetualKeeper PreparePerpetualsKeeper,
 	pricesKeeper ve.PreBlockExecPricesKeeper,
-	yieldKeeper ve.VoteExtensionYieldKeeper,
+	yieldsKeeper ve.VoteExtensionYieldsKeeper,
 	veCache *vecache.VeCache,
 	veCodec codec.VoteExtensionCodec,
 	extCommitCodec codec.ExtendedCommitCodec,
@@ -104,7 +104,7 @@ func PrepareProposalHandler(
 		if err := SetVE(
 			txSetterUtils,
 			pricesKeeper,
-			yieldKeeper,
+			yieldsKeeper,
 			veCache,
 			veCodec,
 			extCommitCodec,
@@ -207,7 +207,7 @@ func PrepareProposalHandler(
 func SetVE(
 	txSetterUtils TxSetterUtils,
 	pricesKeeper ve.PreBlockExecPricesKeeper,
-	yieldKeeper ve.VoteExtensionYieldKeeper,
+	yieldsKeeper ve.VoteExtensionYieldsKeeper,
 	veCache *vecache.VeCache,
 	voteCodec codec.VoteExtensionCodec,
 	extCodec codec.ExtendedCommitCodec,
@@ -226,7 +226,7 @@ func SetVE(
 		txSetterUtils.Request.LocalLastCommit,
 		voteCodec,
 		pricesKeeper,
-		yieldKeeper,
+		yieldsKeeper,
 		veCache,
 	)
 

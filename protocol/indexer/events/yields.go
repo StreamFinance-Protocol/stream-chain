@@ -1,7 +1,7 @@
 package events
 
-// NewUpdatePerpetualEventV1 creates a UpdatePerpetualEventV1 representing
-// update of a perpetual.
+// NewUpdateYieldsParamsEventV1 creates a UpdateYieldsParamsEventV1 representing
+// update of a yields params.
 func NewUpdateYieldsParamsEventV1(
 	sdaiPrice string,
 	assetYieldsIndex string,

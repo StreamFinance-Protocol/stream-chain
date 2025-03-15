@@ -17,7 +17,9 @@ func (k Keeper) CheckForChainOutage(
 		return
 	}
 
-	if !ctx.BlockTime().Before(previousBlockInfo.Timestamp.Add(types.WITHDRAWAL_AND_TRANSFERS_BLOCKED_AFTER_CHAIN_OUTAGE_DURATION)) {
+	if !ctx.BlockTime().Before(
+		previousBlockInfo.Timestamp.Add(types.WITHDRAWAL_AND_TRANSFERS_BLOCKED_AFTER_CHAIN_OUTAGE_DURATION),
+	) {
 		k.SetOutageHeight(ctx, previousBlockInfo.Height)
 	}
 }

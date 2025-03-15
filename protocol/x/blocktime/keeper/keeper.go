@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"fmt"
-	"time"
 
 	"cosmossdk.io/log"
 	storetypes "cosmossdk.io/store/types"
@@ -32,20 +31,17 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With(log.ModuleKey, fmt.Sprintf("x/%s", types.ModuleName))
 }
 
-func (k Keeper) GetPreviousBlockInfo(ctx sdk.Context) types.BlockInfo {
+func (k Keeper) GetPreviousBlockInfo(ctx sdk.Context) (types.BlockInfo, bool) {
 	store := ctx.KVStore(k.storeKey)
 	bytes := store.Get([]byte(types.PreviousBlockInfoKey))
 
 	if bytes == nil {
-		return types.BlockInfo{
-			Height:    0,
-			Timestamp: time.Time{},
-		}
+		return types.BlockInfo{}, false
 	}
 
 	var info types.BlockInfo
 	k.cdc.MustUnmarshal(bytes, &info)
-	return info
+	return info, true
 }
 
 func (k Keeper) SetPreviousBlockInfo(ctx sdk.Context, info *types.BlockInfo) {

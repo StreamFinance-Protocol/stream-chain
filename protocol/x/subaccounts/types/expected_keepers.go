@@ -116,7 +116,7 @@ type BankKeeper interface {
 }
 
 type BlocktimeKeeper interface {
-	GetPreviousBlockInfo(ctx sdk.Context) blocktimetypes.BlockInfo
+	GetPreviousBlockInfo(ctx sdk.Context) (blocktimetypes.BlockInfo, bool)
 }
 
 type YieldKeeper interface {

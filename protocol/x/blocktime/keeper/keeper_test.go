@@ -34,10 +34,10 @@ func TestGetPreviousBlockInfo(t *testing.T) {
 	k.SetPreviousBlockInfo(ctx, expectedBlockInfo)
 
 	// Retrieve the previous block info
-	retrievedBlockInfo := k.GetPreviousBlockInfo(ctx)
+	retrievedBlockInfo, exists := k.GetPreviousBlockInfo(ctx)
 
 	// Assertions
-	require.NotNil(t, retrievedBlockInfo)
+	require.True(t, exists)
 	require.True(t, expectedBlockInfo.Timestamp.Equal(retrievedBlockInfo.Timestamp), "Timestamps should be equal")
 	require.Equal(t, expectedBlockInfo.Height, retrievedBlockInfo.Height)
 }

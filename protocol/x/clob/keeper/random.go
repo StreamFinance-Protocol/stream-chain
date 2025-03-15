@@ -9,8 +9,15 @@ import (
 // GetPseudoRand returns a random number generator seeded with a pseudorandom seed.
 // The seed is based on the previous block timestamp.
 func (k *Keeper) GetPseudoRand(ctx sdk.Context) *rand.Rand {
+	previousBlockInfo, found := k.blockTimeKeeper.GetPreviousBlockInfo(ctx)
+	if !found {
+		return errorsmod.Wrapf(
+			types.ErrPreviousBlockInfoNotFound,
+			"previous block info not found",
+		)
+	}
 	s := rand.NewSource(
-		k.blockTimeKeeper.GetPreviousBlockInfo(ctx).Timestamp.Unix(),
+		previousBlockInfo.Timestamp.Unix(),
 	)
 	return rand.New(s)
 }

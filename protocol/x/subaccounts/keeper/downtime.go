@@ -12,7 +12,10 @@ func (k Keeper) CheckForChainOutage(
 	ctx sdk.Context,
 ) {
 
-	previousBlockInfo := k.blocktimeKeeper.GetPreviousBlockInfo(ctx)
+	previousBlockInfo, found := k.blocktimeKeeper.GetPreviousBlockInfo(ctx)
+	if !found {
+		return
+	}
 
 	if !ctx.BlockTime().Before(previousBlockInfo.Timestamp.Add(types.WITHDRAWAL_AND_TRANSFERS_BLOCKED_AFTER_CHAIN_OUTAGE_DURATION)) {
 		k.SetOutageHeight(ctx, previousBlockInfo.Height)

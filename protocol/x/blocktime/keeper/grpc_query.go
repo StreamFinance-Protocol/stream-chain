@@ -23,7 +23,10 @@ func (k Keeper) PreviousBlockInfo(
 	}
 
 	ctx := lib.UnwrapSDKContext(c, types.ModuleName)
-	info := k.GetPreviousBlockInfo(ctx)
+	info, exists := k.GetPreviousBlockInfo(ctx)
+	if !exists {
+		return nil, status.Error(codes.NotFound, "previous block info not found")
+	}
 	return &types.QueryPreviousBlockInfoResponse{
 		Info: &info,
 	}, nil

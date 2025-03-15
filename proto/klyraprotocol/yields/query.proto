@@ -4,7 +4,7 @@ package klyraprotocol.yields;
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 
-option go_package = "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types";
+option go_package = "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/types";
 
 // Query defines the gRPC querier service.
 service Query {
@@ -12,13 +12,13 @@ service Query {
   // Get the price of sDAI.
   rpc GetSDAIPriceQuery(GetSDAIPriceQueryRequest)
       returns (GetSDAIPriceQueryResponse) {
-    option (google.api.http).get = "/klyraprotocol/v4/yield/get_sdai_price";
+    option (google.api.http).get = "/klyraprotocol/v4/yields/get_sdai_price";
   }
 
   // Get the price of sDAI.
   rpc GetAssetYieldIndexQuery(GetAssetYieldIndexQueryRequest)
       returns (GetAssetYieldIndexQueryResponse) {
-    option (google.api.http).get = "/klyraprotocol/v4/yield/get_asset_yield_index";
+    option (google.api.http).get = "/klyraprotocol/v4/yields/get_asset_yield_index";
   }
 }
 

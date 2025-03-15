@@ -235,7 +235,7 @@ message SubaccountUpdateEventV1 {
   // updated_asset_positions will each be for unique assets.
   repeated klyraprotocol.indexer.protocol.v1.IndexerAssetPosition
       updated_asset_positions = 4;
-  string yield_index = 5;
+  string yields_index = 5;
 }
 
 // StatefulOrderEvent message contains information about a change to a stateful
@@ -575,17 +575,17 @@ message UpdatePerpetualEventV1 {
   // liquidations
   uint32 danger_index_ppm = 6;
 
-  // The perp yield index of this perpetual market
-  string perp_yield_index = 7;
+  // The perp yields index of this perpetual market
+  string perp_yields_index = 7;
 }
 
-// UpdateYieldParamsV1 message contains all the information about an update
-// to the yield params on the Stream Chain.
-message UpdateYieldParamsEventV1 {
+// UpdateYieldsParamsV1 message contains all the information about an update
+// to the yields params on the Stream Chain.
+message UpdateYieldsParamsEventV1 {
 
   // The current price of sDAI in tDAI as seen by the protocol
   string sdai_price = 1;
 
-  // The current generalized asset yield index in the protocol.
-  string asset_yield_index = 2;
+  // The current generalized asset yields index in the protocol.
+  string asset_yields_index = 2;
 }

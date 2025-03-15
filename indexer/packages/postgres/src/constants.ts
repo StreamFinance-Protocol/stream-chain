@@ -17,7 +17,7 @@ import PerpetualMarketModel from './models/perpetual-market-model';
 import PerpetualPositionModel from './models/perpetual-position-model';
 import SubaccountModel from './models/subaccount-model';
 import TransferModel from './models/transfer-model';
-import YieldParamsModel from './models/yield-params-model';
+import YieldsParamsModel from './models/yields-params-model';
 import {
   APITimeInForce,
   CandleResolution,
@@ -116,7 +116,7 @@ export const SQL_TO_JSON_DEFINED_MODELS = [
   PerpetualPositionModel,
   SubaccountModel,
   TransferModel,
-  YieldParamsModel,
+  YieldsParamsModel,
 ];
 
 export type SpecifiedClobPairStatus = Exclude<

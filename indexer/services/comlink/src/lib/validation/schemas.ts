@@ -175,7 +175,7 @@ export const CheckTickerOptionalQuerySchema = checkSchema({
   ticker: checkTickerOptionalQuerySchema,
 });
 
-export const CheckLimitAndYieldParamsSchema = checkSchema({
+export const CheckLimitAndYieldsParamsSchema = checkSchema({
   ...limitSchemaRecord,
   createdAtOrBeforeHeight: {
     in: ['query'],

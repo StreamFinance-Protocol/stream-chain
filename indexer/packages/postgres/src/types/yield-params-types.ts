@@ -1,18 +1,18 @@
-/* ------- YIELD PARAMS TYPES ------- */
+/* ------- YIELDS PARAMS TYPES ------- */
 
 import { IsoString } from './utility-types';
 
-export interface YieldParamsCreateObject {
+export interface YieldsParamsCreateObject {
   sDAIPrice: string,
-  assetYieldIndex: string,
+  assetYieldsIndex: string,
   createdAt: IsoString,
   createdAtHeight: string,
 }
 
-export enum YieldParamsColumns {
+export enum YieldsParamsColumns {
   id = 'id',
   sDAIPrice = 'sDAIPrice',
-  assetYieldIndex = 'assetYieldIndex',
+  assetYieldsIndex = 'assetYieldsIndex',
   createdAt = 'createdAt',
   createdAtHeight = 'createdAtHeight',
 }

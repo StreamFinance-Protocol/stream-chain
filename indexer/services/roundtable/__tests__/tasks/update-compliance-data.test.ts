@@ -305,7 +305,7 @@ describe('update-compliance-data', () => {
       subaccountNumber: 0,
       updatedAtHeight: '1',
       updatedAt: DateTime.utc().toISO() ?? '',
-      assetYieldIndex: testConstants.defaultSubaccount.assetYieldIndex,
+      assetYieldsIndex: testConstants.defaultSubaccount.assetYieldsIndex,
     });
 
     const riskScores: string[] = ['75.00', '50.00'];
@@ -366,7 +366,7 @@ describe('update-compliance-data', () => {
       subaccountNumber: 0,
       updatedAtHeight: '1',
       updatedAt: DateTime.utc().toISO() ?? '',
-      assetYieldIndex: testConstants.defaultSubaccount.assetYieldIndex,
+      assetYieldsIndex: testConstants.defaultSubaccount.assetYieldsIndex,
     });
 
     const addressWithComplianceError: string = 'klyra1gem4xs643fjhaqvphrvv0adpg4435j7xe55waf';
@@ -376,7 +376,7 @@ describe('update-compliance-data', () => {
       subaccountNumber: 0,
       updatedAtHeight: '1',
       updatedAt: DateTime.utc().toISO() ?? '',
-      assetYieldIndex: testConstants.defaultSubaccount.assetYieldIndex,
+      assetYieldsIndex: testConstants.defaultSubaccount.assetYieldsIndex,
     });
 
     const riskScores: string[] = ['75.00', '50.00'];
@@ -455,7 +455,7 @@ describe('update-compliance-data', () => {
       subaccountNumber: 0,
       updatedAtHeight: '1',
       updatedAt: DateTime.utc().toISO() ?? '',
-      assetYieldIndex: testConstants.defaultSubaccount.assetYieldIndex,
+      assetYieldsIndex: testConstants.defaultSubaccount.assetYieldsIndex,
     });
 
     const riskScores: string[] = ['75.00', '50.00'];
@@ -567,7 +567,7 @@ async function setupSubaccounts(
         id: subaccountId,
         updatedAtHeight: '1',
         updatedAt: newUpdatedAt,
-        assetYieldIndex: testConstants.defaultSubaccount.assetYieldIndex,
+        assetYieldsIndex: testConstants.defaultSubaccount.assetYieldsIndex,
       });
     },
   ));

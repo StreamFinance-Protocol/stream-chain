@@ -49,8 +49,8 @@ export interface Asset {
 
   atomicResolution: number;
   /**
-   * The current yield index is determined by the cumulative
-   * all-time history of the yield mechanism for assets.
+   * The current yields index is determined by the cumulative
+   * all-time history of the yields mechanism for assets.
    * Starts at 0. This string should always be converted big.Rat.
    */
 
@@ -108,8 +108,8 @@ export interface AssetSDKType {
 
   atomic_resolution: number;
   /**
-   * The current yield index is determined by the cumulative
-   * all-time history of the yield mechanism for assets.
+   * The current yields index is determined by the cumulative
+   * all-time history of the yields mechanism for assets.
    * Starts at 0. This string should always be converted big.Rat.
    */
 

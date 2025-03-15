@@ -1,25 +1,25 @@
 import {
   IndexerTendermintEvent,
-  UpdateYieldParamsEventV1,
+  UpdateYieldsParamsEventV1,
 } from '@klyraprotocol-indexer/v4-protos';
 
 import { Validator } from './validator';
 import { Handler } from '../handlers/handler';
-import { YieldParamsHandler } from '../handlers/yield-params-handler';
+import { YieldsParamsHandler } from '../handlers/yields-params-handler';
 
-export class YieldParamsValidator extends Validator<UpdateYieldParamsEventV1> {
+export class YieldsParamsValidator extends Validator<UpdateYieldsParamsEventV1> {
   public validate(): void {
 
-    if (this.event.assetYieldIndex === undefined || this.event.assetYieldIndex === '') {
+    if (this.event.assetYieldsIndex === undefined || this.event.assetYieldsIndex === '') {
       return this.logAndThrowParseMessageError(
-        'UpdateYieldParamsEvent must have an assetYieldIndex that is defined and non-empty',
+        'UpdateYieldsParamsEvent must have an assetYieldsIndex that is defined and non-empty',
         { event: this.event },
       );
     }
 
     if (this.event.sdaiPrice === undefined || this.event.sdaiPrice === '') {
       return this.logAndThrowParseMessageError(
-        'UpdateYieldParamsEvent must have an sDAIPrice that is defined and non-empty',
+        'UpdateYieldsParamsEvent must have an sDAIPrice that is defined and non-empty',
         { event: this.event },
       );
     }
@@ -29,9 +29,9 @@ export class YieldParamsValidator extends Validator<UpdateYieldParamsEventV1> {
     indexerTendermintEvent: IndexerTendermintEvent,
     txId: number,
     _: string,
-  ): Handler<UpdateYieldParamsEventV1>[] {
+  ): Handler<UpdateYieldsParamsEventV1>[] {
     return [
-      new YieldParamsHandler(
+      new YieldsParamsHandler(
         this.block,
         this.blockEventIndex,
         indexerTendermintEvent,

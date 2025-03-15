@@ -2,11 +2,11 @@
 syntax = "proto3";
 package klyraprotocol.yields;
 
-option go_package = "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types";
+option go_package = "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/types";
 
 import "cosmos/msg/v1/msg.proto";
 
-// Msg defines the yields Msg service for handling transactions related to yield management.
+// Msg defines the yields Msg service for handling transactions related to yields management.
 service Msg {
   option (cosmos.msg.v1.service) = true;
   // this line is used by starport scaffolding # proto/tx/rpc

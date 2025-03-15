@@ -20,7 +20,7 @@ import {
   testMocks,
 } from '@klyraprotocol-indexer/postgres';
 import { updateBlockCache } from '../../../src/caches/block-cache';
-import { defaultDeleveragingEvent, defaultPreviousHeight, defaultZeroPerpYieldIndex } from '../../helpers/constants';
+import { defaultDeleveragingEvent, defaultPreviousHeight, defaultZeroPerpYieldsIndex } from '../../helpers/constants';
 import { clearCandlesMap } from '../../../src/caches/candle-cache';
 import { createPostgresFunctions } from '../../../src/helpers/postgres/postgres-functions';
 import { redisClient } from '../../../src/helpers/redis/redis-controller';
@@ -44,7 +44,7 @@ import {
   MILLIS_IN_NANOS,
   SECONDS_IN_MILLIS,
   SUBACCOUNT_ORDER_FILL_EVENT_TYPE,
-  ZERO_ASSET_YIELD_INDEX,
+  ZERO_ASSET_YIELDS_INDEX,
 } from '../../../src/constants';
 import { DateTime } from 'luxon';
 import Long from 'long';
@@ -62,7 +62,7 @@ describe('DeleveragingHandler', () => {
     subaccountNumber: defaultDeleveragingEvent.offsetting!.number,
     updatedAt: createdDateTime.toISO() ?? '',
     updatedAtHeight: createdHeight,
-    assetYieldIndex: ZERO_ASSET_YIELD_INDEX,
+    assetYieldsIndex: ZERO_ASSET_YIELDS_INDEX,
   };
 
   const deleveragedSubaccount: SubaccountCreateObject = {
@@ -70,7 +70,7 @@ describe('DeleveragingHandler', () => {
     subaccountNumber: defaultDeleveragingEvent.liquidated!.number,
     updatedAt: createdDateTime.toISO() ?? '',
     updatedAtHeight: createdHeight,
-    assetYieldIndex: ZERO_ASSET_YIELD_INDEX,
+    assetYieldsIndex: ZERO_ASSET_YIELDS_INDEX,
   };
 
   beforeAll(async () => {
@@ -124,7 +124,7 @@ describe('DeleveragingHandler', () => {
     openEventId: testConstants.defaultTendermintEventId,
     lastEventId: testConstants.defaultTendermintEventId,
     settledFunding: '200000',
-    perpYieldIndex: defaultZeroPerpYieldIndex,
+    perpYieldsIndex: defaultZeroPerpYieldsIndex,
   };
   const deleveragedPerpetualPosition: PerpetualPositionCreateObject = {
     ...offsettingPerpetualPosition,

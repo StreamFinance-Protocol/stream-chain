@@ -128446,7 +128446,7 @@ var safePropBackslashRe = /\\/g,
  * @returns {boolean} `true` if reserved, otherwise `false`
  */
 util.isReserved = function isReserved(name) {
-    return /^(?:do|if|in|for|let|new|try|var|case|else|enum|eval|false|null|this|true|void|with|break|catch|class|const|super|throw|while|yield|delete|export|import|public|return|static|switch|typeof|default|extends|finally|package|private|continue|debugger|function|arguments|interface|protected|implements|instanceof)$/.test(name);
+    return /^(?:do|if|in|for|let|new|try|var|case|else|enum|eval|false|null|this|true|void|with|break|catch|class|const|super|throw|while|yields|delete|export|import|public|return|static|switch|typeof|default|extends|finally|package|private|continue|debugger|function|arguments|interface|protected|implements|instanceof)$/.test(name);
 };
 
 /**
@@ -157225,7 +157225,7 @@ const streamChunk = function* (chunk, chunkSize) {
   let len = chunk.byteLength;
 
   if (!chunkSize || len < chunkSize) {
-    yield chunk;
+    yields chunk;
     return;
   }
 
@@ -157234,20 +157234,20 @@ const streamChunk = function* (chunk, chunkSize) {
 
   while (pos < len) {
     end = pos + chunkSize;
-    yield chunk.slice(pos, end);
+    yields chunk.slice(pos, end);
     pos = end;
   }
 };
 
 const readBytes = async function* (iterable, chunkSize) {
   for await (const chunk of readStream(iterable)) {
-    yield* streamChunk(chunk, chunkSize);
+    yields* streamChunk(chunk, chunkSize);
   }
 };
 
 const readStream = async function* (stream) {
   if (stream[Symbol.asyncIterator]) {
-    yield* stream;
+    yields* stream;
     return;
   }
 
@@ -157258,7 +157258,7 @@ const readStream = async function* (stream) {
       if (done) {
         break;
       }
-      yield value;
+      yields value;
     }
   } finally {
     await reader.cancel();

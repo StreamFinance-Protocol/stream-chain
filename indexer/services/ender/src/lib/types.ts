@@ -34,7 +34,7 @@ import {
   UpdateClobPairEventV1,
   DeleveragingEventV1,
   OpenInterestUpdateEventV1,
-  UpdateYieldParamsEventV1,
+  UpdateYieldsParamsEventV1,
   CollateralPoolUpsertEvent,
 } from '@klyraprotocol-indexer/v4-protos';
 import { IHeaders } from 'kafkajs';
@@ -55,7 +55,7 @@ export enum KlyraIndexerSubtypes {
   UPDATE_CLOB_PAIR = 'update_clob_pair',
   DELEVERAGING = 'deleveraging',
   OPEN_INTEREST_UPDATE = 'open_interest_update',
-  YIELD_PARAMS = 'yield_params',
+  YIELDS_PARAMS = 'yields_params',
 }
 
 // Generic interface used for creating the Handler objects
@@ -182,8 +182,8 @@ export type EventProtoWithTypeAndVersion = {
     blockEventIndex: number;
   }
   | {
-    type: KlyraIndexerSubtypes.YIELD_PARAMS;
-    eventProto: UpdateYieldParamsEventV1;
+    type: KlyraIndexerSubtypes.YIELDS_PARAMS;
+    eventProto: UpdateYieldsParamsEventV1;
     indexerTendermintEvent: IndexerTendermintEvent;
     version: number;
     blockEventIndex: number;

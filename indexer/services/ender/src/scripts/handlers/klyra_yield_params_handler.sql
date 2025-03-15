@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION klyra_yield_params_handler(
+CREATE OR REPLACE FUNCTION klyra_yields_params_handler(
     block_height int, block_time timestamp, event_data jsonb) RETURNS jsonb AS $$
 /**
   Parameters:
@@ -10,19 +10,19 @@ CREATE OR REPLACE FUNCTION klyra_yield_params_handler(
   (Note that no text should exist before the function declaration to ensure that exception line numbers are correct.)
 */
 DECLARE
-    yield_params_record yield_params%ROWTYPE;
+    yields_params_record yields_params%ROWTYPE;
 BEGIN
-    yield_params_record."id" = klyra_uuid_from_yield_params_parts(block_height);
-    yield_params_record."sDAIPrice" = jsonb_extract_path_text(event_data, 'sdaiPrice');
-    yield_params_record."assetYieldIndex" = jsonb_extract_path_text(event_data, 'assetYieldIndex');
-    yield_params_record."createdAtHeight" = block_height;
-    yield_params_record."createdAt" = block_time;
+    yields_params_record."id" = klyra_uuid_from_yields_params_parts(block_height);
+    yields_params_record."sDAIPrice" = jsonb_extract_path_text(event_data, 'sdaiPrice');
+    yields_params_record."assetYieldsIndex" = jsonb_extract_path_text(event_data, 'assetYieldsIndex');
+    yields_params_record."createdAtHeight" = block_height;
+    yields_params_record."createdAt" = block_time;
 
-    INSERT INTO yield_params VALUES (yield_params_record.*);
+    INSERT INTO yields_params VALUES (yields_params_record.*);
 
     RETURN jsonb_build_object(
-        'yield_params',
-        klyra_to_jsonb(yield_params_record)
+        'yields_params',
+        klyra_to_jsonb(yields_params_record)
     );
 END;
 $$ LANGUAGE plpgsql;

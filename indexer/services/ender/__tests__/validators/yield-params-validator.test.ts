@@ -2,7 +2,7 @@ import { logger, ParseMessageError } from '@klyraprotocol-indexer/base';
 import {
   IndexerTendermintBlock,
   IndexerTendermintEvent,
-  UpdateYieldParamsEventV1,
+  UpdateYieldsParamsEventV1,
 } from '@klyraprotocol-indexer/v4-protos';
 import {
   dbHelpers, testMocks, perpetualMarketRefresher,
@@ -12,16 +12,16 @@ import {
   defaultHeight,
   defaultTime,
   defaultTxHash,
-  defaultUpdateYieldParamsEvent1,
+  defaultUpdateYieldsParamsEvent1,
 } from '../helpers/constants';
 import {
   createIndexerTendermintBlock,
   createIndexerTendermintEvent,
 } from '../helpers/indexer-proto-helpers';
 import { expectDidntLogError } from '../helpers/validator-helpers';
-import { YieldParamsValidator } from '../../src/validators/yield-params-validator';
+import { YieldsParamsValidator } from '../../src/validators/yields-params-validator';
 
-describe('yield-params-validator', () => {
+describe('yields-params-validator', () => {
   beforeAll(async () => {
     await dbHelpers.migrate();
   });
@@ -43,10 +43,10 @@ describe('yield-params-validator', () => {
   });
 
   describe('validate', () => {
-    it('does not throw error on valid update yield params event', () => {
-      const validator: YieldParamsValidator = new YieldParamsValidator(
-        defaultUpdateYieldParamsEvent1,
-        createBlock(defaultUpdateYieldParamsEvent1),
+    it('does not throw error on valid update yields params event', () => {
+      const validator: YieldsParamsValidator = new YieldsParamsValidator(
+        defaultUpdateYieldsParamsEvent1,
+        createBlock(defaultUpdateYieldsParamsEvent1),
         0,
       );
 
@@ -54,74 +54,74 @@ describe('yield-params-validator', () => {
       expectDidntLogError();
     });
 
-    it('throws error on undefined assetYieldIndex', () => {
-      const validator: YieldParamsValidator = new YieldParamsValidator(
+    it('throws error on undefined assetYieldsIndex', () => {
+      const validator: YieldsParamsValidator = new YieldsParamsValidator(
         {
-          ...defaultUpdateYieldParamsEvent1,
-          assetYieldIndex: undefined as unknown as string, // satisfy type checker
+          ...defaultUpdateYieldsParamsEvent1,
+          assetYieldsIndex: undefined as unknown as string, // satisfy type checker
         },
-        createBlock(defaultUpdateYieldParamsEvent1),
+        createBlock(defaultUpdateYieldsParamsEvent1),
         0,
       );
 
       expect(() => validator.validate()).toThrow(new ParseMessageError(
-        'UpdateYieldParamsEvent must have an assetYieldIndex that is defined and non-empty',
+        'UpdateYieldsParamsEvent must have an assetYieldsIndex that is defined and non-empty',
       ));
     });
 
-    it('throws error on empty assetYieldIndex', () => {
-      const validator: YieldParamsValidator = new YieldParamsValidator(
+    it('throws error on empty assetYieldsIndex', () => {
+      const validator: YieldsParamsValidator = new YieldsParamsValidator(
         {
-          ...defaultUpdateYieldParamsEvent1,
-          assetYieldIndex: '',
+          ...defaultUpdateYieldsParamsEvent1,
+          assetYieldsIndex: '',
         },
-        createBlock(defaultUpdateYieldParamsEvent1),
+        createBlock(defaultUpdateYieldsParamsEvent1),
         0,
       );
 
       expect(() => validator.validate()).toThrow(new ParseMessageError(
-        'UpdateYieldParamsEvent must have an assetYieldIndex that is defined and non-empty',
+        'UpdateYieldsParamsEvent must have an assetYieldsIndex that is defined and non-empty',
       ));
     });
 
     it('throws error on undefined sDAIPrice', () => {
-      const validator: YieldParamsValidator = new YieldParamsValidator(
+      const validator: YieldsParamsValidator = new YieldsParamsValidator(
         {
-          ...defaultUpdateYieldParamsEvent1,
+          ...defaultUpdateYieldsParamsEvent1,
           sdaiPrice: undefined as unknown as string, // satisfy type checker
         },
-        createBlock(defaultUpdateYieldParamsEvent1),
+        createBlock(defaultUpdateYieldsParamsEvent1),
         0,
       );
 
       expect(() => validator.validate()).toThrow(new ParseMessageError(
-        'UpdateYieldParamsEvent must have an sDAIPrice that is defined and non-empty',
+        'UpdateYieldsParamsEvent must have an sDAIPrice that is defined and non-empty',
       ));
     });
 
     it('throws error on empty sDAIPrice', () => {
-      const validator: YieldParamsValidator = new YieldParamsValidator(
+      const validator: YieldsParamsValidator = new YieldsParamsValidator(
         {
-          ...defaultUpdateYieldParamsEvent1,
+          ...defaultUpdateYieldsParamsEvent1,
           sdaiPrice: '',
         },
-        createBlock(defaultUpdateYieldParamsEvent1),
+        createBlock(defaultUpdateYieldsParamsEvent1),
         0,
       );
 
       expect(() => validator.validate()).toThrow(new ParseMessageError(
-        'UpdateYieldParamsEvent must have an sDAIPrice that is defined and non-empty',
+        'UpdateYieldsParamsEvent must have an sDAIPrice that is defined and non-empty',
       ));
     });
   });
 });
 
 function createBlock(
-  updateYieldParamsEvent: UpdateYieldParamsEventV1,
+  updateYieldsParamsEvent: UpdateYieldsParamsEventV1,
 ): IndexerTendermintBlock {
   const event: IndexerTendermintEvent = createIndexerTendermintEvent(
-    KlyraIndexerSubtypes.YIELD_PARAMS,
-    UpdateYieldParamsEventV1.encode(updateYieldParamsEvent).finish(),
+    KlyraIndexerSubtypes.YIELDS_PARAMS,
+    UpdateYieldsParamsEventV1.encode(updateYieldsParamsEvent).finish(),
     0,
     0,
   );

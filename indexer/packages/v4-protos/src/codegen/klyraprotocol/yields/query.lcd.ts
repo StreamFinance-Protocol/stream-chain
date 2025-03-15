@@ -16,14 +16,14 @@ export class LCDQueryClient {
 
 
   async getSDAIPriceQuery(_params: GetSDAIPriceQueryRequest = {}): Promise<GetSDAIPriceQueryResponseSDKType> {
-    const endpoint = `klyraprotocol/v4/yield/get_sdai_price`;
+    const endpoint = `klyraprotocol/v4/yields/get_sdai_price`;
     return await this.req.get<GetSDAIPriceQueryResponseSDKType>(endpoint);
   }
   /* Get the price of sDAI. */
 
 
   async getAssetYieldIndexQuery(_params: GetAssetYieldIndexQueryRequest = {}): Promise<GetAssetYieldIndexQueryResponseSDKType> {
-    const endpoint = `klyraprotocol/v4/yield/get_asset_yield_index`;
+    const endpoint = `klyraprotocol/v4/yields/get_asset_yield_index`;
     return await this.req.get<GetAssetYieldIndexQueryResponseSDKType>(endpoint);
   }
 

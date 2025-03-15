@@ -1,15 +1,15 @@
 import {
   Ordering,
-  YieldParamsColumns,
-  YieldParamsFromDatabase,
+  YieldsParamsColumns,
+  YieldsParamsFromDatabase,
 } from '../../src/types';
-import * as YieldParamsTable from '../../src/stores/yield-params-table';
+import * as YieldsParamsTable from '../../src/stores/yields-params-table';
 import { clearData, migrate, teardown } from '../../src/helpers/db-helpers';
 import { seedData } from '../helpers/mock-generators';
-import { defaultYieldParams1, defaultYieldParams2 } from '../helpers/constants';
+import { defaultYieldsParams1, defaultYieldsParams2 } from '../helpers/constants';
 import { DateTime } from 'luxon';
 
-describe('Yield params store', () => {
+describe('Yields params store', () => {
   beforeEach(async () => {
     await seedData();
   });
@@ -26,608 +26,608 @@ describe('Yield params store', () => {
     await teardown();
   });
 
-  it('Successfully creates new yield params', async () => {
-    await YieldParamsTable.create(defaultYieldParams1);
+  it('Successfully creates new yields params', async () => {
+    await YieldsParamsTable.create(defaultYieldsParams1);
   });
 
-  it('Successfully creates multiple new yield params', async () => {
-    await YieldParamsTable.create(defaultYieldParams1);
-    await YieldParamsTable.create(defaultYieldParams2);
+  it('Successfully creates multiple new yields params', async () => {
+    await YieldsParamsTable.create(defaultYieldsParams1);
+    await YieldsParamsTable.create(defaultYieldsParams2);
   });
 
-  it('Succesfully creates yield params and finds it', async () => {
-    await YieldParamsTable.create(defaultYieldParams1);
-    const yieldParams: YieldParamsFromDatabase[] = await YieldParamsTable.findAll({}, [], {});
+  it('Succesfully creates yields params and finds it', async () => {
+    await YieldsParamsTable.create(defaultYieldsParams1);
+    const yieldsParams: YieldsParamsFromDatabase[] = await YieldsParamsTable.findAll({}, [], {});
 
-    expect(yieldParams.length).toEqual(1);
-    expect(yieldParams[0]).toEqual(
-      expect.objectContaining(defaultYieldParams1),
+    expect(yieldsParams.length).toEqual(1);
+    expect(yieldsParams[0]).toEqual(
+      expect.objectContaining(defaultYieldsParams1),
     );
   });
 
-  it('Succesfully creates multiple yield params and finds them', async () => {
+  it('Succesfully creates multiple yields params and finds them', async () => {
     await Promise.all([
-      YieldParamsTable.create(defaultYieldParams1),
-      YieldParamsTable.create(defaultYieldParams2),
+      YieldsParamsTable.create(defaultYieldsParams1),
+      YieldsParamsTable.create(defaultYieldsParams2),
     ]);
 
-    const yieldParams: YieldParamsFromDatabase[] = await YieldParamsTable.findAll(
+    const yieldsParams: YieldsParamsFromDatabase[] = await YieldsParamsTable.findAll(
       {},
       [],
       {
-        orderBy: [[YieldParamsColumns.createdAtHeight, Ordering.ASC]],
+        orderBy: [[YieldsParamsColumns.createdAtHeight, Ordering.ASC]],
       },
     );
 
-    expect(yieldParams.length).toEqual(2);
-    expect(yieldParams[0]).toEqual(
-      expect.objectContaining(defaultYieldParams1),
+    expect(yieldsParams.length).toEqual(2);
+    expect(yieldsParams[0]).toEqual(
+      expect.objectContaining(defaultYieldsParams1),
     );
-    expect(yieldParams[1]).toEqual(
-      expect.objectContaining(defaultYieldParams2),
+    expect(yieldsParams[1]).toEqual(
+      expect.objectContaining(defaultYieldsParams2),
     );
   });
 
-  it('Successfully finds all yield params with id', async () => {
+  it('Successfully finds all yields params with id', async () => {
     await Promise.all([
-      YieldParamsTable.create(defaultYieldParams1),
-      YieldParamsTable.create(defaultYieldParams2),
+      YieldsParamsTable.create(defaultYieldsParams1),
+      YieldsParamsTable.create(defaultYieldsParams2),
     ]);
 
-    const yieldParams: YieldParamsFromDatabase[] = await YieldParamsTable.findAll(
-      { id: [YieldParamsTable.uuid(defaultYieldParams1.createdAtHeight)] },
+    const yieldsParams: YieldsParamsFromDatabase[] = await YieldsParamsTable.findAll(
+      { id: [YieldsParamsTable.uuid(defaultYieldsParams1.createdAtHeight)] },
       [],
       {
-        orderBy: [[YieldParamsColumns.createdAtHeight, Ordering.ASC]],
+        orderBy: [[YieldsParamsColumns.createdAtHeight, Ordering.ASC]],
       },
     );
 
-    expect(yieldParams.length).toEqual(1);
-    expect(yieldParams[0]).toEqual(
-      expect.objectContaining(defaultYieldParams1),
+    expect(yieldsParams.length).toEqual(1);
+    expect(yieldsParams[0]).toEqual(
+      expect.objectContaining(defaultYieldsParams1),
     );
   });
 
-  it('Successfully finds all yield params with sDAI price', async () => {
+  it('Successfully finds all yields params with sDAI price', async () => {
     await Promise.all([
-      YieldParamsTable.create(defaultYieldParams1),
-      YieldParamsTable.create(defaultYieldParams2),
+      YieldsParamsTable.create(defaultYieldsParams1),
+      YieldsParamsTable.create(defaultYieldsParams2),
     ]);
 
-    const yieldParams: YieldParamsFromDatabase[] = await YieldParamsTable.findAll(
-      { sDAIPrice: defaultYieldParams1.sDAIPrice },
+    const yieldsParams: YieldsParamsFromDatabase[] = await YieldsParamsTable.findAll(
+      { sDAIPrice: defaultYieldsParams1.sDAIPrice },
       [],
       {
-        orderBy: [[YieldParamsColumns.createdAtHeight, Ordering.ASC]],
+        orderBy: [[YieldsParamsColumns.createdAtHeight, Ordering.ASC]],
       },
     );
 
-    expect(yieldParams.length).toEqual(1);
-    expect(yieldParams[0]).toEqual(
-      expect.objectContaining(defaultYieldParams1),
+    expect(yieldsParams.length).toEqual(1);
+    expect(yieldsParams[0]).toEqual(
+      expect.objectContaining(defaultYieldsParams1),
     );
   });
 
-  it('Successfully finds all yield params with asset yield index', async () => {
+  it('Successfully finds all yields params with asset yields index', async () => {
     await Promise.all([
-      YieldParamsTable.create(defaultYieldParams1),
-      YieldParamsTable.create(defaultYieldParams2),
+      YieldsParamsTable.create(defaultYieldsParams1),
+      YieldsParamsTable.create(defaultYieldsParams2),
     ]);
 
-    const yieldParams: YieldParamsFromDatabase[] = await YieldParamsTable.findAll(
-      { assetYieldIndex: defaultYieldParams1.assetYieldIndex },
+    const yieldsParams: YieldsParamsFromDatabase[] = await YieldsParamsTable.findAll(
+      { assetYieldsIndex: defaultYieldsParams1.assetYieldsIndex },
       [],
       {
-        orderBy: [[YieldParamsColumns.createdAtHeight, Ordering.ASC]],
+        orderBy: [[YieldsParamsColumns.createdAtHeight, Ordering.ASC]],
       },
     );
 
-    expect(yieldParams.length).toEqual(1);
-    expect(yieldParams[0]).toEqual(
-      expect.objectContaining(defaultYieldParams1),
+    expect(yieldsParams.length).toEqual(1);
+    expect(yieldsParams[0]).toEqual(
+      expect.objectContaining(defaultYieldsParams1),
     );
   });
 
-  it('Successfully finds all yield params at height: Finds all yield params', async () => {
+  it('Successfully finds all yields params at height: Finds all yields params', async () => {
     await Promise.all([
-      YieldParamsTable.create(defaultYieldParams1),
-      YieldParamsTable.create(defaultYieldParams2),
+      YieldsParamsTable.create(defaultYieldsParams1),
+      YieldsParamsTable.create(defaultYieldsParams2),
     ]);
 
-    const yieldParams: YieldParamsFromDatabase[] = await YieldParamsTable.findAll(
+    const yieldsParams: YieldsParamsFromDatabase[] = await YieldsParamsTable.findAll(
       {
         createdAtHeight: [
-          defaultYieldParams1.createdAtHeight,
-          defaultYieldParams2.createdAtHeight,
+          defaultYieldsParams1.createdAtHeight,
+          defaultYieldsParams2.createdAtHeight,
         ],
       },
       [],
       {
-        orderBy: [[YieldParamsColumns.createdAtHeight, Ordering.ASC]],
+        orderBy: [[YieldsParamsColumns.createdAtHeight, Ordering.ASC]],
       },
     );
 
-    expect(yieldParams.length).toEqual(2);
-    expect(yieldParams[0]).toEqual(
-      expect.objectContaining(defaultYieldParams1),
+    expect(yieldsParams.length).toEqual(2);
+    expect(yieldsParams[0]).toEqual(
+      expect.objectContaining(defaultYieldsParams1),
     );
-    expect(yieldParams[1]).toEqual(
-      expect.objectContaining(defaultYieldParams2),
+    expect(yieldsParams[1]).toEqual(
+      expect.objectContaining(defaultYieldsParams2),
     );
   });
 
-  it('Successfully finds all yield params at height: Find one set of yield params', async () => {
+  it('Successfully finds all yields params at height: Find one set of yields params', async () => {
     await Promise.all([
-      YieldParamsTable.create(defaultYieldParams1),
-      YieldParamsTable.create(defaultYieldParams2),
+      YieldsParamsTable.create(defaultYieldsParams1),
+      YieldsParamsTable.create(defaultYieldsParams2),
     ]);
 
-    const yieldParams: YieldParamsFromDatabase[] = await YieldParamsTable.findAll(
-      { createdAtHeight: [defaultYieldParams2.createdAtHeight] },
+    const yieldsParams: YieldsParamsFromDatabase[] = await YieldsParamsTable.findAll(
+      { createdAtHeight: [defaultYieldsParams2.createdAtHeight] },
       [],
       {
-        orderBy: [[YieldParamsColumns.createdAtHeight, Ordering.ASC]],
+        orderBy: [[YieldsParamsColumns.createdAtHeight, Ordering.ASC]],
       },
     );
 
-    expect(yieldParams.length).toEqual(1);
-    expect(yieldParams[0]).toEqual(
-      expect.objectContaining(defaultYieldParams2),
+    expect(yieldsParams.length).toEqual(1);
+    expect(yieldsParams[0]).toEqual(
+      expect.objectContaining(defaultYieldsParams2),
     );
   });
 
-  it('Successfully finds all yield params at height: No yield params found', async () => {
+  it('Successfully finds all yields params at height: No yields params found', async () => {
     await Promise.all([
-      YieldParamsTable.create(defaultYieldParams1),
-      YieldParamsTable.create(defaultYieldParams2),
+      YieldsParamsTable.create(defaultYieldsParams1),
+      YieldsParamsTable.create(defaultYieldsParams2),
     ]);
 
     const latestHeightPlusOne: string = (
-      parseInt(defaultYieldParams2.createdAtHeight, 10) + 1
+      parseInt(defaultYieldsParams2.createdAtHeight, 10) + 1
     ).toString();
 
-    const yieldParams: YieldParamsFromDatabase[] = await YieldParamsTable.findAll(
+    const yieldsParams: YieldsParamsFromDatabase[] = await YieldsParamsTable.findAll(
       { createdAtHeight: [latestHeightPlusOne] },
       [],
       {
-        orderBy: [[YieldParamsColumns.createdAtHeight, Ordering.ASC]],
+        orderBy: [[YieldsParamsColumns.createdAtHeight, Ordering.ASC]],
       },
     );
 
-    expect(yieldParams.length).toEqual(0);
+    expect(yieldsParams.length).toEqual(0);
   });
 
-  it('Successfully finds all yield params before or at height: All yield params found', async () => {
+  it('Successfully finds all yields params before or at height: All yields params found', async () => {
     await Promise.all([
-      YieldParamsTable.create(defaultYieldParams1),
-      YieldParamsTable.create(defaultYieldParams2),
+      YieldsParamsTable.create(defaultYieldsParams1),
+      YieldsParamsTable.create(defaultYieldsParams2),
     ]);
 
-    const yieldParams: YieldParamsFromDatabase[] = await YieldParamsTable.findAll(
-      { createdBeforeOrAtHeight: defaultYieldParams2.createdAtHeight },
+    const yieldsParams: YieldsParamsFromDatabase[] = await YieldsParamsTable.findAll(
+      { createdBeforeOrAtHeight: defaultYieldsParams2.createdAtHeight },
       [],
       {
-        orderBy: [[YieldParamsColumns.createdAtHeight, Ordering.ASC]],
+        orderBy: [[YieldsParamsColumns.createdAtHeight, Ordering.ASC]],
       },
     );
 
-    expect(yieldParams.length).toEqual(2);
-    expect(yieldParams[0]).toEqual(
-      expect.objectContaining(defaultYieldParams1),
+    expect(yieldsParams.length).toEqual(2);
+    expect(yieldsParams[0]).toEqual(
+      expect.objectContaining(defaultYieldsParams1),
     );
-    expect(yieldParams[1]).toEqual(
-      expect.objectContaining(defaultYieldParams2),
+    expect(yieldsParams[1]).toEqual(
+      expect.objectContaining(defaultYieldsParams2),
     );
   });
 
-  it('Successfully finds all yield params before or at height: One set of yield params found', async () => {
+  it('Successfully finds all yields params before or at height: One set of yields params found', async () => {
     await Promise.all([
-      YieldParamsTable.create(defaultYieldParams1),
-      YieldParamsTable.create(defaultYieldParams2),
+      YieldsParamsTable.create(defaultYieldsParams1),
+      YieldsParamsTable.create(defaultYieldsParams2),
     ]);
 
-    const yieldParams: YieldParamsFromDatabase[] = await YieldParamsTable.findAll(
-      { createdBeforeOrAtHeight: defaultYieldParams1.createdAtHeight },
+    const yieldsParams: YieldsParamsFromDatabase[] = await YieldsParamsTable.findAll(
+      { createdBeforeOrAtHeight: defaultYieldsParams1.createdAtHeight },
       [],
       {
-        orderBy: [[YieldParamsColumns.createdAtHeight, Ordering.ASC]],
+        orderBy: [[YieldsParamsColumns.createdAtHeight, Ordering.ASC]],
       },
     );
 
-    expect(yieldParams.length).toEqual(1);
-    expect(yieldParams[0]).toEqual(
-      expect.objectContaining(defaultYieldParams1),
+    expect(yieldsParams.length).toEqual(1);
+    expect(yieldsParams[0]).toEqual(
+      expect.objectContaining(defaultYieldsParams1),
     );
   });
 
-  it('Successfully finds all yield params before or at height: No yield parms to be found', async () => {
+  it('Successfully finds all yields params before or at height: No yields parms to be found', async () => {
     await Promise.all([
-      YieldParamsTable.create(defaultYieldParams1),
-      YieldParamsTable.create(defaultYieldParams2),
+      YieldsParamsTable.create(defaultYieldsParams1),
+      YieldsParamsTable.create(defaultYieldsParams2),
     ]);
 
     const firsHeightMinusOne: string = (
-      parseInt(defaultYieldParams1.createdAtHeight, 10) - 1
+      parseInt(defaultYieldsParams1.createdAtHeight, 10) - 1
     ).toString();
 
-    const yieldParams: YieldParamsFromDatabase[] = await YieldParamsTable.findAll(
+    const yieldsParams: YieldsParamsFromDatabase[] = await YieldsParamsTable.findAll(
       { createdBeforeOrAtHeight: firsHeightMinusOne },
       [],
       {
-        orderBy: [[YieldParamsColumns.createdAtHeight, Ordering.ASC]],
+        orderBy: [[YieldsParamsColumns.createdAtHeight, Ordering.ASC]],
       },
     );
 
-    expect(yieldParams.length).toEqual(0);
+    expect(yieldsParams.length).toEqual(0);
   });
 
-  it('Successfully finds all yield params after height: All yield params found', async () => {
+  it('Successfully finds all yields params after height: All yields params found', async () => {
     await Promise.all([
-      YieldParamsTable.create(defaultYieldParams1),
-      YieldParamsTable.create(defaultYieldParams2),
+      YieldsParamsTable.create(defaultYieldsParams1),
+      YieldsParamsTable.create(defaultYieldsParams2),
     ]);
 
     const firsHeightMinusOne: string = (
-      parseInt(defaultYieldParams1.createdAtHeight, 10) - 1
+      parseInt(defaultYieldsParams1.createdAtHeight, 10) - 1
     ).toString();
 
-    const yieldParams: YieldParamsFromDatabase[] = await YieldParamsTable.findAll(
+    const yieldsParams: YieldsParamsFromDatabase[] = await YieldsParamsTable.findAll(
       { createdAfterHeight: firsHeightMinusOne },
       [],
       {
-        orderBy: [[YieldParamsColumns.createdAtHeight, Ordering.ASC]],
+        orderBy: [[YieldsParamsColumns.createdAtHeight, Ordering.ASC]],
       },
     );
 
-    expect(yieldParams.length).toEqual(2);
-    expect(yieldParams[0]).toEqual(
-      expect.objectContaining(defaultYieldParams1),
+    expect(yieldsParams.length).toEqual(2);
+    expect(yieldsParams[0]).toEqual(
+      expect.objectContaining(defaultYieldsParams1),
     );
-    expect(yieldParams[1]).toEqual(
-      expect.objectContaining(defaultYieldParams2),
+    expect(yieldsParams[1]).toEqual(
+      expect.objectContaining(defaultYieldsParams2),
     );
   });
 
-  it('Successfully finds all yield params after height: One set of yield params found', async () => {
+  it('Successfully finds all yields params after height: One set of yields params found', async () => {
     await Promise.all([
-      YieldParamsTable.create(defaultYieldParams1),
-      YieldParamsTable.create(defaultYieldParams2),
+      YieldsParamsTable.create(defaultYieldsParams1),
+      YieldsParamsTable.create(defaultYieldsParams2),
     ]);
 
-    const yieldParams: YieldParamsFromDatabase[] = await YieldParamsTable.findAll(
-      { createdAfterHeight: defaultYieldParams1.createdAtHeight },
+    const yieldsParams: YieldsParamsFromDatabase[] = await YieldsParamsTable.findAll(
+      { createdAfterHeight: defaultYieldsParams1.createdAtHeight },
       [],
       {
-        orderBy: [[YieldParamsColumns.createdAtHeight, Ordering.ASC]],
+        orderBy: [[YieldsParamsColumns.createdAtHeight, Ordering.ASC]],
       },
     );
 
-    expect(yieldParams.length).toEqual(1);
-    expect(yieldParams[0]).toEqual(
-      expect.objectContaining(defaultYieldParams2),
+    expect(yieldsParams.length).toEqual(1);
+    expect(yieldsParams[0]).toEqual(
+      expect.objectContaining(defaultYieldsParams2),
     );
   });
 
-  it('Successfully finds all yield params after height: No yield params found', async () => {
+  it('Successfully finds all yields params after height: No yields params found', async () => {
     await Promise.all([
-      YieldParamsTable.create(defaultYieldParams1),
-      YieldParamsTable.create(defaultYieldParams2),
+      YieldsParamsTable.create(defaultYieldsParams1),
+      YieldsParamsTable.create(defaultYieldsParams2),
     ]);
 
-    const yieldParams: YieldParamsFromDatabase[] = await YieldParamsTable.findAll(
-      { createdAfterHeight: defaultYieldParams2.createdAtHeight },
+    const yieldsParams: YieldsParamsFromDatabase[] = await YieldsParamsTable.findAll(
+      { createdAfterHeight: defaultYieldsParams2.createdAtHeight },
       [],
       {
-        orderBy: [[YieldParamsColumns.createdAtHeight, Ordering.ASC]],
+        orderBy: [[YieldsParamsColumns.createdAtHeight, Ordering.ASC]],
       },
     );
 
-    expect(yieldParams.length).toEqual(0);
+    expect(yieldsParams.length).toEqual(0);
   });
 
-  it('Successfully finds all yield params at time: One set of yield params found', async () => {
+  it('Successfully finds all yields params at time: One set of yields params found', async () => {
     await Promise.all([
-      YieldParamsTable.create(defaultYieldParams1),
-      YieldParamsTable.create(defaultYieldParams2),
+      YieldsParamsTable.create(defaultYieldsParams1),
+      YieldsParamsTable.create(defaultYieldsParams2),
     ]);
 
-    const yieldParams: YieldParamsFromDatabase[] = await YieldParamsTable.findAll(
-      { createdAt: defaultYieldParams1.createdAt },
+    const yieldsParams: YieldsParamsFromDatabase[] = await YieldsParamsTable.findAll(
+      { createdAt: defaultYieldsParams1.createdAt },
       [],
       {
-        orderBy: [[YieldParamsColumns.createdAtHeight, Ordering.ASC]],
+        orderBy: [[YieldsParamsColumns.createdAtHeight, Ordering.ASC]],
       },
     );
 
-    expect(yieldParams.length).toEqual(1);
-    expect(yieldParams[0]).toEqual(
-      expect.objectContaining(defaultYieldParams1),
+    expect(yieldsParams.length).toEqual(1);
+    expect(yieldsParams[0]).toEqual(
+      expect.objectContaining(defaultYieldsParams1),
     );
   });
 
-  it('Successfully finds all yield params at time: No yield params found', async () => {
+  it('Successfully finds all yields params at time: No yields params found', async () => {
     await Promise.all([
-      YieldParamsTable.create(defaultYieldParams1),
-      YieldParamsTable.create(defaultYieldParams2),
+      YieldsParamsTable.create(defaultYieldsParams1),
+      YieldsParamsTable.create(defaultYieldsParams2),
     ]);
 
     const latestCreatedAtPlusOne = DateTime.fromISO(
-      defaultYieldParams2.createdAt,
+      defaultYieldsParams2.createdAt,
     )
       .plus({ days: 1 })
       .toISO() ?? '';
 
-    const yieldParams: YieldParamsFromDatabase[] = await YieldParamsTable.findAll(
+    const yieldsParams: YieldsParamsFromDatabase[] = await YieldsParamsTable.findAll(
       { createdAt: latestCreatedAtPlusOne },
       [],
       {
-        orderBy: [[YieldParamsColumns.createdAtHeight, Ordering.ASC]],
+        orderBy: [[YieldsParamsColumns.createdAtHeight, Ordering.ASC]],
       },
     );
 
-    expect(yieldParams.length).toEqual(0);
+    expect(yieldsParams.length).toEqual(0);
   });
 
-  it('Successfully finds all yield params before or at time: All yield params found', async () => {
+  it('Successfully finds all yields params before or at time: All yields params found', async () => {
     await Promise.all([
-      YieldParamsTable.create(defaultYieldParams1),
-      YieldParamsTable.create(defaultYieldParams2),
+      YieldsParamsTable.create(defaultYieldsParams1),
+      YieldsParamsTable.create(defaultYieldsParams2),
     ]);
 
-    const yieldParams: YieldParamsFromDatabase[] = await YieldParamsTable.findAll(
-      { createdBeforeOrAt: defaultYieldParams2.createdAt },
+    const yieldsParams: YieldsParamsFromDatabase[] = await YieldsParamsTable.findAll(
+      { createdBeforeOrAt: defaultYieldsParams2.createdAt },
       [],
       {
-        orderBy: [[YieldParamsColumns.createdAtHeight, Ordering.ASC]],
+        orderBy: [[YieldsParamsColumns.createdAtHeight, Ordering.ASC]],
       },
     );
 
-    expect(yieldParams.length).toEqual(2);
-    expect(yieldParams[0]).toEqual(
-      expect.objectContaining(defaultYieldParams1),
+    expect(yieldsParams.length).toEqual(2);
+    expect(yieldsParams[0]).toEqual(
+      expect.objectContaining(defaultYieldsParams1),
     );
-    expect(yieldParams[1]).toEqual(
-      expect.objectContaining(defaultYieldParams2),
+    expect(yieldsParams[1]).toEqual(
+      expect.objectContaining(defaultYieldsParams2),
     );
   });
 
-  it('Successfully finds all yield params before or at time: One set of yield params found', async () => {
+  it('Successfully finds all yields params before or at time: One set of yields params found', async () => {
     await Promise.all([
-      YieldParamsTable.create(defaultYieldParams1),
-      YieldParamsTable.create(defaultYieldParams2),
+      YieldsParamsTable.create(defaultYieldsParams1),
+      YieldsParamsTable.create(defaultYieldsParams2),
     ]);
 
-    const yieldParams: YieldParamsFromDatabase[] = await YieldParamsTable.findAll(
-      { createdBeforeOrAt: defaultYieldParams1.createdAt },
+    const yieldsParams: YieldsParamsFromDatabase[] = await YieldsParamsTable.findAll(
+      { createdBeforeOrAt: defaultYieldsParams1.createdAt },
       [],
       {
-        orderBy: [[YieldParamsColumns.createdAtHeight, Ordering.ASC]],
+        orderBy: [[YieldsParamsColumns.createdAtHeight, Ordering.ASC]],
       },
     );
 
-    expect(yieldParams.length).toEqual(1);
-    expect(yieldParams[0]).toEqual(
-      expect.objectContaining(defaultYieldParams1),
+    expect(yieldsParams.length).toEqual(1);
+    expect(yieldsParams[0]).toEqual(
+      expect.objectContaining(defaultYieldsParams1),
     );
   });
 
-  it('Successfully finds all yield params before or at time: No yield parms found', async () => {
+  it('Successfully finds all yields params before or at time: No yields parms found', async () => {
     await Promise.all([
-      YieldParamsTable.create(defaultYieldParams1),
-      YieldParamsTable.create(defaultYieldParams2),
+      YieldsParamsTable.create(defaultYieldsParams1),
+      YieldsParamsTable.create(defaultYieldsParams2),
     ]);
 
     const latestCreatedAtMinusOne = DateTime.fromISO(
-      defaultYieldParams1.createdAt,
+      defaultYieldsParams1.createdAt,
     )
       .minus({ days: 1 })
       .toISO() ?? '';
 
-    const yieldParams: YieldParamsFromDatabase[] = await YieldParamsTable.findAll(
+    const yieldsParams: YieldsParamsFromDatabase[] = await YieldsParamsTable.findAll(
       { createdBeforeOrAt: latestCreatedAtMinusOne },
       [],
       {
-        orderBy: [[YieldParamsColumns.createdAtHeight, Ordering.ASC]],
+        orderBy: [[YieldsParamsColumns.createdAtHeight, Ordering.ASC]],
       },
     );
 
-    expect(yieldParams.length).toEqual(0);
+    expect(yieldsParams.length).toEqual(0);
   });
 
-  it('Successfully finds all yield params after time: All yield params found', async () => {
+  it('Successfully finds all yields params after time: All yields params found', async () => {
     await Promise.all([
-      YieldParamsTable.create(defaultYieldParams1),
-      YieldParamsTable.create(defaultYieldParams2),
+      YieldsParamsTable.create(defaultYieldsParams1),
+      YieldsParamsTable.create(defaultYieldsParams2),
     ]);
     const latestCreatedAtMinusOne = DateTime.fromISO(
-      defaultYieldParams1.createdAt,
+      defaultYieldsParams1.createdAt,
     )
       .minus({ days: 1 })
       .toISO() ?? '';
 
-    const yieldParams: YieldParamsFromDatabase[] = await YieldParamsTable.findAll(
+    const yieldsParams: YieldsParamsFromDatabase[] = await YieldsParamsTable.findAll(
       { createdAfter: latestCreatedAtMinusOne },
       [],
       {
-        orderBy: [[YieldParamsColumns.createdAtHeight, Ordering.ASC]],
+        orderBy: [[YieldsParamsColumns.createdAtHeight, Ordering.ASC]],
       },
     );
 
-    expect(yieldParams.length).toEqual(2);
-    expect(yieldParams[0]).toEqual(
-      expect.objectContaining(defaultYieldParams1),
+    expect(yieldsParams.length).toEqual(2);
+    expect(yieldsParams[0]).toEqual(
+      expect.objectContaining(defaultYieldsParams1),
     );
-    expect(yieldParams[1]).toEqual(
-      expect.objectContaining(defaultYieldParams2),
+    expect(yieldsParams[1]).toEqual(
+      expect.objectContaining(defaultYieldsParams2),
     );
   });
 
-  it('Successfully finds all yield params after time: One set of yield params found', async () => {
+  it('Successfully finds all yields params after time: One set of yields params found', async () => {
     await Promise.all([
-      YieldParamsTable.create(defaultYieldParams1),
-      YieldParamsTable.create(defaultYieldParams2),
+      YieldsParamsTable.create(defaultYieldsParams1),
+      YieldsParamsTable.create(defaultYieldsParams2),
     ]);
 
-    const yieldParams: YieldParamsFromDatabase[] = await YieldParamsTable.findAll(
-      { createdAfter: defaultYieldParams1.createdAt },
+    const yieldsParams: YieldsParamsFromDatabase[] = await YieldsParamsTable.findAll(
+      { createdAfter: defaultYieldsParams1.createdAt },
       [],
       {
-        orderBy: [[YieldParamsColumns.createdAtHeight, Ordering.ASC]],
+        orderBy: [[YieldsParamsColumns.createdAtHeight, Ordering.ASC]],
       },
     );
 
-    expect(yieldParams.length).toEqual(1);
-    expect(yieldParams[0]).toEqual(
-      expect.objectContaining(defaultYieldParams2),
+    expect(yieldsParams.length).toEqual(1);
+    expect(yieldsParams[0]).toEqual(
+      expect.objectContaining(defaultYieldsParams2),
     );
   });
 
-  it('Successfully finds all yield params : No yield params found', async () => {
+  it('Successfully finds all yields params : No yields params found', async () => {
     await Promise.all([
-      YieldParamsTable.create(defaultYieldParams1),
-      YieldParamsTable.create(defaultYieldParams2),
+      YieldsParamsTable.create(defaultYieldsParams1),
+      YieldsParamsTable.create(defaultYieldsParams2),
     ]);
 
-    const yieldParams: YieldParamsFromDatabase[] = await YieldParamsTable.findAll(
-      { createdAfter: defaultYieldParams2.createdAt },
+    const yieldsParams: YieldsParamsFromDatabase[] = await YieldsParamsTable.findAll(
+      { createdAfter: defaultYieldsParams2.createdAt },
       [],
       {
-        orderBy: [[YieldParamsColumns.createdAtHeight, Ordering.ASC]],
+        orderBy: [[YieldsParamsColumns.createdAtHeight, Ordering.ASC]],
       },
     );
 
-    expect(yieldParams.length).toEqual(0);
+    expect(yieldsParams.length).toEqual(0);
   });
 
-  it('Successfully finds yield params before or at height and with specific assetYieldIndex', async () => {
+  it('Successfully finds yields params before or at height and with specific assetYieldsIndex', async () => {
     await Promise.all([
-      YieldParamsTable.create(defaultYieldParams1),
-      YieldParamsTable.create(defaultYieldParams2),
+      YieldsParamsTable.create(defaultYieldsParams1),
+      YieldsParamsTable.create(defaultYieldsParams2),
     ]);
 
-    const yieldParams: YieldParamsFromDatabase[] = await YieldParamsTable.findAll(
+    const yieldsParams: YieldsParamsFromDatabase[] = await YieldsParamsTable.findAll(
       {
-        createdBeforeOrAtHeight: defaultYieldParams2.createdAtHeight,
-        assetYieldIndex: defaultYieldParams1.assetYieldIndex,
-      },
-      [],
-      {
-        orderBy: [[YieldParamsColumns.createdAtHeight, Ordering.ASC]],
-      },
-    );
-
-    expect(yieldParams.length).toEqual(1);
-    expect(yieldParams[0]).toEqual(
-      expect.objectContaining(defaultYieldParams1),
-    );
-  });
-
-  it('Successfully finds yield params before or at height with asset yield index and sDAI price', async () => {
-    await Promise.all([
-      YieldParamsTable.create(defaultYieldParams1),
-      YieldParamsTable.create(defaultYieldParams2),
-    ]);
-
-    const yieldParams: YieldParamsFromDatabase[] = await YieldParamsTable.findAll(
-      {
-        createdBeforeOrAtHeight: defaultYieldParams2.createdAtHeight,
-        assetYieldIndex: defaultYieldParams1.assetYieldIndex,
-        sDAIPrice: defaultYieldParams1.sDAIPrice,
+        createdBeforeOrAtHeight: defaultYieldsParams2.createdAtHeight,
+        assetYieldsIndex: defaultYieldsParams1.assetYieldsIndex,
       },
       [],
       {
-        orderBy: [[YieldParamsColumns.createdAtHeight, Ordering.ASC]],
+        orderBy: [[YieldsParamsColumns.createdAtHeight, Ordering.ASC]],
       },
     );
 
-    expect(yieldParams.length).toEqual(1);
-    expect(yieldParams[0]).toEqual(
-      expect.objectContaining(defaultYieldParams1),
+    expect(yieldsParams.length).toEqual(1);
+    expect(yieldsParams[0]).toEqual(
+      expect.objectContaining(defaultYieldsParams1),
     );
   });
 
-  it('Successfully finds yield params at time with asset yield index and sDAI price', async () => {
+  it('Successfully finds yields params before or at height with asset yields index and sDAI price', async () => {
     await Promise.all([
-      YieldParamsTable.create(defaultYieldParams1),
-      YieldParamsTable.create(defaultYieldParams2),
+      YieldsParamsTable.create(defaultYieldsParams1),
+      YieldsParamsTable.create(defaultYieldsParams2),
     ]);
 
-    const yieldParams: YieldParamsFromDatabase[] = await YieldParamsTable.findAll(
+    const yieldsParams: YieldsParamsFromDatabase[] = await YieldsParamsTable.findAll(
       {
-        createdAt: defaultYieldParams2.createdAt,
-        assetYieldIndex: defaultYieldParams2.assetYieldIndex,
-        sDAIPrice: defaultYieldParams2.sDAIPrice,
+        createdBeforeOrAtHeight: defaultYieldsParams2.createdAtHeight,
+        assetYieldsIndex: defaultYieldsParams1.assetYieldsIndex,
+        sDAIPrice: defaultYieldsParams1.sDAIPrice,
       },
       [],
       {
-        orderBy: [[YieldParamsColumns.createdAtHeight, Ordering.ASC]],
+        orderBy: [[YieldsParamsColumns.createdAtHeight, Ordering.ASC]],
       },
     );
 
-    expect(yieldParams.length).toEqual(1);
-    expect(yieldParams[0]).toEqual(
-      expect.objectContaining(defaultYieldParams2),
+    expect(yieldsParams.length).toEqual(1);
+    expect(yieldsParams[0]).toEqual(
+      expect.objectContaining(defaultYieldsParams1),
     );
   });
 
-  it('Finds no yield params on findAll parameters mismatch', async () => {
+  it('Successfully finds yields params at time with asset yields index and sDAI price', async () => {
     await Promise.all([
-      YieldParamsTable.create(defaultYieldParams1),
-      YieldParamsTable.create(defaultYieldParams2),
+      YieldsParamsTable.create(defaultYieldsParams1),
+      YieldsParamsTable.create(defaultYieldsParams2),
     ]);
 
-    const yieldParams: YieldParamsFromDatabase[] = await YieldParamsTable.findAll(
+    const yieldsParams: YieldsParamsFromDatabase[] = await YieldsParamsTable.findAll(
       {
-        assetYieldIndex: defaultYieldParams1.assetYieldIndex,
-        sDAIPrice: defaultYieldParams2.sDAIPrice,
+        createdAt: defaultYieldsParams2.createdAt,
+        assetYieldsIndex: defaultYieldsParams2.assetYieldsIndex,
+        sDAIPrice: defaultYieldsParams2.sDAIPrice,
       },
       [],
       {
-        orderBy: [[YieldParamsColumns.createdAtHeight, Ordering.ASC]],
+        orderBy: [[YieldsParamsColumns.createdAtHeight, Ordering.ASC]],
       },
     );
 
-    expect(yieldParams.length).toEqual(0);
+    expect(yieldsParams.length).toEqual(1);
+    expect(yieldsParams[0]).toEqual(
+      expect.objectContaining(defaultYieldsParams2),
+    );
   });
 
-  it('Successfully finds yield params by from Id', async () => {
+  it('Finds no yields params on findAll parameters mismatch', async () => {
     await Promise.all([
-      YieldParamsTable.create(defaultYieldParams1),
-      YieldParamsTable.create(defaultYieldParams2),
+      YieldsParamsTable.create(defaultYieldsParams1),
+      YieldsParamsTable.create(defaultYieldsParams2),
     ]);
 
-    const yieldParams: YieldParamsFromDatabase | undefined = await YieldParamsTable.findById(
-      YieldParamsTable.uuid(defaultYieldParams1.createdAtHeight),
+    const yieldsParams: YieldsParamsFromDatabase[] = await YieldsParamsTable.findAll(
+      {
+        assetYieldsIndex: defaultYieldsParams1.assetYieldsIndex,
+        sDAIPrice: defaultYieldsParams2.sDAIPrice,
+      },
+      [],
+      {
+        orderBy: [[YieldsParamsColumns.createdAtHeight, Ordering.ASC]],
+      },
     );
 
-    expect(yieldParams).toBeDefined();
-    expect(yieldParams).toEqual(expect.objectContaining(defaultYieldParams1));
+    expect(yieldsParams.length).toEqual(0);
   });
 
-  it('Successfully finds gets latest yield params: Multiple sets of yield params stored', async () => {
+  it('Successfully finds yields params by from Id', async () => {
     await Promise.all([
-      YieldParamsTable.create(defaultYieldParams1),
-      YieldParamsTable.create(defaultYieldParams2),
+      YieldsParamsTable.create(defaultYieldsParams1),
+      YieldsParamsTable.create(defaultYieldsParams2),
     ]);
 
-    const yieldParams: YieldParamsFromDatabase | undefined = await YieldParamsTable.getLatest();
+    const yieldsParams: YieldsParamsFromDatabase | undefined = await YieldsParamsTable.findById(
+      YieldsParamsTable.uuid(defaultYieldsParams1.createdAtHeight),
+    );
 
-    expect(yieldParams).toBeDefined();
-    expect(yieldParams).toEqual(expect.objectContaining(defaultYieldParams2));
+    expect(yieldsParams).toBeDefined();
+    expect(yieldsParams).toEqual(expect.objectContaining(defaultYieldsParams1));
   });
 
-  it('Successfully finds gets latest yield params: One set of yield params stored', async () => {
-    await Promise.all([YieldParamsTable.create(defaultYieldParams1)]);
+  it('Successfully finds gets latest yields params: Multiple sets of yields params stored', async () => {
+    await Promise.all([
+      YieldsParamsTable.create(defaultYieldsParams1),
+      YieldsParamsTable.create(defaultYieldsParams2),
+    ]);
 
-    const yieldParams: YieldParamsFromDatabase | undefined = await YieldParamsTable.getLatest();
+    const yieldsParams: YieldsParamsFromDatabase | undefined = await YieldsParamsTable.getLatest();
 
-    expect(yieldParams).toBeDefined();
-    expect(yieldParams).toEqual(expect.objectContaining(defaultYieldParams1));
+    expect(yieldsParams).toBeDefined();
+    expect(yieldsParams).toEqual(expect.objectContaining(defaultYieldsParams2));
   });
 
-  it('Successfully finds gets latest yield params: No yield params stored', async () => {
-    await expect(YieldParamsTable.getLatest()).rejects.toThrow(
-      'Unable to find latest yield params',
+  it('Successfully finds gets latest yields params: One set of yields params stored', async () => {
+    await Promise.all([YieldsParamsTable.create(defaultYieldsParams1)]);
+
+    const yieldsParams: YieldsParamsFromDatabase | undefined = await YieldsParamsTable.getLatest();
+
+    expect(yieldsParams).toBeDefined();
+    expect(yieldsParams).toEqual(expect.objectContaining(defaultYieldsParams1));
+  });
+
+  it('Successfully finds gets latest yields params: No yields params stored', async () => {
+    await expect(YieldsParamsTable.getLatest()).rejects.toThrow(
+      'Unable to find latest yields params',
     );
   });
 });

@@ -5,7 +5,7 @@ import { MsgClaimYieldForSubaccount, MsgClaimYieldForSubaccountResponse } from "
 
 export interface Msg {
   /**
-   * ClaimYieldForSubaccount claims the yield for the provided subaccount and
+   * ClaimYieldForSubaccount claims the yields for the provided subaccount and
    * persists it to state.
    */
   claimYieldForSubaccount(request: MsgClaimYieldForSubaccount): Promise<MsgClaimYieldForSubaccountResponse>;

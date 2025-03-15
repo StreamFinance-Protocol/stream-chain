@@ -57,8 +57,8 @@ BEGIN
                 rval[i] = klyra_stateful_order_handler(block_height, block_time, event_data);
             WHEN '"deleveraging"'::jsonb THEN
                 rval[i] = klyra_deleveraging_handler(block_height, block_time, event_data, event_index, transaction_index, jsonb_array_element_text(block->'txHashes', transaction_index));
-            WHEN '"yield_params"'::jsonb THEN
-                rval[i] = klyra_yield_params_handler(block_height, block_time, event_data);
+            WHEN '"yields_params"'::jsonb THEN
+                rval[i] = klyra_yields_params_handler(block_height, block_time, event_data);
             ELSE
                 NULL;
             END CASE;

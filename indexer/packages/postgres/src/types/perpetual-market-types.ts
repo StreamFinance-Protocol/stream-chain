@@ -19,7 +19,7 @@ export interface PerpetualMarketCreateObject {
   stepBaseQuantums: number;
   liquidityTierId: number;
   baseOpenInterest: string;
-  perpYieldIndex: string;
+  perpYieldsIndex: string;
 }
 
 export interface PerpetualMarketUpdateObject {
@@ -39,7 +39,7 @@ export interface PerpetualMarketUpdateObject {
   subticksPerTick?: number;
   stepBaseQuantums?: number;
   liquidityTierId?: number;
-  perpYieldIndex?: string;
+  perpYieldsIndex?: string;
 }
 
 export enum PerpetualMarketColumns {
@@ -60,7 +60,7 @@ export enum PerpetualMarketColumns {
   subticksPerTick = 'subticksPerTick',
   stepBaseQuantums = 'stepBaseQuantums',
   liquidityTierId = 'liquidityTierId',
-  perpYieldIndex = 'perpYieldIndex',
+  perpYieldsIndex = 'perpYieldsIndex',
 }
 
 export enum PerpetualMarketStatus {

@@ -1,6 +1,6 @@
 import { SubaccountUpdateEventV1 } from '@klyraprotocol-indexer/v4-protos';
 
-import { ZERO_ASSET_YIELD_INDEX } from '../constants';
+import { ZERO_ASSET_YIELDS_INDEX } from '../constants';
 import { OrderFillWithLiquidity, SubaccountUpdate } from '../lib/translated-types';
 import {
   OrderFillEventWithLiquidation,
@@ -15,7 +15,7 @@ export function subaccountUpdateEventV1ToSubaccountUpdate(
     subaccountId: event.subaccountId,
     updatedPerpetualPositions: event.updatedPerpetualPositions,
     updatedAssetPositions: event.updatedAssetPositions,
-    assetYieldIndex: ZERO_ASSET_YIELD_INDEX,
+    assetYieldsIndex: ZERO_ASSET_YIELDS_INDEX,
   };
 }
 

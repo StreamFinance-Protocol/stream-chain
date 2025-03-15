@@ -1,7 +1,7 @@
 import {
-  YieldParamsColumns,
-  YieldParamsFromDatabase,
-  YieldParamsTable,
+  YieldsParamsColumns,
+  YieldsParamsFromDatabase,
+  YieldsParamsTable,
   dbHelpers,
   Ordering,
   liquidityTierRefresher,
@@ -14,13 +14,13 @@ import {
   defaultPreviousHeight,
   defaultTime,
   defaultTxHash,
-  defaultUpdateYieldParamsEvent1,
+  defaultUpdateYieldsParamsEvent1,
 } from '../helpers/constants';
 import {
   IndexerTendermintBlock,
   IndexerTendermintEvent,
   Timestamp,
-  UpdateYieldParamsEventV1,
+  UpdateYieldsParamsEventV1,
 } from '@klyraprotocol-indexer/v4-protos';
 import {
   createIndexerTendermintBlock,
@@ -31,9 +31,9 @@ import { createKafkaMessage } from '@klyraprotocol-indexer/kafka';
 import { KafkaMessage } from 'kafkajs';
 import { onMessage } from '../../src/lib/on-message';
 import { createPostgresFunctions } from '../../src/helpers/postgres/postgres-functions';
-import { YieldParamsHandler } from '../../src/handlers/yield-params-handler';
+import { YieldsParamsHandler } from '../../src/handlers/yields-params-handler';
 
-describe('yield-params-handler', () => {
+describe('yields-params-handler', () => {
   beforeAll(async () => {
     await dbHelpers.migrate();
     await createPostgresFunctions();
@@ -64,8 +64,8 @@ describe('yield-params-handler', () => {
       const eventIndex: number = 0;
 
       const indexerTendermintEvent: IndexerTendermintEvent = createIndexerTendermintEvent(
-        KlyraIndexerSubtypes.YIELD_PARAMS,
-        UpdateYieldParamsEventV1.encode(defaultUpdateYieldParamsEvent1).finish(),
+        KlyraIndexerSubtypes.YIELDS_PARAMS,
+        UpdateYieldsParamsEventV1.encode(defaultUpdateYieldsParamsEvent1).finish(),
         transactionIndex,
         eventIndex,
       );
@@ -76,52 +76,52 @@ describe('yield-params-handler', () => {
         [defaultTxHash],
       );
 
-      const handler: YieldParamsHandler = new YieldParamsHandler(
+      const handler: YieldsParamsHandler = new YieldsParamsHandler(
         block,
         0,
         indexerTendermintEvent,
         0,
-        defaultUpdateYieldParamsEvent1,
+        defaultUpdateYieldsParamsEvent1,
       );
 
       expect(handler.getParallelizationIds()).toEqual([]);
     });
   });
 
-  it('successfully creates yield params', async () => {
+  it('successfully creates yields params', async () => {
     const transactionIndex: number = 0;
 
-    const kafkaMessage: KafkaMessage = createKafkaMessageFromYieldParamsEvent({
-      yieldParamsEvent: defaultUpdateYieldParamsEvent1,
+    const kafkaMessage: KafkaMessage = createKafkaMessageFromYieldsParamsEvent({
+      yieldsParamsEvent: defaultUpdateYieldsParamsEvent1,
       transactionIndex,
       height: defaultHeight,
       time: defaultTime,
       txHash: defaultTxHash,
     });
 
-    await expectNoExistingYieldParams();
+    await expectNoExistingYieldsParams();
 
     await onMessage(kafkaMessage);
 
-    const newYieldParams: YieldParamsFromDatabase[] = await YieldParamsTable.findAll(
+    const newYieldsParams: YieldsParamsFromDatabase[] = await YieldsParamsTable.findAll(
       {},
       [], {
-        orderBy: [[YieldParamsColumns.createdAtHeight, Ordering.ASC]],
+        orderBy: [[YieldsParamsColumns.createdAtHeight, Ordering.ASC]],
       });
-    expect(newYieldParams.length).toEqual(1);
-    expectYieldParamsMatchEvent(defaultUpdateYieldParamsEvent1, newYieldParams[0]);
-    expectYieldParamsMatchBlock(defaultHeight, defaultTime, newYieldParams[0]);
+    expect(newYieldsParams.length).toEqual(1);
+    expectYieldsParamsMatchEvent(defaultUpdateYieldsParamsEvent1, newYieldsParams[0]);
+    expectYieldsParamsMatchBlock(defaultHeight, defaultTime, newYieldsParams[0]);
   });
 });
 
-function createKafkaMessageFromYieldParamsEvent({
-  yieldParamsEvent,
+function createKafkaMessageFromYieldsParamsEvent({
+  yieldsParamsEvent,
   transactionIndex,
   height,
   time,
   txHash,
 }: {
-  yieldParamsEvent: UpdateYieldParamsEventV1,
+  yieldsParamsEvent: UpdateYieldsParamsEventV1,
   transactionIndex: number,
   height: number,
   time: Timestamp,
@@ -130,8 +130,8 @@ function createKafkaMessageFromYieldParamsEvent({
   const events: IndexerTendermintEvent[] = [];
   events.push(
     createIndexerTendermintEvent(
-      KlyraIndexerSubtypes.YIELD_PARAMS,
-      UpdateYieldParamsEventV1.encode(yieldParamsEvent).finish(),
+      KlyraIndexerSubtypes.YIELDS_PARAMS,
+      UpdateYieldsParamsEventV1.encode(yieldsParamsEvent).finish(),
       transactionIndex,
       0,
     ),
@@ -148,34 +148,34 @@ function createKafkaMessageFromYieldParamsEvent({
   return createKafkaMessage(Buffer.from(binaryBlock));
 }
 
-async function expectNoExistingYieldParams() {
+async function expectNoExistingYieldsParams() {
   // Confirm there is no existing asset
-  const assets: YieldParamsFromDatabase[] = await YieldParamsTable.findAll(
+  const assets: YieldsParamsFromDatabase[] = await YieldsParamsTable.findAll(
     {},
     [], {
-      orderBy: [[YieldParamsColumns.createdAtHeight, Ordering.ASC]],
+      orderBy: [[YieldsParamsColumns.createdAtHeight, Ordering.ASC]],
     });
 
   expect(assets.length).toEqual(0);
 }
 
-function expectYieldParamsMatchEvent(
-  event: UpdateYieldParamsEventV1,
-  yieldParams: YieldParamsFromDatabase,
+function expectYieldsParamsMatchEvent(
+  event: UpdateYieldsParamsEventV1,
+  yieldsParams: YieldsParamsFromDatabase,
 ) {
-  expect(yieldParams.assetYieldIndex).toEqual(event.assetYieldIndex);
-  expect(yieldParams.sDAIPrice).toEqual(event.sdaiPrice);
+  expect(yieldsParams.assetYieldsIndex).toEqual(event.assetYieldsIndex);
+  expect(yieldsParams.sDAIPrice).toEqual(event.sdaiPrice);
 }
 
-function expectYieldParamsMatchBlock(
+function expectYieldsParamsMatchBlock(
   height: number,
   time: Timestamp,
-  yieldParams: YieldParamsFromDatabase,
+  yieldsParams: YieldsParamsFromDatabase,
 ) {
-  expect(yieldParams.createdAtHeight).toEqual(height.toString());
+  expect(yieldsParams.createdAtHeight).toEqual(height.toString());
   const date = new Date(time.seconds.low * 1000);
   date.setMilliseconds(date.getMilliseconds() + Math.floor(time.nanos / 1e6));
   const isoString = date.toISOString();
-  expect(yieldParams.createdAt).toEqual(isoString);
-  expect(yieldParams.id).toEqual(YieldParamsTable.uuid(height.toString()));
+  expect(yieldsParams.createdAt).toEqual(isoString);
+  expect(yieldsParams.id).toEqual(YieldsParamsTable.uuid(height.toString()));
 }

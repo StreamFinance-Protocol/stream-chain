@@ -45,7 +45,7 @@ import {
   TimeInForce,
   TransactionCreateObject,
   TransferCreateObject,
-  YieldParamsCreateObject,
+  YieldsParamsCreateObject,
   CollateralPoolsCreateObject,
 } from '../../src/types';
 
@@ -56,9 +56,9 @@ export const invalidTicker: string = 'INVALID-INVALID';
 export const klyraChain: string = 'klyra';
 export const defaultAddress: string = 'klyra1n88uc38xhjgxzw9nwre4ep2c8ga4fjxcttpsmz';
 export const blockedAddress: string = 'klyra1f9k5qldwmqrnwy8hcgp4fw6heuvszt35xeeywp';
-export const zeroAssetYieldIndex: string = '0/1';
-export const oneAssetYieldIndex: string = '1/1';
-export const defaultZeroPerpYieldIndex: string = '0/1';
+export const zeroAssetYieldsIndex: string = '0/1';
+export const oneAssetYieldsIndex: string = '1/1';
+export const defaultZeroPerpYieldsIndex: string = '0/1';
 
 // ============== Subaccounts ==============
 
@@ -67,7 +67,7 @@ export const defaultSubaccount: SubaccountCreateObject = {
   subaccountNumber: 0,
   updatedAt: createdDateTime.toISO() ?? '' ?? '',
   updatedAtHeight: createdHeight,
-  assetYieldIndex: zeroAssetYieldIndex,
+  assetYieldsIndex: zeroAssetYieldsIndex,
 };
 
 export const defaultSubaccount2: SubaccountCreateObject = {
@@ -75,7 +75,7 @@ export const defaultSubaccount2: SubaccountCreateObject = {
   subaccountNumber: 1,
   updatedAt: createdDateTime.toISO() ?? '',
   updatedAtHeight: createdHeight,
-  assetYieldIndex: zeroAssetYieldIndex,
+  assetYieldsIndex: zeroAssetYieldsIndex,
 };
 
 export const defaultSubaccount3: SubaccountCreateObject = {
@@ -83,7 +83,7 @@ export const defaultSubaccount3: SubaccountCreateObject = {
   subaccountNumber: 2,
   updatedAt: createdDateTime.toISO() ?? '',
   updatedAtHeight: createdHeight,
-  assetYieldIndex: zeroAssetYieldIndex,
+  assetYieldsIndex: zeroAssetYieldsIndex,
 };
 
 export const defaultWalletAddress: string = 'defaultWalletAddress';
@@ -106,7 +106,7 @@ export const isolatedSubaccount: SubaccountCreateObject = {
   subaccountNumber: 128,
   updatedAt: createdDateTime.toISO() ?? '',
   updatedAtHeight: createdHeight,
-  assetYieldIndex: zeroAssetYieldIndex,
+  assetYieldsIndex: zeroAssetYieldsIndex,
 };
 
 export const isolatedSubaccount2: SubaccountCreateObject = {
@@ -114,7 +114,7 @@ export const isolatedSubaccount2: SubaccountCreateObject = {
   subaccountNumber: 256,
   updatedAt: createdDateTime.toISO() ?? '',
   updatedAtHeight: createdHeight,
-  assetYieldIndex: zeroAssetYieldIndex,
+  assetYieldsIndex: zeroAssetYieldsIndex,
 };
 
 export const isolatedSubaccountId: string = SubaccountTable.uuid(
@@ -202,7 +202,7 @@ export const defaultPerpetualMarket: PerpetualMarketCreateObject = {
   stepBaseQuantums: 10,
   liquidityTierId: 0,
   baseOpenInterest: '100000',
-  perpYieldIndex: defaultZeroPerpYieldIndex,
+  perpYieldsIndex: defaultZeroPerpYieldsIndex,
 };
 export const defaultPerpetualMarket2: PerpetualMarketCreateObject = {
   id: '1',
@@ -223,7 +223,7 @@ export const defaultPerpetualMarket2: PerpetualMarketCreateObject = {
   stepBaseQuantums: 1,
   liquidityTierId: 0,
   baseOpenInterest: '100000',
-  perpYieldIndex: defaultZeroPerpYieldIndex,
+  perpYieldsIndex: defaultZeroPerpYieldsIndex,
 };
 export const defaultPerpetualMarket3: PerpetualMarketCreateObject = {
   id: '2',
@@ -245,7 +245,7 @@ export const defaultPerpetualMarket3: PerpetualMarketCreateObject = {
   stepBaseQuantums: 1,
   liquidityTierId: 0,
   baseOpenInterest: '100000',
-  perpYieldIndex: defaultZeroPerpYieldIndex,
+  perpYieldsIndex: defaultZeroPerpYieldsIndex,
 };
 
 export const isolatedPerpetualMarket: PerpetualMarketCreateObject = {
@@ -267,7 +267,7 @@ export const isolatedPerpetualMarket: PerpetualMarketCreateObject = {
   stepBaseQuantums: 1,
   liquidityTierId: 0,
   baseOpenInterest: '100000',
-  perpYieldIndex: defaultZeroPerpYieldIndex,
+  perpYieldsIndex: defaultZeroPerpYieldsIndex,
 };
 
 export const isolatedPerpetualMarket2: PerpetualMarketCreateObject = {
@@ -289,7 +289,7 @@ export const isolatedPerpetualMarket2: PerpetualMarketCreateObject = {
   stepBaseQuantums: 1,
   liquidityTierId: 0,
   baseOpenInterest: '100000',
-  perpYieldIndex: defaultZeroPerpYieldIndex,
+  perpYieldsIndex: defaultZeroPerpYieldsIndex,
 };
 
 // ============== Orders ==============
@@ -464,7 +464,7 @@ export const defaultPerpetualPosition: PerpetualPositionCreateObject = {
   openEventId: defaultTendermintEventId,
   lastEventId: defaultTendermintEventId2,
   settledFunding: '200000',
-  perpYieldIndex: defaultZeroPerpYieldIndex,
+  perpYieldsIndex: defaultZeroPerpYieldsIndex,
 };
 
 export const defaultPerpetualPositionId: string = PerpetualPositionTable.uuid(
@@ -487,7 +487,7 @@ export const isolatedPerpetualPosition: PerpetualPositionCreateObject = {
   openEventId: defaultTendermintEventId,
   lastEventId: defaultTendermintEventId2,
   settledFunding: '200000',
-  perpYieldIndex: defaultZeroPerpYieldIndex,
+  perpYieldsIndex: defaultZeroPerpYieldsIndex,
 };
 
 export const isolatedPerpetualPositionId: string = PerpetualPositionTable.uuid(
@@ -821,18 +821,18 @@ export const nonBlockedComplianceData: ComplianceDataCreateObject = {
   updatedAt: createdDateTime.plus(1).toISO() ?? '',
 };
 
-// ========= Yield Params ==========
+// ========= Yields Params ==========
 
-export const defaultYieldParams1: YieldParamsCreateObject = {
+export const defaultYieldsParams1: YieldsParamsCreateObject = {
   sDAIPrice: '10000000',
-  assetYieldIndex: zeroAssetYieldIndex,
+  assetYieldsIndex: zeroAssetYieldsIndex,
   createdAtHeight: createdHeight,
   createdAt: createdDateTime.toISO() ?? '',
 };
 
-export const defaultYieldParams2: YieldParamsCreateObject = {
+export const defaultYieldsParams2: YieldsParamsCreateObject = {
   sDAIPrice: '11000000',
-  assetYieldIndex: oneAssetYieldIndex,
+  assetYieldsIndex: oneAssetYieldsIndex,
   createdAtHeight: createdHeightPlusOne,
   createdAt: createdDateTime.plus(1).toISO() ?? '',
 };

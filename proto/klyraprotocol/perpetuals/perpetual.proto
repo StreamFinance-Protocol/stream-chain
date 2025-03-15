@@ -31,8 +31,8 @@ message Perpetual {
     (gogoproto.nullable) = false
   ];
 
-  // The current yield index is determined by the cumulative
-  // all-time history of the yield mechanism. Starts at 0.
+  // The current yields index is determined by the cumulative
+  // all-time history of the yields mechanism. Starts at 0.
   // This string should always be converted big.Rat.
   string yield_index = 5;
 }

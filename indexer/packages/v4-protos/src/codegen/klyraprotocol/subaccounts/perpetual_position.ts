@@ -18,7 +18,7 @@ export interface PerpetualPosition {
 
   fundingIndex: Uint8Array;
   /**
-   * The current yield index last time this position was settled.
+   * The current yields index last time this position was settled.
    * Should be converted from string to big.Rat.
    */
 
@@ -42,7 +42,7 @@ export interface PerpetualPositionSDKType {
 
   funding_index: Uint8Array;
   /**
-   * The current yield index last time this position was settled.
+   * The current yields index last time this position was settled.
    * Should be converted from string to big.Rat.
    */
 

@@ -25,7 +25,8 @@ func updatePerpetualPositions(
 	perpIdToYieldIndex map[uint32]string,
 ) {
 	for _, perpUpdate := range update.PerpetualUpdates {
-		if idx := findPosition(update.SettledSubaccount.PerpetualPositions, perpUpdate.PerpetualId); idx >= 0 {
+		idx := findPosition(update.SettledSubaccount.PerpetualPositions, perpUpdate.PerpetualId)
+		if idx >= 0 {
 			updateExistingPerpPosition(update, idx, perpUpdate)
 		} else if perpUpdate.BigQuantumsDelta.Sign() != 0 {
 			createNewPerpPosition(update, perpUpdate, perpIdToFundingIndex, perpIdToYieldIndex)
@@ -35,15 +36,14 @@ func updatePerpetualPositions(
 
 func updateAssetPositions(update *SettledUpdate) {
 	for _, assetUpdate := range update.AssetUpdates {
-		if idx := findPosition(update.SettledSubaccount.AssetPositions, assetUpdate.AssetId); idx >= 0 {
+		idx := findPosition(update.SettledSubaccount.AssetPositions, assetUpdate.AssetId)
+		if idx >= 0 {
 			updateExistingAssetPosition(update, idx, assetUpdate)
 		} else if assetUpdate.BigQuantumsDelta.Sign() != 0 {
 			createNewAssetPosition(update, assetUpdate)
 		}
 	}
 }
-
-// Helper functions
 
 func findPosition[P interface{ GetId() uint32 }](positions []P, id uint32) int {
 	for i, pos := range positions {

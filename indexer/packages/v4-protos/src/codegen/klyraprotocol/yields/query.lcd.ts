@@ -1,5 +1,5 @@
 import { LCDClient } from "@osmonauts/lcd";
-import { GetSDAIPriceQueryRequest, GetSDAIPriceQueryResponseSDKType, GetAssetYieldIndexQueryRequest, GetAssetYieldIndexQueryResponseSDKType } from "./query";
+import { GetSDAIPriceQueryRequest, GetSDAIPriceQueryResponseSDKType, GetAssetYieldsIndexQueryRequest, GetAssetYieldsIndexQueryResponseSDKType } from "./query";
 export class LCDQueryClient {
   req: LCDClient;
 
@@ -10,7 +10,7 @@ export class LCDQueryClient {
   }) {
     this.req = requestClient;
     this.getSDAIPriceQuery = this.getSDAIPriceQuery.bind(this);
-    this.getAssetYieldIndexQuery = this.getAssetYieldIndexQuery.bind(this);
+    this.getAssetYieldsIndexQuery = this.getAssetYieldsIndexQuery.bind(this);
   }
   /* Get the price of sDAI. */
 
@@ -22,9 +22,9 @@ export class LCDQueryClient {
   /* Get the price of sDAI. */
 
 
-  async getAssetYieldIndexQuery(_params: GetAssetYieldIndexQueryRequest = {}): Promise<GetAssetYieldIndexQueryResponseSDKType> {
-    const endpoint = `klyraprotocol/v4/yields/get_asset_yield_index`;
-    return await this.req.get<GetAssetYieldIndexQueryResponseSDKType>(endpoint);
+  async getAssetYieldsIndexQuery(_params: GetAssetYieldsIndexQueryRequest = {}): Promise<GetAssetYieldsIndexQueryResponseSDKType> {
+    const endpoint = `klyraprotocol/v4/yields/get_asset_yields_index`;
+    return await this.req.get<GetAssetYieldsIndexQueryResponseSDKType>(endpoint);
   }
 
 }

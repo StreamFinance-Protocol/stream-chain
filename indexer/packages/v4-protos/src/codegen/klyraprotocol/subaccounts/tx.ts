@@ -1,39 +1,39 @@
 import { SubaccountId, SubaccountIdSDKType } from "./subaccount";
 import * as _m0 from "protobufjs/minimal";
 import { DeepPartial } from "../../helpers";
-/** MsgClaimYieldForSubaccount is the Msg/ClaimYieldForSubaccount request type. */
+/** MsgClaimYieldsForSubaccount is the Msg/ClaimYieldsForSubaccount request type. */
 
-export interface MsgClaimYieldForSubaccount {
-  /** MsgClaimYieldForSubaccount is the Msg/ClaimYieldForSubaccount request type. */
+export interface MsgClaimYieldsForSubaccount {
+  /** MsgClaimYieldsForSubaccount is the Msg/ClaimYieldsForSubaccount request type. */
   id?: SubaccountId;
 }
-/** MsgClaimYieldForSubaccount is the Msg/ClaimYieldForSubaccount request type. */
+/** MsgClaimYieldsForSubaccount is the Msg/ClaimYieldsForSubaccount request type. */
 
-export interface MsgClaimYieldForSubaccountSDKType {
-  /** MsgClaimYieldForSubaccount is the Msg/ClaimYieldForSubaccount request type. */
+export interface MsgClaimYieldsForSubaccountSDKType {
+  /** MsgClaimYieldsForSubaccount is the Msg/ClaimYieldsForSubaccount request type. */
   id?: SubaccountIdSDKType;
 }
 /**
- * MsgClaimYieldForSubaccountResponse is the Msg/ClaimYieldForSubaccount
+ * MsgClaimYieldsForSubaccountResponse is the Msg/ClaimYieldsForSubaccount
  * response type.
  */
 
-export interface MsgClaimYieldForSubaccountResponse {}
+export interface MsgClaimYieldsForSubaccountResponse {}
 /**
- * MsgClaimYieldForSubaccountResponse is the Msg/ClaimYieldForSubaccount
+ * MsgClaimYieldsForSubaccountResponse is the Msg/ClaimYieldsForSubaccount
  * response type.
  */
 
-export interface MsgClaimYieldForSubaccountResponseSDKType {}
+export interface MsgClaimYieldsForSubaccountResponseSDKType {}
 
-function createBaseMsgClaimYieldForSubaccount(): MsgClaimYieldForSubaccount {
+function createBaseMsgClaimYieldsForSubaccount(): MsgClaimYieldsForSubaccount {
   return {
     id: undefined
   };
 }
 
-export const MsgClaimYieldForSubaccount = {
-  encode(message: MsgClaimYieldForSubaccount, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const MsgClaimYieldsForSubaccount = {
+  encode(message: MsgClaimYieldsForSubaccount, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.id !== undefined) {
       SubaccountId.encode(message.id, writer.uint32(10).fork()).ldelim();
     }
@@ -41,10 +41,10 @@ export const MsgClaimYieldForSubaccount = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgClaimYieldForSubaccount {
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgClaimYieldsForSubaccount {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgClaimYieldForSubaccount();
+    const message = createBaseMsgClaimYieldsForSubaccount();
 
     while (reader.pos < end) {
       const tag = reader.uint32();
@@ -63,27 +63,27 @@ export const MsgClaimYieldForSubaccount = {
     return message;
   },
 
-  fromPartial(object: DeepPartial<MsgClaimYieldForSubaccount>): MsgClaimYieldForSubaccount {
-    const message = createBaseMsgClaimYieldForSubaccount();
+  fromPartial(object: DeepPartial<MsgClaimYieldsForSubaccount>): MsgClaimYieldsForSubaccount {
+    const message = createBaseMsgClaimYieldsForSubaccount();
     message.id = object.id !== undefined && object.id !== null ? SubaccountId.fromPartial(object.id) : undefined;
     return message;
   }
 
 };
 
-function createBaseMsgClaimYieldForSubaccountResponse(): MsgClaimYieldForSubaccountResponse {
+function createBaseMsgClaimYieldsForSubaccountResponse(): MsgClaimYieldsForSubaccountResponse {
   return {};
 }
 
-export const MsgClaimYieldForSubaccountResponse = {
-  encode(_: MsgClaimYieldForSubaccountResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const MsgClaimYieldsForSubaccountResponse = {
+  encode(_: MsgClaimYieldsForSubaccountResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgClaimYieldForSubaccountResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgClaimYieldsForSubaccountResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgClaimYieldForSubaccountResponse();
+    const message = createBaseMsgClaimYieldsForSubaccountResponse();
 
     while (reader.pos < end) {
       const tag = reader.uint32();
@@ -98,8 +98,8 @@ export const MsgClaimYieldForSubaccountResponse = {
     return message;
   },
 
-  fromPartial(_: DeepPartial<MsgClaimYieldForSubaccountResponse>): MsgClaimYieldForSubaccountResponse {
-    const message = createBaseMsgClaimYieldForSubaccountResponse();
+  fromPartial(_: DeepPartial<MsgClaimYieldsForSubaccountResponse>): MsgClaimYieldsForSubaccountResponse {
+    const message = createBaseMsgClaimYieldsForSubaccountResponse();
     return message;
   }
 

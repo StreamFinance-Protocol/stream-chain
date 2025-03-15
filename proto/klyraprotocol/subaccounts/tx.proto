@@ -9,15 +9,15 @@ import "klyraprotocol/subaccounts/subaccount.proto";
 // Msg defines the Msg service.
 service Msg {
   option (cosmos.msg.v1.service) = true;
-  // ClaimYieldForSubaccount claims the yields for the provided subaccount and
+  // ClaimYieldsForSubaccount claims the yields for the provided subaccount and
   // persists it to state.
-  rpc ClaimYieldForSubaccount(MsgClaimYieldForSubaccount)
-      returns (MsgClaimYieldForSubaccountResponse);
+  rpc ClaimYieldsForSubaccount(MsgClaimYieldsForSubaccount)
+      returns (MsgClaimYieldsForSubaccountResponse);
 }
 
-// MsgClaimYieldForSubaccount is the Msg/ClaimYieldForSubaccount request type.
-message MsgClaimYieldForSubaccount { SubaccountId id = 1; }
+// MsgClaimYieldsForSubaccount is the Msg/ClaimYieldsForSubaccount request type.
+message MsgClaimYieldsForSubaccount { SubaccountId id = 1; }
 
-// MsgClaimYieldForSubaccountResponse is the Msg/ClaimYieldForSubaccount
+// MsgClaimYieldsForSubaccountResponse is the Msg/ClaimYieldsForSubaccount
 // response type.
-message MsgClaimYieldForSubaccountResponse {}
+message MsgClaimYieldsForSubaccountResponse {}

@@ -54,7 +54,7 @@ export interface Asset {
    * Starts at 0. This string should always be converted big.Rat.
    */
 
-  assetYieldIndex: string;
+  assetYieldsIndex: string;
   /** The max slippage in ppm for the asset. */
 
   maxSlippagePpm: number;
@@ -113,7 +113,7 @@ export interface AssetSDKType {
    * Starts at 0. This string should always be converted big.Rat.
    */
 
-  asset_yield_index: string;
+  asset_yields_index: string;
   /** The max slippage in ppm for the asset. */
 
   max_slippage_ppm: number;
@@ -128,7 +128,7 @@ function createBaseAsset(): Asset {
     hasMarket: false,
     marketId: 0,
     atomicResolution: 0,
-    assetYieldIndex: "",
+    assetYieldsIndex: "",
     maxSlippagePpm: 0
   };
 }
@@ -163,8 +163,8 @@ export const Asset = {
       writer.uint32(56).sint32(message.atomicResolution);
     }
 
-    if (message.assetYieldIndex !== "") {
-      writer.uint32(66).string(message.assetYieldIndex);
+    if (message.assetYieldsIndex !== "") {
+      writer.uint32(66).string(message.assetYieldsIndex);
     }
 
     if (message.maxSlippagePpm !== 0) {
@@ -212,7 +212,7 @@ export const Asset = {
           break;
 
         case 8:
-          message.assetYieldIndex = reader.string();
+          message.assetYieldsIndex = reader.string();
           break;
 
         case 9:
@@ -237,7 +237,7 @@ export const Asset = {
     message.hasMarket = object.hasMarket ?? false;
     message.marketId = object.marketId ?? 0;
     message.atomicResolution = object.atomicResolution ?? 0;
-    message.assetYieldIndex = object.assetYieldIndex ?? "";
+    message.assetYieldsIndex = object.assetYieldsIndex ?? "";
     message.maxSlippagePpm = object.maxSlippagePpm ?? 0;
     return message;
   }

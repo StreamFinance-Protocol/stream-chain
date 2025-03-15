@@ -33,5 +33,5 @@ message Subaccount {
   // The current yields index is determined by the cumulative
   // all-time history of the yields mechanism for assets.
   // Starts at 0. This string should always be converted big.Rat.
-  string asset_yield_index = 5;
+  string asset_yields_index = 5;
 }

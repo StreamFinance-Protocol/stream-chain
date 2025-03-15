@@ -21,7 +21,7 @@ export interface Perpetual {
    * This string should always be converted big.Rat.
    */
 
-  yieldIndex: string;
+  yieldsIndex: string;
 }
 /** Perpetual represents a perpetual on the Klyra exchange. */
 
@@ -44,7 +44,7 @@ export interface PerpetualSDKType {
    * This string should always be converted big.Rat.
    */
 
-  yield_index: string;
+  yields_index: string;
 }
 /**
  * MultiCollateralAssetsArray is an array of assets represented by their
@@ -345,7 +345,7 @@ function createBasePerpetual(): Perpetual {
     fundingIndex: new Uint8Array(),
     openInterest: new Uint8Array(),
     lastFundingRate: new Uint8Array(),
-    yieldIndex: ""
+    yieldsIndex: ""
   };
 }
 
@@ -367,8 +367,8 @@ export const Perpetual = {
       writer.uint32(34).bytes(message.lastFundingRate);
     }
 
-    if (message.yieldIndex !== "") {
-      writer.uint32(42).string(message.yieldIndex);
+    if (message.yieldsIndex !== "") {
+      writer.uint32(42).string(message.yieldsIndex);
     }
 
     return writer;
@@ -400,7 +400,7 @@ export const Perpetual = {
           break;
 
         case 5:
-          message.yieldIndex = reader.string();
+          message.yieldsIndex = reader.string();
           break;
 
         default:
@@ -418,7 +418,7 @@ export const Perpetual = {
     message.fundingIndex = object.fundingIndex ?? new Uint8Array();
     message.openInterest = object.openInterest ?? new Uint8Array();
     message.lastFundingRate = object.lastFundingRate ?? new Uint8Array();
-    message.yieldIndex = object.yieldIndex ?? "";
+    message.yieldsIndex = object.yieldsIndex ?? "";
     return message;
   }
 

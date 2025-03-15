@@ -16,9 +16,9 @@ service Query {
   }
 
   // Get the price of sDAI.
-  rpc GetAssetYieldIndexQuery(GetAssetYieldIndexQueryRequest)
-      returns (GetAssetYieldIndexQueryResponse) {
-    option (google.api.http).get = "/klyraprotocol/v4/yields/get_asset_yield_index";
+  rpc GetAssetYieldsIndexQuery(GetAssetYieldsIndexQueryRequest)
+      returns (GetAssetYieldsIndexQueryResponse) {
+    option (google.api.http).get = "/klyraprotocol/v4/yields/get_asset_yields_index";
   }
 }
 
@@ -30,13 +30,13 @@ message GetSDAIPriceQueryResponse {
   string price = 1; // Assuming price is returned as a string
 }
 
-// GetAssetYieldIndexRequest is a request type for the GetAssetYieldIndex RPC
+// GetAssetYieldsIndexRequest is a request type for the GetAssetYieldsIndex RPC
 // method.
-message GetAssetYieldIndexQueryRequest {}
+message GetAssetYieldsIndexQueryRequest {}
 
-// GetSDAIPriceQueryResponse is a response type for the GetAssetYieldIndex RPC
+// GetSDAIPriceQueryResponse is a response type for the GetAssetYieldsIndex RPC
 // method.
-message GetAssetYieldIndexQueryResponse {
-  string asset_yield_index =
+message GetAssetYieldsIndexQueryResponse {
+  string asset_yields_index =
       1; // Handled as a string, should be converted to big.Rat.
 }

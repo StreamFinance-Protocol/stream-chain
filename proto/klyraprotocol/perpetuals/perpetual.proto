@@ -34,7 +34,7 @@ message Perpetual {
   // The current yields index is determined by the cumulative
   // all-time history of the yields mechanism. Starts at 0.
   // This string should always be converted big.Rat.
-  string yield_index = 5;
+  string yields_index = 5;
 }
 
 // MultiCollateralAssetsArray is an array of assets represented by their

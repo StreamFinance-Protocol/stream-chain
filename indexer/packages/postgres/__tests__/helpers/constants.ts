@@ -705,6 +705,13 @@ export const defaultCollateralPool2: CollateralPoolsCreateObject = {
   quoteAssetId: 1,
 };
 
+export const collateralPoolEmptyCumulativeInsuranceFundDeltaPerBlock: CollateralPoolsCreateObject = {
+  id: 2,
+  maxCumulativeInsuranceFundDeltaPerBlock: '',
+  multiCollateralAssets: '{0}',
+  quoteAssetId: 0,
+};
+
 // ============== OraclePrices ==============
 
 export const defaultOraclePrice: OraclePriceCreateObject = {

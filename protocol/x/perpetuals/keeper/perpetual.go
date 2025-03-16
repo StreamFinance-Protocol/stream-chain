@@ -1852,8 +1852,20 @@ func (k Keeper) UpsertCollateralPool(
 		}
 	}
 
-	// Set collateral pool in store.
 	k.writeCollateralPoolToStore(ctx, collateralPool)
+
+	log.InfoLog(ctx,
+		fmt.Sprintf(
+			"UpsertCollateralPool: Emitting CollateralPoolUpsertEvent with id=%v,"+
+				"maxCumulativeInsuranceFundDeltaPerBlock=%v,"+
+				"multiCollateralAssets=%v,"+
+				"quoteAssetId=%v",
+			collateralPoolId,
+			maxCumulativeInsuranceFundDeltaPerBlock,
+			multiCollateralAssets.MultiCollateralAssets,
+			quoteAssetId,
+		),
+	)
 
 	k.GetIndexerEventManager().AddTxnEvent(
 		ctx,

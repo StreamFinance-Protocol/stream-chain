@@ -113,6 +113,7 @@ func TestPlaceOrder_Error(t *testing.T) {
 				mock.Anything, mock.Anything, mock.Anything, mock.Anything,
 				mock.Anything, mock.Anything, mock.Anything, mock.Anything,
 			).Return(mockLogger)
+			mockLogger.On("Info", mock.Anything, mock.Anything, mock.Anything).Return()
 			if errors.Is(tc.ExpectedError, types.ErrStatefulOrderCollateralizationCheckFailed) {
 				mockLogger.On("Info",
 					mock.Anything,

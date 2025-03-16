@@ -38,13 +38,11 @@ func getDeltaLongFromSettledUpdate(
 		u.PerpetualUpdates[0].GetBigQuantums(),
 	)
 
-	// prevLong = max(0, prevQuantums)
 	prevLong := prevQuantums // re-use pointer for efficiency
 	if prevLong.Sign() < 0 {
 		prevLong.SetUint64(0)
 	}
 
-	// afterLong = max(0, afterQuantums)
 	afterLong := afterQuantums // re-use pointer for efficiency
 	if afterLong.Sign() < 0 {
 		afterLong.SetUint64(0)

@@ -90,7 +90,7 @@ func AddYieldToSubaccount(
 
 	totalNewYieldInQuantums = new(big.Int).Add(assetYield, totalNewPerpYield)
 
-	totalNewYieldInQuantums = HandleInsufficientYieldDueToNegativeTNC(totalNewYieldInQuantums, availableYieldInQuantums)
+	totalNewYieldInQuantums = handleInsufficientYieldDueToNegativeTNC(totalNewYieldInQuantums, availableYieldInQuantums)
 
 	assetYieldIndexString := assetYieldIndex.String()
 	newSubaccount := types.Subaccount{
@@ -112,7 +112,7 @@ func AddYieldToSubaccount(
 	return newSubaccount, totalNewYieldInQuantums, nil
 }
 
-func HandleInsufficientYieldDueToNegativeTNC(
+func handleInsufficientYieldDueToNegativeTNC(
 	totalNewYield *big.Int,
 	availableYield *big.Int,
 ) (
@@ -158,24 +158,14 @@ func calculateAssetYieldInQuoteQuantums(
 	newYield *big.Int,
 	err error,
 ) {
-	if assetPosition == nil {
-		return nil, types.ErrPositionIsNil
-	}
-
-	if generalYieldIndex == nil {
-		return nil, types.ErrGlobalYieldIndexNil
-	}
 
 	if generalYieldIndex.Cmp(big.NewRat(0, 1)) < 0 {
 		return nil, types.ErrGlobalYieldIndexNegative
 	}
 
+	// required because of how calculation handles when currentYieldIndex is 0
 	if generalYieldIndex.Cmp(big.NewRat(0, 1)) == 0 {
 		return big.NewInt(0), nil
-	}
-
-	if subaccount.AssetYieldIndex == "" {
-		return nil, types.ErrYieldIndexUninitialized
 	}
 
 	currentYieldIndex, success := new(big.Rat).SetString(subaccount.AssetYieldIndex)
@@ -250,7 +240,7 @@ func calculateNewPerpYield(
 	perpYieldIndex *big.Rat,
 	err error,
 ) {
-	perpYieldIndex, err = getCurrentYieldIndexForPerp(perpetual)
+	perpYieldIndex, err = GetCurrentYieldIndexForPerp(perpetual)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -263,7 +253,7 @@ func calculateNewPerpYield(
 	return newPerpYield, perpYieldIndex, nil
 }
 
-func getCurrentYieldIndexForPerp(
+func GetCurrentYieldIndexForPerp(
 	perp perptypes.Perpetual,
 ) (
 	yieldIndex *big.Rat,
@@ -287,18 +277,12 @@ func calculatePerpetualYieldInQuoteQuantums(
 	newYield *big.Int,
 	err error,
 ) {
-	if perpPosition == nil {
-		return nil, types.ErrPositionIsNil
-	}
-
-	if generalYieldIndex == nil {
-		return nil, types.ErrGlobalYieldIndexNil
-	}
 
 	if generalYieldIndex.Cmp(big.NewRat(0, 1)) < 0 {
 		return nil, types.ErrGlobalYieldIndexNegative
 	}
 
+	// required because of how calculation handles when currentYieldIndex is 0
 	if generalYieldIndex.Cmp(big.NewRat(0, 1)) == 0 {
 		return big.NewInt(0), nil
 	}

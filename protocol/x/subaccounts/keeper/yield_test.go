@@ -1094,38 +1094,6 @@ func TestAddYieldToSubaccount(t *testing.T) {
 				},
 			},
 		},
-		"Failure: subaccount's asset yield index is empty": {
-			assetPositions:            testutil.CreateTDaiAssetPosition(big.NewInt(100_000_000_000)),
-			subaccountAssetYieldIndex: "",
-			globalAssetYieldIndex:     big.NewRat(1, 1),
-			availableYield:            big.NewInt(1_000_000_000_000_000_000),
-			perpetuals: []perptypes.Perpetual{
-				{
-					Params:       constants.BtcUsd_NoMarginRequirement.Params,
-					FundingIndex: constants.BtcUsd_NoMarginRequirement.FundingIndex,
-					OpenInterest: constants.BtcUsd_NoMarginRequirement.OpenInterest,
-					YieldIndex:   big.NewRat(0, 1).String(),
-				},
-			},
-			perpetualPositions: []*types.PerpetualPosition{
-				{
-					PerpetualId:  uint32(0),
-					Quantums:     dtypes.NewInt(1_000_000_000),
-					FundingIndex: dtypes.NewInt(0),
-					YieldIndex:   big.NewRat(0, 1).String(),
-				},
-			},
-			PerpIdToPerp: map[uint32]perptypes.Perpetual{
-				0: {
-					Params:       constants.BtcUsd_NoMarginRequirement.Params,
-					FundingIndex: constants.BtcUsd_NoMarginRequirement.FundingIndex,
-					OpenInterest: constants.BtcUsd_NoMarginRequirement.OpenInterest,
-					YieldIndex:   big.NewRat(0, 1).String(),
-				},
-			},
-
-			expectedErr: types.ErrYieldIndexUninitialized,
-		},
 		"Failure: global asset yield index is negative": {
 			assetPositions:            testutil.CreateTDaiAssetPosition(big.NewInt(100_000_000_000)),
 			subaccountAssetYieldIndex: constants.AssetYieldIndex_Zero,

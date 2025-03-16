@@ -3,6 +3,7 @@ package keeper
 import (
 	"math/rand"
 
+	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/blocktime/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -11,10 +12,9 @@ import (
 func (k *Keeper) GetPseudoRand(ctx sdk.Context) *rand.Rand {
 	previousBlockInfo, found := k.blockTimeKeeper.GetPreviousBlockInfo(ctx)
 	if !found {
-		return errorsmod.Wrapf(
-			types.ErrPreviousBlockInfoNotFound,
-			"previous block info not found",
-		)
+		previousBlockInfo = types.BlockInfo{
+			Timestamp: ctx.BlockTime(),
+		}
 	}
 	s := rand.NewSource(
 		previousBlockInfo.Timestamp.Unix(),

@@ -12,7 +12,7 @@ func (k Keeper) CheckForChainOutage(
 	ctx sdk.Context,
 ) {
 
-	previousBlockInfo, found := k.blocktimeKeeper.GetPreviousBlockInfo(ctx)
+	previousBlockInfo, found := k.GetPreviousBlockInfo(ctx)
 	if !found {
 		return
 	}

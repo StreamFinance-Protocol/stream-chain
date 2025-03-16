@@ -646,10 +646,7 @@ func (k Keeper) PerformOrderCancellationStatefulValidation(
 	if orderIdToCancel.IsStatefulOrder() {
 		previousBlockInfo, found := k.blockTimeKeeper.GetPreviousBlockInfo(ctx)
 		if !found {
-			return errorsmod.Wrapf(
-				types.ErrPreviousBlockInfoNotFound,
-				"previous block info not found",
-			)
+			return fmt.Errorf("previous block info not found")
 		}
 
 		prevBlockHeight := previousBlockInfo.Height
@@ -859,10 +856,7 @@ func (k Keeper) PerformStatefulOrderValidation(
 		goodTilBlockTimeUnix := order.GetGoodTilBlockTime()
 		previousBlockTime, found := k.blockTimeKeeper.GetPreviousBlockInfo(ctx)
 		if !found {
-			return errorsmod.Wrapf(
-				types.ErrPreviousBlockInfoNotFound,
-				"previous block info not found",
-			)
+			return fmt.Errorf("previous block info not found")
 		}
 		previousBlockTimeUnix := lib.MustConvertIntegerToUint32(previousBlockTime.Timestamp.Unix())
 
@@ -880,7 +874,7 @@ func (k Keeper) PerformStatefulOrderValidation(
 		// Return an error if `goodTilBlockTime` is further into the future
 		// than the previous block time plus `StatefulOrderTimeWindow`.
 		endTimeUnix := lib.MustConvertIntegerToUint32(
-			previousBlockTime.Add(types.StatefulOrderTimeWindow).Unix(),
+			previousBlockTime.Timestamp.Add(types.StatefulOrderTimeWindow).Unix(),
 		)
 		if goodTilBlockTimeUnix > endTimeUnix {
 			return errorsmod.Wrapf(

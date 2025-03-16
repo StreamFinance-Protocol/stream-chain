@@ -1085,7 +1085,7 @@ func New(
 		feetiersmoduletypes.ModuleName,
 		perpetualsmoduletypes.ModuleName,
 		statsmoduletypes.ModuleName,
-		satypes.ModuleName,
+		blocktimemoduletypes.ModuleName,
 		clobmoduletypes.ModuleName,
 		sendingmoduletypes.ModuleName,
 		govplusmoduletypes.ModuleName,

@@ -116,7 +116,7 @@ func TestQueryWithdrawalAndTransfersBlockedInfo(t *testing.T) {
 					},
 				)
 
-				sk.SetOutageHeight(
+				bk.SetOutageHeight(
 					ctx,
 					25,
 				)
@@ -152,7 +152,7 @@ func TestQueryWithdrawalAndTransfersBlockedInfo(t *testing.T) {
 						Timestamp: time.Now(),
 					},
 				)
-				sk.SetOutageHeight(
+				bk.SetOutageHeight(
 					ctx,
 					25,
 				)
@@ -188,7 +188,7 @@ func TestQueryWithdrawalAndTransfersBlockedInfo(t *testing.T) {
 						Timestamp: time.Now(),
 					},
 				)
-				sk.SetOutageHeight(
+				bk.SetOutageHeight(
 					ctx,
 					47,
 				)
@@ -224,7 +224,7 @@ func TestQueryWithdrawalAndTransfersBlockedInfo(t *testing.T) {
 						Timestamp: time.Now(),
 					},
 				)
-				sk.SetOutageHeight(
+				bk.SetOutageHeight(
 					ctx,
 					3,
 				)

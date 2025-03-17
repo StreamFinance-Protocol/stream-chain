@@ -6,7 +6,7 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
-	yieldtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types"
+	yieldstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -35,7 +35,7 @@ func (k Keeper) HandleSdaiWithdraw(
 		return err
 	}
 
-	err = k.yieldKeeper.WithdrawSDaiFromTDai(ctx, account, sdaiAmount, false)
+	err = k.yieldsKeeper.WithdrawSDaiFromTDai(ctx, account, sdaiAmount, false)
 	if err != nil {
 		return err
 	}
@@ -51,7 +51,7 @@ func (k Keeper) HandleSdaiWithdraw(
 	withdrawalEvent := types.BridgeEvent{
 		Id: nextWithdrawalId,
 		Coin: sdk.NewCoin(
-			yieldtypes.SDaiDenom,
+			yieldstypes.SDaiDenom,
 			sdkmath.NewIntFromBigInt(sdaiAmount),
 		),
 		Address:     withdraw.EthRecipient,
@@ -71,6 +71,6 @@ func (k Keeper) burnSdaiForWithdrawal(
 	ctx sdk.Context,
 	amount *big.Int,
 ) (err error) {
-	sDaiCoins := sdk.NewCoins(sdk.NewCoin(yieldtypes.SDaiDenom, sdkmath.NewIntFromBigInt(amount)))
-	return k.bankKeeper.BurnCoins(ctx, yieldtypes.SDaiPoolAccount, sDaiCoins)
+	sDaiCoins := sdk.NewCoins(sdk.NewCoin(yieldstypes.SDaiDenom, sdkmath.NewIntFromBigInt(amount)))
+	return k.bankKeeper.BurnCoins(ctx, yieldstypes.SDaiPoolAccount, sDaiCoins)
 }

@@ -106,7 +106,7 @@ type SubaccountsKeeper interface {
 	) (
 		settledSubaccount satypes.Subaccount,
 		fundingPayments map[uint32]dtypes.SerializableInt,
-		yieldForSubaccount *big.Int,
+		yieldsForSubaccount *big.Int,
 		err error,
 	)
 }

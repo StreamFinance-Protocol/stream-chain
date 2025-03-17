@@ -19,34 +19,34 @@ export interface GetSDAIPriceQueryResponseSDKType {
   price: string;
 }
 /**
- * GetAssetYieldIndexRequest is a request type for the GetAssetYieldIndex RPC
+ * GetAssetYieldsIndexRequest is a request type for the GetAssetYieldsIndex RPC
  * method.
  */
 
-export interface GetAssetYieldIndexQueryRequest {}
+export interface GetAssetYieldsIndexQueryRequest {}
 /**
- * GetAssetYieldIndexRequest is a request type for the GetAssetYieldIndex RPC
+ * GetAssetYieldsIndexRequest is a request type for the GetAssetYieldsIndex RPC
  * method.
  */
 
-export interface GetAssetYieldIndexQueryRequestSDKType {}
+export interface GetAssetYieldsIndexQueryRequestSDKType {}
 /**
- * GetSDAIPriceQueryResponse is a response type for the GetAssetYieldIndex RPC
+ * GetSDAIPriceQueryResponse is a response type for the GetAssetYieldsIndex RPC
  * method.
  */
 
-export interface GetAssetYieldIndexQueryResponse {
+export interface GetAssetYieldsIndexQueryResponse {
   /** Handled as a string, should be converted to big.Rat. */
-  assetYieldIndex: string;
+  assetYieldsIndex: string;
 }
 /**
- * GetSDAIPriceQueryResponse is a response type for the GetAssetYieldIndex RPC
+ * GetSDAIPriceQueryResponse is a response type for the GetAssetYieldsIndex RPC
  * method.
  */
 
-export interface GetAssetYieldIndexQueryResponseSDKType {
+export interface GetAssetYieldsIndexQueryResponseSDKType {
   /** Handled as a string, should be converted to big.Rat. */
-  asset_yield_index: string;
+  asset_yields_index: string;
 }
 
 function createBaseGetSDAIPriceQueryRequest(): GetSDAIPriceQueryRequest {
@@ -128,19 +128,19 @@ export const GetSDAIPriceQueryResponse = {
 
 };
 
-function createBaseGetAssetYieldIndexQueryRequest(): GetAssetYieldIndexQueryRequest {
+function createBaseGetAssetYieldsIndexQueryRequest(): GetAssetYieldsIndexQueryRequest {
   return {};
 }
 
-export const GetAssetYieldIndexQueryRequest = {
-  encode(_: GetAssetYieldIndexQueryRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const GetAssetYieldsIndexQueryRequest = {
+  encode(_: GetAssetYieldsIndexQueryRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): GetAssetYieldIndexQueryRequest {
+  decode(input: _m0.Reader | Uint8Array, length?: number): GetAssetYieldsIndexQueryRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseGetAssetYieldIndexQueryRequest();
+    const message = createBaseGetAssetYieldsIndexQueryRequest();
 
     while (reader.pos < end) {
       const tag = reader.uint32();
@@ -155,39 +155,39 @@ export const GetAssetYieldIndexQueryRequest = {
     return message;
   },
 
-  fromPartial(_: DeepPartial<GetAssetYieldIndexQueryRequest>): GetAssetYieldIndexQueryRequest {
-    const message = createBaseGetAssetYieldIndexQueryRequest();
+  fromPartial(_: DeepPartial<GetAssetYieldsIndexQueryRequest>): GetAssetYieldsIndexQueryRequest {
+    const message = createBaseGetAssetYieldsIndexQueryRequest();
     return message;
   }
 
 };
 
-function createBaseGetAssetYieldIndexQueryResponse(): GetAssetYieldIndexQueryResponse {
+function createBaseGetAssetYieldsIndexQueryResponse(): GetAssetYieldsIndexQueryResponse {
   return {
-    assetYieldIndex: ""
+    assetYieldsIndex: ""
   };
 }
 
-export const GetAssetYieldIndexQueryResponse = {
-  encode(message: GetAssetYieldIndexQueryResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.assetYieldIndex !== "") {
-      writer.uint32(10).string(message.assetYieldIndex);
+export const GetAssetYieldsIndexQueryResponse = {
+  encode(message: GetAssetYieldsIndexQueryResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.assetYieldsIndex !== "") {
+      writer.uint32(10).string(message.assetYieldsIndex);
     }
 
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): GetAssetYieldIndexQueryResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): GetAssetYieldsIndexQueryResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseGetAssetYieldIndexQueryResponse();
+    const message = createBaseGetAssetYieldsIndexQueryResponse();
 
     while (reader.pos < end) {
       const tag = reader.uint32();
 
       switch (tag >>> 3) {
         case 1:
-          message.assetYieldIndex = reader.string();
+          message.assetYieldsIndex = reader.string();
           break;
 
         default:
@@ -199,9 +199,9 @@ export const GetAssetYieldIndexQueryResponse = {
     return message;
   },
 
-  fromPartial(object: DeepPartial<GetAssetYieldIndexQueryResponse>): GetAssetYieldIndexQueryResponse {
-    const message = createBaseGetAssetYieldIndexQueryResponse();
-    message.assetYieldIndex = object.assetYieldIndex ?? "";
+  fromPartial(object: DeepPartial<GetAssetYieldsIndexQueryResponse>): GetAssetYieldsIndexQueryResponse {
+    const message = createBaseGetAssetYieldsIndexQueryResponse();
+    message.assetYieldsIndex = object.assetYieldsIndex ?? "";
     return message;
   }
 

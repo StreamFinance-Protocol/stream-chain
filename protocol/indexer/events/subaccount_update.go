@@ -13,7 +13,7 @@ func NewSubaccountUpdateEvent(
 	updatedPerpetualPositions []*satypes.PerpetualPosition,
 	updatedAssetPositions []*satypes.AssetPosition,
 	fundingPayments map[uint32]dtypes.SerializableInt,
-	assetYieldIndex string,
+	assetYieldsIndex string,
 ) *SubaccountUpdateEventV1 {
 	indexerSubaccountId := v1.SubaccountIdToIndexerSubaccountId(*subaccountId)
 	return &SubaccountUpdateEventV1{
@@ -23,6 +23,6 @@ func NewSubaccountUpdateEvent(
 			fundingPayments,
 		),
 		UpdatedAssetPositions: v1.AssetPositionsToIndexerAssetPositions(updatedAssetPositions),
-		YieldIndex:            assetYieldIndex,
+		YieldsIndex:           assetYieldsIndex,
 	}
 }

@@ -143,8 +143,8 @@ func TestNormalMsgs_Key(t *testing.T) {
 		"/klyraprotocol.sending.MsgWithdrawFromSubaccountResponse",
 
 		// subaccounts
-		"/klyraprotocol.subaccounts.MsgClaimYieldForSubaccount",
-		"/klyraprotocol.subaccounts.MsgClaimYieldForSubaccountResponse",
+		"/klyraprotocol.subaccounts.MsgClaimYieldsForSubaccount",
+		"/klyraprotocol.subaccounts.MsgClaimYieldsForSubaccountResponse",
 	}
 
 	require.Equal(t, expectedMsgs, lib.GetSortedKeys[sort.StringSlice](msgs.NormalMsgs))

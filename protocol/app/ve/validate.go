@@ -13,8 +13,8 @@ import (
 	vetypes "github.com/StreamFinance-Protocol/stream-chain/protocol/app/ve/types"
 	veutils "github.com/StreamFinance-Protocol/stream-chain/protocol/app/ve/utils"
 	vecache "github.com/StreamFinance-Protocol/stream-chain/protocol/caches/vecache"
-	daiUtils "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/keeper"
-	yieldtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types"
+	daiUtils "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/keeper"
+	yieldstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/types"
 	cometabci "github.com/cometbft/cometbft/abci/types"
 	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -37,11 +37,11 @@ func CleanAndValidateExtCommitInfoInPrepareProposal(
 	extCommitInfo cometabci.ExtendedCommitInfo,
 	veCodec codec.VoteExtensionCodec,
 	pricesKeeper PreBlockExecPricesKeeper,
-	yieldKeeper VoteExtensionYieldKeeper,
+	yieldsKeeper VoteExtensionYieldsKeeper,
 	veCache *vecache.VeCache,
 ) (cometabci.ExtendedCommitInfo, error) {
 	for i, vote := range extCommitInfo.Votes {
-		if err := validateIndividualVoteExtensionWithVECache(ctx, vote, veCodec, pricesKeeper, yieldKeeper, veCache); err != nil {
+		if err := validateIndividualVoteExtensionWithVECache(ctx, vote, veCodec, pricesKeeper, yieldsKeeper, veCache); err != nil {
 			ctx.Logger().Info(
 				"failed to validate vote extension - pruning vote",
 				"err", err,
@@ -62,7 +62,7 @@ func ValidateExtendedCommitInfoInProcessProposal(
 	extCommitInfo cometabci.ExtendedCommitInfo,
 	veCodec codec.VoteExtensionCodec,
 	pricesKeeper PreBlockExecPricesKeeper,
-	yieldKeeper VoteExtensionYieldKeeper,
+	yieldsKeeper VoteExtensionYieldsKeeper,
 	validateVEConsensusInfo ValidateVEConsensusInfoFn,
 ) error {
 	if err := validateVEConsensusInfo(ctx, extCommitInfo); err != nil {
@@ -82,7 +82,7 @@ func ValidateExtendedCommitInfoInProcessProposal(
 			vote,
 			veCodec,
 			pricesKeeper,
-			yieldKeeper,
+			yieldsKeeper,
 		); err != nil {
 			ctx.Logger().Error(
 				"failed to validate vote extension",
@@ -101,7 +101,7 @@ func validateIndividualVoteExtensionWithVECache(
 	vote cometabci.ExtendedVoteInfo,
 	voteCodec codec.VoteExtensionCodec,
 	pricesKeeper PreBlockExecPricesKeeper,
-	yieldKeeper VoteExtensionYieldKeeper,
+	yieldsKeeper VoteExtensionYieldsKeeper,
 	veCache *vecache.VeCache,
 ) error {
 	if vote.VoteExtension == nil && vote.ExtensionSignature == nil {
@@ -111,7 +111,7 @@ func validateIndividualVoteExtensionWithVECache(
 		return fmt.Errorf("vote extension not seen")
 	}
 
-	return validateIndividualVoteExtension(ctx, vote, voteCodec, pricesKeeper, yieldKeeper)
+	return validateIndividualVoteExtension(ctx, vote, voteCodec, pricesKeeper, yieldsKeeper)
 }
 
 func validateIndividualVoteExtensionForProccessingProposal(
@@ -119,13 +119,13 @@ func validateIndividualVoteExtensionForProccessingProposal(
 	vote cometabci.ExtendedVoteInfo,
 	voteCodec codec.VoteExtensionCodec,
 	pricesKeeper PreBlockExecPricesKeeper,
-	yieldKeeper VoteExtensionYieldKeeper,
+	yieldsKeeper VoteExtensionYieldsKeeper,
 ) error {
 	if vote.VoteExtension == nil && vote.ExtensionSignature == nil {
 		return nil
 	}
 
-	return validateIndividualVoteExtension(ctx, vote, voteCodec, pricesKeeper, yieldKeeper)
+	return validateIndividualVoteExtension(ctx, vote, voteCodec, pricesKeeper, yieldsKeeper)
 }
 
 func validateIndividualVoteExtension(
@@ -133,13 +133,13 @@ func validateIndividualVoteExtension(
 	vote cometabci.ExtendedVoteInfo,
 	voteCodec codec.VoteExtensionCodec,
 	pricesKeeper PreBlockExecPricesKeeper,
-	yieldKeeper VoteExtensionYieldKeeper,
+	yieldsKeeper VoteExtensionYieldsKeeper,
 ) error {
 	if err := ValidateVEMarketsAndPrices(ctx, pricesKeeper, vote.VoteExtension, voteCodec); err != nil {
 		return err
 	}
 
-	if err := ValidateVeSDaiConversionRate(ctx, yieldKeeper, vote.VoteExtension, voteCodec); err != nil {
+	if err := ValidateVeSDaiConversionRate(ctx, yieldsKeeper, vote.VoteExtension, voteCodec); err != nil {
 		return err
 	}
 
@@ -170,7 +170,7 @@ func ValidateVEMarketsAndPrices(
 
 func ValidateVeSDaiConversionRate(
 	ctx sdk.Context,
-	yieldKeeper VoteExtensionYieldKeeper,
+	yieldsKeeper VoteExtensionYieldsKeeper,
 	veBytes []byte,
 	voteCodec codec.VoteExtensionCodec,
 ) error {
@@ -184,7 +184,7 @@ func ValidateVeSDaiConversionRate(
 		return nil
 	}
 
-	if err := ValidateSDaiConversionRateHeightInVE(ctx, yieldKeeper); err != nil {
+	if err := ValidateSDaiConversionRateHeightInVE(ctx, yieldsKeeper); err != nil {
 		return err
 	}
 
@@ -192,7 +192,7 @@ func ValidateVeSDaiConversionRate(
 		return err
 	}
 
-	if err := ValidateSDaiConversionRateValueInVE(ctx, ve, yieldKeeper); err != nil {
+	if err := ValidateSDaiConversionRateValueInVE(ctx, ve, yieldsKeeper); err != nil {
 		return err
 	}
 
@@ -243,16 +243,16 @@ func ValidateSDaiConversionRateSizeInVE(
 
 func ValidateSDaiConversionRateHeightInVE(
 	ctx sdk.Context,
-	yieldKeeper VoteExtensionYieldKeeper,
+	yieldsKeeper VoteExtensionYieldsKeeper,
 ) error {
-	lastBlockUpdated, found := yieldKeeper.GetSDAILastBlockUpdated(ctx)
+	lastBlockUpdated, found := yieldsKeeper.GetSDAILastBlockUpdated(ctx)
 
 	if !found {
 		return nil
 	}
 
-	if ctx.BlockHeight()-lastBlockUpdated.Int64() < yieldtypes.SDAI_UPDATE_BLOCK_DELAY {
-		return fmt.Errorf("sDai conversion rate height is not within the allowed delay of %d blocks", yieldtypes.SDAI_UPDATE_BLOCK_DELAY)
+	if ctx.BlockHeight()-lastBlockUpdated.Int64() < yieldstypes.SDAI_UPDATE_BLOCK_DELAY {
+		return fmt.Errorf("sDai conversion rate height is not within the allowed delay of %d blocks", yieldstypes.SDAI_UPDATE_BLOCK_DELAY)
 	}
 
 	return nil
@@ -261,24 +261,24 @@ func ValidateSDaiConversionRateHeightInVE(
 func ValidateSDaiConversionRateValueInVE(
 	ctx sdk.Context,
 	ve vetypes.DaemonVoteExtension,
-	yieldKeeper VoteExtensionYieldKeeper,
+	yieldsKeeper VoteExtensionYieldsKeeper,
 ) error {
 	sDaiConversionRate, ok := new(big.Int).SetString(ve.SDaiConversionRate, 10)
 	if !ok {
 		return fmt.Errorf("failed to convert sDai conversion rate to big.Int: %s", ve.SDaiConversionRate)
 	}
 
-	return ValidateBigIntSDaiConversionRateValue(ctx, sDaiConversionRate, yieldKeeper)
+	return ValidateBigIntSDaiConversionRateValue(ctx, sDaiConversionRate, yieldsKeeper)
 }
 
-func ValidateBigIntSDaiConversionRateValue(ctx sdk.Context, sDaiConversionRate *big.Int, yieldKeeper VoteExtensionYieldKeeper) error {
+func ValidateBigIntSDaiConversionRateValue(ctx sdk.Context, sDaiConversionRate *big.Int, yieldsKeeper VoteExtensionYieldsKeeper) error {
 	// TODO: Left in to exit early if the rate is not positive. Could remove this given below check.
 	oneScaledBySDaiDecimals := daiUtils.GetOneScaledBySDaiDecimals()
 	if sDaiConversionRate.Cmp(oneScaledBySDaiDecimals) < 0 {
 		return fmt.Errorf("sDai conversion rate must be greater than 1.0: %s", sDaiConversionRate)
 	}
 
-	prevRate, found := yieldKeeper.GetSDAIPrice(ctx)
+	prevRate, found := yieldsKeeper.GetSDAIPrice(ctx)
 	if found && sDaiConversionRate.Cmp(prevRate) <= 0 {
 		return fmt.Errorf("new sDai conversion rate (%s) is not greater than the previous rate (%s)", sDaiConversionRate, prevRate.String())
 	}

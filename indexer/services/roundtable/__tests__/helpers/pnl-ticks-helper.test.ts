@@ -28,7 +28,7 @@ import {
   getAccountsToUpdate,
   normalizeStartTime,
 } from '../../src/helpers/pnl-ticks-helper';
-import { defaultPnlTickForSubaccounts, defaultZeroPerpYieldIndex } from '../../src/helpers/constants';
+import { defaultPnlTickForSubaccounts, defaultZeroPerpYieldsIndex } from '../../src/helpers/constants';
 import Big from 'big.js';
 import { DateTime } from 'luxon';
 import { LatestAccountPnlTicksCache, PnlTickForSubaccounts, redis } from '@klyraprotocol-indexer/redis';
@@ -47,7 +47,7 @@ describe('pnl-ticks-helper', () => {
       sumOpen: '10',
       sumClose: '0',
       id: testConstants.defaultPerpetualPositionId,
-      perpYieldIndex: defaultZeroPerpYieldIndex,
+      perpYieldsIndex: defaultZeroPerpYieldsIndex,
     },
   ];
   const lastUpdatedFundingIndexMap: FundingIndexMap = {
@@ -120,13 +120,13 @@ describe('pnl-ticks-helper', () => {
         id: testConstants.defaultSubaccountId,
         updatedAtHeight: '1',
         updatedAt: testConstants.defaultSubaccount.updatedAt,
-        assetYieldIndex: testConstants.defaultSubaccount.assetYieldIndex,
+        assetYieldsIndex: testConstants.defaultSubaccount.assetYieldsIndex,
       }),
       SubaccountTable.update({
         id: testConstants.defaultSubaccountId2,
         updatedAtHeight: '2',
         updatedAt: testConstants.defaultSubaccount.updatedAt,
-        assetYieldIndex: testConstants.defaultSubaccount2.assetYieldIndex,
+        assetYieldsIndex: testConstants.defaultSubaccount2.assetYieldsIndex,
       }),
     ]);
 
@@ -287,7 +287,7 @@ describe('pnl-ticks-helper', () => {
         testConstants.defaultPerpetualPosition.subaccountId,
         testConstants.defaultTendermintEventId2,
       ),
-      perpYieldIndex: defaultZeroPerpYieldIndex,
+      perpYieldsIndex: defaultZeroPerpYieldsIndex,
     };
     const tdaiPosition: Big = new Big('10000');
     const equity: Big = calculateEquity(
@@ -314,7 +314,7 @@ describe('pnl-ticks-helper', () => {
         testConstants.defaultPerpetualPosition.subaccountId,
         testConstants.defaultTendermintEventId2,
       ),
-      perpYieldIndex: defaultZeroPerpYieldIndex,
+      perpYieldsIndex: defaultZeroPerpYieldsIndex,
     };
     const tdaiPosition: Big = new Big('10000');
     const equity: Big = calculateEquity(
@@ -343,7 +343,7 @@ describe('pnl-ticks-helper', () => {
           testConstants.defaultPerpetualPosition.subaccountId,
           testConstants.defaultTendermintEventId2,
         ),
-        perpYieldIndex: defaultZeroPerpYieldIndex,
+        perpYieldsIndex: defaultZeroPerpYieldsIndex,
       },
     ];
     const tdaiPosition: Big = new Big('10000');

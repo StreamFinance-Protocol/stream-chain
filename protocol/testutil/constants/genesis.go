@@ -43,7 +43,7 @@ const GenesisState = `{
           "id": 0,
           "market_id": 0,
           "symbol": "TDAI",
-          "asset_yield_index": "1/1",
+          "asset_yields_index": "1/1",
           "max_slippage_ppm": 0
         },
         {
@@ -54,7 +54,7 @@ const GenesisState = `{
           "id": 1,
           "market_id": 0,
           "symbol": "BTC",
-          "asset_yield_index": "1/1",
+          "asset_yields_index": "1/1",
           "max_slippage_ppm": 0
         }
       ]
@@ -1478,7 +1478,7 @@ const GenesisState = `{
         }
       ]
     },
-    "yield": {},
+    "yields": {},
     "sending": {},
     "slashing": {
       "missed_blocks": [],
@@ -1528,7 +1528,7 @@ const GenesisState = `{
             "owner": "klyra199tqg4wdlnu4qjlxchpd7seg454937hju8xa57"
           },
           "margin_enabled": true,
-          "asset_yield_index": "1/1"
+          "asset_yields_index": "1/1"
         },
         {
           "asset_positions": [
@@ -1543,7 +1543,7 @@ const GenesisState = `{
             "owner": "klyra199tqg4wdlnu4qjlxchpd7seg454937hju8xa57"
           },
           "margin_enabled": true,
-          "asset_yield_index": "1/1"
+          "asset_yields_index": "1/1"
         },
         {
           "asset_positions": [
@@ -1558,7 +1558,7 @@ const GenesisState = `{
             "owner": "klyra10fx7sy6ywd5senxae9dwytf8jxek3t2g8gx9ym"
           },
           "margin_enabled": true,
-          "asset_yield_index": "1/1"
+          "asset_yields_index": "1/1"
         },
         {
           "asset_positions": [
@@ -1573,7 +1573,7 @@ const GenesisState = `{
             "owner": "klyra10fx7sy6ywd5senxae9dwytf8jxek3t2g8gx9ym"
           },
           "margin_enabled": true,
-          "asset_yield_index": "1/1"
+          "asset_yields_index": "1/1"
         },
         {
           "asset_positions": [
@@ -1588,7 +1588,7 @@ const GenesisState = `{
             "owner": "klyra1fjg6zp6vv8t9wvy4lps03r5l4g7tkjw93awcky"
           },
           "margin_enabled": true,
-          "asset_yield_index": "1/1"
+          "asset_yields_index": "1/1"
         },
         {
           "asset_positions": [
@@ -1603,7 +1603,7 @@ const GenesisState = `{
             "owner": "klyra1fjg6zp6vv8t9wvy4lps03r5l4g7tkjw93awcky"
           },
           "margin_enabled": true,
-          "asset_yield_index": "1/1"
+          "asset_yields_index": "1/1"
         },
         {
           "asset_positions": [
@@ -1618,7 +1618,7 @@ const GenesisState = `{
             "owner": "klyra1wau5mja7j7zdavtfq9lu7ejef05hm6ffxz2hcc"
           },
           "margin_enabled": true,
-          "asset_yield_index": "1/1"
+          "asset_yields_index": "1/1"
         },
         {
           "asset_positions": [
@@ -1633,7 +1633,7 @@ const GenesisState = `{
             "owner": "klyra1wau5mja7j7zdavtfq9lu7ejef05hm6ffxz2hcc"
           },
           "margin_enabled": true,
-          "asset_yield_index": "1/1"
+          "asset_yields_index": "1/1"
         },
         {
           "asset_positions": [
@@ -1648,7 +1648,7 @@ const GenesisState = `{
             "owner": "klyra1nzuttarf5k2j0nug5yzhr6p74t9avehn6x2c0s"
           },
           "margin_enabled": true,
-          "asset_yield_index": "1/1"
+          "asset_yields_index": "1/1"
         },
         {
           "asset_positions": [
@@ -1663,7 +1663,7 @@ const GenesisState = `{
             "owner": "klyra1nzuttarf5k2j0nug5yzhr6p74t9avehn6x2c0s"
           },
           "margin_enabled": true,
-          "asset_yield_index": "1/1"
+          "asset_yields_index": "1/1"
         }
       ]
     },

@@ -1,7 +1,7 @@
 import { Rpc } from "../../helpers";
 import * as _m0 from "protobufjs/minimal";
 import { QueryClient, createProtobufRpcClient } from "@cosmjs/stargate";
-import { GetSDAIPriceQueryRequest, GetSDAIPriceQueryResponse, GetAssetYieldIndexQueryRequest, GetAssetYieldIndexQueryResponse } from "./query";
+import { GetSDAIPriceQueryRequest, GetSDAIPriceQueryResponse, GetAssetYieldsIndexQueryRequest, GetAssetYieldsIndexQueryResponse } from "./query";
 /** Query defines the gRPC querier service. */
 
 export interface Query {
@@ -9,7 +9,7 @@ export interface Query {
   getSDAIPriceQuery(request?: GetSDAIPriceQueryRequest): Promise<GetSDAIPriceQueryResponse>;
   /** Get the price of sDAI. */
 
-  getAssetYieldIndexQuery(request?: GetAssetYieldIndexQueryRequest): Promise<GetAssetYieldIndexQueryResponse>;
+  getAssetYieldsIndexQuery(request?: GetAssetYieldsIndexQueryRequest): Promise<GetAssetYieldsIndexQueryResponse>;
 }
 export class QueryClientImpl implements Query {
   private readonly rpc: Rpc;
@@ -17,7 +17,7 @@ export class QueryClientImpl implements Query {
   constructor(rpc: Rpc) {
     this.rpc = rpc;
     this.getSDAIPriceQuery = this.getSDAIPriceQuery.bind(this);
-    this.getAssetYieldIndexQuery = this.getAssetYieldIndexQuery.bind(this);
+    this.getAssetYieldsIndexQuery = this.getAssetYieldsIndexQuery.bind(this);
   }
 
   getSDAIPriceQuery(request: GetSDAIPriceQueryRequest = {}): Promise<GetSDAIPriceQueryResponse> {
@@ -26,10 +26,10 @@ export class QueryClientImpl implements Query {
     return promise.then(data => GetSDAIPriceQueryResponse.decode(new _m0.Reader(data)));
   }
 
-  getAssetYieldIndexQuery(request: GetAssetYieldIndexQueryRequest = {}): Promise<GetAssetYieldIndexQueryResponse> {
-    const data = GetAssetYieldIndexQueryRequest.encode(request).finish();
-    const promise = this.rpc.request("klyraprotocol.yields.Query", "GetAssetYieldIndexQuery", data);
-    return promise.then(data => GetAssetYieldIndexQueryResponse.decode(new _m0.Reader(data)));
+  getAssetYieldsIndexQuery(request: GetAssetYieldsIndexQueryRequest = {}): Promise<GetAssetYieldsIndexQueryResponse> {
+    const data = GetAssetYieldsIndexQueryRequest.encode(request).finish();
+    const promise = this.rpc.request("klyraprotocol.yields.Query", "GetAssetYieldsIndexQuery", data);
+    return promise.then(data => GetAssetYieldsIndexQueryResponse.decode(new _m0.Reader(data)));
   }
 
 }
@@ -41,8 +41,8 @@ export const createRpcQueryExtension = (base: QueryClient) => {
       return queryService.getSDAIPriceQuery(request);
     },
 
-    getAssetYieldIndexQuery(request?: GetAssetYieldIndexQueryRequest): Promise<GetAssetYieldIndexQueryResponse> {
-      return queryService.getAssetYieldIndexQuery(request);
+    getAssetYieldsIndexQuery(request?: GetAssetYieldsIndexQueryRequest): Promise<GetAssetYieldsIndexQueryResponse> {
+      return queryService.getAssetYieldsIndexQuery(request);
     }
 
   };

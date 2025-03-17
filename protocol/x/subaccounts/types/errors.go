@@ -34,16 +34,16 @@ var (
 		ModuleName, 100, "multiple updates were specified for the same position id")
 	ErrNonUniqueUpdatesSubaccount = errorsmod.Register(
 		ModuleName, 101, "multiple updates were specified for the same subaccountId")
-	ErrFailedToUpdateSubaccounts                          = errorsmod.Register(ModuleName, 102, "failed to apply subaccount updates")
-	ErrProductPositionNotUpdatable                        = errorsmod.Register(ModuleName, 103, "product position is not updatable")
-	ErrGlobalYieldIndexNil                                = errorsmod.Register(ModuleName, 104, "general yield index is nil")
-	ErrGlobalYieldIndexNegative                           = errorsmod.Register(ModuleName, 105, "general yield index is negative")
-	ErrYieldIndexUninitialized                            = errorsmod.Register(ModuleName, 106, "yield index for subaccount is badly initialised to empty string")
-	ErrPerpYieldIndexUninitialized                        = errorsmod.Register(ModuleName, 107, "yield index for perpetual is badly initialised to empty string")
-	ErrGeneralYieldIndexSmallerThanYieldIndexInSubaccount = errorsmod.Register(ModuleName, 108, "general yield index is less than the current yield index")
-	ErrNoYieldToClaim                                     = errorsmod.Register(ModuleName, 109, "there is no yield to claim for subaccount")
-	ErrYieldClaimedNegative                               = errorsmod.Register(ModuleName, 110, "subaccount has negative total yield claim")
-	ErrTryingToDepositNegativeYield                       = errorsmod.Register(ModuleName, 111, "attempting to deposit negative yield into collateral pool")
+	ErrFailedToUpdateSubaccounts                            = errorsmod.Register(ModuleName, 102, "failed to apply subaccount updates")
+	ErrProductPositionNotUpdatable                          = errorsmod.Register(ModuleName, 103, "product position is not updatable")
+	ErrGlobalYieldsIndexNil                                 = errorsmod.Register(ModuleName, 104, "general yields index is nil")
+	ErrGlobalYieldsIndexNegative                            = errorsmod.Register(ModuleName, 105, "general yields index is negative")
+	ErrYieldsIndexUninitialized                             = errorsmod.Register(ModuleName, 106, "yields index for subaccount is badly initialised to empty string")
+	ErrPerpYieldsIndexUninitialized                         = errorsmod.Register(ModuleName, 107, "yields index for perpetual is badly initialised to empty string")
+	ErrGeneralYieldsIndexSmallerThanYieldsIndexInSubaccount = errorsmod.Register(ModuleName, 108, "general yields index is less than the current yields index")
+	ErrNoYieldsToClaim                                      = errorsmod.Register(ModuleName, 109, "there is no yields to claim for subaccount")
+	ErrYieldsClaimedNegative                                = errorsmod.Register(ModuleName, 110, "subaccount has negative total yields claim")
+	ErrTryingToDepositNegativeYields                        = errorsmod.Register(ModuleName, 111, "attempting to deposit negative yields into collateral pool")
 
 	// 200 - 299: subaccount id related.
 	ErrInvalidSubaccountIdNumber = errorsmod.Register(
@@ -55,8 +55,8 @@ var (
 	ErrDuplicateSubaccountIds   = errorsmod.Register(ModuleName, 202, "duplicate subaccount id found in genesis")
 
 	// 300 - 399: asset position related.
-	ErrAssetPositionZeroQuantum            = errorsmod.Register(ModuleName, 301, "asset position's quantum cannot be zero")
-	ErrNegativeAssetYieldIndexNotSupported = errorsmod.Register(ModuleName, 304, "negative asset yield index not supported")
+	ErrAssetPositionZeroQuantum             = errorsmod.Register(ModuleName, 301, "asset position's quantum cannot be zero")
+	ErrNegativeAssetYieldsIndexNotSupported = errorsmod.Register(ModuleName, 304, "negative asset yields index not supported")
 
 	// 400 - 499: perpetual position related.
 	ErrPerpPositionsOutOfOrder = errorsmod.Register(ModuleName, 400, "perpetual positions are out of order")
@@ -84,6 +84,6 @@ var (
 	// 500 - 599: transfer related.
 	ErrAssetTransferQuantumsNotPositive = errorsmod.Register(
 		ModuleName, 500, "asset transfer quantums is not positive")
-	ErrYieldClaim = errorsmod.Register(
-		ModuleName, 502, "error when claiming yield for subaccount")
+	ErrYieldsClaim = errorsmod.Register(
+		ModuleName, 502, "error when claiming yields for subaccount")
 )

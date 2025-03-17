@@ -14,7 +14,7 @@ import (
 	pricecache "github.com/StreamFinance-Protocol/stream-chain/protocol/caches/pricecache"
 	vecache "github.com/StreamFinance-Protocol/stream-chain/protocol/caches/vecache"
 	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
-	yieldkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/keeper"
+	yieldskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/keeper"
 	abci "github.com/cometbft/cometbft/abci/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -27,7 +27,7 @@ type VEApplier struct {
 	pricesKeeper VEApplierPricesKeeper
 
 	// ratelimit keeper that is used to write sDAI conversion rate to state.
-	yieldKeeper VEApplierYieldKeeper
+	yieldsKeeper VEApplierYieldsKeeper
 
 	// spotPriceUpdateCache is the cache that stores the final spot prices
 	spotPriceUpdateCache pricecache.PriceUpdatesCache
@@ -53,7 +53,7 @@ func NewVEApplier(
 	logger log.Logger,
 	voteAggregator aggregator.VoteAggregator,
 	pricesKeeper VEApplierPricesKeeper,
-	yieldKeeper VEApplierYieldKeeper,
+	yieldsKeeper VEApplierYieldsKeeper,
 	voteExtensionCodec codec.VoteExtensionCodec,
 	extendedCommitCodec codec.ExtendedCommitCodec,
 	spotPriceUpdateCache pricecache.PriceUpdatesCache,
@@ -64,7 +64,7 @@ func NewVEApplier(
 	return &VEApplier{
 		voteAggregator:          voteAggregator,
 		pricesKeeper:            pricesKeeper,
-		yieldKeeper:             yieldKeeper,
+		yieldsKeeper:            yieldsKeeper,
 		spotPriceUpdateCache:    spotPriceUpdateCache,
 		pnlPriceUpdateCache:     pnlPriceUpdateCache,
 		sDaiConversionRateCache: sDaiConversionRateCache,
@@ -237,7 +237,7 @@ func (vea *VEApplier) writeConversionRateToStoreFromCache(ctx sdk.Context) error
 		return nil
 	}
 
-	return vea.yieldKeeper.ProcessNewSDaiConversionRateUpdate(ctx, sDaiConversionRate, big.NewInt(ctx.BlockHeight()))
+	return vea.yieldsKeeper.ProcessNewSDaiConversionRateUpdate(ctx, sDaiConversionRate, big.NewInt(ctx.BlockHeight()))
 }
 
 func (vea *VEApplier) WritePricesToStoreAndMaybeCache(
@@ -295,7 +295,7 @@ func (vea *VEApplier) WriteSDaiConversionRateToStoreAndMaybeCache(
 		return nil
 	}
 
-	oneScaledBySDaiDecimals := yieldkeeper.GetOneScaledBySDaiDecimals()
+	oneScaledBySDaiDecimals := yieldskeeper.GetOneScaledBySDaiDecimals()
 	if sDaiConversionRate.Cmp(oneScaledBySDaiDecimals) < 0 {
 		return fmt.Errorf(
 			"invalid sDAI conversion rate: %s",
@@ -303,7 +303,7 @@ func (vea *VEApplier) WriteSDaiConversionRateToStoreAndMaybeCache(
 		)
 	}
 
-	err := vea.yieldKeeper.ProcessNewSDaiConversionRateUpdate(
+	err := vea.yieldsKeeper.ProcessNewSDaiConversionRateUpdate(
 		ctx,
 		sDaiConversionRate,
 		big.NewInt(ctx.BlockHeight()),

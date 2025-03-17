@@ -33,8 +33,8 @@ import (
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	statstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/stats/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
-	yieldkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/keeper"
-	yieldtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types"
+	yieldskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/keeper"
+	yieldstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/types"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -726,12 +726,12 @@ func TestPlaceShortTermOrder(t *testing.T) {
 			mockBankKeeper.On(
 				"GetBalance",
 				mock.Anything,
-				authtypes.NewModuleAddress(yieldtypes.TDaiPoolAccount),
+				authtypes.NewModuleAddress(yieldstypes.TDaiPoolAccount),
 				constants.TDai.Denom,
 			).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, mockBankKeeper, indexer_manager.NewIndexerEventManagerNoop(), nil)
-			ks.YieldKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+			ks.YieldsKeeper.SetAssetYieldsIndex(ks.Ctx, big.NewRat(1, 1))
 			ctx := ks.Ctx.WithIsCheckTx(true)
 
 			// Create liquidity tiers.
@@ -752,7 +752,7 @@ func TestPlaceShortTermOrder(t *testing.T) {
 					p.Params.LiquidityTier,
 					p.Params.DangerIndexPpm,
 					p.Params.CollateralPoolId,
-					p.YieldIndex,
+					p.YieldsIndex,
 				)
 				require.NoError(t, err)
 			}
@@ -977,12 +977,12 @@ func TestAddPreexistingStatefulOrder(t *testing.T) {
 			mockBankKeeper.On(
 				"GetBalance",
 				mock.Anything,
-				authtypes.NewModuleAddress(yieldtypes.TDaiPoolAccount),
+				authtypes.NewModuleAddress(yieldstypes.TDaiPoolAccount),
 				constants.TDai.Denom,
 			).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, mockBankKeeper, indexer_manager.NewIndexerEventManagerNoop(), nil)
-			ks.YieldKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+			ks.YieldsKeeper.SetAssetYieldsIndex(ks.Ctx, big.NewRat(1, 1))
 			ctx := ks.Ctx.WithIsCheckTx(true)
 
 			// Create liquidity tiers.
@@ -1003,7 +1003,7 @@ func TestAddPreexistingStatefulOrder(t *testing.T) {
 					p.Params.LiquidityTier,
 					p.Params.DangerIndexPpm,
 					p.Params.CollateralPoolId,
-					p.YieldIndex,
+					p.YieldsIndex,
 				)
 				require.NoError(t, err)
 			}
@@ -1126,7 +1126,7 @@ func TestPlaceOrder_SendOffchainMessages(t *testing.T) {
 	bankMock.On(
 		"GetBalance",
 		mock.Anything,
-		authtypes.NewModuleAddress(yieldtypes.TDaiPoolAccount),
+		authtypes.NewModuleAddress(yieldstypes.TDaiPoolAccount),
 		constants.TDai.Denom,
 	).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 
@@ -1192,7 +1192,7 @@ func TestPerformStatefulOrderValidation_PreExistingStatefulOrder(t *testing.T) {
 	bankMock.On(
 		"GetBalance",
 		mock.Anything,
-		authtypes.NewModuleAddress(yieldtypes.TDaiPoolAccount),
+		authtypes.NewModuleAddress(yieldstypes.TDaiPoolAccount),
 		constants.TDai.Denom,
 	).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 
@@ -1862,11 +1862,11 @@ func TestPerformStatefulOrderValidation(t *testing.T) {
 				}).Build()
 
 			rateString := sdaiservertypes.TestSDAIEventRequest.ConversionRate
-			rate, conversionErr := yieldkeeper.ConvertStringToBigInt(rateString)
+			rate, conversionErr := yieldskeeper.ConvertStringToBigInt(rateString)
 			require.NoError(t, conversionErr)
 
-			tApp.App.YieldKeeper.SetSDAIPrice(tApp.App.NewUncachedContext(false, tmproto.Header{}), rate)
-			tApp.App.YieldKeeper.SetAssetYieldIndex(tApp.App.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+			tApp.App.YieldsKeeper.SetSDAIPrice(tApp.App.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.App.YieldsKeeper.SetAssetYieldsIndex(tApp.App.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
 			ctx := tApp.AdvanceToBlock(
 				// Stateful validation happens at blockHeight+1 for short term order placements.
@@ -1954,7 +1954,7 @@ func TestGetStatePosition_Success(t *testing.T) {
 			indexerEventManager := &mocks.IndexerEventManager{}
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, &mocks.BankKeeper{}, indexerEventManager, nil)
 			perpetuals.InitGenesis(ks.Ctx, *ks.PerpetualsKeeper, constants.Perpetuals_DefaultGenesisState)
-			ks.YieldKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+			ks.YieldsKeeper.SetAssetYieldsIndex(ks.Ctx, big.NewRat(1, 1))
 
 			// Create subaccount if it's specified.
 			if tc.subaccount != nil {

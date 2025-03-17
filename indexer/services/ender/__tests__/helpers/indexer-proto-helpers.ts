@@ -930,7 +930,7 @@ export const HARDCODED_PERPETUAL_MARKET_VALUES: Object = {
   nextFundingRate: '0',
   status: PerpetualMarketStatus.ACTIVE,
   openInterest: '0',
-  perpYieldIndex: '0/1',
+  perpYieldsIndex: '0/1',
 };
 
 export function expectPerpetualMarketV1(

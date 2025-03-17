@@ -31,7 +31,7 @@ var (
 		&constants.Long_Asset_1ETH,
 	}
 	indexerAssetPositions = v1.AssetPositionsToIndexerAssetPositions(updatedAssetPositions)
-	assetYieldIndex       = big.NewRat(1, 1).String()
+	assetYieldsIndex      = big.NewRat(1, 1).String()
 )
 
 func TestNewSubaccountUpdateEvent_Success(t *testing.T) {
@@ -40,13 +40,13 @@ func TestNewSubaccountUpdateEvent_Success(t *testing.T) {
 		updatedPerpetualPositions,
 		updatedAssetPositions,
 		fundingPayments,
-		assetYieldIndex,
+		assetYieldsIndex,
 	)
 	expectedSubaccountUpdateEventProto := &events.SubaccountUpdateEventV1{
 		SubaccountId:              &indexerSubaccountId,
 		UpdatedPerpetualPositions: indexerPerpetualPositions,
 		UpdatedAssetPositions:     indexerAssetPositions,
-		YieldIndex:                assetYieldIndex,
+		YieldsIndex:               assetYieldsIndex,
 	}
 	require.Equal(t, expectedSubaccountUpdateEventProto, subaccountUpdateEvent)
 }

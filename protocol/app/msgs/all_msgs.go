@@ -229,8 +229,8 @@ var (
 		"/klyraprotocol.stats.MsgUpdateParamsResponse": {},
 
 		// subaccounts
-		"/klyraprotocol.subaccounts.MsgClaimYieldForSubaccount":         {},
-		"/klyraprotocol.subaccounts.MsgClaimYieldForSubaccountResponse": {},
+		"/klyraprotocol.subaccounts.MsgClaimYieldsForSubaccount":         {},
+		"/klyraprotocol.subaccounts.MsgClaimYieldsForSubaccountResponse": {},
 	}
 
 	// DisallowMsgs are messages that cannot be externally submitted.

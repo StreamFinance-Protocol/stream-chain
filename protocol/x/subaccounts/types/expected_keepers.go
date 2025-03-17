@@ -118,6 +118,6 @@ type BlocktimeKeeper interface {
 	GetOutageHeight(ctx sdk.Context) (bool, uint32)
 }
 
-type YieldKeeper interface {
-	GetAssetYieldIndex(ctx sdk.Context) (yieldIndex *big.Rat, found bool)
+type YieldsKeeper interface {
+	GetAssetYieldsIndex(ctx sdk.Context) (yieldsIndex *big.Rat, found bool)
 }

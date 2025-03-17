@@ -37,7 +37,7 @@ import (
 	statskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/stats/keeper"
 	subkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/keeper"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
-	yieldkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/keeper"
+	yieldskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/keeper"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -53,7 +53,7 @@ type ClobKeepersTestContext struct {
 	AssetsKeeper      *asskeeper.Keeper
 	BlockTimeKeeper   *blocktimekeeper.Keeper
 	FeeTiersKeeper    *feetierskeeper.Keeper
-	YieldKeeper       *yieldkeeper.Keeper
+	YieldsKeeper      *yieldskeeper.Keeper
 	PerpetualsKeeper  *perpkeeper.Keeper
 	StatsKeeper       *statskeeper.Keeper
 	SubaccountsKeeper *subkeeper.Keeper
@@ -129,7 +129,7 @@ func NewClobKeepersTestContextWithUninitializedMemStore(
 			db,
 			cdc,
 		)
-		ks.YieldKeeper, _ = createYieldKeeper(
+		ks.YieldsKeeper, _ = createYieldsKeeper(
 			stateStore,
 			db,
 			cdc,
@@ -145,7 +145,7 @@ func NewClobKeepersTestContextWithUninitializedMemStore(
 			ks.AssetsKeeper,
 			bankKeeper,
 			ks.PerpetualsKeeper,
-			ks.YieldKeeper,
+			ks.YieldsKeeper,
 			ks.BlockTimeKeeper,
 			indexerEventsTransientStoreKey,
 			true,
@@ -168,7 +168,7 @@ func NewClobKeepersTestContextWithUninitializedMemStore(
 			voteAggregator = veaggregator.NewVeAggregator(
 				log.NewNopLogger(),
 				*ks.PricesKeeper,
-				*ks.YieldKeeper,
+				*ks.YieldsKeeper,
 				pricesAggregatorFn,
 				conversionRateAggregatorFn,
 			)
@@ -178,7 +178,7 @@ func NewClobKeepersTestContextWithUninitializedMemStore(
 			log.NewNopLogger(),
 			voteAggregator,
 			ks.PricesKeeper,
-			ks.YieldKeeper,
+			ks.YieldsKeeper,
 			vecodec.NewDefaultVoteExtensionCodec(),
 			vecodec.NewDefaultExtendedCommitCodec(),
 			&pricecache.PriceUpdatesCacheImpl{},

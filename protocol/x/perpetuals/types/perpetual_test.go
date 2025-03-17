@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestPerpetual_GetYieldIndexAsRat(t *testing.T) {
+func TestPerpetual_GetYieldsIndexAsRat(t *testing.T) {
 	tests := []struct {
 		desc        string
 		perpetual   *types.Perpetual
@@ -16,9 +16,9 @@ func TestPerpetual_GetYieldIndexAsRat(t *testing.T) {
 		expectedErr error
 	}{
 		{
-			desc: "Valid yield index",
+			desc: "Valid yields index",
 			perpetual: &types.Perpetual{
-				YieldIndex: "0.05",
+				YieldsIndex: "0.05",
 			},
 			expectedRat: big.NewRat(5, 100),
 			expectedErr: nil,
@@ -30,17 +30,17 @@ func TestPerpetual_GetYieldIndexAsRat(t *testing.T) {
 			expectedErr: types.ErrPerpIsNil,
 		},
 		{
-			desc: "Empty yield index",
+			desc: "Empty yields index",
 			perpetual: &types.Perpetual{
-				YieldIndex: "",
+				YieldsIndex: "",
 			},
 			expectedRat: nil,
-			expectedErr: types.ErrYieldIndexDoesNotExist,
+			expectedErr: types.ErrYieldsIndexDoesNotExist,
 		},
 		{
-			desc: "Invalid yield index format",
+			desc: "Invalid yields index format",
 			perpetual: &types.Perpetual{
-				YieldIndex: "not_a_number",
+				YieldsIndex: "not_a_number",
 			},
 			expectedRat: nil,
 			expectedErr: types.ErrRatToStringConversion,
@@ -49,7 +49,7 @@ func TestPerpetual_GetYieldIndexAsRat(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.desc, func(t *testing.T) {
-			rat, err := tc.perpetual.GetYieldIndexAsRat()
+			rat, err := tc.perpetual.GetYieldsIndexAsRat()
 
 			if tc.expectedErr != nil {
 				require.ErrorIs(t, err, tc.expectedErr)

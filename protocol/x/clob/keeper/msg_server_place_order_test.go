@@ -20,7 +20,7 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
-	yieldtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types"
+	yieldstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/stretchr/testify/mock"
@@ -98,12 +98,12 @@ func TestPlaceOrder_Error(t *testing.T) {
 			bankMock.On(
 				"GetBalance",
 				mock.Anything,
-				authtypes.NewModuleAddress(yieldtypes.TDaiPoolAccount),
+				authtypes.NewModuleAddress(yieldstypes.TDaiPoolAccount),
 				constants.TDai.Denom,
 			).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, bankMock, indexerEventManager, nil)
-			ks.YieldKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+			ks.YieldsKeeper.SetAssetYieldsIndex(ks.Ctx, big.NewRat(1, 1))
 
 			msgServer := keeper.NewMsgServerImpl(&ks.ClobKeeper)
 
@@ -113,6 +113,7 @@ func TestPlaceOrder_Error(t *testing.T) {
 				mock.Anything, mock.Anything, mock.Anything, mock.Anything,
 				mock.Anything, mock.Anything, mock.Anything, mock.Anything,
 			).Return(mockLogger)
+			mockLogger.On("Info", mock.Anything, mock.Anything, mock.Anything).Return()
 			if errors.Is(tc.ExpectedError, types.ErrStatefulOrderCollateralizationCheckFailed) {
 				mockLogger.On("Info",
 					mock.Anything,
@@ -149,7 +150,7 @@ func TestPlaceOrder_Error(t *testing.T) {
 				perpetual.Params.LiquidityTier,
 				perpetual.Params.DangerIndexPpm,
 				perpetual.Params.CollateralPoolId,
-				perpetual.YieldIndex,
+				perpetual.YieldsIndex,
 			)
 			require.NoError(t, err)
 
@@ -288,12 +289,12 @@ func TestPlaceOrder_Success(t *testing.T) {
 			bankMock.On(
 				"GetBalance",
 				mock.Anything,
-				authtypes.NewModuleAddress(yieldtypes.TDaiPoolAccount),
+				authtypes.NewModuleAddress(yieldstypes.TDaiPoolAccount),
 				constants.TDai.Denom,
 			).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, bankMock, indexerEventManager, nil)
-			ks.YieldKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+			ks.YieldsKeeper.SetAssetYieldsIndex(ks.Ctx, big.NewRat(1, 1))
 
 			msgServer := keeper.NewMsgServerImpl(&ks.ClobKeeper)
 
@@ -322,7 +323,7 @@ func TestPlaceOrder_Success(t *testing.T) {
 				perpetual.Params.LiquidityTier,
 				perpetual.Params.DangerIndexPpm,
 				perpetual.Params.CollateralPoolId,
-				perpetual.YieldIndex,
+				perpetual.YieldsIndex,
 			)
 			require.NoError(t, err)
 

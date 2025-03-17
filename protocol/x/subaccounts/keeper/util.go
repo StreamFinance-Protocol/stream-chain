@@ -101,14 +101,14 @@ func getPerpIdToFundingIndex(
 	return perpIdToFundingIndex
 }
 
-func getPerpIdToYieldIndex(
+func getPerpIdToYieldsIndex(
 	allPerps []perptypes.Perpetual,
 ) map[uint32]string {
-	perpIdToYieldIndex := make(map[uint32]string)
+	perpIdToYieldsIndex := make(map[uint32]string)
 	for _, perp := range allPerps {
-		perpIdToYieldIndex[perp.GetId()] = perp.YieldIndex
+		perpIdToYieldsIndex[perp.GetId()] = perp.YieldsIndex
 	}
-	return perpIdToYieldIndex
+	return perpIdToYieldsIndex
 }
 
 func getValidAssetIdMap(

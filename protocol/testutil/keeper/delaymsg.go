@@ -15,7 +15,7 @@ import (
 	perpetualskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/keeper"
 	perpetualstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	priceskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/keeper"
-	yieldkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/keeper"
+	yieldskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/keeper"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -34,7 +34,7 @@ func DelayMsgKeepers(
 	bankKeeper bankkeeper.Keeper,
 	perpsKeeper *perpetualskeeper.Keeper,
 	pricesKeeper *priceskeeper.Keeper,
-	yieldKeeper *yieldkeeper.Keeper,
+	yieldsKeeper *yieldskeeper.Keeper,
 	authorities []string,
 ) {
 	ctx = initKeepers(t, func(
@@ -59,7 +59,7 @@ func DelayMsgKeepers(
 		perpsKeeper, _ = createPerpetualsKeeper(stateStore, db, cdc, pricesKeeper, epochsKeeper, assetsKeeper, nil, transientStoreKey)
 		accountKeeper, _ := createAccountKeeper(stateStore, db, cdc, registry)
 		bankKeeper, _ = createBankKeeper(stateStore, db, cdc, accountKeeper)
-		yieldKeeper, _ = createYieldKeeper(
+		yieldsKeeper, _ = createYieldsKeeper(
 			stateStore,
 			db,
 			cdc,
@@ -69,7 +69,7 @@ func DelayMsgKeepers(
 			true,
 		)
 		bridgeKeeper, _, _, _, _ =
-			createBridgeKeeper(stateStore, db, cdc, transientStoreKey, yieldKeeper, bankKeeper)
+			createBridgeKeeper(stateStore, db, cdc, transientStoreKey, yieldsKeeper, bankKeeper)
 
 		// Register perps keeper msg server for msg routing.
 		perpetualstypes.RegisterMsgServer(router, perpetualskeeper.NewMsgServerImpl(perpsKeeper))
@@ -93,7 +93,7 @@ func DelayMsgKeepers(
 			delayMsgKeeper,
 		}
 	})
-	return ctx, delayMsgKeeper, storeKey, bridgeKeeper, bankKeeper, perpsKeeper, pricesKeeper, yieldKeeper, authorities
+	return ctx, delayMsgKeeper, storeKey, bridgeKeeper, bankKeeper, perpsKeeper, pricesKeeper, yieldsKeeper, authorities
 }
 
 func createDelayMsgKeeper(

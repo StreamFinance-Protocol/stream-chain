@@ -10,7 +10,7 @@ import (
 // Helper function to compute the delta long for a single settled update on a perpetual.
 // OI is defined as the sum of all positive long positions. So what we are calculating is
 // how many new long positions were there. -100 -> -50 would be 0 new long positions
-// -100 -> 50 would be 100 new long positions
+// -100 -> 50 would be 50 new long positions
 // -100 -> 0 would be 0 new long positions
 // 0 -> 100 would be 100 new long positions
 // 100 -> 50 would be -50 new long positions
@@ -38,13 +38,11 @@ func getDeltaLongFromSettledUpdate(
 		u.PerpetualUpdates[0].GetBigQuantums(),
 	)
 
-	// prevLong = max(0, prevQuantums)
 	prevLong := prevQuantums // re-use pointer for efficiency
 	if prevLong.Sign() < 0 {
 		prevLong.SetUint64(0)
 	}
 
-	// afterLong = max(0, afterQuantums)
 	afterLong := afterQuantums // re-use pointer for efficiency
 	if afterLong.Sign() < 0 {
 		afterLong.SetUint64(0)

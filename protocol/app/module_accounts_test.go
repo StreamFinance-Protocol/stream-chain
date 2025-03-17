@@ -7,7 +7,7 @@ import (
 	bridgemoduletypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
 	perpetualsmoduletypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
-	yieldtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types"
+	yieldstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
@@ -25,8 +25,8 @@ func TestModuleAccountsToAddresses(t *testing.T) {
 		govtypes.ModuleName:                     "klyra10d07y265gmmuvt4z0w9aw880jnsr700jv2gw70",
 		satypes.ModuleName:                      "klyra1v88c3xv9xyv3eetdx0tvcmq7ung3dywptd5ps3",
 		perpetualsmoduletypes.InsuranceFundName: "klyra1c7ptc87hkd54e3r7zjy92q29xkq7t79w9y9stt",
-		yieldtypes.SDaiPoolAccount:              "klyra1r3fsd6humm0ghyq0te5jf8eumklmclyaw0hs3y",
-		yieldtypes.TDaiPoolAccount:              "klyra1lv0pg8fqarvuwekkp6xuv64nt9yn7fd4q0kgn3",
+		yieldstypes.SDaiPoolAccount:             "klyra1r3fsd6humm0ghyq0te5jf8eumklmclyaw0hs3y",
+		yieldstypes.TDaiPoolAccount:             "klyra1lv0pg8fqarvuwekkp6xuv64nt9yn7fd4q0kgn3",
 		satypes.LiquidityFeeModuleAddress:       "klyra1l4fct6xefgds6tsslrluwy2juuyaet366dl234",
 	}
 
@@ -75,8 +75,8 @@ func TestModuleAccountAddrs(t *testing.T) {
 		"klyra10d07y265gmmuvt4z0w9aw880jnsr700jv2gw70": true, // x/ gov
 		"klyra1v88c3xv9xyv3eetdx0tvcmq7ung3dywptd5ps3": true, // x/subaccount
 		"klyra1c7ptc87hkd54e3r7zjy92q29xkq7t79w9y9stt": true, // x/clob.insuranceFund
-		"klyra1r3fsd6humm0ghyq0te5jf8eumklmclyaw0hs3y": true, // x/yield.SDAIPoolAccount
-		"klyra1lv0pg8fqarvuwekkp6xuv64nt9yn7fd4q0kgn3": true, // x/yield.TDAIPoolAccount
+		"klyra1r3fsd6humm0ghyq0te5jf8eumklmclyaw0hs3y": true, // x/yields.SDAIPoolAccount
+		"klyra1lv0pg8fqarvuwekkp6xuv64nt9yn7fd4q0kgn3": true, // x/yields.TDAIPoolAccount
 		"klyra1l4fct6xefgds6tsslrluwy2juuyaet366dl234": true, // x/subaccount.LiquidityFeeModuleAddress
 	}
 

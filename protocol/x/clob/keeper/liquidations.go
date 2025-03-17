@@ -1139,9 +1139,9 @@ func (k Keeper) validateValidatorAndLiquidityFee(
 
 func deepCopySubaccount(subaccount satypes.Subaccount) satypes.Subaccount {
 	copySubaccount := satypes.Subaccount{
-		Id:              subaccount.Id,
-		MarginEnabled:   subaccount.MarginEnabled,
-		AssetYieldIndex: subaccount.AssetYieldIndex,
+		Id:               subaccount.Id,
+		MarginEnabled:    subaccount.MarginEnabled,
+		AssetYieldsIndex: subaccount.AssetYieldsIndex,
 	}
 
 	// Deep copy AssetPositions if not nil

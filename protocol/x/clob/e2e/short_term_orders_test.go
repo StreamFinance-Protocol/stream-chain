@@ -28,14 +28,14 @@ import (
 	assettypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/assets/types"
 	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
-	yieldkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/keeper"
+	yieldskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/keeper"
 )
 
 func TestPlaceOrder(t *testing.T) {
 	tApp := testapp.NewTestAppBuilder(t).Build()
 	ctx := tApp.InitChain()
 
-	tApp.App.YieldKeeper.SetAssetYieldIndex(ctx, big.NewRat(1, 1))
+	tApp.App.YieldsKeeper.SetAssetYieldsIndex(ctx, big.NewRat(1, 1))
 
 	aliceSubaccount := tApp.App.SubaccountsKeeper.GetSubaccount(ctx, constants.Alice_Num0)
 	bobSubaccount := tApp.App.SubaccountsKeeper.GetSubaccount(ctx, constants.Bob_Num0)
@@ -227,7 +227,7 @@ func TestPlaceOrder(t *testing.T) {
 										},
 									},
 									nil, // no funding payments
-									constants.AssetYieldIndex_Zero,
+									constants.AssetYieldsIndex_Zero,
 								),
 							),
 						},
@@ -255,7 +255,7 @@ func TestPlaceOrder(t *testing.T) {
 										},
 									},
 									nil, // no funding payments
-									constants.AssetYieldIndex_Zero,
+									constants.AssetYieldsIndex_Zero,
 								),
 							),
 						},
@@ -400,7 +400,7 @@ func TestPlaceOrder(t *testing.T) {
 										},
 									},
 									nil, // no funding payments
-									constants.AssetYieldIndex_Zero,
+									constants.AssetYieldsIndex_Zero,
 								),
 							),
 						},
@@ -428,7 +428,7 @@ func TestPlaceOrder(t *testing.T) {
 										},
 									},
 									nil, // no funding payments
-									constants.AssetYieldIndex_Zero,
+									constants.AssetYieldsIndex_Zero,
 								),
 							),
 						},
@@ -579,7 +579,7 @@ func TestPlaceOrder(t *testing.T) {
 										},
 									},
 									nil, // no funding payments
-									constants.AssetYieldIndex_Zero,
+									constants.AssetYieldsIndex_Zero,
 								),
 							),
 						},
@@ -607,7 +607,7 @@ func TestPlaceOrder(t *testing.T) {
 										},
 									},
 									nil, // no funding payments
-									constants.AssetYieldIndex_Zero,
+									constants.AssetYieldsIndex_Zero,
 								),
 							),
 						},
@@ -758,7 +758,7 @@ func TestPlaceOrder(t *testing.T) {
 										},
 									},
 									nil, // no funding payments
-									constants.AssetYieldIndex_Zero,
+									constants.AssetYieldsIndex_Zero,
 								),
 							),
 						},
@@ -786,7 +786,7 @@ func TestPlaceOrder(t *testing.T) {
 										},
 									},
 									nil, // no funding payments
-									constants.AssetYieldIndex_Zero,
+									constants.AssetYieldsIndex_Zero,
 								),
 							),
 						},
@@ -937,7 +937,7 @@ func TestPlaceOrder(t *testing.T) {
 										},
 									},
 									nil, // no funding payments
-									constants.AssetYieldIndex_Zero,
+									constants.AssetYieldsIndex_Zero,
 								),
 							),
 						},
@@ -965,7 +965,7 @@ func TestPlaceOrder(t *testing.T) {
 										},
 									},
 									nil, // no funding payments
-									constants.AssetYieldIndex_Zero,
+									constants.AssetYieldsIndex_Zero,
 								),
 							),
 						},
@@ -1116,7 +1116,7 @@ func TestPlaceOrder(t *testing.T) {
 										},
 									},
 									nil, // no funding payments
-									constants.AssetYieldIndex_Zero,
+									constants.AssetYieldsIndex_Zero,
 								),
 							),
 						},
@@ -1144,7 +1144,7 @@ func TestPlaceOrder(t *testing.T) {
 										},
 									},
 									nil, // no funding payments
-									constants.AssetYieldIndex_Zero,
+									constants.AssetYieldsIndex_Zero,
 								),
 							),
 						},
@@ -1222,20 +1222,20 @@ func TestPlaceOrder(t *testing.T) {
 			tApp = testapp.NewTestAppBuilder(t).WithAppOptions(appOpts).Build()
 
 			rateString := sdaiservertypes.TestSDAIEventRequest.ConversionRate
-			rate, conversionErr := yieldkeeper.ConvertStringToBigInt(rateString)
+			rate, conversionErr := yieldskeeper.ConvertStringToBigInt(rateString)
 			require.NoError(t, conversionErr)
 
-			tApp.App.YieldKeeper.SetSDAIPrice(tApp.App.NewUncachedContext(false, tmproto.Header{}), rate)
-			tApp.App.YieldKeeper.SetAssetYieldIndex(tApp.App.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+			tApp.App.YieldsKeeper.SetSDAIPrice(tApp.App.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.App.YieldsKeeper.SetAssetYieldsIndex(tApp.App.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
-			tApp.CrashingApp.YieldKeeper.SetSDAIPrice(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), rate)
-			tApp.CrashingApp.YieldKeeper.SetAssetYieldIndex(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+			tApp.CrashingApp.YieldsKeeper.SetSDAIPrice(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.CrashingApp.YieldsKeeper.SetAssetYieldsIndex(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
-			tApp.NoCheckTxApp.YieldKeeper.SetSDAIPrice(tApp.NoCheckTxApp.NewUncachedContext(false, tmproto.Header{}), rate)
-			tApp.NoCheckTxApp.YieldKeeper.SetAssetYieldIndex(tApp.NoCheckTxApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+			tApp.NoCheckTxApp.YieldsKeeper.SetSDAIPrice(tApp.NoCheckTxApp.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.NoCheckTxApp.YieldsKeeper.SetAssetYieldsIndex(tApp.NoCheckTxApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
-			tApp.ParallelApp.YieldKeeper.SetSDAIPrice(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), rate)
-			tApp.ParallelApp.YieldKeeper.SetAssetYieldIndex(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+			tApp.ParallelApp.YieldsKeeper.SetSDAIPrice(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.ParallelApp.YieldsKeeper.SetAssetYieldsIndex(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
 			ctx = tApp.InitChain()
 			// Clear any messages produced prior to these checkTx calls.

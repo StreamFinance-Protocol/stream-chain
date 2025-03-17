@@ -110,7 +110,7 @@ describe('update-perpetual-handler', () => {
         atomicResolution: defaultUpdatePerpetualEvent.atomicResolution,
         liquidityTierId: defaultUpdatePerpetualEvent.liquidityTier,
         dangerIndexPpm: defaultUpdatePerpetualEvent.dangerIndexPpm,
-        perpYieldIndex: defaultUpdatePerpetualEvent.perpYieldIndex,
+        perpYieldsIndex: defaultUpdatePerpetualEvent.perpYieldsIndex,
       }),
     );
     expect(perpetualMarket).toEqual(
@@ -121,11 +121,11 @@ describe('update-perpetual-handler', () => {
     expectPerpetualMarketKafkaMessage(producerSendMock, [perpetualMarket!]);
   });
 
-  it('updates an existing perpetual market with new perp yield index', async () => {
+  it('updates an existing perpetual market with new perp yields index', async () => {
     const transactionIndex: number = 0;
     const updatedPerpetualEvent = {
       ...defaultUpdatePerpetualEvent,
-      perpYieldIndex: '1/1',
+      perpYieldsIndex: '1/1',
     };
     const kafkaMessage: KafkaMessage = createKafkaMessageFromUpdatePerpetualEvent({
       updatePerpetualEvent: updatedPerpetualEvent,
@@ -147,7 +147,7 @@ describe('update-perpetual-handler', () => {
         marketId: updatedPerpetualEvent.marketId,
         atomicResolution: updatedPerpetualEvent.atomicResolution,
         liquidityTierId: updatedPerpetualEvent.liquidityTier,
-        perpYieldIndex: '1/1',
+        perpYieldsIndex: '1/1',
       }),
     );
     expect(perpetualMarket).toEqual(

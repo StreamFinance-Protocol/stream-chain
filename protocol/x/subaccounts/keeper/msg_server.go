@@ -19,18 +19,18 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 
 var _ types.MsgServer = msgServer{}
 
-func (k msgServer) ClaimYieldForSubaccount(
+func (k msgServer) ClaimYieldsForSubaccount(
 	goCtx context.Context,
-	msg *types.MsgClaimYieldForSubaccount,
+	msg *types.MsgClaimYieldsForSubaccount,
 ) (
-	response *types.MsgClaimYieldForSubaccountResponse,
+	response *types.MsgClaimYieldsForSubaccountResponse,
 	err error,
 ) {
 	ctx := lib.UnwrapSDKContext(goCtx, types.ModuleName)
-	err = k.ClaimYieldForSubaccountFromIdAndSetNewState(ctx, msg.Id)
+	err = k.ClaimYieldsForSubaccountFromIdAndSetNewState(ctx, msg.Id)
 	if err != nil {
 		return nil, err
 	}
 
-	return &types.MsgClaimYieldForSubaccountResponse{}, nil
+	return &types.MsgClaimYieldsForSubaccountResponse{}, nil
 }

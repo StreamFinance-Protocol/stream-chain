@@ -871,9 +871,9 @@ func TestPrepareProposalHandler(t *testing.T) {
 			)
 
 			// necessary mock keepers
-			mPricesKeeper, mClobKeeper, mPerpKeeper, mYieldKeeper, mBridgeKeeper := buildMockKeepers()
+			mPricesKeeper, mClobKeeper, mPerpKeeper, mYieldsKeeper, mBridgeKeeper := buildMockKeepers()
 
-			setMockResponses(mBridgeKeeper, mPricesKeeper, mYieldKeeper, mClobKeeper, mPerpKeeper, tc)
+			setMockResponses(mBridgeKeeper, mPricesKeeper, mYieldsKeeper, mClobKeeper, mPerpKeeper, tc)
 
 			ctx, _, _, _, _, _ := keepertest.PricesKeepers(t)
 
@@ -893,7 +893,7 @@ func TestPrepareProposalHandler(t *testing.T) {
 				mClobKeeper,
 				mPerpKeeper,
 				mPricesKeeper,
-				mYieldKeeper,
+				mYieldsKeeper,
 				veCache,
 				votecodec,
 				extcodec,
@@ -981,10 +981,10 @@ func TestPrepareProposalHandler_OtherTxs(t *testing.T) {
 			mockBridgeKeeper.On("GetAcknowledgeBridges", mock.Anything, mock.Anything).
 				Return(constants.MsgAcknowledgeBridges_Ids0_1_Height0)
 
-			mockYieldKeeper := mocks.VoteExtensionYieldKeeper{}
-			mockYieldKeeper.On("GetSDAILastBlockUpdated", mock.Anything).
+			mockYieldsKeeper := mocks.VoteExtensionYieldsKeeper{}
+			mockYieldsKeeper.On("GetSDAILastBlockUpdated", mock.Anything).
 				Return(new(big.Int), false)
-			mockYieldKeeper.On("GetSDAIPrice", mock.Anything).
+			mockYieldsKeeper.On("GetSDAIPrice", mock.Anything).
 				Return(new(big.Int), false)
 
 			mockPerpKeeper := mocks.PreparePerpetualsKeeper{}
@@ -1009,7 +1009,7 @@ func TestPrepareProposalHandler_OtherTxs(t *testing.T) {
 				&mockClobKeeper,
 				&mockPerpKeeper,
 				&mockPricesKeeper,
-				&mockYieldKeeper,
+				&mockYieldsKeeper,
 				veCache,
 				vecodec.NewDefaultVoteExtensionCodec(),
 				vecodec.NewDefaultExtendedCommitCodec(),
@@ -1290,20 +1290,20 @@ func createRequestPrepareProposal(
 	}
 }
 
-func buildMockKeepers() (*mocks.PreBlockExecPricesKeeper, *mocks.PrepareClobKeeper, *mocks.PreparePerpetualsKeeper, *mocks.VoteExtensionYieldKeeper, *mocks.PrepareBridgeKeeper) {
+func buildMockKeepers() (*mocks.PreBlockExecPricesKeeper, *mocks.PrepareClobKeeper, *mocks.PreparePerpetualsKeeper, *mocks.VoteExtensionYieldsKeeper, *mocks.PrepareBridgeKeeper) {
 	mPricesk := &mocks.PreBlockExecPricesKeeper{}
 	mClobk := &mocks.PrepareClobKeeper{}
 	mPerpk2 := &mocks.PreparePerpetualsKeeper{}
-	mYieldk := &mocks.VoteExtensionYieldKeeper{}
+	mYieldsk := &mocks.VoteExtensionYieldsKeeper{}
 	mBridgek := &mocks.PrepareBridgeKeeper{}
 
-	return mPricesk, mClobk, mPerpk2, mYieldk, mBridgek
+	return mPricesk, mClobk, mPerpk2, mYieldsk, mBridgek
 }
 
 func setMockResponses(
 	mBridgeKeeper *mocks.PrepareBridgeKeeper,
 	mPricesKeeper *mocks.PreBlockExecPricesKeeper,
-	mYieldKeeper *mocks.VoteExtensionYieldKeeper,
+	mYieldsKeeper *mocks.VoteExtensionYieldsKeeper,
 	mClobKeeper *mocks.PrepareClobKeeper,
 	mPerpKeeper *mocks.PreparePerpetualsKeeper,
 	tc PerpareProposalHandlerTC,
@@ -1316,9 +1316,9 @@ func setMockResponses(
 		Return(tc.fundingResp)
 	mClobKeeper.On("GetOperations", mock.Anything, mock.Anything).
 		Return(tc.clobResp)
-	mYieldKeeper.On("GetSDAILastBlockUpdated", mock.Anything).
+	mYieldsKeeper.On("GetSDAILastBlockUpdated", mock.Anything).
 		Return(new(big.Int), false)
-	mYieldKeeper.On("GetSDAIPrice", mock.Anything).
+	mYieldsKeeper.On("GetSDAIPrice", mock.Anything).
 		Return(new(big.Int), false)
 	mBridgeKeeper.On("GetAcknowledgeBridges", mock.Anything, mock.Anything).
 		Return(tc.bridgeResp)

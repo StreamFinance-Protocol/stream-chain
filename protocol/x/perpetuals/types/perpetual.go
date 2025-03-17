@@ -12,18 +12,18 @@ func (p *Perpetual) GetId() uint32 {
 	return p.Params.Id
 }
 
-func (p *Perpetual) GetYieldIndexAsRat() (*big.Rat, error) {
+func (p *Perpetual) GetYieldsIndexAsRat() (*big.Rat, error) {
 	if p == nil {
 		return nil, ErrPerpIsNil
 	}
 
-	yieldIndex := p.GetYieldIndex()
+	yieldsIndex := p.GetYieldsIndex()
 
-	if yieldIndex == "" {
-		return nil, ErrYieldIndexDoesNotExist
+	if yieldsIndex == "" {
+		return nil, ErrYieldsIndexDoesNotExist
 	}
 
-	result, success := new(big.Rat).SetString(yieldIndex)
+	result, success := new(big.Rat).SetString(yieldsIndex)
 
 	if !success {
 		return nil, ErrRatToStringConversion

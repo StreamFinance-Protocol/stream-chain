@@ -9,7 +9,7 @@ import (
 
 	indexerevents "github.com/StreamFinance-Protocol/stream-chain/protocol/indexer/events"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/indexer/indexer_manager"
-	yieldtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types"
+	yieldstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/types"
 
 	sdkmath "cosmossdk.io/math"
 
@@ -104,7 +104,7 @@ func TestGetInsuranceFundBalanceInQuoteQuantums(t *testing.T) {
 					a.HasMarket,
 					a.MarketId,
 					a.AtomicResolution,
-					a.AssetYieldIndex,
+					a.AssetYieldsIndex,
 					a.MaxSlippagePpm,
 				)
 				require.NoError(t, err)
@@ -332,7 +332,7 @@ func TestCanDeleverageSubaccount(t *testing.T) {
 			mockIndexerEventManager := &mocks.IndexerEventManager{}
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, bankMock, mockIndexerEventManager, nil)
 
-			ks.YieldKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+			ks.YieldsKeeper.SetAssetYieldsIndex(ks.Ctx, big.NewRat(1, 1))
 
 			// Initialize the liquidations config.
 			err := ks.ClobKeeper.InitializeLiquidationsConfig(ks.Ctx, tc.liquidationConfig)
@@ -349,7 +349,7 @@ func TestCanDeleverageSubaccount(t *testing.T) {
 			bankMock.On(
 				"GetBalance",
 				mock.Anything,
-				authtypes.NewModuleAddress(yieldtypes.TDaiPoolAccount),
+				authtypes.NewModuleAddress(yieldstypes.TDaiPoolAccount),
 				constants.TDai.Denom,
 			).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 
@@ -384,7 +384,7 @@ func TestCanDeleverageSubaccount(t *testing.T) {
 					perpetual.Params.LiquidityTier,
 					perpetual.Params.DangerIndexPpm,
 					perpetual.Params.CollateralPoolId,
-					perpetual.YieldIndex,
+					perpetual.YieldsIndex,
 				)
 				require.NoError(t, err)
 			}
@@ -474,8 +474,8 @@ func TestOffsetSubaccountPerpetualPosition(t *testing.T) {
 			deltaQuantums:          big.NewInt(100_000_000),
 			expectedSubaccounts: []satypes.Subaccount{
 				{
-					Id:              &constants.Carl_Num0,
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					Id:               &constants.Carl_Num0,
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Dave_Num0,
@@ -484,7 +484,7 @@ func TestOffsetSubaccountPerpetualPosition(t *testing.T) {
 					AssetPositions: keepertest.CreateTDaiAssetPosition(
 						big.NewInt(50_000_000_000 + 54_999_000_000),
 					),
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 			},
 			expectedFills: []types.MatchPerpetualDeleveraging_Fill{
@@ -506,15 +506,15 @@ func TestOffsetSubaccountPerpetualPosition(t *testing.T) {
 			deltaQuantums:          big.NewInt(-100_000_000),
 			expectedSubaccounts: []satypes.Subaccount{
 				{
-					Id:              &constants.Carl_Num0,
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					Id:               &constants.Carl_Num0,
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Dave_Num0,
 					AssetPositions: keepertest.CreateTDaiAssetPosition(
 						big.NewInt(100_000_000_000 - 54_999_000_000),
 					),
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 			},
 			expectedFills: []types.MatchPerpetualDeleveraging_Fill{
@@ -538,10 +538,10 @@ func TestOffsetSubaccountPerpetualPosition(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(50_000_000), // 0.5 BTC
-							YieldIndex:  big.NewRat(0, 1).String(),
+							YieldsIndex: big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Dave_Num1,
@@ -552,10 +552,10 @@ func TestOffsetSubaccountPerpetualPosition(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(50_000_000), // 0.5 BTC
-							YieldIndex:  big.NewRat(0, 1).String(),
+							YieldsIndex: big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 			},
 			liquidatedSubaccountId: constants.Carl_Num0,
@@ -563,8 +563,8 @@ func TestOffsetSubaccountPerpetualPosition(t *testing.T) {
 			deltaQuantums:          big.NewInt(100_000_000),
 			expectedSubaccounts: []satypes.Subaccount{
 				{
-					Id:              &constants.Carl_Num0,
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					Id:               &constants.Carl_Num0,
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Dave_Num0,
@@ -573,7 +573,7 @@ func TestOffsetSubaccountPerpetualPosition(t *testing.T) {
 					AssetPositions: keepertest.CreateTDaiAssetPosition(
 						big.NewInt(50_000_000_000 + 27_499_500_000),
 					),
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Dave_Num1,
@@ -582,7 +582,7 @@ func TestOffsetSubaccountPerpetualPosition(t *testing.T) {
 					AssetPositions: keepertest.CreateTDaiAssetPosition(
 						big.NewInt(50_000_000_000 + 27_499_500_000),
 					),
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 			},
 			expectedFills: []types.MatchPerpetualDeleveraging_Fill{
@@ -609,15 +609,15 @@ func TestOffsetSubaccountPerpetualPosition(t *testing.T) {
 			deltaQuantums:          big.NewInt(100_000_000),
 			expectedSubaccounts: []satypes.Subaccount{
 				{
-					Id:              &constants.Carl_Num0,
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					Id:               &constants.Carl_Num0,
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 				{
 					Id:                 constants.Carl_Num1_1BTC_Short.Id,
 					AssetPositions:     constants.Carl_Num1_1BTC_Short.AssetPositions,
 					PerpetualPositions: constants.Carl_Num1_1BTC_Short.PerpetualPositions,
 					MarginEnabled:      constants.Carl_Num1_1BTC_Short.MarginEnabled,
-					AssetYieldIndex:    big.NewRat(1, 1).String(),
+					AssetYieldsIndex:   big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Dave_Num0,
@@ -626,7 +626,7 @@ func TestOffsetSubaccountPerpetualPosition(t *testing.T) {
 					AssetPositions: keepertest.CreateTDaiAssetPosition(
 						big.NewInt(50_000_000_000 + 54_999_000_000),
 					),
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 			},
 			expectedFills: []types.MatchPerpetualDeleveraging_Fill{
@@ -649,15 +649,15 @@ func TestOffsetSubaccountPerpetualPosition(t *testing.T) {
 			deltaQuantums:          big.NewInt(100_000_000),
 			expectedSubaccounts: []satypes.Subaccount{
 				{
-					Id:              &constants.Carl_Num0,
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					Id:               &constants.Carl_Num0,
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 				{
 					Id:                 constants.Dave_Num1_1ETH_Long_50000USD.Id,
 					AssetPositions:     constants.Dave_Num1_1ETH_Long_50000USD.AssetPositions,
 					PerpetualPositions: constants.Dave_Num1_1ETH_Long_50000USD.PerpetualPositions,
 					MarginEnabled:      constants.Dave_Num1_1ETH_Long_50000USD.MarginEnabled,
-					AssetYieldIndex:    big.NewRat(1, 1).String(),
+					AssetYieldsIndex:   big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Dave_Num0,
@@ -666,7 +666,7 @@ func TestOffsetSubaccountPerpetualPosition(t *testing.T) {
 					AssetPositions: keepertest.CreateTDaiAssetPosition(
 						big.NewInt(50_000_000_000 + 54_999_000_000),
 					),
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 			},
 			expectedFills: []types.MatchPerpetualDeleveraging_Fill{
@@ -689,15 +689,15 @@ func TestOffsetSubaccountPerpetualPosition(t *testing.T) {
 			deltaQuantums:          big.NewInt(100_000_000),
 			expectedSubaccounts: []satypes.Subaccount{
 				{
-					Id:              &constants.Carl_Num0,
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					Id:               &constants.Carl_Num0,
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 				{
 					Id:                 constants.Dave_Num0_1BTC_Long_50001USD_Short.Id,
 					AssetPositions:     constants.Dave_Num0_1BTC_Long_50001USD_Short.AssetPositions,
 					PerpetualPositions: constants.Dave_Num0_1BTC_Long_50001USD_Short.PerpetualPositions,
 					MarginEnabled:      constants.Dave_Num0_1BTC_Long_50001USD_Short.MarginEnabled,
-					AssetYieldIndex:    big.NewRat(1, 1).String(),
+					AssetYieldsIndex:   big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Dave_Num1,
@@ -706,7 +706,7 @@ func TestOffsetSubaccountPerpetualPosition(t *testing.T) {
 					AssetPositions: keepertest.CreateTDaiAssetPosition(
 						big.NewInt(50_000_000_000 + 50_000_000_000),
 					),
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 			},
 			expectedFills: []types.MatchPerpetualDeleveraging_Fill{
@@ -749,20 +749,20 @@ func TestOffsetSubaccountPerpetualPosition(t *testing.T) {
 							PerpetualId:  1,
 							Quantums:     dtypes.NewInt(1_000_000_000), // 1 ETH
 							FundingIndex: dtypes.NewInt(0),
-							YieldIndex:   big.NewRat(0, 1).String(),
+							YieldsIndex:  big.NewRat(0, 1).String(),
 						},
 					},
 					AssetPositions: keepertest.CreateTDaiAssetPosition(
 						big.NewInt(-3_000_000_000),
 					),
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Dave_Num0,
 					AssetPositions: keepertest.CreateTDaiAssetPosition(
 						big.NewInt(50_000_000_000 + 50_000_000_000),
 					),
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 			},
 			expectedFills: []types.MatchPerpetualDeleveraging_Fill{
@@ -782,12 +782,12 @@ func TestOffsetSubaccountPerpetualPosition(t *testing.T) {
 			mockIndexerEventManager := &mocks.IndexerEventManager{}
 			bankMock := &mocks.BankKeeper{}
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, bankMock, mockIndexerEventManager, nil)
-			ks.YieldKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+			ks.YieldsKeeper.SetAssetYieldsIndex(ks.Ctx, big.NewRat(1, 1))
 
 			bankMock.On(
 				"GetBalance",
 				mock.Anything,
-				authtypes.NewModuleAddress(yieldtypes.TDaiPoolAccount),
+				authtypes.NewModuleAddress(yieldstypes.TDaiPoolAccount),
 				constants.TDai.Denom,
 			).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 
@@ -818,7 +818,7 @@ func TestOffsetSubaccountPerpetualPosition(t *testing.T) {
 					p.Params.LiquidityTier,
 					p.Params.DangerIndexPpm,
 					p.Params.CollateralPoolId,
-					p.YieldIndex,
+					p.YieldsIndex,
 				)
 				require.NoError(t, err)
 			}
@@ -963,8 +963,8 @@ func TestProcessDeleveraging(t *testing.T) {
 			deltaQuantums:        big.NewInt(100_000_000), // 1 BTC
 
 			expectedLiquidatedSubaccount: satypes.Subaccount{
-				Id:              &constants.Carl_Num0,
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				Id:               &constants.Carl_Num0,
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 			expectedOffsettingSubaccount: satypes.Subaccount{
 				Id: &constants.Dave_Num0,
@@ -973,7 +973,7 @@ func TestProcessDeleveraging(t *testing.T) {
 				AssetPositions: keepertest.CreateTDaiAssetPosition(
 					big.NewInt(50_000_000_000 + 54_999_000_000),
 				),
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 		},
 		"Liquidated: under-collateralized, TNC > 0, offsetting: under-collateralized, TNC > 0": {
@@ -982,8 +982,8 @@ func TestProcessDeleveraging(t *testing.T) {
 			deltaQuantums:        big.NewInt(100_000_000), // 1 BTC
 
 			expectedLiquidatedSubaccount: satypes.Subaccount{
-				Id:              &constants.Carl_Num0,
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				Id:               &constants.Carl_Num0,
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 			expectedOffsettingSubaccount: satypes.Subaccount{
 				Id: &constants.Dave_Num0,
@@ -992,7 +992,7 @@ func TestProcessDeleveraging(t *testing.T) {
 				AssetPositions: keepertest.CreateTDaiAssetPosition(
 					big.NewInt(-45_001_000_000 + 54_999_000_000),
 				),
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 		},
 		"Liquidated: under-collateralized, TNC > 0, offsetting: under-collateralized, TNC == 0": {
@@ -1001,8 +1001,8 @@ func TestProcessDeleveraging(t *testing.T) {
 			deltaQuantums:        big.NewInt(100_000_000), // 1 BTC
 
 			expectedLiquidatedSubaccount: satypes.Subaccount{
-				Id:              &constants.Carl_Num0,
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				Id:               &constants.Carl_Num0,
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 			expectedOffsettingSubaccount: satypes.Subaccount{
 				Id: &constants.Dave_Num0,
@@ -1011,7 +1011,7 @@ func TestProcessDeleveraging(t *testing.T) {
 				AssetPositions: keepertest.CreateTDaiAssetPosition(
 					big.NewInt(-50_000_000_000 + 54_999_000_000),
 				),
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 		},
 		"Liquidated: under-collateralized, TNC > 0, offsetting: under-collateralized, TNC < 0": {
@@ -1020,8 +1020,8 @@ func TestProcessDeleveraging(t *testing.T) {
 			deltaQuantums:        big.NewInt(100_000_000), // 1 BTC
 
 			expectedLiquidatedSubaccount: satypes.Subaccount{
-				Id:              &constants.Carl_Num0,
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				Id:               &constants.Carl_Num0,
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 			expectedOffsettingSubaccount: satypes.Subaccount{
 				Id: &constants.Dave_Num0,
@@ -1030,7 +1030,7 @@ func TestProcessDeleveraging(t *testing.T) {
 				AssetPositions: keepertest.CreateTDaiAssetPosition(
 					big.NewInt(-50_001_000_000 + 54_999_000_000),
 				),
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 		},
 		"Liquidated: under-collateralized, TNC == 0, offsetting: well-collateralized": {
@@ -1039,8 +1039,8 @@ func TestProcessDeleveraging(t *testing.T) {
 			deltaQuantums:        big.NewInt(100_000_000), // 1 BTC
 
 			expectedLiquidatedSubaccount: satypes.Subaccount{
-				Id:              &constants.Carl_Num0,
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				Id:               &constants.Carl_Num0,
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 			expectedOffsettingSubaccount: satypes.Subaccount{
 				Id: &constants.Dave_Num0,
@@ -1049,7 +1049,7 @@ func TestProcessDeleveraging(t *testing.T) {
 				AssetPositions: keepertest.CreateTDaiAssetPosition(
 					big.NewInt(50_000_000_000 + 50_000_000_000),
 				),
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 		},
 		"Liquidated: under-collateralized, TNC == 0, offsetting: under-collateralized, TNC > 0": {
@@ -1058,8 +1058,8 @@ func TestProcessDeleveraging(t *testing.T) {
 			deltaQuantums:        big.NewInt(100_000_000), // 1 BTC
 
 			expectedLiquidatedSubaccount: satypes.Subaccount{
-				Id:              &constants.Carl_Num0,
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				Id:               &constants.Carl_Num0,
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 			expectedOffsettingSubaccount: satypes.Subaccount{
 				Id: &constants.Dave_Num0,
@@ -1068,7 +1068,7 @@ func TestProcessDeleveraging(t *testing.T) {
 				AssetPositions: keepertest.CreateTDaiAssetPosition(
 					big.NewInt(-45_001_000_000 + 50_000_000_000),
 				),
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 		},
 		"Liquidated: under-collateralized, TNC == 0, offsetting: under-collateralized, TNC == 0": {
@@ -1077,15 +1077,15 @@ func TestProcessDeleveraging(t *testing.T) {
 			deltaQuantums:        big.NewInt(100_000_000), // 1 BTC
 
 			expectedLiquidatedSubaccount: satypes.Subaccount{
-				Id:              &constants.Carl_Num0,
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				Id:               &constants.Carl_Num0,
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 			expectedOffsettingSubaccount: satypes.Subaccount{
 				Id: &constants.Dave_Num0,
 				// TNC of liquidated subaccount is $0, which means the bankruptcy price
 				// to close 1 BTC short is $50,000 and we close both positions at this price.
 				// TDai of this suabccount is -$50,000 + $50,000 = $0.
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 		},
 		"Liquidated: under-collateralized, TNC == 0, offsetting: under-collateralized, TNC < 0": {
@@ -1108,8 +1108,8 @@ func TestProcessDeleveraging(t *testing.T) {
 			deltaQuantums:        big.NewInt(100_000_000), // 1 BTC
 
 			expectedLiquidatedSubaccount: satypes.Subaccount{
-				Id:              &constants.Carl_Num0,
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				Id:               &constants.Carl_Num0,
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 			expectedOffsettingSubaccount: satypes.Subaccount{
 				Id: &constants.Dave_Num0,
@@ -1118,7 +1118,7 @@ func TestProcessDeleveraging(t *testing.T) {
 				AssetPositions: keepertest.CreateTDaiAssetPosition(
 					big.NewInt(50_000_000_000 + 49_999_000_000),
 				),
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 		},
 		"Liquidated: under-collateralized, TNC < 0, offsetting: under-collateralized, TNC > 0": {
@@ -1127,8 +1127,8 @@ func TestProcessDeleveraging(t *testing.T) {
 			deltaQuantums:        big.NewInt(100_000_000), // 1 BTC
 
 			expectedLiquidatedSubaccount: satypes.Subaccount{
-				Id:              &constants.Carl_Num0,
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				Id:               &constants.Carl_Num0,
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 			expectedOffsettingSubaccount: satypes.Subaccount{
 				Id: &constants.Dave_Num0,
@@ -1137,7 +1137,7 @@ func TestProcessDeleveraging(t *testing.T) {
 				AssetPositions: keepertest.CreateTDaiAssetPosition(
 					big.NewInt(-45_001_000_000 + 49_999_000_000),
 				),
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 		},
 		"Liquidated: under-collateralized, TNC < 0, offsetting: under-collateralized, TNC == 0": {
@@ -1183,10 +1183,10 @@ func TestProcessDeleveraging(t *testing.T) {
 						PerpetualId:  0,
 						Quantums:     dtypes.NewInt(-90_000_000), // -0.9 BTC
 						FundingIndex: dtypes.ZeroInt(),
-						YieldIndex:   big.NewRat(0, 1).String(),
+						YieldsIndex:  big.NewRat(0, 1).String(),
 					},
 				},
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 			expectedOffsettingSubaccount: satypes.Subaccount{
 				Id: &constants.Dave_Num0,
@@ -1200,10 +1200,10 @@ func TestProcessDeleveraging(t *testing.T) {
 						PerpetualId:  0,
 						Quantums:     dtypes.NewInt(90_000_000), // 0.9 BTC
 						FundingIndex: dtypes.ZeroInt(),
-						YieldIndex:   big.NewRat(0, 1).String(),
+						YieldsIndex:  big.NewRat(0, 1).String(),
 					},
 				},
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 		},
 		`Liquidated: under-collateralized, TNC < 0, offsetting: under-collateralized, TNC < 0 -
@@ -1235,15 +1235,15 @@ func TestProcessDeleveraging(t *testing.T) {
 					{
 						PerpetualId: 0,
 						Quantums:    dtypes.NewInt(-100_000_000), // -1 BTC
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 					{
 						PerpetualId: 1,
 						Quantums:    dtypes.NewInt(-10_000_000_000), // -10 ETH
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 				},
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 			offsettingSubaccount: constants.Dave_Num0_1BTC_Long_50000USD,
 			deltaQuantums:        big.NewInt(100_000_000), // 1 BTC
@@ -1261,17 +1261,17 @@ func TestProcessDeleveraging(t *testing.T) {
 						PerpetualId:  1,
 						Quantums:     dtypes.NewInt(-10_000_000_000), // -10 ETH
 						FundingIndex: dtypes.ZeroInt(),
-						YieldIndex:   big.NewRat(0, 1).String(),
+						YieldsIndex:  big.NewRat(0, 1).String(),
 					},
 				},
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 			expectedOffsettingSubaccount: satypes.Subaccount{
 				Id: &constants.Dave_Num0,
 				AssetPositions: keepertest.CreateTDaiAssetPosition(
 					big.NewInt(50_000_000_000 + 50_500_000_000),
 				),
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 		},
 		"Fails when deltaQuantums is invalid with respect to liquidated subaccounts's position side": {
@@ -1310,12 +1310,12 @@ func TestProcessDeleveraging(t *testing.T) {
 			mockIndexerEventManager := &mocks.IndexerEventManager{}
 			bankMock := &mocks.BankKeeper{}
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, bankMock, mockIndexerEventManager, nil)
-			ks.YieldKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+			ks.YieldsKeeper.SetAssetYieldsIndex(ks.Ctx, big.NewRat(1, 1))
 
 			bankMock.On(
 				"GetBalance",
 				mock.Anything,
-				authtypes.NewModuleAddress(yieldtypes.TDaiPoolAccount),
+				authtypes.NewModuleAddress(yieldstypes.TDaiPoolAccount),
 				constants.TDai.Denom,
 			).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 
@@ -1346,7 +1346,7 @@ func TestProcessDeleveraging(t *testing.T) {
 					p.Params.LiquidityTier,
 					p.Params.DangerIndexPpm,
 					p.Params.CollateralPoolId,
-					p.YieldIndex,
+					p.YieldsIndex,
 				)
 				require.NoError(t, err)
 			}
@@ -1450,14 +1450,14 @@ func TestProcessDeleveragingAtOraclePrice(t *testing.T) {
 				AssetPositions: keepertest.CreateTDaiAssetPosition(
 					big.NewInt(100_000_000_000 - 50_000_000_000),
 				),
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 			expectedOffsettingSubaccount: satypes.Subaccount{
 				Id: &constants.Dave_Num0,
 				AssetPositions: keepertest.CreateTDaiAssetPosition(
 					big.NewInt(50_000_000_000 + 50_000_000_000),
 				),
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 		},
 		"Liquidated: well-collateralized, offsetting: under-collateralized, TNC > 0": {
@@ -1470,14 +1470,14 @@ func TestProcessDeleveragingAtOraclePrice(t *testing.T) {
 				AssetPositions: keepertest.CreateTDaiAssetPosition(
 					big.NewInt(50_000_000_000 + 50_000_000_000),
 				),
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 			expectedOffsettingSubaccount: satypes.Subaccount{
 				Id: &constants.Carl_Num0,
 				AssetPositions: keepertest.CreateTDaiAssetPosition(
 					big.NewInt(54_999_000_000 - 50_000_000_000),
 				),
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 		},
 		"Liquidated: well-collateralized, offsetting: under-collateralized, TNC == 0": {
@@ -1490,11 +1490,11 @@ func TestProcessDeleveragingAtOraclePrice(t *testing.T) {
 				AssetPositions: keepertest.CreateTDaiAssetPosition(
 					big.NewInt(100_000_000_000 - 50_000_000_000),
 				),
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 			expectedOffsettingSubaccount: satypes.Subaccount{
-				Id:              &constants.Dave_Num0,
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				Id:               &constants.Dave_Num0,
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 		},
 		"Liquidated: well-collateralized, offsetting: under-collateralized, TNC < 0": {
@@ -1515,14 +1515,14 @@ func TestProcessDeleveragingAtOraclePrice(t *testing.T) {
 				AssetPositions: keepertest.CreateTDaiAssetPosition(
 					big.NewInt(54_999_000_000 - 50_000_000_000),
 				),
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 			expectedOffsettingSubaccount: satypes.Subaccount{
 				Id: &constants.Dave_Num0,
 				AssetPositions: keepertest.CreateTDaiAssetPosition(
 					big.NewInt(50_000_000_000 + 50_000_000_000),
 				),
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 		},
 		"Liquidated: under-collateralized, TNC == 0, offsetting: under-collateralized, TNC < 0": {
@@ -1557,12 +1557,12 @@ func TestProcessDeleveragingAtOraclePrice(t *testing.T) {
 			mockIndexerEventManager := &mocks.IndexerEventManager{}
 			bankMock := &mocks.BankKeeper{}
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, bankMock, mockIndexerEventManager, nil)
-			ks.YieldKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+			ks.YieldsKeeper.SetAssetYieldsIndex(ks.Ctx, big.NewRat(1, 1))
 
 			bankMock.On(
 				"GetBalance",
 				mock.Anything,
-				authtypes.NewModuleAddress(yieldtypes.TDaiPoolAccount),
+				authtypes.NewModuleAddress(yieldstypes.TDaiPoolAccount),
 				constants.TDai.Denom,
 			).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 
@@ -1593,7 +1593,7 @@ func TestProcessDeleveragingAtOraclePrice(t *testing.T) {
 					p.Params.LiquidityTier,
 					p.Params.DangerIndexPpm,
 					p.Params.CollateralPoolId,
-					p.YieldIndex,
+					p.YieldsIndex,
 				)
 				require.NoError(t, err)
 			}
@@ -1700,10 +1700,10 @@ func TestProcessDeleveraging_Rounding(t *testing.T) {
 					{
 						PerpetualId: 0,
 						Quantums:    dtypes.NewInt(-100_000_000), // -1 BTC
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 				},
-				AssetYieldIndex: "1/1",
+				AssetYieldsIndex: "1/1",
 			},
 			offsettingSubaccount: constants.Dave_Num0_1BTC_Long_50000USD,
 			deltaQuantums:        big.NewInt(49_999_991),
@@ -1721,10 +1721,10 @@ func TestProcessDeleveraging_Rounding(t *testing.T) {
 					{
 						PerpetualId: 0,
 						Quantums:    dtypes.NewInt(100_000_000),
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 				},
-				AssetYieldIndex: "1/1",
+				AssetYieldsIndex: "1/1",
 			},
 			offsettingSubaccount: constants.Carl_Num0_1BTC_Short_100000USD,
 			deltaQuantums:        big.NewInt(-49_999_991),
@@ -1737,12 +1737,12 @@ func TestProcessDeleveraging_Rounding(t *testing.T) {
 			mockIndexerEventManager := &mocks.IndexerEventManager{}
 			bankMock := &mocks.BankKeeper{}
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, bankMock, mockIndexerEventManager, nil)
-			ks.YieldKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+			ks.YieldsKeeper.SetAssetYieldsIndex(ks.Ctx, big.NewRat(1, 1))
 
 			bankMock.On(
 				"GetBalance",
 				mock.Anything,
-				authtypes.NewModuleAddress(yieldtypes.TDaiPoolAccount),
+				authtypes.NewModuleAddress(yieldstypes.TDaiPoolAccount),
 				constants.TDai.Denom,
 			).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 
@@ -1775,7 +1775,7 @@ func TestProcessDeleveraging_Rounding(t *testing.T) {
 					p.Params.LiquidityTier,
 					p.Params.DangerIndexPpm,
 					p.Params.CollateralPoolId,
-					p.YieldIndex,
+					p.YieldsIndex,
 				)
 				require.NoError(t, err)
 			}

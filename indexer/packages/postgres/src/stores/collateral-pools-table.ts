@@ -102,10 +102,18 @@ export async function upsert(
   collateralPoolToUpsert: CollateralPoolsCreateObject,
   options: Options = { txId: undefined },
 ): Promise<CollateralPoolFromDatabase> {
+  const cleanedCollateralPool = {
+    ...collateralPoolToUpsert,
+    maxCumulativeInsuranceFundDeltaPerBlock: 
+      collateralPoolToUpsert.maxCumulativeInsuranceFundDeltaPerBlock === '' 
+        ? '0' 
+        : collateralPoolToUpsert.maxCumulativeInsuranceFundDeltaPerBlock,
+  };
+
   const collateralPools: CollateralPoolsModel[] = await CollateralPoolsModel.query(
     Transaction.get(options.txId),
   )
-    .upsert(collateralPoolToUpsert)
+    .upsert(cleanedCollateralPool)
     .returning('*');
   // should only ever be one collateral pool
   return collateralPools[0];

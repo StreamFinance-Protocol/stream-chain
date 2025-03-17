@@ -10,7 +10,7 @@ import (
 	bridgemoduletypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
 	perpetualsmoduletypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
-	yieldtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield/types"
+	yieldstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/types"
 	"golang.org/x/exp/maps"
 )
 
@@ -35,8 +35,8 @@ var (
 		satypes.ModuleName: nil,
 		// insurance fund account manages insurance fund for liquidations.
 		perpetualsmoduletypes.InsuranceFundName: nil,
-		yieldtypes.SDaiPoolAccount:              {authtypes.Burner},
-		yieldtypes.TDaiPoolAccount:              {authtypes.Burner, authtypes.Minter},
+		yieldstypes.SDaiPoolAccount:             {authtypes.Burner},
+		yieldstypes.TDaiPoolAccount:             {authtypes.Burner, authtypes.Minter},
 		// liquidity fee module account holds tokens for liquidity fee.
 		satypes.LiquidityFeeModuleAddress: nil,
 	}

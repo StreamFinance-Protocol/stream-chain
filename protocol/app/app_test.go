@@ -27,7 +27,7 @@ import (
 	sendingmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending"
 	statsmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/stats"
 	subaccountsmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts"
-	yieldmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yield"
+	yieldsmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	authzmodule "github.com/cosmos/cosmos-sdk/x/authz/module"
@@ -197,7 +197,7 @@ func TestModuleBasics(t *testing.T) {
 		govplusmodule.AppModuleBasic{},
 		delaymsgmodule.AppModuleBasic{},
 		epochsmodule.AppModuleBasic{},
-		yieldmodule.AppModuleBasic{},
+		yieldsmodule.AppModuleBasic{},
 	)
 
 	app := testapp.DefaultTestApp(nil)

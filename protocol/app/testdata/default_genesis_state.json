@@ -9,7 +9,7 @@
         "has_market": false,
         "market_id": 0,
         "atomic_resolution": -6,
-        "asset_yield_index": "1/1",
+        "asset_yields_index": "1/1",
         "max_slippage_ppm": 0
       },
       {
@@ -20,7 +20,7 @@
         "has_market": false,
         "market_id": 0,
         "atomic_resolution": -8,
-        "asset_yield_index": "",
+        "asset_yields_index": "",
         "max_slippage_ppm": 0
       }
     ]
@@ -78,10 +78,6 @@
       "eth_block_height": "0",
       "klyra_block_height": "0"
     }
-  },
-  "capability": {
-    "index": "1",
-    "owners": []
   },
   "clob": {
     "clob_pairs": [],
@@ -292,68 +288,6 @@
     "constitution": ""
   },
   "govplus": {},
-  "ibc": {
-    "client_genesis": {
-      "clients": [],
-      "clients_consensus": [],
-      "clients_metadata": [],
-      "params": {
-        "allowed_clients": [
-          "*"
-        ]
-      },
-      "create_localhost": false,
-      "next_client_sequence": "0"
-    },
-    "connection_genesis": {
-      "connections": [],
-      "client_connection_paths": [],
-      "next_connection_sequence": "0",
-      "params": {
-        "max_expected_time_per_block": "30000000000"
-      }
-    },
-    "channel_genesis": {
-      "channels": [],
-      "acknowledgements": [],
-      "commitments": [],
-      "receipts": [],
-      "send_sequences": [],
-      "recv_sequences": [],
-      "ack_sequences": [],
-      "next_channel_sequence": "0",
-      "params": {
-        "upgrade_timeout": {
-          "height": {
-            "revision_number": "0",
-            "revision_height": "0"
-          },
-          "timestamp": "600000000000"
-        }
-      }
-    }
-  },
-  "interchainaccounts": {
-    "controller_genesis_state": {
-      "active_channels": [],
-      "interchain_accounts": [],
-      "params": {
-        "controller_enabled": true
-      },
-      "ports": []
-    },
-    "host_genesis_state": {
-      "active_channels": [],
-      "interchain_accounts": [],
-      "params": {
-        "allow_messages": [
-          "*"
-        ],
-        "host_enabled": true
-      },
-      "port": "icahost"
-    }
-  },
   "params": null,
   "perpetuals": {
     "collateral_pools": [
@@ -424,25 +358,7 @@
       }
     ]
   },
-  "ratelimit": {
-    "limit_params_list": [
-      {
-        "denom": "ibc/DEEFE2DEFDC8EA8879923C4CCA42BB888C3CD03FF7ECFEFB1C2FEC27A732ACC8",
-        "limiters": [
-          {
-            "baseline_minimum": "1000000000000000000000000",
-            "baseline_tvl_ppm": 10000,
-            "period": "3600s"
-          },
-          {
-            "baseline_minimum": "10000000000000000000000000",
-            "baseline_tvl_ppm": 100000,
-            "period": "86400s"
-          }
-        ]
-      }
-    ]
-  },
+  "yields": {},
   "sending": {},
   "slashing": {
     "params": {
@@ -479,15 +395,6 @@
   },
   "subaccounts": {
     "subaccounts": []
-  },
-  "transfer": {
-    "port_id": "transfer",
-    "denom_traces": [],
-    "params": {
-      "send_enabled": true,
-      "receive_enabled": true
-    },
-    "total_escrowed": []
   },
   "upgrade": {}
 }

@@ -1339,7 +1339,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -1433,7 +1433,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -1541,7 +1541,7 @@ paths:
 
                           * If no scheme is provided, `https` is assumed.
 
-                          * An HTTP GET on the URL must yield a
+                          * An HTTP GET on the URL must yields a
                           [google.protobuf.Type][]
                             value in binary format, or produce an error.
                           * Applications are allowed to cache lookup results
@@ -1636,7 +1636,7 @@ paths:
                       last '/'
 
                       in the type URL, for example "foo.bar.com/x/y.z" will
-                      yield type
+                      yields type
 
                       name "y.z".
 
@@ -1742,7 +1742,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -1836,7 +1836,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -1957,7 +1957,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -2051,7 +2051,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -4391,7 +4391,7 @@ paths:
 
                             * If no scheme is provided, `https` is assumed.
 
-                            * An HTTP GET on the URL must yield a
+                            * An HTTP GET on the URL must yields a
                             [google.protobuf.Type][]
                               value in binary format, or produce an error.
                             * Applications are allowed to cache lookup results
@@ -4486,7 +4486,7 @@ paths:
                         last '/'
 
                         in the type URL, for example "foo.bar.com/x/y.z" will
-                        yield type
+                        yields type
 
                         name "y.z".
 
@@ -4624,7 +4624,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -4718,7 +4718,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -4869,7 +4869,7 @@ paths:
 
                       * If no scheme is provided, `https` is assumed.
 
-                      * An HTTP GET on the URL must yield a
+                      * An HTTP GET on the URL must yields a
                       [google.protobuf.Type][]
                         value in binary format, or produce an error.
                       * Applications are allowed to cache lookup results based
@@ -4963,7 +4963,7 @@ paths:
                   methods only use the fully qualified type name after the last
                   '/'
 
-                  in the type URL, for example "foo.bar.com/x/y.z" will yield
+                  in the type URL, for example "foo.bar.com/x/y.z" will yields
                   type
 
                   name "y.z".
@@ -5099,7 +5099,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -5193,7 +5193,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -5315,7 +5315,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -5409,7 +5409,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -5546,7 +5546,7 @@ paths:
 
                             * If no scheme is provided, `https` is assumed.
 
-                            * An HTTP GET on the URL must yield a
+                            * An HTTP GET on the URL must yields a
                             [google.protobuf.Type][]
                               value in binary format, or produce an error.
                             * Applications are allowed to cache lookup results
@@ -5641,7 +5641,7 @@ paths:
                         last '/'
 
                         in the type URL, for example "foo.bar.com/x/y.z" will
-                        yield type
+                        yields type
 
                         name "y.z".
 
@@ -5778,7 +5778,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -5872,7 +5872,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -6115,7 +6115,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -6209,7 +6209,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -6369,7 +6369,7 @@ paths:
 
                       * If no scheme is provided, `https` is assumed.
 
-                      * An HTTP GET on the URL must yield a
+                      * An HTTP GET on the URL must yields a
                       [google.protobuf.Type][]
                         value in binary format, or produce an error.
                       * Applications are allowed to cache lookup results based
@@ -6463,7 +6463,7 @@ paths:
                   methods only use the fully qualified type name after the last
                   '/'
 
-                  in the type URL, for example "foo.bar.com/x/y.z" will yield
+                  in the type URL, for example "foo.bar.com/x/y.z" will yields
                   type
 
                   name "y.z".
@@ -6604,7 +6604,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -6698,7 +6698,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -6856,7 +6856,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -6950,7 +6950,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -7044,7 +7044,7 @@ paths:
 
                       * If no scheme is provided, `https` is assumed.
 
-                      * An HTTP GET on the URL must yield a
+                      * An HTTP GET on the URL must yields a
                       [google.protobuf.Type][]
                         value in binary format, or produce an error.
                       * Applications are allowed to cache lookup results based
@@ -7138,7 +7138,7 @@ paths:
                   methods only use the fully qualified type name after the last
                   '/'
 
-                  in the type URL, for example "foo.bar.com/x/y.z" will yield
+                  in the type URL, for example "foo.bar.com/x/y.z" will yields
                   type
 
                   name "y.z".
@@ -7236,7 +7236,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -7330,7 +7330,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -7424,7 +7424,7 @@ paths:
 
                       * If no scheme is provided, `https` is assumed.
 
-                      * An HTTP GET on the URL must yield a
+                      * An HTTP GET on the URL must yields a
                       [google.protobuf.Type][]
                         value in binary format, or produce an error.
                       * Applications are allowed to cache lookup results based
@@ -7518,7 +7518,7 @@ paths:
                   methods only use the fully qualified type name after the last
                   '/'
 
-                  in the type URL, for example "foo.bar.com/x/y.z" will yield
+                  in the type URL, for example "foo.bar.com/x/y.z" will yields
                   type
 
                   name "y.z".
@@ -7616,7 +7616,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -7710,7 +7710,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -7862,7 +7862,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -7956,7 +7956,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -8221,7 +8221,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -8315,7 +8315,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -8615,7 +8615,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -8709,7 +8709,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -8819,7 +8819,7 @@ paths:
 
                           * If no scheme is provided, `https` is assumed.
 
-                          * An HTTP GET on the URL must yield a
+                          * An HTTP GET on the URL must yields a
                           [google.protobuf.Type][]
                             value in binary format, or produce an error.
                           * Applications are allowed to cache lookup results
@@ -8914,7 +8914,7 @@ paths:
                       last '/'
 
                       in the type URL, for example "foo.bar.com/x/y.z" will
-                      yield type
+                      yields type
 
                       name "y.z".
 
@@ -9052,7 +9052,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -9146,7 +9146,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -9248,7 +9248,7 @@ paths:
 
                       * If no scheme is provided, `https` is assumed.
 
-                      * An HTTP GET on the URL must yield a
+                      * An HTTP GET on the URL must yields a
                       [google.protobuf.Type][]
                         value in binary format, or produce an error.
                       * Applications are allowed to cache lookup results based
@@ -9342,7 +9342,7 @@ paths:
                   methods only use the fully qualified type name after the last
                   '/'
 
-                  in the type URL, for example "foo.bar.com/x/y.z" will yield
+                  in the type URL, for example "foo.bar.com/x/y.z" will yields
                   type
 
                   name "y.z".
@@ -9476,7 +9476,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -9570,7 +9570,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -9714,7 +9714,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -9808,7 +9808,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -10058,7 +10058,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -10152,7 +10152,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -10433,7 +10433,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -10527,7 +10527,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -10644,7 +10644,7 @@ paths:
 
                           * If no scheme is provided, `https` is assumed.
 
-                          * An HTTP GET on the URL must yield a
+                          * An HTTP GET on the URL must yields a
                           [google.protobuf.Type][]
                             value in binary format, or produce an error.
                           * Applications are allowed to cache lookup results
@@ -10739,7 +10739,7 @@ paths:
                       last '/'
 
                       in the type URL, for example "foo.bar.com/x/y.z" will
-                      yield type
+                      yields type
 
                       name "y.z".
 
@@ -10877,7 +10877,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -10971,7 +10971,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -11078,7 +11078,7 @@ paths:
 
                       * If no scheme is provided, `https` is assumed.
 
-                      * An HTTP GET on the URL must yield a
+                      * An HTTP GET on the URL must yields a
                       [google.protobuf.Type][]
                         value in binary format, or produce an error.
                       * Applications are allowed to cache lookup results based
@@ -11172,7 +11172,7 @@ paths:
                   methods only use the fully qualified type name after the last
                   '/'
 
-                  in the type URL, for example "foo.bar.com/x/y.z" will yield
+                  in the type URL, for example "foo.bar.com/x/y.z" will yields
                   type
 
                   name "y.z".
@@ -11306,7 +11306,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -11400,7 +11400,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -11574,7 +11574,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -11668,7 +11668,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -11828,7 +11828,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -11922,7 +11922,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -12136,7 +12136,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -12230,7 +12230,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -12459,7 +12459,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -12553,7 +12553,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -12771,7 +12771,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -12865,7 +12865,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -13083,7 +13083,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -13177,7 +13177,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -13349,7 +13349,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -13443,7 +13443,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -13618,7 +13618,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -13712,7 +13712,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -13886,7 +13886,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -13980,7 +13980,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -14249,7 +14249,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -14343,7 +14343,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -14507,7 +14507,7 @@ paths:
 
                           * If no scheme is provided, `https` is assumed.
 
-                          * An HTTP GET on the URL must yield a
+                          * An HTTP GET on the URL must yields a
                           [google.protobuf.Type][]
                             value in binary format, or produce an error.
                           * Applications are allowed to cache lookup results
@@ -14602,7 +14602,7 @@ paths:
                       last '/'
 
                       in the type URL, for example "foo.bar.com/x/y.z" will
-                      yield type
+                      yields type
 
                       name "y.z".
 
@@ -14708,7 +14708,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -14802,7 +14802,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -14913,7 +14913,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -15007,7 +15007,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -15130,7 +15130,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -15224,7 +15224,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -15375,7 +15375,7 @@ paths:
 
                       * If no scheme is provided, `https` is assumed.
 
-                      * An HTTP GET on the URL must yield a
+                      * An HTTP GET on the URL must yields a
                       [google.protobuf.Type][]
                         value in binary format, or produce an error.
                       * Applications are allowed to cache lookup results based
@@ -15469,7 +15469,7 @@ paths:
                   methods only use the fully qualified type name after the last
                   '/'
 
-                  in the type URL, for example "foo.bar.com/x/y.z" will yield
+                  in the type URL, for example "foo.bar.com/x/y.z" will yields
                   type
 
                   name "y.z".
@@ -15566,7 +15566,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -15660,7 +15660,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -15782,7 +15782,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -15876,7 +15876,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -16015,7 +16015,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -16109,7 +16109,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -16227,7 +16227,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -16321,7 +16321,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -16446,7 +16446,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -16540,7 +16540,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -16643,7 +16643,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -16737,7 +16737,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -16840,7 +16840,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -16934,7 +16934,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -17028,7 +17028,7 @@ paths:
 
                       * If no scheme is provided, `https` is assumed.
 
-                      * An HTTP GET on the URL must yield a
+                      * An HTTP GET on the URL must yields a
                       [google.protobuf.Type][]
                         value in binary format, or produce an error.
                       * Applications are allowed to cache lookup results based
@@ -17122,7 +17122,7 @@ paths:
                   methods only use the fully qualified type name after the last
                   '/'
 
-                  in the type URL, for example "foo.bar.com/x/y.z" will yield
+                  in the type URL, for example "foo.bar.com/x/y.z" will yields
                   type
 
                   name "y.z".
@@ -17219,7 +17219,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -17313,7 +17313,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -17449,7 +17449,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -17543,7 +17543,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -17643,7 +17643,7 @@ paths:
 
                             * If no scheme is provided, `https` is assumed.
 
-                            * An HTTP GET on the URL must yield a
+                            * An HTTP GET on the URL must yields a
                             [google.protobuf.Type][]
                               value in binary format, or produce an error.
                             * Applications are allowed to cache lookup results
@@ -17738,7 +17738,7 @@ paths:
                         last '/'
 
                         in the type URL, for example "foo.bar.com/x/y.z" will
-                        yield type
+                        yields type
 
                         name "y.z".
 
@@ -17875,7 +17875,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -17969,7 +17969,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -18146,7 +18146,7 @@ paths:
 
                             * If no scheme is provided, `https` is assumed.
 
-                            * An HTTP GET on the URL must yield a
+                            * An HTTP GET on the URL must yields a
                             [google.protobuf.Type][]
                               value in binary format, or produce an error.
                             * Applications are allowed to cache lookup results
@@ -18241,7 +18241,7 @@ paths:
                         last '/'
 
                         in the type URL, for example "foo.bar.com/x/y.z" will
-                        yield type
+                        yields type
 
                         name "y.z".
 
@@ -18370,7 +18370,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -18464,7 +18464,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -18630,7 +18630,7 @@ paths:
 
                             * If no scheme is provided, `https` is assumed.
 
-                            * An HTTP GET on the URL must yield a
+                            * An HTTP GET on the URL must yields a
                             [google.protobuf.Type][]
                               value in binary format, or produce an error.
                             * Applications are allowed to cache lookup results
@@ -18725,7 +18725,7 @@ paths:
                         last '/'
 
                         in the type URL, for example "foo.bar.com/x/y.z" will
-                        yield type
+                        yields type
 
                         name "y.z".
 
@@ -18854,7 +18854,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -18948,7 +18948,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -21395,7 +21395,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -21489,7 +21489,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -21611,7 +21611,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -21705,7 +21705,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -21856,7 +21856,7 @@ paths:
 
                       * If no scheme is provided, `https` is assumed.
 
-                      * An HTTP GET on the URL must yield a
+                      * An HTTP GET on the URL must yields a
                       [google.protobuf.Type][]
                         value in binary format, or produce an error.
                       * Applications are allowed to cache lookup results based
@@ -21950,7 +21950,7 @@ paths:
                   methods only use the fully qualified type name after the last
                   '/'
 
-                  in the type URL, for example "foo.bar.com/x/y.z" will yield
+                  in the type URL, for example "foo.bar.com/x/y.z" will yields
                   type
 
                   name "y.z".
@@ -22047,7 +22047,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -22141,7 +22141,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -22270,7 +22270,7 @@ paths:
 
                           * If no scheme is provided, `https` is assumed.
 
-                          * An HTTP GET on the URL must yield a
+                          * An HTTP GET on the URL must yields a
                           [google.protobuf.Type][]
                             value in binary format, or produce an error.
                           * Applications are allowed to cache lookup results
@@ -22357,7 +22357,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -22451,7 +22451,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -22579,7 +22579,7 @@ paths:
 
                             * If no scheme is provided, `https` is assumed.
 
-                            * An HTTP GET on the URL must yield a
+                            * An HTTP GET on the URL must yields a
                             [google.protobuf.Type][]
                               value in binary format, or produce an error.
                             * Applications are allowed to cache lookup results
@@ -22686,7 +22686,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -22780,7 +22780,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -22955,7 +22955,7 @@ paths:
 
                             * If no scheme is provided, `https` is assumed.
 
-                            * An HTTP GET on the URL must yield a
+                            * An HTTP GET on the URL must yields a
                             [google.protobuf.Type][]
                               value in binary format, or produce an error.
                             * Applications are allowed to cache lookup results
@@ -23065,7 +23065,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -23159,7 +23159,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -23394,7 +23394,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -23488,7 +23488,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -23602,7 +23602,7 @@ paths:
 
                             * If no scheme is provided, `https` is assumed.
 
-                            * An HTTP GET on the URL must yield a
+                            * An HTTP GET on the URL must yields a
                             [google.protobuf.Type][]
                               value in binary format, or produce an error.
                             * Applications are allowed to cache lookup results
@@ -23697,7 +23697,7 @@ paths:
                         last '/'
 
                         in the type URL, for example "foo.bar.com/x/y.z" will
-                        yield type
+                        yields type
 
                         name "y.z".
 
@@ -23898,7 +23898,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -23992,7 +23992,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -24187,7 +24187,7 @@ paths:
 
                           * If no scheme is provided, `https` is assumed.
 
-                          * An HTTP GET on the URL must yield a
+                          * An HTTP GET on the URL must yields a
                           [google.protobuf.Type][]
                             value in binary format, or produce an error.
                           * Applications are allowed to cache lookup results
@@ -24282,7 +24282,7 @@ paths:
                       last '/'
 
                       in the type URL, for example "foo.bar.com/x/y.z" will
-                      yield type
+                      yields type
 
                       name "y.z".
 
@@ -24456,7 +24456,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -24550,7 +24550,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -24727,7 +24727,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -24821,7 +24821,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -25033,7 +25033,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -25127,7 +25127,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -25269,7 +25269,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -25363,7 +25363,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -25569,7 +25569,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -25663,7 +25663,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -25907,7 +25907,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -26001,7 +26001,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -26810,7 +26810,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -26904,7 +26904,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -27241,7 +27241,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -27335,7 +27335,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -27612,7 +27612,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -27706,7 +27706,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -27880,7 +27880,7 @@ paths:
 
                             * If no scheme is provided, `https` is assumed.
 
-                            * An HTTP GET on the URL must yield a
+                            * An HTTP GET on the URL must yields a
                             [google.protobuf.Type][]
                               value in binary format, or produce an error.
                             * Applications are allowed to cache lookup results
@@ -27975,7 +27975,7 @@ paths:
                         last '/'
 
                         in the type URL, for example "foo.bar.com/x/y.z" will
-                        yield type
+                        yields type
 
                         name "y.z".
 
@@ -28238,7 +28238,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -28332,7 +28332,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -28499,7 +28499,7 @@ paths:
 
                           * If no scheme is provided, `https` is assumed.
 
-                          * An HTTP GET on the URL must yield a
+                          * An HTTP GET on the URL must yields a
                           [google.protobuf.Type][]
                             value in binary format, or produce an error.
                           * Applications are allowed to cache lookup results
@@ -28594,7 +28594,7 @@ paths:
                       last '/'
 
                       in the type URL, for example "foo.bar.com/x/y.z" will
-                      yield type
+                      yields type
 
                       name "y.z".
 
@@ -28834,7 +28834,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -28928,7 +28928,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -29125,7 +29125,7 @@ paths:
 
                                 * If no scheme is provided, `https` is assumed.
 
-                                * An HTTP GET on the URL must yield a
+                                * An HTTP GET on the URL must yields a
                                 [google.protobuf.Type][]
                                   value in binary format, or produce an error.
                                 * Applications are allowed to cache lookup
@@ -29221,7 +29221,7 @@ paths:
                             the last '/'
 
                             in the type URL, for example "foo.bar.com/x/y.z"
-                            will yield type
+                            will yields type
 
                             name "y.z".
 
@@ -29490,7 +29490,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -29584,7 +29584,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -29734,7 +29734,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -29828,7 +29828,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -29946,7 +29946,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -30040,7 +30040,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -30150,7 +30150,7 @@ paths:
 
                             * If no scheme is provided, `https` is assumed.
 
-                            * An HTTP GET on the URL must yield a
+                            * An HTTP GET on the URL must yields a
                             [google.protobuf.Type][]
                               value in binary format, or produce an error.
                             * Applications are allowed to cache lookup results
@@ -30245,7 +30245,7 @@ paths:
                         last '/'
 
                         in the type URL, for example "foo.bar.com/x/y.z" will
-                        yield type
+                        yields type
 
                         name "y.z".
 
@@ -30508,7 +30508,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -30602,7 +30602,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -30767,7 +30767,7 @@ paths:
 
                           * If no scheme is provided, `https` is assumed.
 
-                          * An HTTP GET on the URL must yield a
+                          * An HTTP GET on the URL must yields a
                           [google.protobuf.Type][]
                             value in binary format, or produce an error.
                           * Applications are allowed to cache lookup results
@@ -30862,7 +30862,7 @@ paths:
                       last '/'
 
                       in the type URL, for example "foo.bar.com/x/y.z" will
-                      yield type
+                      yields type
 
                       name "y.z".
 
@@ -31102,7 +31102,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -31196,7 +31196,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -31388,7 +31388,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -31482,7 +31482,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -31704,7 +31704,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -31798,7 +31798,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -31978,7 +31978,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -32072,7 +32072,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -32286,7 +32286,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -32380,7 +32380,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -32551,7 +32551,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -32645,7 +32645,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -32781,7 +32781,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -32875,7 +32875,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -33012,7 +33012,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -33106,7 +33106,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -33233,7 +33233,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -33327,7 +33327,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -33511,7 +33511,7 @@ paths:
 
                             * If no scheme is provided, `https` is assumed.
 
-                            * An HTTP GET on the URL must yield a
+                            * An HTTP GET on the URL must yields a
                             [google.protobuf.Type][]
                               value in binary format, or produce an error.
                             * Applications are allowed to cache lookup results
@@ -33606,7 +33606,7 @@ paths:
                         last '/'
 
                         in the type URL, for example "foo.bar.com/x/y.z" will
-                        yield type
+                        yields type
 
                         name "y.z".
 
@@ -33713,7 +33713,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -33807,7 +33807,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -33921,7 +33921,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -34015,7 +34015,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -34310,7 +34310,7 @@ paths:
 
                           * If no scheme is provided, `https` is assumed.
 
-                          * An HTTP GET on the URL must yield a
+                          * An HTTP GET on the URL must yields a
                           [google.protobuf.Type][]
                             value in binary format, or produce an error.
                           * Applications are allowed to cache lookup results
@@ -34405,7 +34405,7 @@ paths:
                       last '/'
 
                       in the type URL, for example "foo.bar.com/x/y.z" will
-                      yield type
+                      yields type
 
                       name "y.z".
 
@@ -34562,7 +34562,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -34656,7 +34656,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -34803,7 +34803,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -34897,7 +34897,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -35068,7 +35068,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -35162,7 +35162,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -35286,7 +35286,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -35380,7 +35380,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -35500,7 +35500,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -35594,7 +35594,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -35737,7 +35737,7 @@ paths:
 
                           * If no scheme is provided, `https` is assumed.
 
-                          * An HTTP GET on the URL must yield a
+                          * An HTTP GET on the URL must yields a
                           [google.protobuf.Type][]
                             value in binary format, or produce an error.
                           * Applications are allowed to cache lookup results
@@ -35832,7 +35832,7 @@ paths:
                       last '/'
 
                       in the type URL, for example "foo.bar.com/x/y.z" will
-                      yield type
+                      yields type
 
                       name "y.z".
 
@@ -35933,7 +35933,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -36027,7 +36027,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -36164,7 +36164,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -36258,7 +36258,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -36396,7 +36396,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -36490,7 +36490,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -36680,7 +36680,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -36774,7 +36774,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -38102,7 +38102,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -38196,7 +38196,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -39505,7 +39505,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -39599,7 +39599,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -39786,7 +39786,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -39880,7 +39880,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -39994,7 +39994,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -40088,7 +40088,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -40193,7 +40193,7 @@ paths:
 
                             * If no scheme is provided, `https` is assumed.
 
-                            * An HTTP GET on the URL must yield a
+                            * An HTTP GET on the URL must yields a
                             [google.protobuf.Type][]
                               value in binary format, or produce an error.
                             * Applications are allowed to cache lookup results
@@ -40288,7 +40288,7 @@ paths:
                         last '/'
 
                         in the type URL, for example "foo.bar.com/x/y.z" will
-                        yield type
+                        yields type
 
                         name "y.z".
 
@@ -40415,7 +40415,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -40509,7 +40509,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -40671,7 +40671,7 @@ paths:
 
                             * If no scheme is provided, `https` is assumed.
 
-                            * An HTTP GET on the URL must yield a
+                            * An HTTP GET on the URL must yields a
                             [google.protobuf.Type][]
                               value in binary format, or produce an error.
                             * Applications are allowed to cache lookup results
@@ -40766,7 +40766,7 @@ paths:
                         last '/'
 
                         in the type URL, for example "foo.bar.com/x/y.z" will
-                        yield type
+                        yields type
 
                         name "y.z".
 
@@ -40893,7 +40893,7 @@ paths:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -40987,7 +40987,7 @@ paths:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -41452,7 +41452,7 @@ definitions:
 
           * If no scheme is provided, `https` is assumed.
 
-          * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+          * An HTTP GET on the URL must yields a [google.protobuf.Type][]
             value in binary format, or produce an error.
           * Applications are allowed to cache lookup results based on the
             URL, or have them precompiled into a binary to avoid any
@@ -41536,7 +41536,7 @@ definitions:
 
       methods only use the fully qualified type name after the last '/'
 
-      in the type URL, for example "foo.bar.com/x/y.z" will yield type
+      in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
       name "y.z".
 
@@ -41623,7 +41623,7 @@ definitions:
 
                 * If no scheme is provided, `https` is assumed.
 
-                * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+                * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                   value in binary format, or produce an error.
                 * Applications are allowed to cache lookup results based on the
                   URL, or have them precompiled into a binary to avoid any
@@ -41712,7 +41712,7 @@ definitions:
 
             methods only use the fully qualified type name after the last '/'
 
-            in the type URL, for example "foo.bar.com/x/y.z" will yield type
+            in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
             name "y.z".
 
@@ -43398,7 +43398,7 @@ definitions:
 
               * If no scheme is provided, `https` is assumed.
 
-              * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+              * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                 value in binary format, or produce an error.
               * Applications are allowed to cache lookup results based on the
                 URL, or have them precompiled into a binary to avoid any
@@ -43484,7 +43484,7 @@ definitions:
 
           methods only use the fully qualified type name after the last '/'
 
-          in the type URL, for example "foo.bar.com/x/y.z" will yield type
+          in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
           name "y.z".
 
@@ -43587,7 +43587,7 @@ definitions:
 
                   * If no scheme is provided, `https` is assumed.
 
-                  * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+                  * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                     value in binary format, or produce an error.
                   * Applications are allowed to cache lookup results based on
                   the
@@ -43678,7 +43678,7 @@ definitions:
 
               methods only use the fully qualified type name after the last '/'
 
-              in the type URL, for example "foo.bar.com/x/y.z" will yield type
+              in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
               name "y.z".
 
@@ -45325,7 +45325,7 @@ definitions:
 
               * If no scheme is provided, `https` is assumed.
 
-              * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+              * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                 value in binary format, or produce an error.
               * Applications are allowed to cache lookup results based on the
                 URL, or have them precompiled into a binary to avoid any
@@ -45411,7 +45411,7 @@ definitions:
 
           methods only use the fully qualified type name after the last '/'
 
-          in the type URL, for example "foo.bar.com/x/y.z" will yield type
+          in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
           name "y.z".
 
@@ -45524,7 +45524,7 @@ definitions:
 
               * If no scheme is provided, `https` is assumed.
 
-              * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+              * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                 value in binary format, or produce an error.
               * Applications are allowed to cache lookup results based on the
                 URL, or have them precompiled into a binary to avoid any
@@ -45610,7 +45610,7 @@ definitions:
 
           methods only use the fully qualified type name after the last '/'
 
-          in the type URL, for example "foo.bar.com/x/y.z" will yield type
+          in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
           name "y.z".
 
@@ -45732,7 +45732,7 @@ definitions:
 
               * If no scheme is provided, `https` is assumed.
 
-              * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+              * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                 value in binary format, or produce an error.
               * Applications are allowed to cache lookup results based on the
                 URL, or have them precompiled into a binary to avoid any
@@ -45818,7 +45818,7 @@ definitions:
 
           methods only use the fully qualified type name after the last '/'
 
-          in the type URL, for example "foo.bar.com/x/y.z" will yield type
+          in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
           name "y.z".
 
@@ -45946,7 +45946,7 @@ definitions:
 
                     * If no scheme is provided, `https` is assumed.
 
-                    * An HTTP GET on the URL must yield a
+                    * An HTTP GET on the URL must yields a
                     [google.protobuf.Type][]
                       value in binary format, or produce an error.
                     * Applications are allowed to cache lookup results based on
@@ -46040,7 +46040,7 @@ definitions:
                 methods only use the fully qualified type name after the last
                 '/'
 
-                in the type URL, for example "foo.bar.com/x/y.z" will yield type
+                in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
                 name "y.z".
 
@@ -46238,7 +46238,7 @@ definitions:
 
               * If no scheme is provided, `https` is assumed.
 
-              * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+              * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                 value in binary format, or produce an error.
               * Applications are allowed to cache lookup results based on the
                 URL, or have them precompiled into a binary to avoid any
@@ -46324,7 +46324,7 @@ definitions:
 
           methods only use the fully qualified type name after the last '/'
 
-          in the type URL, for example "foo.bar.com/x/y.z" will yield type
+          in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
           name "y.z".
 
@@ -46483,7 +46483,7 @@ definitions:
 
                     * If no scheme is provided, `https` is assumed.
 
-                    * An HTTP GET on the URL must yield a
+                    * An HTTP GET on the URL must yields a
                     [google.protobuf.Type][]
                       value in binary format, or produce an error.
                     * Applications are allowed to cache lookup results based on
@@ -46577,7 +46577,7 @@ definitions:
                 methods only use the fully qualified type name after the last
                 '/'
 
-                in the type URL, for example "foo.bar.com/x/y.z" will yield type
+                in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
                 name "y.z".
 
@@ -46693,7 +46693,7 @@ definitions:
 
               * If no scheme is provided, `https` is assumed.
 
-              * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+              * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                 value in binary format, or produce an error.
               * Applications are allowed to cache lookup results based on the
                 URL, or have them precompiled into a binary to avoid any
@@ -46779,7 +46779,7 @@ definitions:
 
           methods only use the fully qualified type name after the last '/'
 
-          in the type URL, for example "foo.bar.com/x/y.z" will yield type
+          in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
           name "y.z".
 
@@ -46861,7 +46861,7 @@ definitions:
 
               * If no scheme is provided, `https` is assumed.
 
-              * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+              * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                 value in binary format, or produce an error.
               * Applications are allowed to cache lookup results based on the
                 URL, or have them precompiled into a binary to avoid any
@@ -46947,7 +46947,7 @@ definitions:
 
           methods only use the fully qualified type name after the last '/'
 
-          in the type URL, for example "foo.bar.com/x/y.z" will yield type
+          in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
           name "y.z".
 
@@ -47303,7 +47303,7 @@ definitions:
 
                   * If no scheme is provided, `https` is assumed.
 
-                  * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+                  * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                     value in binary format, or produce an error.
                   * Applications are allowed to cache lookup results based on
                   the
@@ -47394,7 +47394,7 @@ definitions:
 
               methods only use the fully qualified type name after the last '/'
 
-              in the type URL, for example "foo.bar.com/x/y.z" will yield type
+              in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
               name "y.z".
 
@@ -47512,7 +47512,7 @@ definitions:
 
               * If no scheme is provided, `https` is assumed.
 
-              * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+              * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                 value in binary format, or produce an error.
               * Applications are allowed to cache lookup results based on the
                 URL, or have them precompiled into a binary to avoid any
@@ -47598,7 +47598,7 @@ definitions:
 
           methods only use the fully qualified type name after the last '/'
 
-          in the type URL, for example "foo.bar.com/x/y.z" will yield type
+          in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
           name "y.z".
 
@@ -48231,7 +48231,7 @@ definitions:
 
                   * If no scheme is provided, `https` is assumed.
 
-                  * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+                  * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                     value in binary format, or produce an error.
                   * Applications are allowed to cache lookup results based on
                   the
@@ -48322,7 +48322,7 @@ definitions:
 
               methods only use the fully qualified type name after the last '/'
 
-              in the type URL, for example "foo.bar.com/x/y.z" will yield type
+              in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
               name "y.z".
 
@@ -48440,7 +48440,7 @@ definitions:
 
               * If no scheme is provided, `https` is assumed.
 
-              * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+              * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                 value in binary format, or produce an error.
               * Applications are allowed to cache lookup results based on the
                 URL, or have them precompiled into a binary to avoid any
@@ -48526,7 +48526,7 @@ definitions:
 
           methods only use the fully qualified type name after the last '/'
 
-          in the type URL, for example "foo.bar.com/x/y.z" will yield type
+          in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
           name "y.z".
 
@@ -49547,7 +49547,7 @@ definitions:
 
               * If no scheme is provided, `https` is assumed.
 
-              * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+              * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                 value in binary format, or produce an error.
               * Applications are allowed to cache lookup results based on the
                 URL, or have them precompiled into a binary to avoid any
@@ -49633,7 +49633,7 @@ definitions:
 
           methods only use the fully qualified type name after the last '/'
 
-          in the type URL, for example "foo.bar.com/x/y.z" will yield type
+          in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
           name "y.z".
 
@@ -49768,7 +49768,7 @@ definitions:
 
                   * If no scheme is provided, `https` is assumed.
 
-                  * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+                  * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                     value in binary format, or produce an error.
                   * Applications are allowed to cache lookup results based on
                   the
@@ -49859,7 +49859,7 @@ definitions:
 
               methods only use the fully qualified type name after the last '/'
 
-              in the type URL, for example "foo.bar.com/x/y.z" will yield type
+              in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
               name "y.z".
 
@@ -49948,7 +49948,7 @@ definitions:
 
               * If no scheme is provided, `https` is assumed.
 
-              * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+              * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                 value in binary format, or produce an error.
               * Applications are allowed to cache lookup results based on the
                 URL, or have them precompiled into a binary to avoid any
@@ -50034,7 +50034,7 @@ definitions:
 
           methods only use the fully qualified type name after the last '/'
 
-          in the type URL, for example "foo.bar.com/x/y.z" will yield type
+          in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
           name "y.z".
 
@@ -50117,7 +50117,7 @@ definitions:
 
                 * If no scheme is provided, `https` is assumed.
 
-                * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+                * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                   value in binary format, or produce an error.
                 * Applications are allowed to cache lookup results based on the
                   URL, or have them precompiled into a binary to avoid any
@@ -50206,7 +50206,7 @@ definitions:
 
             methods only use the fully qualified type name after the last '/'
 
-            in the type URL, for example "foo.bar.com/x/y.z" will yield type
+            in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
             name "y.z".
 
@@ -50310,7 +50310,7 @@ definitions:
 
               * If no scheme is provided, `https` is assumed.
 
-              * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+              * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                 value in binary format, or produce an error.
               * Applications are allowed to cache lookup results based on the
                 URL, or have them precompiled into a binary to avoid any
@@ -50396,7 +50396,7 @@ definitions:
 
           methods only use the fully qualified type name after the last '/'
 
-          in the type URL, for example "foo.bar.com/x/y.z" will yield type
+          in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
           name "y.z".
 
@@ -50479,7 +50479,7 @@ definitions:
 
                 * If no scheme is provided, `https` is assumed.
 
-                * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+                * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                   value in binary format, or produce an error.
                 * Applications are allowed to cache lookup results based on the
                   URL, or have them precompiled into a binary to avoid any
@@ -50568,7 +50568,7 @@ definitions:
 
             methods only use the fully qualified type name after the last '/'
 
-            in the type URL, for example "foo.bar.com/x/y.z" will yield type
+            in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
             name "y.z".
 
@@ -50675,7 +50675,7 @@ definitions:
 
               * If no scheme is provided, `https` is assumed.
 
-              * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+              * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                 value in binary format, or produce an error.
               * Applications are allowed to cache lookup results based on the
                 URL, or have them precompiled into a binary to avoid any
@@ -50761,7 +50761,7 @@ definitions:
 
           methods only use the fully qualified type name after the last '/'
 
-          in the type URL, for example "foo.bar.com/x/y.z" will yield type
+          in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
           name "y.z".
 
@@ -50856,7 +50856,7 @@ definitions:
 
               * If no scheme is provided, `https` is assumed.
 
-              * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+              * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                 value in binary format, or produce an error.
               * Applications are allowed to cache lookup results based on the
                 URL, or have them precompiled into a binary to avoid any
@@ -50942,7 +50942,7 @@ definitions:
 
           methods only use the fully qualified type name after the last '/'
 
-          in the type URL, for example "foo.bar.com/x/y.z" will yield type
+          in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
           name "y.z".
 
@@ -51038,7 +51038,7 @@ definitions:
 
                     * If no scheme is provided, `https` is assumed.
 
-                    * An HTTP GET on the URL must yield a
+                    * An HTTP GET on the URL must yields a
                     [google.protobuf.Type][]
                       value in binary format, or produce an error.
                     * Applications are allowed to cache lookup results based on
@@ -51132,7 +51132,7 @@ definitions:
                 methods only use the fully qualified type name after the last
                 '/'
 
-                in the type URL, for example "foo.bar.com/x/y.z" will yield type
+                in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
                 name "y.z".
 
@@ -51252,7 +51252,7 @@ definitions:
 
                     * If no scheme is provided, `https` is assumed.
 
-                    * An HTTP GET on the URL must yield a
+                    * An HTTP GET on the URL must yields a
                     [google.protobuf.Type][]
                       value in binary format, or produce an error.
                     * Applications are allowed to cache lookup results based on
@@ -51346,7 +51346,7 @@ definitions:
                 methods only use the fully qualified type name after the last
                 '/'
 
-                in the type URL, for example "foo.bar.com/x/y.z" will yield type
+                in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
                 name "y.z".
 
@@ -51462,7 +51462,7 @@ definitions:
 
                     * If no scheme is provided, `https` is assumed.
 
-                    * An HTTP GET on the URL must yield a
+                    * An HTTP GET on the URL must yields a
                     [google.protobuf.Type][]
                       value in binary format, or produce an error.
                     * Applications are allowed to cache lookup results based on
@@ -51556,7 +51556,7 @@ definitions:
                 methods only use the fully qualified type name after the last
                 '/'
 
-                in the type URL, for example "foo.bar.com/x/y.z" will yield type
+                in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
                 name "y.z".
 
@@ -52880,7 +52880,7 @@ definitions:
 
                 * If no scheme is provided, `https` is assumed.
 
-                * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+                * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                   value in binary format, or produce an error.
                 * Applications are allowed to cache lookup results based on the
                   URL, or have them precompiled into a binary to avoid any
@@ -52969,7 +52969,7 @@ definitions:
 
             methods only use the fully qualified type name after the last '/'
 
-            in the type URL, for example "foo.bar.com/x/y.z" will yield type
+            in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
             name "y.z".
 
@@ -53072,7 +53072,7 @@ definitions:
 
               * If no scheme is provided, `https` is assumed.
 
-              * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+              * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                 value in binary format, or produce an error.
               * Applications are allowed to cache lookup results based on the
                 URL, or have them precompiled into a binary to avoid any
@@ -53158,7 +53158,7 @@ definitions:
 
           methods only use the fully qualified type name after the last '/'
 
-          in the type URL, for example "foo.bar.com/x/y.z" will yield type
+          in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
           name "y.z".
 
@@ -53250,7 +53250,7 @@ definitions:
 
               * If no scheme is provided, `https` is assumed.
 
-              * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+              * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                 value in binary format, or produce an error.
               * Applications are allowed to cache lookup results based on the
                 URL, or have them precompiled into a binary to avoid any
@@ -53330,7 +53330,7 @@ definitions:
 
                   * If no scheme is provided, `https` is assumed.
 
-                  * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+                  * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                     value in binary format, or produce an error.
                   * Applications are allowed to cache lookup results based on
                   the
@@ -53418,7 +53418,7 @@ definitions:
 
                     * If no scheme is provided, `https` is assumed.
 
-                    * An HTTP GET on the URL must yield a
+                    * An HTTP GET on the URL must yields a
                     [google.protobuf.Type][]
                       value in binary format, or produce an error.
                     * Applications are allowed to cache lookup results based on
@@ -53530,7 +53530,7 @@ definitions:
 
                     * If no scheme is provided, `https` is assumed.
 
-                    * An HTTP GET on the URL must yield a
+                    * An HTTP GET on the URL must yields a
                     [google.protobuf.Type][]
                       value in binary format, or produce an error.
                     * Applications are allowed to cache lookup results based on
@@ -53680,7 +53680,7 @@ definitions:
 
               * If no scheme is provided, `https` is assumed.
 
-              * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+              * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                 value in binary format, or produce an error.
               * Applications are allowed to cache lookup results based on the
                 URL, or have them precompiled into a binary to avoid any
@@ -53766,7 +53766,7 @@ definitions:
 
           methods only use the fully qualified type name after the last '/'
 
-          in the type URL, for example "foo.bar.com/x/y.z" will yield type
+          in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
           name "y.z".
 
@@ -54101,7 +54101,7 @@ definitions:
 
                   * If no scheme is provided, `https` is assumed.
 
-                  * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+                  * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                     value in binary format, or produce an error.
                   * Applications are allowed to cache lookup results based on
                   the
@@ -54192,7 +54192,7 @@ definitions:
 
               methods only use the fully qualified type name after the last '/'
 
-              in the type URL, for example "foo.bar.com/x/y.z" will yield type
+              in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
               name "y.z".
 
@@ -54354,7 +54354,7 @@ definitions:
 
                     * If no scheme is provided, `https` is assumed.
 
-                    * An HTTP GET on the URL must yield a
+                    * An HTTP GET on the URL must yields a
                     [google.protobuf.Type][]
                       value in binary format, or produce an error.
                     * Applications are allowed to cache lookup results based on
@@ -54448,7 +54448,7 @@ definitions:
                 methods only use the fully qualified type name after the last
                 '/'
 
-                in the type URL, for example "foo.bar.com/x/y.z" will yield type
+                in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
                 name "y.z".
 
@@ -55524,7 +55524,7 @@ definitions:
 
                     * If no scheme is provided, `https` is assumed.
 
-                    * An HTTP GET on the URL must yield a
+                    * An HTTP GET on the URL must yields a
                     [google.protobuf.Type][]
                       value in binary format, or produce an error.
                     * Applications are allowed to cache lookup results based on
@@ -55618,7 +55618,7 @@ definitions:
                 methods only use the fully qualified type name after the last
                 '/'
 
-                in the type URL, for example "foo.bar.com/x/y.z" will yield type
+                in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
                 name "y.z".
 
@@ -56107,7 +56107,7 @@ definitions:
 
                   * If no scheme is provided, `https` is assumed.
 
-                  * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+                  * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                     value in binary format, or produce an error.
                   * Applications are allowed to cache lookup results based on
                   the
@@ -56198,7 +56198,7 @@ definitions:
 
               methods only use the fully qualified type name after the last '/'
 
-              in the type URL, for example "foo.bar.com/x/y.z" will yield type
+              in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
               name "y.z".
 
@@ -56420,7 +56420,7 @@ definitions:
 
                     * If no scheme is provided, `https` is assumed.
 
-                    * An HTTP GET on the URL must yield a
+                    * An HTTP GET on the URL must yields a
                     [google.protobuf.Type][]
                       value in binary format, or produce an error.
                     * Applications are allowed to cache lookup results based on
@@ -56514,7 +56514,7 @@ definitions:
                 methods only use the fully qualified type name after the last
                 '/'
 
-                in the type URL, for example "foo.bar.com/x/y.z" will yield type
+                in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
                 name "y.z".
 
@@ -56840,7 +56840,7 @@ definitions:
 
                         * If no scheme is provided, `https` is assumed.
 
-                        * An HTTP GET on the URL must yield a
+                        * An HTTP GET on the URL must yields a
                         [google.protobuf.Type][]
                           value in binary format, or produce an error.
                         * Applications are allowed to cache lookup results based
@@ -56934,7 +56934,7 @@ definitions:
                     methods only use the fully qualified type name after the
                     last '/'
 
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    in the type URL, for example "foo.bar.com/x/y.z" will yields
                     type
 
                     name "y.z".
@@ -57515,7 +57515,7 @@ definitions:
 
                   * If no scheme is provided, `https` is assumed.
 
-                  * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+                  * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                     value in binary format, or produce an error.
                   * Applications are allowed to cache lookup results based on
                   the
@@ -57606,7 +57606,7 @@ definitions:
 
               methods only use the fully qualified type name after the last '/'
 
-              in the type URL, for example "foo.bar.com/x/y.z" will yield type
+              in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
               name "y.z".
 
@@ -57904,7 +57904,7 @@ definitions:
 
                     * If no scheme is provided, `https` is assumed.
 
-                    * An HTTP GET on the URL must yield a
+                    * An HTTP GET on the URL must yields a
                     [google.protobuf.Type][]
                       value in binary format, or produce an error.
                     * Applications are allowed to cache lookup results based on
@@ -57998,7 +57998,7 @@ definitions:
                 methods only use the fully qualified type name after the last
                 '/'
 
-                in the type URL, for example "foo.bar.com/x/y.z" will yield type
+                in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
                 name "y.z".
 
@@ -58581,7 +58581,7 @@ definitions:
 
               * If no scheme is provided, `https` is assumed.
 
-              * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+              * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                 value in binary format, or produce an error.
               * Applications are allowed to cache lookup results based on the
                 URL, or have them precompiled into a binary to avoid any
@@ -58667,7 +58667,7 @@ definitions:
 
           methods only use the fully qualified type name after the last '/'
 
-          in the type URL, for example "foo.bar.com/x/y.z" will yield type
+          in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
           name "y.z".
 
@@ -59104,7 +59104,7 @@ definitions:
 
                 * If no scheme is provided, `https` is assumed.
 
-                * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+                * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                   value in binary format, or produce an error.
                 * Applications are allowed to cache lookup results based on the
                   URL, or have them precompiled into a binary to avoid any
@@ -59193,7 +59193,7 @@ definitions:
 
             methods only use the fully qualified type name after the last '/'
 
-            in the type URL, for example "foo.bar.com/x/y.z" will yield type
+            in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
             name "y.z".
 
@@ -59376,7 +59376,7 @@ definitions:
 
               * If no scheme is provided, `https` is assumed.
 
-              * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+              * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                 value in binary format, or produce an error.
               * Applications are allowed to cache lookup results based on the
                 URL, or have them precompiled into a binary to avoid any
@@ -59462,7 +59462,7 @@ definitions:
 
           methods only use the fully qualified type name after the last '/'
 
-          in the type URL, for example "foo.bar.com/x/y.z" will yield type
+          in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
           name "y.z".
 
@@ -59936,7 +59936,7 @@ definitions:
 
                   * If no scheme is provided, `https` is assumed.
 
-                  * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+                  * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                     value in binary format, or produce an error.
                   * Applications are allowed to cache lookup results based on
                   the
@@ -60027,7 +60027,7 @@ definitions:
 
               methods only use the fully qualified type name after the last '/'
 
-              in the type URL, for example "foo.bar.com/x/y.z" will yield type
+              in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
               name "y.z".
 
@@ -60932,7 +60932,7 @@ definitions:
 
                   * If no scheme is provided, `https` is assumed.
 
-                  * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+                  * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                     value in binary format, or produce an error.
                   * Applications are allowed to cache lookup results based on
                   the
@@ -61023,7 +61023,7 @@ definitions:
 
               methods only use the fully qualified type name after the last '/'
 
-              in the type URL, for example "foo.bar.com/x/y.z" will yield type
+              in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
               name "y.z".
 
@@ -61251,7 +61251,7 @@ definitions:
 
                     * If no scheme is provided, `https` is assumed.
 
-                    * An HTTP GET on the URL must yield a
+                    * An HTTP GET on the URL must yields a
                     [google.protobuf.Type][]
                       value in binary format, or produce an error.
                     * Applications are allowed to cache lookup results based on
@@ -61345,7 +61345,7 @@ definitions:
                 methods only use the fully qualified type name after the last
                 '/'
 
-                in the type URL, for example "foo.bar.com/x/y.z" will yield type
+                in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
                 name "y.z".
 
@@ -61734,7 +61734,7 @@ definitions:
 
               * If no scheme is provided, `https` is assumed.
 
-              * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+              * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                 value in binary format, or produce an error.
               * Applications are allowed to cache lookup results based on the
                 URL, or have them precompiled into a binary to avoid any
@@ -61820,7 +61820,7 @@ definitions:
 
           methods only use the fully qualified type name after the last '/'
 
-          in the type URL, for example "foo.bar.com/x/y.z" will yield type
+          in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
           name "y.z".
 
@@ -62007,7 +62007,7 @@ definitions:
 
                     * If no scheme is provided, `https` is assumed.
 
-                    * An HTTP GET on the URL must yield a
+                    * An HTTP GET on the URL must yields a
                     [google.protobuf.Type][]
                       value in binary format, or produce an error.
                     * Applications are allowed to cache lookup results based on
@@ -62101,7 +62101,7 @@ definitions:
                 methods only use the fully qualified type name after the last
                 '/'
 
-                in the type URL, for example "foo.bar.com/x/y.z" will yield type
+                in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
                 name "y.z".
 
@@ -62221,7 +62221,7 @@ definitions:
 
                     * If no scheme is provided, `https` is assumed.
 
-                    * An HTTP GET on the URL must yield a
+                    * An HTTP GET on the URL must yields a
                     [google.protobuf.Type][]
                       value in binary format, or produce an error.
                     * Applications are allowed to cache lookup results based on
@@ -62315,7 +62315,7 @@ definitions:
                 methods only use the fully qualified type name after the last
                 '/'
 
-                in the type URL, for example "foo.bar.com/x/y.z" will yield type
+                in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
                 name "y.z".
 
@@ -62429,7 +62429,7 @@ definitions:
 
                     * If no scheme is provided, `https` is assumed.
 
-                    * An HTTP GET on the URL must yield a
+                    * An HTTP GET on the URL must yields a
                     [google.protobuf.Type][]
                       value in binary format, or produce an error.
                     * Applications are allowed to cache lookup results based on
@@ -62523,7 +62523,7 @@ definitions:
                 methods only use the fully qualified type name after the last
                 '/'
 
-                in the type URL, for example "foo.bar.com/x/y.z" will yield type
+                in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
                 name "y.z".
 
@@ -62610,7 +62610,7 @@ definitions:
 
                     * If no scheme is provided, `https` is assumed.
 
-                    * An HTTP GET on the URL must yield a
+                    * An HTTP GET on the URL must yields a
                     [google.protobuf.Type][]
                       value in binary format, or produce an error.
                     * Applications are allowed to cache lookup results based on
@@ -62704,7 +62704,7 @@ definitions:
                 methods only use the fully qualified type name after the last
                 '/'
 
-                in the type URL, for example "foo.bar.com/x/y.z" will yield type
+                in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
                 name "y.z".
 
@@ -62813,7 +62813,7 @@ definitions:
 
                 * If no scheme is provided, `https` is assumed.
 
-                * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+                * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                   value in binary format, or produce an error.
                 * Applications are allowed to cache lookup results based on the
                   URL, or have them precompiled into a binary to avoid any
@@ -62902,7 +62902,7 @@ definitions:
 
             methods only use the fully qualified type name after the last '/'
 
-            in the type URL, for example "foo.bar.com/x/y.z" will yield type
+            in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
             name "y.z".
 
@@ -63011,7 +63011,7 @@ definitions:
 
                 * If no scheme is provided, `https` is assumed.
 
-                * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+                * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                   value in binary format, or produce an error.
                 * Applications are allowed to cache lookup results based on the
                   URL, or have them precompiled into a binary to avoid any
@@ -63100,7 +63100,7 @@ definitions:
 
             methods only use the fully qualified type name after the last '/'
 
-            in the type URL, for example "foo.bar.com/x/y.z" will yield type
+            in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
             name "y.z".
 
@@ -63184,7 +63184,7 @@ definitions:
 
                 * If no scheme is provided, `https` is assumed.
 
-                * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+                * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                   value in binary format, or produce an error.
                 * Applications are allowed to cache lookup results based on the
                   URL, or have them precompiled into a binary to avoid any
@@ -63273,7 +63273,7 @@ definitions:
 
             methods only use the fully qualified type name after the last '/'
 
-            in the type URL, for example "foo.bar.com/x/y.z" will yield type
+            in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
             name "y.z".
 
@@ -65915,7 +65915,7 @@ definitions:
 
               * If no scheme is provided, `https` is assumed.
 
-              * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+              * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                 value in binary format, or produce an error.
               * Applications are allowed to cache lookup results based on the
                 URL, or have them precompiled into a binary to avoid any
@@ -66001,7 +66001,7 @@ definitions:
 
           methods only use the fully qualified type name after the last '/'
 
-          in the type URL, for example "foo.bar.com/x/y.z" will yield type
+          in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
           name "y.z".
 
@@ -66148,7 +66148,7 @@ definitions:
 
                   * If no scheme is provided, `https` is assumed.
 
-                  * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+                  * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                     value in binary format, or produce an error.
                   * Applications are allowed to cache lookup results based on
                   the
@@ -66239,7 +66239,7 @@ definitions:
 
               methods only use the fully qualified type name after the last '/'
 
-              in the type URL, for example "foo.bar.com/x/y.z" will yield type
+              in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
               name "y.z".
 
@@ -69389,7 +69389,7 @@ definitions:
 
                     * If no scheme is provided, `https` is assumed.
 
-                    * An HTTP GET on the URL must yield a
+                    * An HTTP GET on the URL must yields a
                     [google.protobuf.Type][]
                       value in binary format, or produce an error.
                     * Applications are allowed to cache lookup results based on
@@ -69483,7 +69483,7 @@ definitions:
                 methods only use the fully qualified type name after the last
                 '/'
 
-                in the type URL, for example "foo.bar.com/x/y.z" will yield type
+                in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
                 name "y.z".
 
@@ -69685,7 +69685,7 @@ definitions:
 
                     * If no scheme is provided, `https` is assumed.
 
-                    * An HTTP GET on the URL must yield a
+                    * An HTTP GET on the URL must yields a
                     [google.protobuf.Type][]
                       value in binary format, or produce an error.
                     * Applications are allowed to cache lookup results based on
@@ -69779,7 +69779,7 @@ definitions:
                 methods only use the fully qualified type name after the last
                 '/'
 
-                in the type URL, for example "foo.bar.com/x/y.z" will yield type
+                in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
                 name "y.z".
 
@@ -70043,7 +70043,7 @@ definitions:
 
               * If no scheme is provided, `https` is assumed.
 
-              * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+              * An HTTP GET on the URL must yields a [google.protobuf.Type][]
                 value in binary format, or produce an error.
               * Applications are allowed to cache lookup results based on the
                 URL, or have them precompiled into a binary to avoid any
@@ -70129,7 +70129,7 @@ definitions:
 
           methods only use the fully qualified type name after the last '/'
 
-          in the type URL, for example "foo.bar.com/x/y.z" will yield type
+          in the type URL, for example "foo.bar.com/x/y.z" will yields type
 
           name "y.z".
 

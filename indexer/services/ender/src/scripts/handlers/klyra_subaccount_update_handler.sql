@@ -36,12 +36,12 @@ BEGIN
     subaccount_record."subaccountNumber" = jsonb_extract_path(event_data, 'subaccountId', 'number')::int;
     subaccount_record."updatedAtHeight" = block_height;
     subaccount_record."updatedAt" = block_time;
-    subaccount_record."assetYieldIndex" = jsonb_extract_path_text(event_data, 'yieldIndex');
+    subaccount_record."assetYieldsIndex" = jsonb_extract_path_text(event_data, 'yieldsIndex');
     INSERT INTO subaccounts
     VALUES (subaccount_record.*)
     ON CONFLICT ("id") DO UPDATE
         SET "updatedAtHeight" = subaccount_record."updatedAtHeight", "updatedAt" = subaccount_record."updatedAt",
-            "assetYieldIndex" = subaccount_record."assetYieldIndex";
+            "assetYieldsIndex" = subaccount_record."assetYieldsIndex";
 
     -- Process all the perpetual position updates that are part of the update.
     FOR perpetual_position_update IN SELECT * FROM jsonb_array_elements(event_data->'updatedPerpetualPositions') LOOP
@@ -56,10 +56,10 @@ BEGIN
             perpetual_position_found boolean;
             existing_funding numeric;
             new_settled_funding numeric;
-            perp_yield_index text;
+            perp_yields_index text;
         BEGIN
             perpetual_id = (perpetual_position_update->'perpetualId')::bigint;
-            perp_yield_index = jsonb_extract_path_text(perpetual_position_update, 'perpYieldIndex');
+            perp_yields_index = jsonb_extract_path_text(perpetual_position_update, 'perpYieldsIndex');
             SELECT * INTO perpetual_market FROM perpetual_markets WHERE id = perpetual_id;
             SELECT * INTO perpetual_position_record FROM perpetual_positions
                                                     WHERE "subaccountId" = subaccount_record."id"
@@ -89,7 +89,7 @@ BEGIN
                                               "settledFunding" = settled_funding,
                                               "status" = 'CLOSED',
                                               "size" = 0,
-                                              "perpYieldIndex" = perp_yield_index
+                                              "perpYieldsIndex" = perp_yields_index
                                           WHERE "id" = perpetual_position_record."id"
                                           RETURNING * INTO perpetual_position_record;
                 perpetual_position_record_updates = array_append(
@@ -105,7 +105,7 @@ BEGIN
                                                "lastEventId" = event_id,
                                                "settledFunding" = settled_funding,
                                                "maxSize" = max_size,
-                                               "perpYieldIndex" = perp_yield_index
+                                               "perpYieldsIndex" = perp_yields_index
                                             WHERE "id" = perpetual_position_record."id" RETURNING * INTO perpetual_position_record;
                 perpetual_position_record_updates = array_append(
                     perpetual_position_record_updates, klyra_to_jsonb(perpetual_position_record));
@@ -135,7 +135,7 @@ BEGIN
                 perpetual_position_record."closeEventId" = NULL;
                 perpetual_position_record."lastEventId" = event_id;
                 perpetual_position_record."settledFunding" = new_settled_funding;
-                perpetual_position_record."perpYieldIndex" = perp_yield_index;
+                perpetual_position_record."perpYieldsIndex" = perp_yields_index;
                 INSERT INTO perpetual_positions VALUES (perpetual_position_record.*);
                 perpetual_position_record_updates = array_append(
                     perpetual_position_record_updates, klyra_to_jsonb(perpetual_position_record));

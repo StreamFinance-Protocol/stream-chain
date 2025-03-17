@@ -258,7 +258,7 @@ func TestWithdrawFundsFromSubaccountToAccount_DepositFundsFromAccountToSubaccoun
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			ctx, keeper, pricesKeeper, perpetualsKeeper, accountKeeper, bankKeeper, assetsKeeper, ratelimitKeeper, _, _ := keepertest.SubaccountsKeepers(t, true)
+			ctx, keeper, pricesKeeper, perpetualsKeeper, accountKeeper, bankKeeper, assetsKeeper, yieldsKeeper, _, _ := keepertest.SubaccountsKeepers(t, true)
 			prices.InitGenesis(ctx, *pricesKeeper, constants.Prices_DefaultGenesisState)
 
 			_, err := assetsKeeper.CreateAsset(
@@ -270,7 +270,7 @@ func TestWithdrawFundsFromSubaccountToAccount_DepositFundsFromAccountToSubaccoun
 				tc.asset.HasMarket,
 				tc.asset.MarketId,
 				tc.asset.AtomicResolution,
-				tc.asset.AssetYieldIndex,
+				tc.asset.AssetYieldsIndex,
 				tc.asset.MaxSlippagePpm,
 			)
 			require.NoError(t, err)
@@ -285,7 +285,7 @@ func TestWithdrawFundsFromSubaccountToAccount_DepositFundsFromAccountToSubaccoun
 					asstypes.AssetTDai.HasMarket,
 					asstypes.AssetTDai.MarketId,
 					asstypes.AssetTDai.AtomicResolution,
-					asstypes.AssetTDai.AssetYieldIndex,
+					asstypes.AssetTDai.AssetYieldsIndex,
 					asstypes.AssetTDai.MaxSlippagePpm,
 				)
 			} else {
@@ -300,7 +300,7 @@ func TestWithdrawFundsFromSubaccountToAccount_DepositFundsFromAccountToSubaccoun
 
 			keepertest.CreateTestPerpetuals(t, ctx, perpetualsKeeper)
 
-			ratelimitKeeper.SetAssetYieldIndex(ctx, big.NewRat(1, 1))
+			yieldsKeeper.SetAssetYieldsIndex(ctx, big.NewRat(1, 1))
 
 			// Set up Subaccounts module account.
 			auth_testutil.CreateTestModuleAccount(ctx, accountKeeper, types.ModuleName, []string{})
@@ -595,7 +595,7 @@ func TestWithdrawFundsFromSubaccountToAccount_DepositFundsFromAccountToSubaccoun
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			ctx, keeper, pricesKeeper, perpetualsKeeper, accountKeeper, bankKeeper, assetsKeeper, ratelimitKeeper, _, _ := keepertest.SubaccountsKeepers(t, true)
+			ctx, keeper, pricesKeeper, perpetualsKeeper, accountKeeper, bankKeeper, assetsKeeper, yieldsKeeper, _, _ := keepertest.SubaccountsKeepers(t, true)
 			keepertest.CreateTestMarkets(t, ctx, pricesKeeper)
 
 			if !tc.skipSetUpTDai {
@@ -614,7 +614,7 @@ func TestWithdrawFundsFromSubaccountToAccount_DepositFundsFromAccountToSubaccoun
 					tc.asset.HasMarket,
 					tc.asset.MarketId,
 					tc.asset.AtomicResolution,
-					tc.asset.AssetYieldIndex,
+					tc.asset.AssetYieldsIndex,
 					tc.asset.MaxSlippagePpm,
 				)
 				require.NoError(t, err)
@@ -628,7 +628,7 @@ func TestWithdrawFundsFromSubaccountToAccount_DepositFundsFromAccountToSubaccoun
 
 			keepertest.CreateTestPerpetuals(t, ctx, perpetualsKeeper)
 
-			ratelimitKeeper.SetAssetYieldIndex(ctx, big.NewRat(1, 1))
+			yieldsKeeper.SetAssetYieldsIndex(ctx, big.NewRat(1, 1))
 
 			// Set up Subaccounts module account.
 			auth_testutil.CreateTestModuleAccount(ctx, accountKeeper, types.ModuleName, []string{})
@@ -904,7 +904,7 @@ func TestTransferFundsFromSubaccountToSubaccount_Success(t *testing.T) {
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			ctx, keeper, pricesKeeper, perpetualsKeeper, accountKeeper, bankKeeper, assetsKeeper, ratelimitKeeper, _, _ := keepertest.SubaccountsKeepers(t, true)
+			ctx, keeper, pricesKeeper, perpetualsKeeper, accountKeeper, bankKeeper, assetsKeeper, yieldsKeeper, _, _ := keepertest.SubaccountsKeepers(t, true)
 			prices.InitGenesis(ctx, *pricesKeeper, constants.Prices_DefaultGenesisState)
 			assets.InitGenesis(ctx, *assetsKeeper, constants.Assets_DefaultGenesisState)
 
@@ -912,7 +912,7 @@ func TestTransferFundsFromSubaccountToSubaccount_Success(t *testing.T) {
 			keepertest.CreateTestCollateralPools(t, ctx, perpetualsKeeper)
 
 			keepertest.CreateTestPerpetuals(t, ctx, perpetualsKeeper)
-			ratelimitKeeper.SetAssetYieldIndex(ctx, big.NewRat(1, 1))
+			yieldsKeeper.SetAssetYieldsIndex(ctx, big.NewRat(1, 1))
 
 			// Set up Subaccounts module account.
 			auth_testutil.CreateTestModuleAccount(ctx, accountKeeper, types.ModuleName, []string{})
@@ -1219,7 +1219,7 @@ func TestTransferFundsFromSubaccountToSubaccount_Failure(t *testing.T) {
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			ctx, keeper, pricesKeeper, perpetualsKeeper, accountKeeper, bankKeeper, assetsKeeper, ratelimitKeeper, _, _ := keepertest.SubaccountsKeepers(t, true)
+			ctx, keeper, pricesKeeper, perpetualsKeeper, accountKeeper, bankKeeper, assetsKeeper, yieldsKeeper, _, _ := keepertest.SubaccountsKeepers(t, true)
 			keepertest.CreateTestMarkets(t, ctx, pricesKeeper)
 
 			if !tc.skipSetUpTDai {
@@ -1235,7 +1235,7 @@ func TestTransferFundsFromSubaccountToSubaccount_Failure(t *testing.T) {
 
 			keepertest.CreateTestPerpetuals(t, ctx, perpetualsKeeper)
 
-			ratelimitKeeper.SetAssetYieldIndex(ctx, big.NewRat(1, 1))
+			yieldsKeeper.SetAssetYieldsIndex(ctx, big.NewRat(1, 1))
 
 			// Set up Subaccounts module account.
 			auth_testutil.CreateTestModuleAccount(ctx, accountKeeper, types.ModuleName, []string{})
@@ -1258,7 +1258,7 @@ func TestTransferFundsFromSubaccountToSubaccount_Failure(t *testing.T) {
 					tc.asset.HasMarket,
 					tc.asset.MarketId,
 					tc.asset.AtomicResolution,
-					tc.asset.AssetYieldIndex,
+					tc.asset.AssetYieldsIndex,
 					tc.asset.MaxSlippagePpm,
 				)
 				require.NoError(t, err)
@@ -1457,7 +1457,7 @@ func TestTransferFeesToFeeCollectorModule(t *testing.T) {
 					tc.asset.HasMarket,
 					tc.asset.MarketId,
 					tc.asset.AtomicResolution,
-					tc.asset.AssetYieldIndex,
+					tc.asset.AssetYieldsIndex,
 					tc.asset.MaxSlippagePpm,
 				)
 				require.NoError(t, err)
@@ -1715,7 +1715,7 @@ func TestTransferInsuranceFundPayments(t *testing.T) {
 				tc.perpetual.Params.LiquidityTier,
 				tc.perpetual.Params.DangerIndexPpm,
 				tc.perpetual.Params.CollateralPoolId,
-				tc.perpetual.YieldIndex,
+				tc.perpetual.YieldsIndex,
 			)
 			require.NoError(t, err)
 

@@ -189,7 +189,7 @@ func CreateTestPerpetuals(t *testing.T, ctx sdk.Context, k *keeper.Keeper) {
 			p.Params.LiquidityTier,
 			p.Params.DangerIndexPpm,
 			p.Params.CollateralPoolId,
-			p.YieldIndex,
+			p.YieldsIndex,
 		)
 		require.NoError(t, err)
 	}
@@ -356,7 +356,7 @@ func CreatePerpetualMarkets(
 			perp.Params.LiquidityTier,
 			perp.Params.DangerIndexPpm,
 			perp.Params.CollateralPoolId,
-			perp.YieldIndex,
+			perp.YieldsIndex,
 		)
 		require.NoError(t, err)
 	}

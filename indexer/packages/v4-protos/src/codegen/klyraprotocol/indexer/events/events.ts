@@ -609,7 +609,7 @@ export interface SubaccountUpdateEventV1 {
   subaccountId?: IndexerSubaccountId;
   updatedPerpetualPositions: IndexerPerpetualPosition[];
   updatedAssetPositions: IndexerAssetPosition[];
-  yieldIndex: string;
+  yieldsIndex: string;
 }
 /**
  * SubaccountUpdateEvent message contains information about an update to a
@@ -624,7 +624,7 @@ export interface SubaccountUpdateEventV1SDKType {
   subaccount_id?: IndexerSubaccountIdSDKType;
   updated_perpetual_positions: IndexerPerpetualPositionSDKType[];
   updated_asset_positions: IndexerAssetPositionSDKType[];
-  yield_index: string;
+  yields_index: string;
 }
 /**
  * StatefulOrderEvent message contains information about a change to a stateful
@@ -1438,9 +1438,9 @@ export interface UpdatePerpetualEventV1 {
    */
 
   dangerIndexPpm: number;
-  /** The perp yield index of this perpetual market */
+  /** The perp yields index of this perpetual market */
 
-  perpYieldIndex: string;
+  perpYieldsIndex: string;
 }
 /**
  * UpdatePerpetualEventV1 message contains all the information about an update
@@ -1486,33 +1486,33 @@ export interface UpdatePerpetualEventV1SDKType {
    */
 
   danger_index_ppm: number;
-  /** The perp yield index of this perpetual market */
+  /** The perp yields index of this perpetual market */
 
-  perp_yield_index: string;
+  perp_yields_index: string;
 }
 /**
- * UpdateYieldParamsV1 message contains all the information about an update
- * to the yield params on the Stream Chain.
+ * UpdateYieldsParamsV1 message contains all the information about an update
+ * to the yields params on the Stream Chain.
  */
 
-export interface UpdateYieldParamsEventV1 {
+export interface UpdateYieldsParamsEventV1 {
   /** The current price of sDAI in tDAI as seen by the protocol */
   sdaiPrice: string;
-  /** The current generalized asset yield index in the protocol. */
+  /** The current generalized asset yields index in the protocol. */
 
-  assetYieldIndex: string;
+  assetYieldsIndex: string;
 }
 /**
- * UpdateYieldParamsV1 message contains all the information about an update
- * to the yield params on the Stream Chain.
+ * UpdateYieldsParamsV1 message contains all the information about an update
+ * to the yields params on the Stream Chain.
  */
 
-export interface UpdateYieldParamsEventV1SDKType {
+export interface UpdateYieldsParamsEventV1SDKType {
   /** The current price of sDAI in tDAI as seen by the protocol */
   sdai_price: string;
-  /** The current generalized asset yield index in the protocol. */
+  /** The current generalized asset yields index in the protocol. */
 
-  asset_yield_index: string;
+  asset_yields_index: string;
 }
 
 function createBaseFundingUpdateV1(): FundingUpdateV1 {
@@ -2390,7 +2390,7 @@ function createBaseSubaccountUpdateEventV1(): SubaccountUpdateEventV1 {
     subaccountId: undefined,
     updatedPerpetualPositions: [],
     updatedAssetPositions: [],
-    yieldIndex: ""
+    yieldsIndex: ""
   };
 }
 
@@ -2408,8 +2408,8 @@ export const SubaccountUpdateEventV1 = {
       IndexerAssetPosition.encode(v!, writer.uint32(34).fork()).ldelim();
     }
 
-    if (message.yieldIndex !== "") {
-      writer.uint32(42).string(message.yieldIndex);
+    if (message.yieldsIndex !== "") {
+      writer.uint32(42).string(message.yieldsIndex);
     }
 
     return writer;
@@ -2437,7 +2437,7 @@ export const SubaccountUpdateEventV1 = {
           break;
 
         case 5:
-          message.yieldIndex = reader.string();
+          message.yieldsIndex = reader.string();
           break;
 
         default:
@@ -2454,7 +2454,7 @@ export const SubaccountUpdateEventV1 = {
     message.subaccountId = object.subaccountId !== undefined && object.subaccountId !== null ? IndexerSubaccountId.fromPartial(object.subaccountId) : undefined;
     message.updatedPerpetualPositions = object.updatedPerpetualPositions?.map(e => IndexerPerpetualPosition.fromPartial(e)) || [];
     message.updatedAssetPositions = object.updatedAssetPositions?.map(e => IndexerAssetPosition.fromPartial(e)) || [];
-    message.yieldIndex = object.yieldIndex ?? "";
+    message.yieldsIndex = object.yieldsIndex ?? "";
     return message;
   }
 
@@ -3626,7 +3626,7 @@ function createBaseUpdatePerpetualEventV1(): UpdatePerpetualEventV1 {
     atomicResolution: 0,
     liquidityTier: 0,
     dangerIndexPpm: 0,
-    perpYieldIndex: ""
+    perpYieldsIndex: ""
   };
 }
 
@@ -3656,8 +3656,8 @@ export const UpdatePerpetualEventV1 = {
       writer.uint32(48).uint32(message.dangerIndexPpm);
     }
 
-    if (message.perpYieldIndex !== "") {
-      writer.uint32(58).string(message.perpYieldIndex);
+    if (message.perpYieldsIndex !== "") {
+      writer.uint32(58).string(message.perpYieldsIndex);
     }
 
     return writer;
@@ -3697,7 +3697,7 @@ export const UpdatePerpetualEventV1 = {
           break;
 
         case 7:
-          message.perpYieldIndex = reader.string();
+          message.perpYieldsIndex = reader.string();
           break;
 
         default:
@@ -3717,36 +3717,36 @@ export const UpdatePerpetualEventV1 = {
     message.atomicResolution = object.atomicResolution ?? 0;
     message.liquidityTier = object.liquidityTier ?? 0;
     message.dangerIndexPpm = object.dangerIndexPpm ?? 0;
-    message.perpYieldIndex = object.perpYieldIndex ?? "";
+    message.perpYieldsIndex = object.perpYieldsIndex ?? "";
     return message;
   }
 
 };
 
-function createBaseUpdateYieldParamsEventV1(): UpdateYieldParamsEventV1 {
+function createBaseUpdateYieldsParamsEventV1(): UpdateYieldsParamsEventV1 {
   return {
     sdaiPrice: "",
-    assetYieldIndex: ""
+    assetYieldsIndex: ""
   };
 }
 
-export const UpdateYieldParamsEventV1 = {
-  encode(message: UpdateYieldParamsEventV1, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const UpdateYieldsParamsEventV1 = {
+  encode(message: UpdateYieldsParamsEventV1, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.sdaiPrice !== "") {
       writer.uint32(10).string(message.sdaiPrice);
     }
 
-    if (message.assetYieldIndex !== "") {
-      writer.uint32(18).string(message.assetYieldIndex);
+    if (message.assetYieldsIndex !== "") {
+      writer.uint32(18).string(message.assetYieldsIndex);
     }
 
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): UpdateYieldParamsEventV1 {
+  decode(input: _m0.Reader | Uint8Array, length?: number): UpdateYieldsParamsEventV1 {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseUpdateYieldParamsEventV1();
+    const message = createBaseUpdateYieldsParamsEventV1();
 
     while (reader.pos < end) {
       const tag = reader.uint32();
@@ -3757,7 +3757,7 @@ export const UpdateYieldParamsEventV1 = {
           break;
 
         case 2:
-          message.assetYieldIndex = reader.string();
+          message.assetYieldsIndex = reader.string();
           break;
 
         default:
@@ -3769,10 +3769,10 @@ export const UpdateYieldParamsEventV1 = {
     return message;
   },
 
-  fromPartial(object: DeepPartial<UpdateYieldParamsEventV1>): UpdateYieldParamsEventV1 {
-    const message = createBaseUpdateYieldParamsEventV1();
+  fromPartial(object: DeepPartial<UpdateYieldsParamsEventV1>): UpdateYieldsParamsEventV1 {
+    const message = createBaseUpdateYieldsParamsEventV1();
     message.sdaiPrice = object.sdaiPrice ?? "";
-    message.assetYieldIndex = object.assetYieldIndex ?? "";
+    message.assetYieldsIndex = object.assetYieldsIndex ?? "";
     return message;
   }
 

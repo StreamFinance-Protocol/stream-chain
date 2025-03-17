@@ -22,7 +22,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/gogoproto/proto"
-	icacontrollertypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/controller/types"
 )
 
 func newAny(v proto.Message) *codectypes.Any {
@@ -184,26 +183,6 @@ func TestAuthz(t *testing.T) {
 				Msgs: []*codectypes.Any{
 					newAny(
 						&authz.MsgExec{},
-					),
-				},
-			},
-
-			expectedMsgExecCheckTxSuccess: false,
-			expectedMsgExecCheckTxCode:    sdkerrors.ErrInvalidRequest.ABCICode(),
-		},
-		"Fail (unsupported): Bob wraps unspported transactions": {
-			subaccounts: []satypes.Subaccount{
-				constants.Alice_Num0_100_000USD,
-				constants.Bob_Num0_100_000USD,
-			},
-
-			msgGrant: nil,
-
-			msgExec: &authz.MsgExec{
-				Grantee: constants.BobAccAddress.String(),
-				Msgs: []*codectypes.Any{
-					newAny(
-						&icacontrollertypes.MsgUpdateParams{},
 					),
 				},
 			},

@@ -61,7 +61,7 @@ func TestGenesisState_Validate(t *testing.T) {
 			},
 			expectedError: nil,
 		},
-		"valid with zero AssetYieldIndex": {
+		"valid with zero AssetYieldsIndex": {
 			genState: &types.GenesisState{
 				Subaccounts: []types.Subaccount{
 					{
@@ -69,13 +69,13 @@ func TestGenesisState_Validate(t *testing.T) {
 							Owner:  sample.AccAddress(),
 							Number: uint32(0),
 						},
-						AssetYieldIndex: "1",
+						AssetYieldsIndex: "1",
 					},
 				},
 			},
 			expectedError: nil,
 		},
-		"valid with positive AssetYieldIndex": {
+		"valid with positive AssetYieldsIndex": {
 			genState: &types.GenesisState{
 				Subaccounts: []types.Subaccount{
 					{
@@ -83,7 +83,7 @@ func TestGenesisState_Validate(t *testing.T) {
 							Owner:  sample.AccAddress(),
 							Number: uint32(0),
 						},
-						AssetYieldIndex: "10",
+						AssetYieldsIndex: "10",
 					},
 				},
 			},
@@ -187,7 +187,7 @@ func TestGenesisState_Validate(t *testing.T) {
 				},
 			},
 		},
-		"invalid: AssetYieldIndex is not a rational number 1": {
+		"invalid: AssetYieldsIndex is not a rational number 1": {
 			genState: &types.GenesisState{
 				Subaccounts: []types.Subaccount{
 					{
@@ -201,13 +201,13 @@ func TestGenesisState_Validate(t *testing.T) {
 								Quantums: dtypes.NewInt(1_000),
 							},
 						},
-						AssetYieldIndex: "12abc34",
+						AssetYieldsIndex: "12abc34",
 					},
 				},
 			},
 			expectedError: errors.New("could not convert string to big.Rat"),
 		},
-		"invalid: AssetYieldIndex is negative": {
+		"invalid: AssetYieldsIndex is negative": {
 			genState: &types.GenesisState{
 				Subaccounts: []types.Subaccount{
 					{
@@ -221,11 +221,11 @@ func TestGenesisState_Validate(t *testing.T) {
 								Quantums: dtypes.NewInt(1_000),
 							},
 						},
-						AssetYieldIndex: "-1/1",
+						AssetYieldsIndex: "-1/1",
 					},
 				},
 			},
-			expectedError: types.ErrNegativeAssetYieldIndexNotSupported,
+			expectedError: types.ErrNegativeAssetYieldsIndexNotSupported,
 		},
 		"invalid: asset position quantum == 0": {
 			genState: &types.GenesisState{

@@ -37,8 +37,8 @@ func networkWithSubaccountObjects(t *testing.T, n int) (*network.Network, []type
 				Owner:  strconv.Itoa(i),
 				Number: uint32(n),
 			},
-			AssetPositions:  keepertest.CreateTDaiAssetPosition(big.NewInt(1_000)),
-			AssetYieldIndex: "1/1",
+			AssetPositions:   keepertest.CreateTDaiAssetPosition(big.NewInt(1_000)),
+			AssetYieldsIndex: "1/1",
 		}
 		nullify.Fill(&subaccount) //nolint:staticcheck
 		state.Subaccounts = append(state.Subaccounts, subaccount)

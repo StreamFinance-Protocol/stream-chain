@@ -25,7 +25,7 @@ import {
   TransferFromDatabase,
   TransferType,
   parentSubaccountHelpers,
-  YieldParamsFromDatabase,
+  YieldsParamsFromDatabase,
   CollateralPoolFromDatabase,
 } from '@klyraprotocol-indexer/postgres';
 import { OrderbookLevels, PriceLevel } from '@klyraprotocol-indexer/redis';
@@ -57,7 +57,7 @@ import {
   SubaccountResponseObject,
   TradeResponseObject,
   TransferResponseObject,
-  YieldParamsResponseObject,
+  YieldsParamsResponseObject,
   CollateralPoolsResponseObject,
 } from '../types';
 
@@ -109,7 +109,7 @@ export function perpetualPositionToResponseObject(
     sumOpen: position.sumOpen,
     sumClose: position.sumClose,
     netFunding: netFunding.toFixed(),
-    perpYieldIndex: position.perpYieldIndex,
+    perpYieldsIndex: position.perpYieldsIndex,
   };
 }
 
@@ -335,7 +335,7 @@ export function subaccountToResponseObject({
     assetPositions,
     // TODO(DEC-687): Track `marginEnabled` for subaccounts.
     marginEnabled: true,
-    assetYieldIndex: subaccount.assetYieldIndex,
+    assetYieldsIndex: subaccount.assetYieldsIndex,
   };
 }
 
@@ -375,7 +375,7 @@ export function perpetualMarketToResponseObject(
     openInterestLowerCap: liquidityTier.openInterestLowerCap,
     openInterestUpperCap: liquidityTier.openInterestUpperCap,
     baseOpenInterest: perpetualMarket.baseOpenInterest,
-    perpYieldIndex: perpetualMarket.perpYieldIndex,
+    perpYieldsIndex: perpetualMarket.perpYieldsIndex,
   };
 }
 
@@ -569,15 +569,15 @@ export function candlesToSparklineResponseObject(
   );
 }
 
-export function yieldParamsToResponseObject(
-  yieldParams: YieldParamsFromDatabase,
-): YieldParamsResponseObject {
+export function yieldsParamsToResponseObject(
+  yieldsParams: YieldsParamsFromDatabase,
+): YieldsParamsResponseObject {
   return {
-    id: yieldParams.id,
-    sDAIPrice: yieldParams.sDAIPrice,
-    assetYieldIndex: yieldParams.assetYieldIndex,
-    createdAt: yieldParams.createdAt,
-    createdAtHeight: yieldParams.createdAtHeight,
+    id: yieldsParams.id,
+    sDAIPrice: yieldsParams.sDAIPrice,
+    assetYieldsIndex: yieldsParams.assetYieldsIndex,
+    createdAt: yieldsParams.createdAt,
+    createdAtHeight: yieldsParams.createdAtHeight,
   };
 }
 

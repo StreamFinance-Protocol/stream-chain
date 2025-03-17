@@ -26,10 +26,10 @@ import (
 	bridgecli "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/client/cli"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
 	epochstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/epochs/types"
-	ratelimittypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
 	sendingcli "github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending/client/cli"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
 	subaccounttypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
+	yieldstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/types"
 	tmtypes "github.com/cometbft/cometbft/types"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
@@ -44,7 +44,7 @@ var (
 	subaccountNumberOne          = uint32(1)
 	subaccountNonExistent        = uint32(127)
 	testTdaiBalance              = big.NewInt(99999)
-	testTdaiBalancePlusYield     = new(big.Int).Add(testTdaiBalance, big.NewInt(1))
+	testTdaiBalancePlusYields    = new(big.Int).Add(testTdaiBalance, big.NewInt(1))
 	testSdaiBalance              = big.NewInt(100000000000000000)
 	sDaiPoolAccountAddressString = "klyra1r3fsd6humm0ghyq0te5jf8eumklmclyaw0hs3y"
 )
@@ -83,7 +83,7 @@ func (s *BridgeIntegrationTestSuite) SetupTest() {
 			// Disable the Price daemon in the integration tests.
 			appOptions.Set(daemonflags.FlagPriceDaemonEnabled, false)
 			appOptions.Set(daemonflags.FlagBridgeDaemonEnabled, false)
-			appOptions.Set(daemonflags.FlagSDAIDaemonMockNoYield, true)
+			appOptions.Set(daemonflags.FlagSDAIDaemonMockNoYields, true)
 
 			// Effectively disable the health monitor panic timeout for these tests. This is necessary
 			// because all clob cli tests are running in the same process and the total time to run is >> 5 minutes
@@ -146,11 +146,11 @@ func (s *BridgeIntegrationTestSuite) SetupTest() {
 		bankstate.Balances,
 		banktypes.Balance{
 			subaccounttypes.ModuleAddress.String(),
-			sdk.NewCoins(sdk.NewCoin(ratelimittypes.TDaiDenom, sdkmath.NewIntFromBigInt(testTdaiBalance))),
+			sdk.NewCoins(sdk.NewCoin(yieldstypes.TDaiDenom, sdkmath.NewIntFromBigInt(testTdaiBalance))),
 		},
 		banktypes.Balance{
 			sDaiPoolAccountAddressString,
-			sdk.NewCoins(sdk.NewCoin(ratelimittypes.SDaiDenom, sdkmath.NewIntFromBigInt(testSdaiBalance))),
+			sdk.NewCoins(sdk.NewCoin(yieldstypes.SDaiDenom, sdkmath.NewIntFromBigInt(testSdaiBalance))),
 		},
 	)
 
@@ -247,7 +247,7 @@ func (s *BridgeIntegrationTestSuite) TestCLIBridge_SuccessOneSdaiQuantum() {
 		"0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
 		uint64(1),
 		testSdaiBalance.Uint64()-1,
-		testTdaiBalancePlusYield.Uint64()-1,
+		testTdaiBalancePlusYields.Uint64()-1,
 	)
 }
 
@@ -257,7 +257,7 @@ func (s *BridgeIntegrationTestSuite) TestCLIBridge_FailureZeroSdaiQuantum() {
 		"0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
 		uint64(0),
 		testSdaiBalance.Uint64(),
-		testTdaiBalancePlusYield.Uint64(),
+		testTdaiBalancePlusYields.Uint64(),
 	)
 }
 
@@ -267,7 +267,7 @@ func (s *BridgeIntegrationTestSuite) TestCLIBridge_FailureMalformedWithdrawer() 
 		"0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
 		uint64(0),
 		testSdaiBalance.Uint64(),
-		testTdaiBalancePlusYield.Uint64(),
+		testTdaiBalancePlusYields.Uint64(),
 	)
 }
 
@@ -303,15 +303,15 @@ func (s *BridgeIntegrationTestSuite) prepareAccountForWithdrawal() {
 	val := s.network.Validators[0]
 	ctx := val.ClientCtx
 
-	var halfOfTestTdaiBalancePlusYield big.Int
-	halfOfTestTdaiBalancePlusYield.Quo(testTdaiBalancePlusYield, big.NewInt(2))
+	var halfOfTestTdaiBalancePlusYields big.Int
+	halfOfTestTdaiBalancePlusYields.Quo(testTdaiBalancePlusYields, big.NewInt(2))
 
 	argsTransferToAccount := []string{
 		s.validatorAddress.String(),
 		fmt.Sprintf("%d", 0),
 		s.validatorAddress.String(),
 		fmt.Sprintf("%d", 0),
-		fmt.Sprintf("%d", halfOfTestTdaiBalancePlusYield.Uint64()),
+		fmt.Sprintf("%d", halfOfTestTdaiBalancePlusYields.Uint64()),
 	}
 
 	argsTransferToAccount = append(argsTransferToAccount,
@@ -319,7 +319,7 @@ func (s *BridgeIntegrationTestSuite) prepareAccountForWithdrawal() {
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 	)
 
-	// Send half of tdai to the account from subaccount and get yield
+	// Send half of tdai to the account from subaccount and get yields
 	// TODO: In the withdraw from subaccount flow, we first send coins to the
 	// bank account, then we update the subaccount.
 	_, err := clitestutil.ExecTestCLICmd(ctx, sendingcli.CmdWithdrawFromSubaccount(), argsTransferToAccount)
@@ -331,7 +331,7 @@ func (s *BridgeIntegrationTestSuite) prepareAccountForWithdrawal() {
 	_, err = s.network.WaitForHeight(currentHeight + 3)
 	s.Require().NoError(err)
 
-	// Withdraw from subaccount (this time withdraw the rest, including yield)
+	// Withdraw from subaccount (this time withdraw the rest, including yields)
 	_, err = clitestutil.ExecTestCLICmd(ctx, sendingcli.CmdWithdrawFromSubaccount(), argsTransferToAccount)
 	s.Require().NoError(err)
 
@@ -412,16 +412,16 @@ func (s *BridgeIntegrationTestSuite) sendBridgeAndVerifyEvents(
 
 	for i, withdrawal := range withdrawals {
 		s.Require().Equal(queryWithdrawEventsResponse.Withdrawals[i].Coin.Amount.Uint64(), withdrawal.amount)
-		s.Require().Equal(queryWithdrawEventsResponse.Withdrawals[i].Coin.Denom, ratelimittypes.SDaiDenom)
+		s.Require().Equal(queryWithdrawEventsResponse.Withdrawals[i].Coin.Denom, yieldstypes.SDaiDenom)
 		s.Require().Equal(queryWithdrawEventsResponse.Withdrawals[i].Address, withdrawal.ethAddress)
 		s.Require().Greater(queryWithdrawEventsResponse.Withdrawals[i].BlockHeight, uint64(1))
 		s.Require().False(queryWithdrawEventsResponse.Withdrawals[i].IsDeposit)
 	}
 
-	totalSupplySDai, err := testutil_bank.GetTotalSupplyOfDenom(val, s.cfg.Codec, ratelimittypes.SDaiDenom)
+	totalSupplySDai, err := testutil_bank.GetTotalSupplyOfDenom(val, s.cfg.Codec, yieldstypes.SDaiDenom)
 	s.Require().NoError(err)
 
-	totalSupplyTDai, err := testutil_bank.GetTotalSupplyOfDenom(val, s.cfg.Codec, ratelimittypes.TDaiDenom)
+	totalSupplyTDai, err := testutil_bank.GetTotalSupplyOfDenom(val, s.cfg.Codec, yieldstypes.TDaiDenom)
 	s.Require().NoError(err)
 
 	s.Require().Equal(expectedSDaiSupply, totalSupplySDai)

@@ -66,7 +66,7 @@ export default class PerpetualMarketModel extends Model {
         'subticksPerTick',
         'stepBaseQuantums',
         'liquidityTierId',
-        'perpYieldIndex',
+        'perpYieldsIndex',
       ],
       properties: {
         id: { type: 'string', pattern: IntegerPattern },
@@ -90,7 +90,7 @@ export default class PerpetualMarketModel extends Model {
         stepBaseQuantums: { type: 'integer' },
         liquidityTierId: { type: 'integer' },
         baseOpenInterest: { type: 'string', pattern: NumericPattern },
-        perpYieldIndex: { type: 'string' },
+        perpYieldsIndex: { type: 'string' },
       },
     };
   }
@@ -121,7 +121,7 @@ export default class PerpetualMarketModel extends Model {
       stepBaseQuantums: 'integer',
       liquidityTierId: 'integer',
       baseOpenInterest: 'string',
-      perpYieldIndex: 'string',
+      perpYieldsIndex: 'string',
     };
   }
 
@@ -161,5 +161,5 @@ export default class PerpetualMarketModel extends Model {
 
   baseOpenInterest!: string;
 
-  perpYieldIndex!: string;
+  perpYieldsIndex!: string;
 }

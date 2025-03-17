@@ -69,7 +69,7 @@ import {
   defaultLiquidation,
   defaultLiquidationEvent,
   defaultPreviousHeight,
-  defaultZeroPerpYieldIndex,
+  defaultZeroPerpYieldsIndex,
 } from '../../helpers/constants';
 import { KlyraIndexerSubtypes } from '../../../src/lib/types';
 import { LiquidationHandler } from '../../../src/handlers/order-fills/liquidation-handler';
@@ -146,7 +146,7 @@ describe('LiquidationHandler', () => {
     openEventId: testConstants.defaultTendermintEventId4,
     lastEventId: testConstants.defaultTendermintEventId4,
     settledFunding: '200000',
-    perpYieldIndex: defaultZeroPerpYieldIndex,
+    perpYieldsIndex: defaultZeroPerpYieldsIndex,
   };
 
   describe('getParallelizationIds', () => {

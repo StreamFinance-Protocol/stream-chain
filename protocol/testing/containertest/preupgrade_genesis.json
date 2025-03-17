@@ -33,7 +33,7 @@
             "id": 0,
             "market_id": 0,
             "symbol": "TDAI",
-            "asset_yield_index": "0/1",
+            "asset_yields_index": "0/1",
             "max_slippage_ppm": 0
           }
         ]
@@ -252,10 +252,6 @@
             "1800s"
           ]
         }
-      },
-      "capability": {
-        "index": "1",
-        "owners": []
       },
       "clob": {
         "block_rate_limit_config": {
@@ -1174,68 +1170,6 @@
         "starting_proposal_id": "1",
         "votes": []
       },
-      "ibc": {
-        "channel_genesis": {
-          "ack_sequences": [],
-          "acknowledgements": [],
-          "channels": [],
-          "commitments": [],
-          "next_channel_sequence": "0",
-          "receipts": [],
-          "recv_sequences": [],
-          "send_sequences": []
-        },
-        "client_genesis": {
-          "clients": [],
-          "clients_consensus": [],
-          "clients_metadata": [],
-          "create_localhost": false,
-          "next_client_sequence": "0",
-          "params": {
-            "allowed_clients": [
-              "07-tendermint"
-            ]
-          }
-        },
-        "connection_genesis": {
-          "client_connection_paths": [],
-          "connections": [],
-          "next_connection_sequence": "0",
-          "params": {
-            "max_expected_time_per_block": "30000000000"
-          }
-        }
-      },
-      "interchainaccounts": {
-        "controller_genesis_state": {
-          "active_channels": [],
-          "interchain_accounts": [],
-          "params": {
-            "controller_enabled": false
-          },
-          "ports": []
-        },
-        "host_genesis_state": {
-          "active_channels": [],
-          "interchain_accounts": [],
-          "params": {
-            "allow_messages": [
-              "/ibc.applications.transfer.v1.MsgTransfer",
-              "/cosmos.bank.v1beta1.MsgSend",
-              "/cosmos.staking.v1beta1.MsgDelegate",
-              "/cosmos.staking.v1beta1.MsgBeginRedelegate",
-              "/cosmos.staking.v1beta1.MsgUndelegate",
-              "/cosmos.staking.v1beta1.MsgCancelUnbondingDelegation",
-              "/cosmos.distribution.v1beta1.MsgSetWithdrawAddress",
-              "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward",
-              "/cosmos.distribution.v1beta1.MsgFundCommunityPool",
-              "/cosmos.gov.v1.MsgVote"
-            ],
-            "host_enabled": true
-          },
-          "port": "icahost"
-        }
-      },
       "perpetuals": {
         "collateral_pools": [
           {
@@ -1338,7 +1272,7 @@
               "market_id": 1,
               "ticker": "ETH-USD"
             },
-            "yield_index": "0/1"
+            "yields_index": "0/1"
           },
           {
             "params": {
@@ -1349,7 +1283,7 @@
               "market_id": 2,
               "ticker": "LINK-USD"
             },
-            "yield_index": "0/1"
+            "yields_index": "0/1"
           },
           {
             "params": {
@@ -1360,7 +1294,7 @@
               "market_id": 3,
               "ticker": "MATIC-USD"
             },
-            "yield_index": "0/1"
+            "yields_index": "0/1"
           },
           {
             "params": {
@@ -1371,7 +1305,7 @@
               "market_id": 4,
               "ticker": "CRV-USD"
             },
-            "yield_index": "0/1"
+            "yields_index": "0/1"
           },
           {
             "params": {
@@ -1382,7 +1316,7 @@
               "market_id": 5,
               "ticker": "SOL-USD"
             },
-            "yield_index": "0/1"
+            "yields_index": "0/1"
           },
           {
             "params": {
@@ -1393,7 +1327,7 @@
               "market_id": 6,
               "ticker": "ADA-USD"
             },
-            "yield_index": "0/1"
+            "yields_index": "0/1"
           },
           {
             "params": {
@@ -1404,7 +1338,7 @@
               "market_id": 7,
               "ticker": "AVAX-USD"
             },
-            "yield_index": "0/1"
+            "yields_index": "0/1"
           },
           {
             "params": {
@@ -1415,7 +1349,7 @@
               "market_id": 8,
               "ticker": "FIL-USD"
             },
-            "yield_index": "0/1"
+            "yields_index": "0/1"
           },
           {
             "params": {
@@ -1426,7 +1360,7 @@
               "market_id": 9,
               "ticker": "LTC-USD"
             },
-            "yield_index": "0/1"
+            "yields_index": "0/1"
           },
           {
             "params": {
@@ -1437,7 +1371,7 @@
               "market_id": 10,
               "ticker": "DOGE-USD"
             },
-            "yield_index": "0/1"
+            "yields_index": "0/1"
           },
           {
             "params": {
@@ -1448,7 +1382,7 @@
               "market_id": 11,
               "ticker": "ATOM-USD"
             },
-            "yield_index": "0/1"
+            "yields_index": "0/1"
           },
           {
             "params": {
@@ -1459,7 +1393,7 @@
               "market_id": 12,
               "ticker": "DOT-USD"
             },
-            "yield_index": "0/1"
+            "yields_index": "0/1"
           },
           {
             "params": {
@@ -1470,7 +1404,7 @@
               "market_id": 13,
               "ticker": "UNI-USD"
             },
-            "yield_index": "0/1"
+            "yields_index": "0/1"
           },
           {
             "params": {
@@ -1481,7 +1415,7 @@
               "market_id": 14,
               "ticker": "BCH-USD"
             },
-            "yield_index": "0/1"
+            "yields_index": "0/1"
           },
           {
             "params": {
@@ -1492,7 +1426,7 @@
               "market_id": 15,
               "ticker": "TRX-USD"
             },
-            "yield_index": "0/1"
+            "yields_index": "0/1"
           },
           {
             "params": {
@@ -1503,7 +1437,7 @@
               "market_id": 16,
               "ticker": "NEAR-USD"
             },
-            "yield_index": "0/1"
+            "yields_index": "0/1"
           },
           {
             "params": {
@@ -1514,7 +1448,7 @@
               "market_id": 17,
               "ticker": "MKR-USD"
             },
-            "yield_index": "0/1"
+            "yields_index": "0/1"
           },
           {
             "params": {
@@ -1525,7 +1459,7 @@
               "market_id": 18,
               "ticker": "XLM-USD"
             },
-            "yield_index": "0/1"
+            "yields_index": "0/1"
           },
           {
             "params": {
@@ -1536,7 +1470,7 @@
               "market_id": 19,
               "ticker": "ETC-USD"
             },
-            "yield_index": "0/1"
+            "yields_index": "0/1"
           },
           {
             "params": {
@@ -1547,7 +1481,7 @@
               "market_id": 20,
               "ticker": "COMP-USD"
             },
-            "yield_index": "0/1"
+            "yields_index": "0/1"
           },
           {
             "params": {
@@ -1558,7 +1492,7 @@
               "market_id": 21,
               "ticker": "WLD-USD"
             },
-            "yield_index": "0/1"
+            "yields_index": "0/1"
           },
           {
             "params": {
@@ -1569,7 +1503,7 @@
               "market_id": 22,
               "ticker": "APE-USD"
             },
-            "yield_index": "0/1"
+            "yields_index": "0/1"
           },
           {
             "params": {
@@ -1580,7 +1514,7 @@
               "market_id": 23,
               "ticker": "APT-USD"
             },
-            "yield_index": "0/1"
+            "yields_index": "0/1"
           },
           {
             "params": {
@@ -1591,7 +1525,7 @@
               "market_id": 24,
               "ticker": "ARB-USD"
             },
-            "yield_index": "0/1"
+            "yields_index": "0/1"
           },
           {
             "params": {
@@ -1602,7 +1536,7 @@
               "market_id": 25,
               "ticker": "BLUR-USD"
             },
-            "yield_index": "0/1"
+            "yields_index": "0/1"
           },
           {
             "params": {
@@ -1613,7 +1547,7 @@
               "market_id": 26,
               "ticker": "LDO-USD"
             },
-            "yield_index": "0/1"
+            "yields_index": "0/1"
           },
           {
             "params": {
@@ -1624,7 +1558,7 @@
               "market_id": 27,
               "ticker": "OP-USD"
             },
-            "yield_index": "0/1"
+            "yields_index": "0/1"
           },
           {
             "params": {
@@ -1635,7 +1569,7 @@
               "market_id": 28,
               "ticker": "PEPE-USD"
             },
-            "yield_index": "0/1"
+            "yields_index": "0/1"
           },
           {
             "params": {
@@ -1646,7 +1580,7 @@
               "market_id": 29,
               "ticker": "SEI-USD"
             },
-            "yield_index": "0/1"
+            "yields_index": "0/1"
           },
           {
             "params": {
@@ -1657,7 +1591,7 @@
               "market_id": 30,
               "ticker": "SHIB-USD"
             },
-            "yield_index": "0/1"
+            "yields_index": "0/1"
           },
           {
             "params": {
@@ -1668,7 +1602,7 @@
               "market_id": 31,
               "ticker": "SUI-USD"
             },
-            "yield_index": "0/1"
+            "yields_index": "0/1"
           },
           {
             "params": {
@@ -1679,7 +1613,7 @@
               "market_id": 32,
               "ticker": "XRP-USD"
             },
-            "yield_index": "0/1"
+            "yields_index": "0/1"
           },
           {
             "params": {
@@ -1690,7 +1624,7 @@
               "market_id": 33,
               "ticker": "TEST-USD"
             },
-            "yield_index": "0/1"
+            "yields_index": "0/1"
           }
         ]
       },
@@ -2204,7 +2138,7 @@
               "owner": "klyra199tqg4wdlnu4qjlxchpd7seg454937hju8xa57"
             },
             "margin_enabled": true,
-            "asset_yield_index": "0/1"
+            "asset_yields_index": "0/1"
           },
           {
             "asset_positions": [
@@ -2219,7 +2153,7 @@
               "owner": "klyra10fx7sy6ywd5senxae9dwytf8jxek3t2g8gx9ym"
             },
             "margin_enabled": true,
-            "asset_yield_index": "0/1"
+            "asset_yields_index": "0/1"
           },
           {
             "asset_positions": [
@@ -2234,7 +2168,7 @@
               "owner": "klyra10fx7sy6ywd5senxae9dwytf8jxek3t2g8gx9ym"
             },
             "margin_enabled": true,
-            "asset_yield_index": "0/1"
+            "asset_yields_index": "0/1"
           },
           {
             "asset_positions": [
@@ -2249,7 +2183,7 @@
               "owner": "klyra1fjg6zp6vv8t9wvy4lps03r5l4g7tkjw93awcky"
             },
             "margin_enabled": true,
-            "asset_yield_index": "0/1"
+            "asset_yields_index": "0/1"
           },
           {
             "asset_positions": [
@@ -2264,7 +2198,7 @@
               "owner": "klyra1wau5mja7j7zdavtfq9lu7ejef05hm6ffxz2hcc"
             },
             "margin_enabled": true,
-            "asset_yield_index": "0/1"
+            "asset_yields_index": "0/1"
           },
           {
             "asset_positions": [
@@ -2279,7 +2213,7 @@
               "owner": "klyra1fjg6zp6vv8t9wvy4lps03r5l4g7tkjw93awcky"
             },
             "margin_enabled": true,
-            "asset_yield_index": "0/1"
+            "asset_yields_index": "0/1"
           },
           {
             "asset_positions": [
@@ -2294,7 +2228,7 @@
               "owner": "klyra1wau5mja7j7zdavtfq9lu7ejef05hm6ffxz2hcc"
             },
             "margin_enabled": true,
-            "asset_yield_index": "0/1"
+            "asset_yields_index": "0/1"
           },
           {
             "asset_positions": [
@@ -2309,18 +2243,9 @@
               "owner": "klyra1nzuttarf5k2j0nug5yzhr6p74t9avehn6x2c0s"
             },
             "margin_enabled": true,
-            "asset_yield_index": "0/1"
+            "asset_yields_index": "0/1"
           }
         ]
-      },
-      "transfer": {
-        "denom_traces": [],
-        "params": {
-          "receive_enabled": true,
-          "send_enabled": true
-        },
-        "port_id": "transfer",
-        "total_escrowed": []
       },
       "upgrade": {}
     }

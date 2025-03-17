@@ -19,10 +19,10 @@ export const createRPCQueryClient = async ({
       govplus: (await import("./govplus/query.rpc.Query")).createRpcQueryExtension(client),
       perpetuals: (await import("./perpetuals/query.rpc.Query")).createRpcQueryExtension(client),
       prices: (await import("./prices/query.rpc.Query")).createRpcQueryExtension(client),
-      ratelimit: (await import("./ratelimit/query.rpc.Query")).createRpcQueryExtension(client),
       sending: (await import("./sending/query.rpc.Query")).createRpcQueryExtension(client),
       stats: (await import("./stats/query.rpc.Query")).createRpcQueryExtension(client),
-      subaccounts: (await import("./subaccounts/query.rpc.Query")).createRpcQueryExtension(client)
+      subaccounts: (await import("./subaccounts/query.rpc.Query")).createRpcQueryExtension(client),
+      yields: (await import("./yields/query.rpc.Query")).createRpcQueryExtension(client)
     }
   };
 };

@@ -20,10 +20,10 @@ func SubaccountIdToIndexerSubaccountId(
 	}
 }
 
-func AssetYieldIndexToIndexerAssetYieldIndex(
-	assetYieldIndex *big.Rat,
+func AssetYieldsIndexToIndexerAssetYieldsIndex(
+	assetYieldsIndex *big.Rat,
 ) string {
-	return assetYieldIndex.String()
+	return assetYieldsIndex.String()
 }
 
 func PerpetualPositionToIndexerPerpetualPosition(

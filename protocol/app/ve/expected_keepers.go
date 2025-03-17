@@ -31,7 +31,7 @@ type PreBlockExecPricesKeeper interface {
 	GetSmoothedSpotPrice(markedId uint32) (uint64, bool)
 }
 
-type VoteExtensionRateLimitKeeper interface {
+type VoteExtensionYieldsKeeper interface {
 	GetSDAIPrice(ctx sdk.Context) (price *big.Int, found bool)
 	GetSDAILastBlockUpdated(ctx sdk.Context) (blockHeight *big.Int, found bool)
 }

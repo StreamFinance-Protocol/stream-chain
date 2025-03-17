@@ -15,7 +15,7 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/mocks"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
-	ratelimitkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/keeper"
+	yieldskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/keeper"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -31,7 +31,7 @@ type BridgeKeepersTestContext struct {
 	PricesKeeper       *priceskeeper.Keeper
 	PerpetualsKeeper   *perpkeeper.Keeper
 	AssetsKeeper       *assetskeeper.Keeper
-	RatelimitKeeper    *ratelimitkeeper.Keeper
+	YieldsKeeper       *yieldskeeper.Keeper
 	BridgeEventManager *bridgeserver_types.BridgeEventManager
 	MockDelayMsgKeeper *mocks.DelayMsgKeeper
 	MockTimeProvider   *mocks.TimeProvider
@@ -51,7 +51,6 @@ func BridgeKeepers(
 	) []GenesisInitializer {
 		// Define necessary keepers here for unit tests
 		epochsKeeper, _ := createEpochsKeeper(stateStore, db, cdc)
-		blockTimeKeeper, _ := createBlockTimeKeeper(stateStore, db, cdc)
 		ks.PricesKeeper, _, _, _, _ = createPricesKeeper(stateStore, db, cdc, transientStoreKey)
 		ks.AssetsKeeper, _ = createAssetsKeeper(
 			stateStore,
@@ -73,14 +72,12 @@ func BridgeKeepers(
 		)
 		ks.AccountKeeper, _ = createAccountKeeper(stateStore, db, cdc, registry)
 		ks.BankKeeper, _ = createBankKeeper(stateStore, db, cdc, ks.AccountKeeper)
-		ks.RatelimitKeeper, _ = createRatelimitKeeper(
+		ks.YieldsKeeper, _ = createYieldsKeeper(
 			stateStore,
 			db,
 			cdc,
-			blockTimeKeeper,
 			ks.BankKeeper,
 			ks.PerpetualsKeeper,
-			ks.AssetsKeeper,
 			transientStoreKey,
 			true,
 		)
@@ -89,11 +86,11 @@ func BridgeKeepers(
 			db,
 			cdc,
 			transientStoreKey,
-			ks.RatelimitKeeper,
+			ks.YieldsKeeper,
 			ks.BankKeeper,
 		)
 
-		return []GenesisInitializer{ks.RatelimitKeeper, ks.PricesKeeper, ks.BridgeKeeper, ks.PerpetualsKeeper, ks.AssetsKeeper}
+		return []GenesisInitializer{ks.YieldsKeeper, ks.PricesKeeper, ks.BridgeKeeper, ks.PerpetualsKeeper, ks.AssetsKeeper}
 	})
 
 	return ks
@@ -104,7 +101,7 @@ func createBridgeKeeper(
 	db *dbm.MemDB,
 	cdc *codec.ProtoCodec,
 	transientStoreKey storetypes.StoreKey,
-	ratelimitKeeper types.RateLimitKeeper,
+	yieldsKeeper types.YieldsKeeper,
 	bankKeeper types.BankKeeper,
 ) (
 	*keeper.Keeper,
@@ -129,7 +126,7 @@ func createBridgeKeeper(
 		storeKey,
 		transientStoreKey,
 		bridgeEventManager,
-		ratelimitKeeper,
+		yieldsKeeper,
 		bankKeeper,
 		mockDelayMsgKeeper,
 		[]string{

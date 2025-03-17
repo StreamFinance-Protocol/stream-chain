@@ -47,7 +47,7 @@ import {
 } from '../helpers/constants';
 import { updateBlockCache } from '../../src/caches/block-cache';
 import { createPostgresFunctions } from '../../src/helpers/postgres/postgres-functions';
-import { ZERO_ASSET_YIELD_INDEX } from '../../src/constants';
+import { ZERO_ASSET_YIELDS_INDEX } from '../../src/constants';
 
 describe('transferHandler', () => {
   beforeAll(async () => {
@@ -87,7 +87,7 @@ describe('transferHandler', () => {
     subaccountNumber: defaultTransferEvent.sender!.subaccountId!.number,
     updatedAt: defaultDateTime.toISO() ?? '',
     updatedAtHeight: defaultPreviousHeight,
-    assetYieldIndex: ZERO_ASSET_YIELD_INDEX,
+    assetYieldsIndex: ZERO_ASSET_YIELDS_INDEX,
   };
 
   const defaultRecipientSubaccount: SubaccountCreateObject = {
@@ -95,7 +95,7 @@ describe('transferHandler', () => {
     subaccountNumber: defaultTransferEvent.recipient!.subaccountId!.number,
     updatedAt: defaultDateTime.toISO() ?? '',
     updatedAtHeight: defaultPreviousHeight,
-    assetYieldIndex: ZERO_ASSET_YIELD_INDEX,
+    assetYieldsIndex: ZERO_ASSET_YIELDS_INDEX,
   };
 
   let asset: AssetFromDatabase;

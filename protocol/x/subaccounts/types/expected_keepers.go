@@ -120,6 +120,6 @@ type BlocktimeKeeper interface {
 	GetDowntimeInfoFor(ctx sdk.Context, duration time.Duration) blocktimetypes.AllDowntimeInfo_DowntimeInfo
 }
 
-type RatelimitKeeper interface {
-	GetAssetYieldIndex(ctx sdk.Context) (yieldIndex *big.Rat, found bool)
+type YieldsKeeper interface {
+	GetAssetYieldsIndex(ctx sdk.Context) (yieldsIndex *big.Rat, found bool)
 }

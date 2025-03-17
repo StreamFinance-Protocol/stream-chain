@@ -43,7 +43,7 @@ const GenesisStateNoVe = `{
           "id": 0,
           "market_id": 0,
           "symbol": "TDAI",
-          "asset_yield_index": "1/1",
+          "asset_yields_index": "1/1",
           "max_slippage_ppm": 0
         },
         {
@@ -54,7 +54,7 @@ const GenesisStateNoVe = `{
           "id": 1,
           "market_id": 0,
           "symbol": "BTC",
-          "asset_yield_index": "1/1",
+          "asset_yields_index": "1/1",
           "max_slippage_ppm": 0
         }
       ]
@@ -242,10 +242,6 @@ const GenesisStateNoVe = `{
           "1800s"
         ]
       }
-    },
-    "capability": {
-      "index": "1",
-      "owners": []
     },
     "clob": {
       "block_rate_limit_config": {
@@ -864,43 +860,6 @@ const GenesisStateNoVe = `{
       "votes": []
     },
     "govplus": {},
-   "ibc": {
-      "channel_genesis": {
-        "ack_sequences": [],
-        "acknowledgements": [],
-        "channels": [],
-        "commitments": [],
-        "next_channel_sequence": "0",
-        "receipts": [],
-        "recv_sequences": [],
-        "send_sequences": [],
-        "params": {
-          "upgrade_timeout": {
-            "timestamp": "1"
-          }
-        }
-      },
-      "client_genesis": {
-        "clients": [],
-        "clients_consensus": [],
-        "clients_metadata": [],
-        "create_localhost": false,
-        "next_client_sequence": "0",
-        "params": {
-          "allowed_clients": [
-            "07-tendermint"
-          ]
-        }
-      },
-      "connection_genesis": {
-        "client_connection_paths": [],
-        "connections": [],
-        "next_connection_sequence": "0",
-        "params": {
-          "max_expected_time_per_block": "30000000000"
-        }
-      }
-    },
     "perpetuals": {
       "collateral_pools": [
         {
@@ -993,7 +952,7 @@ const GenesisStateNoVe = `{
             "market_id": 0,
             "ticker": "BTC-USD"
           },
-          "yield_index": "0/1"
+          "yields_index": "0/1"
         },
         {
           "params": {
@@ -1004,7 +963,7 @@ const GenesisStateNoVe = `{
             "market_id": 1,
             "ticker": "ETH-USD"
           },
-          "yield_index": "0/1"
+          "yields_index": "0/1"
         }
       ]
     },
@@ -1476,25 +1435,7 @@ const GenesisStateNoVe = `{
         }
       ]
     },
-    "ratelimit": {
-      "limit_params_list": [
-        {
-          "denom": "ibc/DEEFE2DEFDC8EA8879923C4CCA42BB888C3CD03FF7ECFEFB1C2FEC27A732ACC8",
-          "limiters": [
-            {
-              "baseline_minimum": "1000000000000000000000000",
-              "baseline_tvl_ppm": 10000,
-              "period": "3600s"
-            },
-            {
-              "baseline_minimum": "10000000000000000000000000",
-              "baseline_tvl_ppm": 100000,
-              "period": "86400s"
-            }
-          ]
-        }
-      ]
-    },
+    "yields": {},
     "sending": {},
     "slashing": {
       "missed_blocks": [],
@@ -1544,7 +1485,7 @@ const GenesisStateNoVe = `{
             "owner": "klyra199tqg4wdlnu4qjlxchpd7seg454937hju8xa57"
           },
           "margin_enabled": true,
-          "asset_yield_index": "1/1"
+          "asset_yields_index": "1/1"
         },
         {
           "asset_positions": [
@@ -1559,7 +1500,7 @@ const GenesisStateNoVe = `{
             "owner": "klyra10fx7sy6ywd5senxae9dwytf8jxek3t2g8gx9ym"
           },
           "margin_enabled": true,
-          "asset_yield_index": "1/1"
+          "asset_yields_index": "1/1"
         },
         {
           "asset_positions": [
@@ -1574,7 +1515,7 @@ const GenesisStateNoVe = `{
             "owner": "klyra1fjg6zp6vv8t9wvy4lps03r5l4g7tkjw93awcky"
           },
           "margin_enabled": true,
-          "asset_yield_index": "1/1"
+          "asset_yields_index": "1/1"
         },
         {
           "asset_positions": [
@@ -1589,7 +1530,7 @@ const GenesisStateNoVe = `{
             "owner": "klyra1wau5mja7j7zdavtfq9lu7ejef05hm6ffxz2hcc"
           },
           "margin_enabled": true,
-          "asset_yield_index": "1/1"
+          "asset_yields_index": "1/1"
         },
         {
           "asset_positions": [
@@ -1604,7 +1545,7 @@ const GenesisStateNoVe = `{
             "owner": "klyra1nzuttarf5k2j0nug5yzhr6p74t9avehn6x2c0s"
           },
           "margin_enabled": true,
-          "asset_yield_index": "1/1"
+          "asset_yields_index": "1/1"
         }
       ]
     },

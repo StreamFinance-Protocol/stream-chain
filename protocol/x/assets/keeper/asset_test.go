@@ -65,7 +65,7 @@ func createNAssets(
 			hasMarket,                   // HasMarket
 			marketId,                    // MarketId
 			int32(i),                    // AtomicResolution
-			"1/1",                       // AssetYieldIndex
+			"1/1",                       // AssetYieldsIndex
 			uint32(0),                   // MaxSlippagePpm
 		)
 		if err != nil {
@@ -91,7 +91,7 @@ func TestCreateAsset_MarketNotFound(t *testing.T) {
 		true,
 		uint32(999),
 		int32(-1),
-		"1/1",     // AssetYieldIndex
+		"1/1",     // AssetYieldsIndex
 		uint32(0), // MaxSlippagePpm
 	)
 	require.EqualError(t, err, errorsmod.Wrap(pricestypes.ErrMarketPriceDoesNotExist, "999").Error())
@@ -113,7 +113,7 @@ func TestCreateAsset_InvalidTDaiAsset(t *testing.T) {
 		true,
 		uint32(999),
 		int32(-1),
-		"1/1",     // AssetYieldIndex
+		"1/1",     // AssetYieldsIndex
 		uint32(0), // MaxSlippagePpm
 	)
 	require.ErrorIs(t, err, types.ErrTDaiMustBeAssetZero)
@@ -131,7 +131,7 @@ func TestCreateAsset_InvalidTDaiAsset(t *testing.T) {
 		true,
 		uint32(999),
 		int32(-1),
-		"1/1",     // AssetYieldIndex
+		"1/1",     // AssetYieldsIndex
 		uint32(0), // MaxSlippagePpm
 	)
 	require.ErrorIs(t, err, types.ErrTDaiMustBeAssetZero)
@@ -149,7 +149,7 @@ func TestCreateAsset_InvalidTDaiAsset(t *testing.T) {
 		true,
 		uint32(999),
 		int32(-1),
-		"1/1",     // AssetYieldIndex
+		"1/1",     // AssetYieldsIndex
 		uint32(0), // MaxSlippagePpm
 	)
 	require.ErrorIs(t, err, types.ErrUnexpectedTDaiDenomExponent)
@@ -171,7 +171,7 @@ func TestCreateAsset_MarketIdInvalid(t *testing.T) {
 		false,
 		uint32(1),
 		int32(-1),
-		"1/1",     // AssetYieldIndex
+		"1/1",     // AssetYieldsIndex
 		uint32(0), // MaxSlippagePpm
 	)
 	require.EqualError(t, err, errorsmod.Wrap(types.ErrInvalidMarketId, "Market ID: 1").Error())
@@ -194,7 +194,7 @@ func TestCreateAsset_AssetAlreadyExists(t *testing.T) {
 		false,       // hasMarket
 		0,           // marketId
 		10,          // atomicResolution
-		"1/1",       // AssetYieldIndex
+		"1/1",       // AssetYieldsIndex
 		uint32(0),   // MaxSlippagePpm
 	)
 	require.NoError(t, err)
@@ -209,7 +209,7 @@ func TestCreateAsset_AssetAlreadyExists(t *testing.T) {
 		false,       // hasMarket
 		0,           // marketId
 		10,          // atomicResolution
-		"1/1",       // AssetYieldIndex
+		"1/1",       // AssetYieldsIndex
 		uint32(0),   // MaxSlippagePpm
 	)
 	require.EqualError(t, err, errorsmod.Wrap(types.ErrAssetDenomAlreadyExists, "btc-denom").Error())
@@ -224,7 +224,7 @@ func TestCreateAsset_AssetAlreadyExists(t *testing.T) {
 		false,            // hasMarket
 		0,                // marketId
 		10,               // atomicResolution
-		"1/1",            // AssetYieldIndex
+		"1/1",            // AssetYieldsIndex
 		uint32(0),        // MaxSlippagePpm
 	)
 	require.ErrorIs(t, err, types.ErrAssetIdAlreadyExists)
@@ -490,7 +490,7 @@ func TestConvertAssetToCoin_Success(t *testing.T) {
 				false,
 				0,
 				tc.atomicResolution,
-				"1/1",     // AssetYieldIndex
+				"1/1",     // AssetYieldsIndex
 				uint32(0), // MaxSlippagePpm
 			)
 			require.NoError(t, err)
@@ -547,7 +547,7 @@ func TestConvertAssetToCoin_Failure(t *testing.T) {
 		false,
 		0,
 		-6,
-		"1/1",     // AssetYieldIndex
+		"1/1",     // AssetYieldsIndex
 		uint32(0), // MaxSlippagePpm
 	)
 	require.NoError(t, err)
@@ -569,7 +569,7 @@ func TestConvertAssetToCoin_Failure(t *testing.T) {
 		false,
 		0,
 		-50,       /* invalid asset atomic resolution */
-		"1/1",     // AssetYieldIndex
+		"1/1",     // AssetYieldsIndex
 		uint32(0), // MaxSlippagePpm
 	)
 	require.NoError(t, err)
@@ -671,7 +671,7 @@ func TestConvertCoinToAsset_Success(t *testing.T) {
 				false,
 				0,
 				tc.atomicResolution,
-				"1/1",     // AssetYieldIndex
+				"1/1",     // AssetYieldsIndex
 				uint32(0), // MaxSlippagePpm
 			)
 			require.NoError(t, err)
@@ -734,7 +734,7 @@ func TestConvertCoinToAsset_Failure(t *testing.T) {
 		false,
 		0,
 		-6,
-		"1/1",     // AssetYieldIndex
+		"1/1",     // AssetYieldsIndex
 		uint32(0), // MaxSlippagePpm
 	)
 	require.NoError(t, err)
@@ -759,7 +759,7 @@ func TestConvertCoinToAsset_Failure(t *testing.T) {
 		false,
 		0,
 		-50,       /* invalid asset atomic resolution */
-		"1/1",     // AssetYieldIndex
+		"1/1",     // AssetYieldsIndex
 		uint32(0), // MaxSlippagePpm
 	)
 	require.NoError(t, err)
@@ -888,7 +888,7 @@ func TestGetNetCollateralWithSlippage(t *testing.T) {
 				tc.asset.HasMarket,
 				tc.asset.MarketId,
 				tc.asset.AtomicResolution,
-				tc.asset.AssetYieldIndex,
+				tc.asset.AssetYieldsIndex,
 				tc.asset.MaxSlippagePpm,
 			)
 			require.NoError(t, err)

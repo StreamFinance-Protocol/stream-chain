@@ -24,7 +24,7 @@ func (k Keeper) CreateAsset(
 	hasMarket bool,
 	marketId uint32,
 	atomicResolution int32,
-	assetYieldIndex string,
+	assetYieldsIndex string,
 	maxSlippagePpm uint32,
 ) (types.Asset, error) {
 	if prevAsset, exists := k.GetAsset(ctx, assetId); exists {
@@ -81,7 +81,7 @@ func (k Keeper) CreateAsset(
 		HasMarket:        hasMarket,
 		MarketId:         marketId,
 		AtomicResolution: atomicResolution,
-		AssetYieldIndex:  assetYieldIndex,
+		AssetYieldsIndex: assetYieldsIndex,
 		MaxSlippagePpm:   maxSlippagePpm,
 	}
 

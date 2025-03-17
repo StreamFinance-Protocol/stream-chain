@@ -1,0 +1,7 @@
+syntax = "proto3";
+package klyraprotocol.yields;
+
+option go_package = "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/types";
+
+// GenesisState defines the yields module's genesis state.
+message GenesisState {}

@@ -19,7 +19,7 @@ var (
 		Denom:            TDaiDenom,
 		HasMarket:        false,
 		AtomicResolution: lib.TDAIAtomicResolution,
-		AssetYieldIndex:  "1/1",
+		AssetYieldsIndex: "1/1",
 		MaxSlippagePpm:   uint32(0),
 	}
 	AssetBtc = Asset{
@@ -33,7 +33,7 @@ var (
 	}
 )
 
-// DefaultGenesis returns the default Capability genesis state
+// DefaultGenesis returns the default Assets genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
 		Assets: []Asset{

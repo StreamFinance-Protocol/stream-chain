@@ -23,9 +23,9 @@ import (
 	epochstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/epochs/types"
 	perpetualstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
-	ratelimitmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
 	sendingtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
+	yieldsmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/types"
 	tmjson "github.com/cometbft/cometbft/libs/json"
 	tmtypes "github.com/cometbft/cometbft/types"
 	dbm "github.com/cosmos/cosmos-db"
@@ -51,10 +51,6 @@ import (
 	simcli "github.com/cosmos/cosmos-sdk/x/simulation/client/cli"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
-	icatypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/types"
-	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
-	exportedtypes "github.com/cosmos/ibc-go/v8/modules/core/exported"
 	"github.com/stretchr/testify/require"
 )
 
@@ -105,16 +101,12 @@ var genesisModuleOrder = []string{
 	authtypes.ModuleName,
 	banktypes.ModuleName,
 	authz.ModuleName,
-	capabilitytypes.ModuleName,
 	feegranttypes.ModuleName,
 	stakingtypes.ModuleName,
 	slashingtypes.ModuleName,
 	paramstypes.ModuleName,
-	exportedtypes.ModuleName,
 	evidencetypes.ModuleName,
-	ratelimitmodule.ModuleName,
-	ibctransfertypes.ModuleName,
-	icatypes.ModuleName,
+	yieldsmodule.ModuleName,
 	pricestypes.ModuleName,
 	assetstypes.ModuleName,
 	perpetualstypes.ModuleName,
@@ -125,24 +117,12 @@ var genesisModuleOrder = []string{
 	blocktimetypes.ModuleName,
 }
 
-var skippedGenesisModules = map[string]interface{}{
-	// Skip adding the interchain accounts module since the modules simulation
-	// https://github.com/cosmos/ibc-go/blob/2551dea/modules/apps/27-interchain-accounts/simulation/proposals.go#L23
-	// adds both ICA host and controller messages while the app only supports host messages causing the
-	// simulation to fail due to unroutable controller messages.
-	icatypes.ModuleName: nil,
-}
-
 // WithRandomlyGeneratedOperationsSimulationManager uses the default weighted operations of each of
 // the modules which are currently using randomness to generate operations for simulation.
 func (app *SimApp) WithRandomlyGeneratedOperationsSimulationManager() {
 	// Find all simulation modules and replace the auth one with one that is needed for simulation.
 	simAppModules := []module.AppModuleSimulation{}
 	for _, genesisModule := range genesisModuleOrder {
-		if _, skipped := skippedGenesisModules[genesisModule]; skipped {
-			continue
-		}
-
 		if simAppModule, ok := app.ModuleManager.Modules[genesisModule].(module.AppModuleSimulation); ok {
 			// Replace the auth module so that it generates some random accounts.
 			if simAppModule.(module.AppModule).Name() == authtypes.ModuleName {
@@ -166,12 +146,11 @@ func (app *SimApp) WithRandomlyGeneratedOperationsSimulationManager() {
 			foundSimAppModules = append(foundSimAppModules, simAppModule.(module.AppModuleBasic).Name())
 		}
 	}
-	if len(simAppModules) != len(foundSimAppModules)-len(skippedGenesisModules) {
+	if len(simAppModules) != len(foundSimAppModules) {
 		panic(fmt.Sprintf(
 			"Under specified AppModuleSimulation genesis order. "+
-				"Genesis order is %s with skipped modules %s but found modules %s.",
+				"Genesis order is %s but found modules %s.",
 			genesisModuleOrder,
-			skippedGenesisModules,
 			foundSimAppModules,
 		))
 	}

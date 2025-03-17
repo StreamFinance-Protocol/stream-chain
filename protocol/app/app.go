@@ -17,6 +17,7 @@ import (
 	bigintcache "github.com/StreamFinance-Protocol/stream-chain/protocol/caches/bigintcache"
 	pricecache "github.com/StreamFinance-Protocol/stream-chain/protocol/caches/pricecache"
 	vecache "github.com/StreamFinance-Protocol/stream-chain/protocol/caches/vecache"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
 	reflectionv1 "cosmossdk.io/api/cosmos/reflection/v1"
@@ -39,7 +40,6 @@ import (
 	abci "github.com/cometbft/cometbft/abci/types"
 	tmjson "github.com/cometbft/cometbft/libs/json"
 	tmos "github.com/cometbft/cometbft/libs/os"
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -95,9 +95,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	"github.com/cosmos/ibc-go/modules/capability"
-	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
-	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
 	"github.com/gorilla/mux"
 	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cast"
@@ -174,9 +171,6 @@ import (
 	pricesmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices"
 	pricesmodulekeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/keeper"
 	pricesmoduletypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
-	ratelimitmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit"
-	ratelimitmodulekeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/keeper"
-	ratelimitmoduletypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
 	sendingmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending"
 	sendingmodulekeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending/keeper"
 	sendingmoduletypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending/types"
@@ -186,23 +180,9 @@ import (
 	subaccountsmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts"
 	subaccountsmodulekeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/keeper"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
-
-	// IBC
-	ica "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts"
-	icacontrollertypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/controller/types"
-	icahost "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/host"
-	icahostkeeper "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/host/keeper"
-	icahosttypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/host/types"
-	icatypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/types"
-	"github.com/cosmos/ibc-go/v8/modules/apps/transfer"
-	ibctransferkeeper "github.com/cosmos/ibc-go/v8/modules/apps/transfer/keeper"
-	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
-	ibc "github.com/cosmos/ibc-go/v8/modules/core"
-	ibcclient "github.com/cosmos/ibc-go/v8/modules/core/02-client/types" // nolint:staticcheck
-	ibcconnectiontypes "github.com/cosmos/ibc-go/v8/modules/core/03-connection/types"
-	ibcporttypes "github.com/cosmos/ibc-go/v8/modules/core/05-port/types"
-	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
-	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
+	yieldsmodule "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields"
+	yieldskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/keeper"
+	yieldstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/types"
 
 	// Indexer
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/indexer"
@@ -258,30 +238,21 @@ type App struct {
 	memKeys map[string]*storetypes.MemoryStoreKey
 
 	// keepers
-	AccountKeeper    authkeeper.AccountKeeper
-	AuthzKeeper      authzkeeper.Keeper
-	BankKeeper       bankkeeper.Keeper
-	CapabilityKeeper *capabilitykeeper.Keeper
-	StakingKeeper    *stakingkeeper.Keeper
-	SlashingKeeper   slashingkeeper.Keeper
-	DistrKeeper      distrkeeper.Keeper
-	GovKeeper        *govkeeper.Keeper
-	CrisisKeeper     *crisiskeeper.Keeper
-	UpgradeKeeper    *upgradekeeper.Keeper
-	ParamsKeeper     paramskeeper.Keeper
-	// IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
-	IBCKeeper             *ibckeeper.Keeper
-	ICAHostKeeper         icahostkeeper.Keeper
+	AccountKeeper         authkeeper.AccountKeeper
+	AuthzKeeper           authzkeeper.Keeper
+	BankKeeper            bankkeeper.Keeper
+	StakingKeeper         *stakingkeeper.Keeper
+	SlashingKeeper        slashingkeeper.Keeper
+	DistrKeeper           distrkeeper.Keeper
+	GovKeeper             *govkeeper.Keeper
+	CrisisKeeper          *crisiskeeper.Keeper
+	UpgradeKeeper         *upgradekeeper.Keeper
+	ParamsKeeper          paramskeeper.Keeper
 	EvidenceKeeper        evidencekeeper.Keeper
-	TransferKeeper        ibctransferkeeper.Keeper
-	RatelimitKeeper       ratelimitmodulekeeper.Keeper
+	YieldsKeeper          yieldskeeper.Keeper
 	FeeGrantKeeper        feegrantkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
 	GovPlusKeeper         govplusmodulekeeper.Keeper
-
-	// make scoped keepers public for test purposes
-	ScopedIBCKeeper         capabilitykeeper.ScopedKeeper
-	ScopedIBCTransferKeeper capabilitykeeper.ScopedKeeper
 
 	PricesKeeper pricesmodulekeeper.Keeper
 
@@ -392,13 +363,8 @@ func New(
 		consensusparamtypes.StoreKey,
 		upgradetypes.StoreKey,
 		feegrant.StoreKey,
-		ibcexported.StoreKey,
-		ibctransfertypes.StoreKey,
-		ratelimitmoduletypes.StoreKey,
-		icacontrollertypes.StoreKey,
-		icahosttypes.StoreKey,
+		yieldstypes.StoreKey,
 		evidencetypes.StoreKey,
-		capabilitytypes.StoreKey,
 		pricesmoduletypes.StoreKey,
 		assetsmoduletypes.StoreKey,
 		blocktimemoduletypes.StoreKey,
@@ -422,7 +388,7 @@ func New(
 		indexer_manager.TransientStoreKey,
 		perpetualsmoduletypes.TransientStoreKey,
 	)
-	memKeys := storetypes.NewMemoryStoreKeys(capabilitytypes.MemStoreKey, clobmoduletypes.MemStoreKey)
+	memKeys := storetypes.NewMemoryStoreKeys(clobmoduletypes.MemStoreKey)
 
 	app := &App{
 		BaseApp:           bApp,
@@ -456,13 +422,6 @@ func New(
 		app.event,
 	)
 	bApp.SetParamStore(&app.ConsensusParamsKeeper.ParamsStore)
-
-	// add capability keeper and ScopeToModule for ibc module
-	app.CapabilityKeeper = capabilitykeeper.NewKeeper(
-		appCodec,
-		keys[capabilitytypes.StoreKey],
-		memKeys[capabilitytypes.MemStoreKey],
-	)
 
 	// add keepers
 	app.AccountKeeper = authkeeper.NewAccountKeeper(
@@ -593,43 +552,6 @@ func New(
 	// Set legacy router for backwards compatibility with gov v1beta1
 	govKeeper.SetLegacyRouter(govRouter)
 
-	// grant capabilities for the ibc, ibc-transfer, ICAHostKeeper and ratelimit modules
-	scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibcexported.ModuleName)
-	scopedIBCTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
-	scopedICAHostKeeper := app.CapabilityKeeper.ScopeToModule(icahosttypes.SubModuleName)
-
-	// scopedRatelimitKeeper is not used as an input to any other module.
-	app.CapabilityKeeper.ScopeToModule(ratelimitmoduletypes.ModuleName)
-
-	app.CapabilityKeeper.Seal()
-
-	// Create IBC Keeper
-	app.IBCKeeper = ibckeeper.NewKeeper(
-		appCodec,
-		keys[ibcexported.StoreKey],
-		app.getSubspace(ibcexported.ModuleName),
-		app.StakingKeeper,
-		app.UpgradeKeeper,
-		scopedIBCKeeper,
-		lib.GovModuleAddress.String(),
-	)
-
-	// Create ICA Host Keeper
-	app.ICAHostKeeper = icahostkeeper.NewKeeper(
-		appCodec,
-		keys[icahosttypes.StoreKey], // key
-		app.getSubspace(icahosttypes.SubModuleName), // paramSpace
-		app.IBCKeeper.ChannelKeeper,                 // ics4Wrapper, may be replaced with middleware such as ics29 fee
-		app.IBCKeeper.ChannelKeeper,                 // channelKeeper
-		app.IBCKeeper.PortKeeper,                    // portKeeper
-		app.AccountKeeper,                           // accountKeeper
-		scopedICAHostKeeper,                         // scopedKeeper
-		app.MsgServiceRouter(),                      // msgRouter
-		lib.GovModuleAddress.String(),               // authority
-	)
-
-	app.ICAHostKeeper.WithQueryRouter(app.GRPCQueryRouter())
-
 	app.BlockTimeKeeper = *blocktimemodulekeeper.NewKeeper(
 		appCodec,
 		keys[blocktimemoduletypes.StoreKey],
@@ -646,7 +568,7 @@ func New(
 	logger.Info("Parsed Daemon flags", "Flags", daemonFlags)
 
 	// Setup server for sDAI oracle prices.
-	// The in-memory data structure is shared by the x/ratelimit module and sdaioracle daemon.
+	// The in-memory data structure is shared by the x/yields module and sdaioracle daemon.
 	sDAIEventManager := createSDAIEventManager(appFlags, daemonFlags)
 
 	msgSender, indexerFlags := getIndexerFromOptions(appOpts, logger)
@@ -656,52 +578,15 @@ func New(
 		indexerFlags.SendOffchainData,
 	)
 
-	app.RatelimitKeeper = *ratelimitmodulekeeper.NewKeeper(
+	app.YieldsKeeper = *yieldskeeper.NewKeeper(
 		appCodec,
-		keys[ratelimitmoduletypes.StoreKey],
+		keys[yieldstypes.StoreKey],
 		sDAIEventManager,
 		app.IndexerEventManager,
 		app.BankKeeper,
-		app.BlockTimeKeeper,
 		&app.PerpetualsKeeper,
-		&app.AssetsKeeper,
-		app.IBCKeeper.ChannelKeeper, // ICS4Wrapper
-		// set the governance and delaymsg module accounts as the authority for conducting upgrades
-		[]string{
-			lib.GovModuleAddress.String(),
-			delaymsgmoduletypes.ModuleAddress.String(),
-		},
 	)
-	rateLimitModule := ratelimitmodule.NewAppModule(appCodec, app.RatelimitKeeper)
-
-	// Create Transfer Keepers
-	app.TransferKeeper = ibctransferkeeper.NewKeeper(
-		appCodec,
-		keys[ibctransfertypes.StoreKey],
-		app.getSubspace(ibctransfertypes.ModuleName),
-		app.RatelimitKeeper, // ICS4Wrapper
-		app.IBCKeeper.ChannelKeeper,
-		app.IBCKeeper.PortKeeper,
-		app.AccountKeeper,
-		app.BankKeeper,
-		scopedIBCTransferKeeper,
-		lib.GovModuleAddress.String(),
-	)
-	transferModule := transfer.NewAppModule(app.TransferKeeper)
-	transferIBCModule := transfer.NewIBCModule(app.TransferKeeper)
-
-	// Wrap the x/ratelimit middlware over the IBC Transfer module
-	var transferStack ibcporttypes.IBCModule = transferIBCModule
-	transferStack = ratelimitmodule.NewIBCMiddleware(app.RatelimitKeeper, transferStack)
-
-	icaHostIBCModule := icahost.NewIBCModule(app.ICAHostKeeper)
-	// Create static IBC router, add transfer route, then set and seal it
-	ibcRouter := ibcporttypes.NewRouter()
-	// Ordering of `AddRoute` does not matter.
-	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferStack)
-	ibcRouter.AddRoute(icahosttypes.SubModuleName, icaHostIBCModule)
-
-	app.IBCKeeper.SetRouter(ibcRouter)
+	rateLimitModule := yieldsmodule.NewAppModule(appCodec, app.YieldsKeeper)
 
 	// create evidence keeper with router
 	evidenceKeeper := evidencekeeper.NewKeeper(
@@ -919,7 +804,7 @@ func New(
 		keys[bridgemoduletypes.StoreKey],
 		tkeys[bridgemoduletypes.TransientStoreKey],
 		bridgeEventManager,
-		app.RatelimitKeeper,
+		app.YieldsKeeper,
 		app.BankKeeper,
 		app.DelayMsgKeeper,
 		// gov module and delayMsg module accounts are allowed to send messages to the bridge module.
@@ -977,7 +862,7 @@ func New(
 		app.AssetsKeeper,
 		app.BankKeeper,
 		app.PerpetualsKeeper,
-		app.RatelimitKeeper,
+		app.YieldsKeeper,
 		app.BlockTimeKeeper,
 		app.IndexerEventManager,
 	)
@@ -1007,7 +892,7 @@ func New(
 	aggregator := veaggregator.NewVeAggregator(
 		logger,
 		app.PricesKeeper,
-		app.RatelimitKeeper,
+		app.YieldsKeeper,
 		pricesAggregatorFn,
 		conversionRateAggregatorFn,
 	)
@@ -1020,7 +905,7 @@ func New(
 		logger,
 		aggregator,
 		app.PricesKeeper,
-		app.RatelimitKeeper,
+		app.YieldsKeeper,
 		app.voteCodec,
 		app.extCodec,
 		&spotPriceUpdateCache,
@@ -1109,7 +994,7 @@ func New(
 	)
 
 	if !appFlags.NonValidatingFullNode {
-		app.InitVoteExtensions(logger, app.voteCodec, app.PricesKeeper, &app.PerpetualsKeeper, &app.ClobKeeper, &app.RatelimitKeeper, sDAIEventManager, veApplier)
+		app.InitVoteExtensions(logger, app.voteCodec, app.PricesKeeper, &app.PerpetualsKeeper, &app.ClobKeeper, &app.YieldsKeeper, sDAIEventManager, veApplier)
 	}
 
 	/****  Module Options ****/
@@ -1128,7 +1013,6 @@ func New(
 		auth.NewAppModule(appCodec, app.AccountKeeper, nil, app.getSubspace(authtypes.ModuleName)),
 		bank.NewAppModule(appCodec, app.BankKeeper, app.AccountKeeper, app.getSubspace(banktypes.ModuleName)),
 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
-		capability.NewAppModule(appCodec, *app.CapabilityKeeper, false),
 		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
 		crisis.NewAppModule(app.CrisisKeeper, skipGenesisInvariants, app.getSubspace(crisistypes.ModuleName)),
 		gov.NewAppModule(appCodec, app.GovKeeper, app.AccountKeeper, app.BankKeeper, app.getSubspace(govtypes.ModuleName)),
@@ -1158,11 +1042,8 @@ func New(
 		),
 		upgrade.NewAppModule(app.UpgradeKeeper, addresscodec.NewBech32Codec(sdk.Bech32PrefixAccAddr)),
 		evidence.NewAppModule(app.EvidenceKeeper),
-		ibc.NewAppModule(app.IBCKeeper),
-		ica.NewAppModule(nil, &app.ICAHostKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
-		transferModule,
 		pricesModule,
 		assetsModule,
 		blockTimeModule,
@@ -1192,14 +1073,11 @@ func New(
 		blocktimemoduletypes.ModuleName, // Must be first
 		authz.ModuleName,                // Delete expired grants.
 		epochsmoduletypes.ModuleName,
-		capabilitytypes.ModuleName,
 		distrtypes.ModuleName,
 		slashingtypes.ModuleName,
 		evidencetypes.ModuleName,
 		stakingtypes.ModuleName,
-		ibcexported.ModuleName,
-		ibctransfertypes.ModuleName,
-		ratelimitmoduletypes.ModuleName,
+		yieldstypes.ModuleName,
 		authtypes.ModuleName,
 		banktypes.ModuleName,
 		govtypes.ModuleName,
@@ -1208,7 +1086,6 @@ func New(
 		feegrant.ModuleName,
 		paramstypes.ModuleName,
 		consensusparamtypes.ModuleName,
-		icatypes.ModuleName,
 		pricesmoduletypes.ModuleName,
 		assetsmoduletypes.ModuleName,
 		bridgemoduletypes.ModuleName,
@@ -1230,7 +1107,6 @@ func New(
 		crisistypes.ModuleName,
 		govtypes.ModuleName,
 		stakingtypes.ModuleName,
-		capabilitytypes.ModuleName,
 		authtypes.ModuleName,
 		banktypes.ModuleName,
 		distrtypes.ModuleName,
@@ -1240,11 +1116,8 @@ func New(
 		feegrant.ModuleName,
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
-		ibcexported.ModuleName,
-		ibctransfertypes.ModuleName,
-		ratelimitmoduletypes.ModuleName,
+		yieldstypes.ModuleName,
 		consensusparamtypes.ModuleName,
-		icatypes.ModuleName,
 		pricesmoduletypes.ModuleName,
 		assetsmoduletypes.ModuleName,
 		bridgemoduletypes.ModuleName,
@@ -1263,12 +1136,8 @@ func New(
 
 	// NOTE: The genutils module must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.
-	// NOTE: Capability module must occur first so that it can initialize any capabilities
-	// so that other modules that want to create or claim capabilities afterwards in InitChain
-	// can do so safely.
 	app.ModuleManager.SetOrderInitGenesis(
 		epochsmoduletypes.ModuleName,
-		capabilitytypes.ModuleName,
 		authtypes.ModuleName,
 		banktypes.ModuleName,
 		distrtypes.ModuleName,
@@ -1276,16 +1145,13 @@ func New(
 		slashingtypes.ModuleName,
 		govtypes.ModuleName,
 		crisistypes.ModuleName,
-		ibcexported.ModuleName,
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
-		ibctransfertypes.ModuleName,
-		ratelimitmoduletypes.ModuleName,
+		yieldstypes.ModuleName,
 		feegrant.ModuleName,
 		consensusparamtypes.ModuleName,
-		icatypes.ModuleName,
 		pricesmoduletypes.ModuleName,
 		assetsmoduletypes.ModuleName,
 		blocktimemoduletypes.ModuleName,
@@ -1306,23 +1172,19 @@ func New(
 	// x/auth is run last since it depends on the x/staking module.
 	app.ModuleManager.SetOrderMigrations(
 		epochsmoduletypes.ModuleName,
-		capabilitytypes.ModuleName,
 		banktypes.ModuleName,
 		distrtypes.ModuleName,
 		stakingtypes.ModuleName,
 		slashingtypes.ModuleName,
 		govtypes.ModuleName,
 		crisistypes.ModuleName,
-		ibcexported.ModuleName,
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
-		ibctransfertypes.ModuleName,
-		ratelimitmoduletypes.ModuleName,
+		yieldstypes.ModuleName,
 		feegrant.ModuleName,
 		consensusparamtypes.ModuleName,
-		icatypes.ModuleName,
 		pricesmoduletypes.ModuleName,
 		assetsmoduletypes.ModuleName,
 		blocktimemoduletypes.ModuleName,
@@ -1390,7 +1252,7 @@ func New(
 				&app.ClobKeeper,
 				app.PerpetualsKeeper,
 				app.PricesKeeper,
-				app.RatelimitKeeper,
+				app.YieldsKeeper,
 				veCache,
 				app.voteCodec,
 				app.extCodec,
@@ -1422,7 +1284,7 @@ func New(
 				app.StakingKeeper,
 				app.PerpetualsKeeper,
 				app.PricesKeeper,
-				app.RatelimitKeeper,
+				app.YieldsKeeper,
 				app.extCodec,
 				app.voteCodec,
 				veApplier,
@@ -1466,9 +1328,6 @@ func New(
 		version.GitCommit,
 	)
 
-	app.ScopedIBCKeeper = scopedIBCKeeper
-	app.ScopedIBCTransferKeeper = scopedIBCTransferKeeper
-
 	return app
 }
 
@@ -1494,9 +1353,9 @@ func (app *App) RegisterDaemonWithHealthMonitor(
 
 func createSDAIEventManager(appFlags flags.Flags, daemonFlags daemonflags.DaemonFlags) sdaidaemontypes.SDAIEventManager {
 	if daemonFlags.SDAI.MockEnabled {
-		return sdaidaemontypes.SetupMockFixedYieldEventManager()
-	} else if daemonFlags.SDAI.MockNoYield {
-		return sdaidaemontypes.SetupMockEventManagerNoYield()
+		return sdaidaemontypes.SetupMockFixedYieldsEventManager()
+	} else if daemonFlags.SDAI.MockNoYields {
+		return sdaidaemontypes.SetupMockEventManagerNoYields()
 	} else if !appFlags.NonValidatingFullNode && daemonFlags.SDAI.Enabled {
 		return sdaidaemontypes.NewsDAIEventManager()
 	}
@@ -1542,7 +1401,7 @@ func (app *App) InitVoteExtensions(
 	pricesKeeper pricesmodulekeeper.Keeper,
 	perpetualsKeeper *perpetualsmodulekeeper.Keeper,
 	clobKeeper *clobmodulekeeper.Keeper,
-	rateLimitKeeper *ratelimitmodulekeeper.Keeper,
+	yieldsKeeper *yieldskeeper.Keeper,
 	sDAIEventManager sdaidaemontypes.SDAIEventManager,
 	veApplier *veapplier.VEApplier,
 ) {
@@ -1552,7 +1411,7 @@ func (app *App) InitVoteExtensions(
 		pricesKeeper,
 		perpetualsKeeper,
 		clobKeeper,
-		rateLimitKeeper,
+		yieldsKeeper,
 		sDAIEventManager,
 		veApplier,
 	)
@@ -1788,14 +1647,6 @@ func initParamsKeeper(
 	paramsKeeper.Subspace(slashingtypes.ModuleName)
 	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govv1.ParamKeyTable()) //nolint:staticcheck
 	paramsKeeper.Subspace(crisistypes.ModuleName)
-
-	// register the key tables for legacy param subspaces
-	keyTable := ibcclient.ParamKeyTable()
-	keyTable.RegisterParamSet(&ibcconnectiontypes.Params{})
-	paramsKeeper.Subspace(ibcexported.ModuleName).WithKeyTable(keyTable)
-	paramsKeeper.Subspace(ibctransfertypes.ModuleName).WithKeyTable(ibctransfertypes.ParamKeyTable())
-	paramsKeeper.Subspace(icahosttypes.SubModuleName).WithKeyTable(icahosttypes.ParamKeyTable())
-	paramsKeeper.Subspace(icacontrollertypes.SubModuleName).WithKeyTable(icacontrollertypes.ParamKeyTable())
 
 	return paramsKeeper
 }

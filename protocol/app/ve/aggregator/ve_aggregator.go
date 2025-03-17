@@ -12,7 +12,7 @@ import (
 	pricetypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	ratelimitkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/keeper"
+	yieldskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/keeper"
 )
 
 // Vote encapsulates the validator and oracle data contained within a vote extension.
@@ -42,7 +42,7 @@ type MedianAggregator struct {
 	// keeper is used to fetch the marketParam object
 	pricesKeeper pk.Keeper
 
-	ratelimitKeeper ratelimitkeeper.Keeper
+	yieldsKeeper yieldskeeper.Keeper
 
 	// prices is a map of validator address to a map of currency pair to price
 	perValidatorPrices map[string]map[string]veaggregator.AggregatorPricePair
@@ -57,7 +57,7 @@ type MedianAggregator struct {
 func NewVeAggregator(
 	logger log.Logger,
 	pricekeeper pk.Keeper,
-	ratelimitKeeper ratelimitkeeper.Keeper,
+	yieldsKeeper yieldskeeper.Keeper,
 	pricesAggregateFn veaggregator.PricesAggregateFn,
 	conversionRateAggregateFn veaggregator.ConversionRateAggregateFn,
 ) VoteAggregator {
@@ -68,7 +68,7 @@ func NewVeAggregator(
 		pricesAggregateFn:              pricesAggregateFn,
 		conversionRateAggregateFn:      conversionRateAggregateFn,
 		pricesKeeper:                   pricekeeper,
-		ratelimitKeeper:                ratelimitKeeper,
+		yieldsKeeper:                   yieldsKeeper,
 	}
 }
 
@@ -79,7 +79,7 @@ func (ma *MedianAggregator) AggregateDaemonVEIntoFinalPricesAndConversionRate(
 	// wipe the previous prices
 	ma.perValidatorPrices = make(map[string]map[string]veaggregator.AggregatorPricePair)
 	lastCommittedPrices := ma.getLastCommittedPrices(ctx)
-	lastCommittedSDAIPrice, found := ma.ratelimitKeeper.GetSDAIPrice(ctx)
+	lastCommittedSDAIPrice, found := ma.yieldsKeeper.GetSDAIPrice(ctx)
 	if !found {
 		ma.logger.Error("failed to get last committed sDai conversion rate")
 	}

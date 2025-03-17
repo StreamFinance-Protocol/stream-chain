@@ -81,7 +81,7 @@ describe('addresses-controller#V4', () => {
           equity: getFixedRepresentation(159500),
           freeCollateral: getFixedRepresentation(152000),
           marginEnabled: true,
-          assetYieldIndex: testConstants.defaultSubaccount.assetYieldIndex,
+          assetYieldsIndex: testConstants.defaultSubaccount.assetYieldsIndex,
           openPerpetualPositions: {
             [testConstants.defaultPerpetualMarket.ticker]: {
               market: testConstants.defaultPerpetualMarket.ticker,
@@ -106,7 +106,7 @@ describe('addresses-controller#V4', () => {
               createdAtHeight: testConstants.defaultPerpetualPosition.createdAtHeight,
               exitPrice: null,
               closedAt: null,
-              perpYieldIndex: testConstants.defaultPerpetualPosition.perpYieldIndex,
+              perpYieldsIndex: testConstants.defaultPerpetualPosition.perpYieldsIndex,
             },
           },
           assetPositions: {
@@ -159,7 +159,7 @@ describe('addresses-controller#V4', () => {
           equity: getFixedRepresentation(10000),
           freeCollateral: getFixedRepresentation(10000),
           marginEnabled: true,
-          assetYieldIndex: testConstants.defaultSubaccount.assetYieldIndex,
+          assetYieldsIndex: testConstants.defaultSubaccount.assetYieldsIndex,
           openPerpetualPositions: {},
           assetPositions: {
             [testConstants.defaultAsset.symbol]: {
@@ -243,7 +243,7 @@ describe('addresses-controller#V4', () => {
             subaccountNumber: testConstants.defaultSubaccount.subaccountNumber,
             equity: getFixedRepresentation(159500),
             freeCollateral: getFixedRepresentation(152000),
-            assetYieldIndex: testConstants.defaultSubaccount.assetYieldIndex,
+            assetYieldsIndex: testConstants.defaultSubaccount.assetYieldsIndex,
             marginEnabled: true,
             openPerpetualPositions: {
               [testConstants.defaultPerpetualMarket.ticker]: {
@@ -269,7 +269,7 @@ describe('addresses-controller#V4', () => {
                 createdAtHeight: testConstants.defaultPerpetualPosition.createdAtHeight,
                 exitPrice: null,
                 closedAt: null,
-                perpYieldIndex: testConstants.defaultPerpetualPosition.perpYieldIndex,
+                perpYieldsIndex: testConstants.defaultPerpetualPosition.perpYieldsIndex,
               },
             },
             assetPositions: {
@@ -295,14 +295,14 @@ describe('addresses-controller#V4', () => {
             equity: getFixedRepresentation(0),
             freeCollateral: getFixedRepresentation(0),
             marginEnabled: true,
-            assetYieldIndex: testConstants.defaultSubaccount2.assetYieldIndex,
+            assetYieldsIndex: testConstants.defaultSubaccount2.assetYieldsIndex,
             openPerpetualPositions: {},
             assetPositions: {},
           },
           {
             address: testConstants.defaultAddress,
             subaccountNumber: testConstants.isolatedSubaccount.subaccountNumber,
-            assetYieldIndex: testConstants.isolatedSubaccount.assetYieldIndex,
+            assetYieldsIndex: testConstants.isolatedSubaccount.assetYieldsIndex,
             equity: getFixedRepresentation(0),
             freeCollateral: getFixedRepresentation(0),
             marginEnabled: true,
@@ -312,7 +312,7 @@ describe('addresses-controller#V4', () => {
           {
             address: testConstants.defaultAddress,
             subaccountNumber: testConstants.isolatedSubaccount2.subaccountNumber,
-            assetYieldIndex: testConstants.isolatedSubaccount2.assetYieldIndex,
+            assetYieldsIndex: testConstants.isolatedSubaccount2.assetYieldsIndex,
             equity: getFixedRepresentation(0),
             freeCollateral: getFixedRepresentation(0),
             marginEnabled: true,
@@ -398,7 +398,7 @@ describe('addresses-controller#V4', () => {
               equity: getFixedRepresentation(159500),
               freeCollateral: getFixedRepresentation(152000),
               marginEnabled: true,
-              assetYieldIndex: testConstants.defaultSubaccount.assetYieldIndex,
+              assetYieldsIndex: testConstants.defaultSubaccount.assetYieldsIndex,
               openPerpetualPositions: {
                 [testConstants.defaultPerpetualMarket.ticker]: {
                   market: testConstants.defaultPerpetualMarket.ticker,
@@ -423,7 +423,7 @@ describe('addresses-controller#V4', () => {
                   createdAtHeight: testConstants.defaultPerpetualPosition.createdAtHeight,
                   exitPrice: null,
                   closedAt: null,
-                  perpYieldIndex: testConstants.defaultPerpetualPosition.perpYieldIndex,
+                  perpYieldsIndex: testConstants.defaultPerpetualPosition.perpYieldsIndex,
                 },
               },
               assetPositions: {
@@ -446,7 +446,7 @@ describe('addresses-controller#V4', () => {
             {
               address: testConstants.defaultAddress,
               subaccountNumber: testConstants.isolatedSubaccount.subaccountNumber,
-              assetYieldIndex: testConstants.isolatedSubaccount.assetYieldIndex,
+              assetYieldsIndex: testConstants.isolatedSubaccount.assetYieldsIndex,
               equity: getFixedRepresentation(5000),
               freeCollateral: getFixedRepresentation(5000),
               marginEnabled: true,
@@ -464,7 +464,7 @@ describe('addresses-controller#V4', () => {
             {
               address: testConstants.defaultAddress,
               subaccountNumber: testConstants.isolatedSubaccount2.subaccountNumber,
-              assetYieldIndex: testConstants.isolatedSubaccount2.assetYieldIndex,
+              assetYieldsIndex: testConstants.isolatedSubaccount2.assetYieldsIndex,
               equity: getFixedRepresentation(0),
               freeCollateral: getFixedRepresentation(0),
               marginEnabled: true,

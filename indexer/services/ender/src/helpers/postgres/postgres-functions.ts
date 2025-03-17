@@ -47,7 +47,7 @@ const HANDLER_SCRIPTS: string[] = [
   'klyra_transfer_handler.sql',
   'klyra_update_clob_pair_handler.sql',
   'klyra_update_perpetual_handler.sql',
-  'klyra_yield_params_handler.sql',
+  'klyra_yields_params_handler.sql',
 ];
 
 const DB_SETUP_SCRIPTS: string[] = [
@@ -89,7 +89,7 @@ const HELPER_SCRIPTS: string[] = [
   'klyra_uuid_from_subaccount_id_parts.sql',
   'klyra_uuid_from_transaction_parts.sql',
   'klyra_uuid_from_transfer_parts.sql',
-  'klyra_uuid_from_yield_params_parts.sql',
+  'klyra_uuid_from_yields_params_parts.sql',
 ];
 
 const MAIN_SCRIPTS: string[] = ['klyra_block_processor.sql'];

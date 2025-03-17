@@ -50,11 +50,11 @@ export interface IndexerPerpetualPosition {
 
   fundingPayment: Uint8Array;
   /**
-   * The current yield index last time this position was settled.
+   * The current yields index last time this position was settled.
    * Should be converted from string to big.Rat.
    */
 
-  perpYieldIndex: string;
+  perpYieldsIndex: string;
 }
 /**
  * IndexerPerpetualPosition are an account’s positions of a `Perpetual`.
@@ -82,11 +82,11 @@ export interface IndexerPerpetualPositionSDKType {
 
   funding_payment: Uint8Array;
   /**
-   * The current yield index last time this position was settled.
+   * The current yields index last time this position was settled.
    * Should be converted from string to big.Rat.
    */
 
-  perp_yield_index: string;
+  perp_yields_index: string;
 }
 /**
  * IndexerAssetPosition define an account’s positions of an `Asset`.
@@ -188,7 +188,7 @@ function createBaseIndexerPerpetualPosition(): IndexerPerpetualPosition {
     quantums: new Uint8Array(),
     fundingIndex: new Uint8Array(),
     fundingPayment: new Uint8Array(),
-    perpYieldIndex: ""
+    perpYieldsIndex: ""
   };
 }
 
@@ -210,8 +210,8 @@ export const IndexerPerpetualPosition = {
       writer.uint32(34).bytes(message.fundingPayment);
     }
 
-    if (message.perpYieldIndex !== "") {
-      writer.uint32(42).string(message.perpYieldIndex);
+    if (message.perpYieldsIndex !== "") {
+      writer.uint32(42).string(message.perpYieldsIndex);
     }
 
     return writer;
@@ -243,7 +243,7 @@ export const IndexerPerpetualPosition = {
           break;
 
         case 5:
-          message.perpYieldIndex = reader.string();
+          message.perpYieldsIndex = reader.string();
           break;
 
         default:
@@ -261,7 +261,7 @@ export const IndexerPerpetualPosition = {
     message.quantums = object.quantums ?? new Uint8Array();
     message.fundingIndex = object.fundingIndex ?? new Uint8Array();
     message.fundingPayment = object.fundingPayment ?? new Uint8Array();
-    message.perpYieldIndex = object.perpYieldIndex ?? "";
+    message.perpYieldsIndex = object.perpYieldsIndex ?? "";
     return message;
   }
 

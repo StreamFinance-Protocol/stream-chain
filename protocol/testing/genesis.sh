@@ -1514,11 +1514,6 @@ function edit_genesis() {
 	dasel put -t int -f "$GENESIS" '.app_state.delaymsg.delayed_messages.[0].block_height' -v '378000'
 	# Uncomment the following to schedule the message to execute in ~120 days (at 1.6s per block.)
 	# dasel put -t int -f "$GENESIS" '.app_state.delaymsg.delayed_messages.[0].block_height' -v '6480000'
-
-	# ICA Host Params
-	update_ica_host_params
-	# ICA Controller Params
-	update_ica_controller_params
 }
 
 function add_subaccount() {

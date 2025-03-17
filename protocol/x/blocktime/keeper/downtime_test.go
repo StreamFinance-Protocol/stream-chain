@@ -10,7 +10,7 @@ import (
 
 	keepertest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/keeper"
 	blocktimekeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/blocktime/keeper"
-	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
+	blocktimetypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/blocktime/types"
 )
 
 func TestCheckForChainOutage(t *testing.T) {
@@ -44,7 +44,7 @@ func TestCheckForChainOutage(t *testing.T) {
 		},
 		"Current block exceeds duration sets and returns new outage": {
 			firstTimestamp:    time.Unix(1, 0),
-			secondTimestamp:   time.Unix(1, 0).Add(satypes.WITHDRAWAL_AND_TRANSFERS_BLOCKED_AFTER_CHAIN_OUTAGE_DURATION + time.Second),
+			secondTimestamp:   time.Unix(1, 0).Add(blocktimetypes.WITHDRAWAL_AND_TRANSFERS_BLOCKED_AFTER_CHAIN_OUTAGE_DURATION + time.Second),
 			setupOutageHeight: func(ctx sdk.Context, sk blocktimekeeper.Keeper) {},
 
 			expectedIsChainOutage: true,

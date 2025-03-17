@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
+	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/blocktime/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

@@ -2,7 +2,6 @@ package types
 
 import (
 	"math/big"
-	"time"
 
 	errorsmod "cosmossdk.io/errors"
 )
@@ -139,5 +138,3 @@ func (u UpdateType) String() string {
 // blocks withdrawals and transfers will be blocked if a negative TNC subaccount is seen in state,
 // starting from the last block a negative TNC subaccount was seen.
 const WITHDRAWAL_AND_TRANSFERS_BLOCKED_AFTER_NEGATIVE_TNC_SUBACCOUNT_SEEN_BLOCKS = 50
-
-const WITHDRAWAL_AND_TRANSFERS_BLOCKED_AFTER_CHAIN_OUTAGE_DURATION = 5 * time.Minute

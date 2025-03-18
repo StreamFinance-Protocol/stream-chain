@@ -74,7 +74,7 @@ func GeneratePerpetual(optionalModifications ...PerpetualModifierOption) *perpty
 		},
 		FundingIndex:    dtypes.ZeroInt(),
 		OpenInterest:    dtypes.ZeroInt(),
-		YieldIndex:      big.NewRat(0, 1).String(),
+		YieldsIndex:     big.NewRat(0, 1).String(),
 		LastFundingRate: dtypes.ZeroInt(),
 	}
 

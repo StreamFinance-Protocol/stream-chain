@@ -459,7 +459,7 @@ func createPerpetuals(
 			perp.Params.LiquidityTier,
 			perp.Params.DangerIndexPpm,
 			perp.Params.CollateralPoolId,
-			perp.YieldIndex,
+			perp.YieldsIndex,
 		)
 		if err != nil {
 			return err
@@ -550,7 +550,7 @@ func createAssets(
 			asset.HasMarket,
 			asset.MarketId,
 			asset.AtomicResolution,
-			asset.AssetYieldIndex,
+			asset.AssetYieldsIndex,
 			asset.MaxSlippagePpm,
 		)
 		if err != nil {

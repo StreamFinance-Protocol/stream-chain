@@ -236,7 +236,7 @@ export async function updateMarketCheckerFields(
     stringColumns: [
       PerpetualMarketColumns.status,
       PerpetualMarketColumns.ticker,
-      PerpetualMarketColumns.perpYieldIndex,
+      PerpetualMarketColumns.perpYieldsIndex,
     ],
     numericColumns: [
       PerpetualMarketColumns.id,

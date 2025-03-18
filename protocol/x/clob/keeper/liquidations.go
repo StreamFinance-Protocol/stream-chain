@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"errors"
-	"fmt"
 	"math"
 	"math/big"
 	"time"
@@ -82,7 +81,6 @@ func (k Keeper) LiquidateSubaccountsAgainstOrderbookInternal(
 	err error,
 ) {
 
-	fmt.Println("LiquidateSubaccountsAgainstOrderbookInternal subaccountIds", subaccountIds)
 	numIsolatedLiquidations := 0
 	for i := 0; i < int(k.Flags.MaxLiquidationAttemptsPerBlock); i++ {
 		subaccount, subaccountId := k.GetNextSubaccountToLiquidate(ctx, subaccountIds, isolatedPositionsPriorityHeap, &numIsolatedLiquidations)
@@ -108,7 +106,6 @@ func (k Keeper) LiquidateSubaccountsAgainstOrderbookInternal(
 
 		// Generate a new liquidation order with the appropriate order size from the sorted subaccount ids.
 		liquidationOrder, err := k.MaybeGetLiquidationOrder(ctx, subaccountId.SubaccountId)
-		fmt.Println("liquidationOrder", liquidationOrder)
 		if errors.Is(err, types.ErrNoPerpetualPositionsToLiquidate) {
 			i--
 			continue
@@ -117,8 +114,6 @@ func (k Keeper) LiquidateSubaccountsAgainstOrderbookInternal(
 		}
 
 		optimisticallyFilledQuantums, _, err := k.PlacePerpetualLiquidation(ctx, *liquidationOrder)
-		fmt.Println("optimisticallyFilledQuantums", optimisticallyFilledQuantums)
-		fmt.Println("err", err)
 		// Exception for liquidation which conflicts with clob pair status. This is expected for liquidations generated
 		// for subaccounts with open positions in final settlement markets.
 		if err != nil {
@@ -131,8 +126,6 @@ func (k Keeper) LiquidateSubaccountsAgainstOrderbookInternal(
 		}
 
 		err = k.handleLiquidationOrderPlacementResult(ctx, liquidationOrder, optimisticallyFilledQuantums, &subaccountsToDeleverage, subaccountIds)
-		fmt.Println("err", err)
-		fmt.Println("subaccountsToDeleverage", subaccountsToDeleverage)
 		if err != nil {
 			return nil, err
 		}
@@ -1146,9 +1139,9 @@ func (k Keeper) validateValidatorAndLiquidityFee(
 
 func deepCopySubaccount(subaccount satypes.Subaccount) satypes.Subaccount {
 	copySubaccount := satypes.Subaccount{
-		Id:              subaccount.Id,
-		MarginEnabled:   subaccount.MarginEnabled,
-		AssetYieldIndex: subaccount.AssetYieldIndex,
+		Id:               subaccount.Id,
+		MarginEnabled:    subaccount.MarginEnabled,
+		AssetYieldsIndex: subaccount.AssetYieldsIndex,
 	}
 
 	// Deep copy AssetPositions if not nil

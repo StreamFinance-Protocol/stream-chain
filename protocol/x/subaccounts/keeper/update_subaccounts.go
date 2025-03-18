@@ -87,7 +87,7 @@ func (k Keeper) UpdateSubaccounts(
 		},
 	)
 
-	settledUpdates, subaccountIdToFundingPayments, subaccountIdToYieldClaimed, err := k.getSettledUpdates(ctx, updates, true)
+	settledUpdates, subaccountIdToFundingPayments, subaccountIdToYieldsClaimed, err := k.getSettledUpdates(ctx, updates, true)
 	if err != nil {
 		return false, nil, err
 	}
@@ -122,21 +122,21 @@ func (k Keeper) UpdateSubaccounts(
 		}
 	}
 
-	perpIdToYieldIndex := getPerpIdToYieldIndex(allPerps)
+	perpIdToYieldsIndex := getPerpIdToYieldsIndex(allPerps)
 
-	UpdateSubaccountPositions(settledUpdates, perpIdToFundingIndex, perpIdToYieldIndex)
+	UpdateSubaccountPositions(settledUpdates, perpIdToFundingIndex, perpIdToYieldsIndex)
 
-	// Perform yield claim in by transferring appropriate x/bank coin amount
+	// Perform yields claim in by transferring appropriate x/bank coin amount
 	for _, update := range settledUpdates {
 		subaccountId := *update.SettledSubaccount.Id
-		amountToTransfer := subaccountIdToYieldClaimed[subaccountId]
+		amountToTransfer := subaccountIdToYieldsClaimed[subaccountId]
 
-		// this assumed the perpetual updates are not applied therefore the yield is not sent twice when we then call
-		// computeAndExecuteCollateralTransfer as if the subaccount is newly opened deposit yield to subaccount will
-		// transfer yield to the dummy pool and then the full asset amount will be transferred to the collateral pool
-		// if a a subaccount is closed, the yield is sent to the collateral pool and then the full amount will be sent
+		// this assumed the perpetual updates are not applied therefore the yields is not sent twice when we then call
+		// computeAndExecuteCollateralTransfer as if the subaccount is newly opened deposit yields to subaccount will
+		// transfer yields to the dummy pool and then the full asset amount will be transferred to the collateral pool
+		// if a a subaccount is closed, the yields is sent to the collateral pool and then the full amount will be sent
 		// back to the dummy pool in computeAndExecuteCollateralTransfer
-		err := k.DepositYieldToSubaccount(ctx, subaccountId, amountToTransfer)
+		err := k.DepositYieldsToSubaccount(ctx, subaccountId, amountToTransfer)
 		if err != nil {
 			return false, nil, err
 		}
@@ -157,13 +157,13 @@ func (k Keeper) UpdateSubaccounts(
 	// per update and emit a cometbft event for each settled funding payment.
 	for _, u := range settledUpdates {
 		// TODO this should never hit but we add as a sanity check and to help catch a potential bug in testing
-		if u.SettledSubaccount.AssetYieldIndex == "" {
-			return false, nil, errors.New("asset yield index is not set")
+		if u.SettledSubaccount.AssetYieldsIndex == "" {
+			return false, nil, errors.New("asset yields index is not set")
 		}
 
 		for _, perp := range u.SettledSubaccount.PerpetualPositions {
-			if perp.YieldIndex == "" {
-				return false, nil, errors.New("perp yield index is not set")
+			if perp.YieldsIndex == "" {
+				return false, nil, errors.New("perp yields index is not set")
 			}
 		}
 
@@ -184,7 +184,7 @@ func (k Keeper) UpdateSubaccounts(
 					),
 					getUpdatedAssetPositions(u),
 					fundingPayments,
-					u.SettledSubaccount.AssetYieldIndex,
+					u.SettledSubaccount.AssetYieldsIndex,
 				),
 			),
 		)
@@ -221,19 +221,19 @@ func (k Keeper) getSettledUpdates(
 ) (
 	settledUpdates []SettledUpdate,
 	subaccountIdToFundingPayments map[types.SubaccountId]map[uint32]dtypes.SerializableInt,
-	subaccountIdToYieldClaimed map[types.SubaccountId]*big.Int,
+	subaccountIdToYieldsClaimed map[types.SubaccountId]*big.Int,
 	err error,
 ) {
 	var idToSettledSubaccount = make(map[types.SubaccountId]types.Subaccount)
 	settledUpdates = make([]SettledUpdate, len(updates))
 	subaccountIdToFundingPayments = make(map[types.SubaccountId]map[uint32]dtypes.SerializableInt)
-	subaccountIdToYieldClaimed = make(map[types.SubaccountId]*big.Int)
+	subaccountIdToYieldsClaimed = make(map[types.SubaccountId]*big.Int)
 
 	// Iterate over all updates and query the relevant `Subaccounts`.
 	for i, u := range updates {
 		settledSubaccount, exists := idToSettledSubaccount[u.SubaccountId]
 		var fundingPayments map[uint32]dtypes.SerializableInt
-		var yieldForSubaccount *big.Int
+		var yieldsForSubaccount *big.Int
 
 		if exists && requireUniqueSubaccount {
 			return nil, nil, nil, types.ErrNonUniqueUpdatesSubaccount
@@ -243,12 +243,12 @@ func (k Keeper) getSettledUpdates(
 		// idToSettledSubaccount map.
 		if !exists {
 			subaccount := k.GetSubaccount(ctx, u.SubaccountId)
-			settledSubaccount, fundingPayments, yieldForSubaccount, err = k.GetSettledSubaccount(ctx, subaccount)
+			settledSubaccount, fundingPayments, yieldsForSubaccount, err = k.GetSettledSubaccount(ctx, subaccount)
 			if err != nil {
 				return nil, nil, nil, err
 			}
 
-			subaccountIdToYieldClaimed[u.SubaccountId] = yieldForSubaccount
+			subaccountIdToYieldsClaimed[u.SubaccountId] = yieldsForSubaccount
 			idToSettledSubaccount[u.SubaccountId] = settledSubaccount
 			subaccountIdToFundingPayments[u.SubaccountId] = fundingPayments
 		}
@@ -262,7 +262,50 @@ func (k Keeper) getSettledUpdates(
 		settledUpdates[i] = settledUpdate
 	}
 
-	return settledUpdates, subaccountIdToFundingPayments, subaccountIdToYieldClaimed, nil
+	return settledUpdates, subaccountIdToFundingPayments, subaccountIdToYieldsClaimed, nil
+}
+
+func (k Keeper) isTradingBlocked(ctx sdk.Context, settledUpdates []SettledUpdate) (bool, bool, error) {
+	lastBlockNegativeTncSubaccountSeen, negativeTncSubaccountExists, err := k.getLastBlockNegativeSubaccountSeen(
+		ctx,
+		settledUpdates,
+	)
+	if err != nil {
+		return false, false, err
+	}
+	currentBlock := uint32(ctx.BlockHeight())
+
+	// Panic if the current block is less than the last block a negative TNC subaccount was seen.
+	if negativeTncSubaccountExists && currentBlock < lastBlockNegativeTncSubaccountSeen {
+		panic(
+			fmt.Sprintf(
+				"internalCanUpdateSubaccounts: current block (%d) is less than the last "+
+					"block a negative TNC subaccount was seen (%d)",
+				currentBlock,
+				lastBlockNegativeTncSubaccountSeen,
+			),
+		)
+	}
+
+	// Panic if the current block is less than the last block a chain outage was seen.
+	isChainOutage, chainOutageHeight := k.blocktimeKeeper.GetOutageHeight(ctx)
+	if isChainOutage && currentBlock < chainOutageHeight {
+		panic(
+			fmt.Sprintf(
+				"internalCanUpdateSubaccounts: current block (%d) is less than the last "+
+					"block a chain outage was seen (%d)",
+				currentBlock,
+				chainOutageHeight,
+			),
+		)
+	}
+
+	negativeTncSubaccountSeen := negativeTncSubaccountExists && currentBlock-lastBlockNegativeTncSubaccountSeen <
+		types.WITHDRAWAL_AND_TRANSFERS_BLOCKED_AFTER_NEGATIVE_TNC_SUBACCOUNT_SEEN_BLOCKS
+	chainOutageSeen := isChainOutage && currentBlock-chainOutageHeight <
+		types.WITHDRAWAL_AND_TRANSFERS_BLOCKED_AFTER_NEGATIVE_TNC_SUBACCOUNT_SEEN_BLOCKS
+
+	return negativeTncSubaccountSeen, chainOutageSeen, nil
 }
 
 // internalCanUpdateSubaccounts will validate all `updates` to the relevant subaccounts and compute
@@ -313,48 +356,10 @@ func (k Keeper) internalCanUpdateSubaccounts(
 	// - There was a negative TNC subaccount seen for any of the collateral pools of subaccounts being updated
 	// - There was a chain outage that lasted at least five minutes.
 	if updateType == types.Withdrawal || updateType == types.Transfer {
-		lastBlockNegativeTncSubaccountSeen, negativeTncSubaccountExists, err := k.getLastBlockNegativeSubaccountSeen(
-			ctx,
-			settledUpdates,
-		)
+		negativeTncSubaccountSeen, chainOutageSeen, err := k.isTradingBlocked(ctx, settledUpdates)
 		if err != nil {
 			return false, nil, err
 		}
-		currentBlock := uint32(ctx.BlockHeight())
-
-		// Panic if the current block is less than the last block a negative TNC subaccount was seen.
-		if negativeTncSubaccountExists && currentBlock < lastBlockNegativeTncSubaccountSeen {
-			panic(
-				fmt.Sprintf(
-					"internalCanUpdateSubaccounts: current block (%d) is less than the last "+
-						"block a negative TNC subaccount was seen (%d)",
-					currentBlock,
-					lastBlockNegativeTncSubaccountSeen,
-				),
-			)
-		}
-
-		// Panic if the current block is less than the last block a chain outage was seen.
-		downtimeInfo := k.blocktimeKeeper.GetDowntimeInfoFor(
-			ctx,
-			types.WITHDRAWAL_AND_TRANSFERS_BLOCKED_AFTER_CHAIN_OUTAGE_DURATION,
-		)
-		chainOutageExists := downtimeInfo.BlockInfo.Height > 0 && downtimeInfo.Duration > 0
-		if chainOutageExists && currentBlock < downtimeInfo.BlockInfo.Height {
-			panic(
-				fmt.Sprintf(
-					"internalCanUpdateSubaccounts: current block (%d) is less than the last "+
-						"block a chain outage was seen (%d)",
-					currentBlock,
-					downtimeInfo.BlockInfo.Height,
-				),
-			)
-		}
-
-		negativeTncSubaccountSeen := negativeTncSubaccountExists && currentBlock-lastBlockNegativeTncSubaccountSeen <
-			types.WITHDRAWAL_AND_TRANSFERS_BLOCKED_AFTER_NEGATIVE_TNC_SUBACCOUNT_SEEN_BLOCKS
-		chainOutageSeen := chainOutageExists && currentBlock-downtimeInfo.BlockInfo.Height <
-			types.WITHDRAWAL_AND_TRANSFERS_BLOCKED_AFTER_NEGATIVE_TNC_SUBACCOUNT_SEEN_BLOCKS
 
 		if negativeTncSubaccountSeen || chainOutageSeen {
 			success = false

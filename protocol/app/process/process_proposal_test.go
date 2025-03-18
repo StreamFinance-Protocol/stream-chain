@@ -267,7 +267,7 @@ func TestProcessProposalHandler_Error(t *testing.T) {
 				mockBridgeKeeper.On("GetBridgeEventFromServer", mock.Anything, bridgeEvent.Id).Return(bridgeEvent, true).Once()
 			}
 
-			mockRatelimitKeeper := &mocks.VoteExtensionRateLimitKeeper{}
+			mockYieldsKeeper := &mocks.VoteExtensionYieldsKeeper{}
 
 			handler := process.ProcessProposalHandler(
 				constants.TestEncodingCfg.TxConfig,
@@ -276,7 +276,7 @@ func TestProcessProposalHandler_Error(t *testing.T) {
 				&mocks.ProcessStakingKeeper{},
 				&mocks.ProcessPerpetualKeeper{},
 				pricesKeeper,
-				mockRatelimitKeeper,
+				mockYieldsKeeper,
 				vecodec.NewDefaultExtendedCommitCodec(),
 				vecodec.NewDefaultVoteExtensionCodec(),
 				mockVEApplier,

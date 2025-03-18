@@ -117,20 +117,20 @@ var (
 		25,
 		"open interest would become negative after update",
 	)
-	ErrYieldIndexDoesNotExist = errorsmod.Register(
+	ErrYieldsIndexDoesNotExist = errorsmod.Register(
 		ModuleName,
 		26,
-		"perpetual yield index does not exist",
+		"perpetual yields index does not exist",
 	)
 	ErrPerpIsNil = errorsmod.Register(
 		ModuleName,
 		27,
 		"perp is nil",
 	)
-	ErrYieldIndexNegative = errorsmod.Register(
+	ErrYieldsIndexNegative = errorsmod.Register(
 		ModuleName,
 		28,
-		"perp yield index is negative",
+		"perp yields index is negative",
 	)
 	ErrTotalTDaiPreMintIsNil = errorsmod.Register(
 		ModuleName,

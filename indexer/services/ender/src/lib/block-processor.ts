@@ -42,7 +42,7 @@ import { TransferValidator } from '../validators/transfer-validator';
 import { UpdateClobPairValidator } from '../validators/update-clob-pair-validator';
 import { UpdatePerpetualValidator } from '../validators/update-perpetual-validator';
 import { Validator, ValidatorInitializer } from '../validators/validator';
-import { YieldParamsValidator } from '../validators/yield-params-validator';
+import { YieldsParamsValidator } from '../validators/yields-params-validator';
 
 const TXN_EVENT_SUBTYPE_VERSION_TO_VALIDATOR_MAPPING: Record<
   string,
@@ -94,8 +94,8 @@ const TXN_EVENT_SUBTYPE_VERSION_TO_VALIDATOR_MAPPING: Record<
     KlyraIndexerSubtypes.LIQUIDITY_TIER.toString(),
     2,
   )]: LiquidityTierValidatorV2,
-  [serializeSubtypeAndVersion(KlyraIndexerSubtypes.YIELD_PARAMS.toString(), 1)]:
-    YieldParamsValidator,
+  [serializeSubtypeAndVersion(KlyraIndexerSubtypes.YIELDS_PARAMS.toString(), 1)]:
+    YieldsParamsValidator,
 };
 
 const BLOCK_EVENT_SUBTYPE_VERSION_TO_VALIDATOR_MAPPING: Record<

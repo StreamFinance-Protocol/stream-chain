@@ -2739,7 +2739,7 @@
                 return function(e) {
                     for (var n, r, o, i, a, u = e.textContent, s = 0, l = u[0], c = 1, f = e.innerHTML = "", p = 0; r = n, n = p < 7 && "\\" == n ? 1 : c;) {
                         if (c = l, l = u[++s], i = f.length > 1, !c || p > 8 && "\n" == c || [/\S/.test(c), 1, 1, !/[$\w]/.test(c), ("/" == n || "\n" == n) && i, '"' == n && i, "'" == n && i, u[s - 4] + r + n == "--\x3e", r + n == "*/"][p])
-                            for (f && (e.appendChild(a = t.createElement("span")).setAttribute("style", ["color: #555; font-weight: bold;", "", "", "color: #555;", ""][p ? p < 3 ? 2 : p > 6 ? 4 : p > 3 ? 3 : +/^(a(bstract|lias|nd|rguments|rray|s(m|sert)?|uto)|b(ase|egin|ool(ean)?|reak|yte)|c(ase|atch|har|hecked|lass|lone|ompl|onst|ontinue)|de(bugger|cimal|clare|f(ault|er)?|init|l(egate|ete)?)|do|double|e(cho|ls?if|lse(if)?|nd|nsure|num|vent|x(cept|ec|p(licit|ort)|te(nds|nsion|rn)))|f(allthrough|alse|inal(ly)?|ixed|loat|or(each)?|riend|rom|unc(tion)?)|global|goto|guard|i(f|mp(lements|licit|ort)|n(it|clude(_once)?|line|out|stanceof|t(erface|ernal)?)?|s)|l(ambda|et|ock|ong)|m(icrolight|odule|utable)|NaN|n(amespace|ative|ext|ew|il|ot|ull)|o(bject|perator|r|ut|verride)|p(ackage|arams|rivate|rotected|rotocol|ublic)|r(aise|e(adonly|do|f|gister|peat|quire(_once)?|scue|strict|try|turn))|s(byte|ealed|elf|hort|igned|izeof|tatic|tring|truct|ubscript|uper|ynchronized|witch)|t(emplate|hen|his|hrows?|ransient|rue|ry|ype(alias|def|id|name|of))|u(n(checked|def(ined)?|ion|less|signed|til)|se|sing)|v(ar|irtual|oid|olatile)|w(char_t|hen|here|hile|ith)|xor|yield)$/.test(f) : 0]), a.appendChild(t.createTextNode(f))), o = p && p < 7 ? p : o, f = "", p = 11; ![1, /[\/{}[(\-+*=<>:;|\\.,?!&@~]/.test(c), /[\])]/.test(c), /[$\w]/.test(c), "/" == c && o < 2 && "<" != n, '"' == c, "'" == c, c + l + u[s + 1] + u[s + 2] == "\x3c!--", c + l == "/*", c + l == "//", "#" == c][--p];);
+                            for (f && (e.appendChild(a = t.createElement("span")).setAttribute("style", ["color: #555; font-weight: bold;", "", "", "color: #555;", ""][p ? p < 3 ? 2 : p > 6 ? 4 : p > 3 ? 3 : +/^(a(bstract|lias|nd|rguments|rray|s(m|sert)?|uto)|b(ase|egin|ool(ean)?|reak|yte)|c(ase|atch|har|hecked|lass|lone|ompl|onst|ontinue)|de(bugger|cimal|clare|f(ault|er)?|init|l(egate|ete)?)|do|double|e(cho|ls?if|lse(if)?|nd|nsure|num|vent|x(cept|ec|p(licit|ort)|te(nds|nsion|rn)))|f(allthrough|alse|inal(ly)?|ixed|loat|or(each)?|riend|rom|unc(tion)?)|global|goto|guard|i(f|mp(lements|licit|ort)|n(it|clude(_once)?|line|out|stanceof|t(erface|ernal)?)?|s)|l(ambda|et|ock|ong)|m(icrolight|odule|utable)|NaN|n(amespace|ative|ext|ew|il|ot|ull)|o(bject|perator|r|ut|verride)|p(ackage|arams|rivate|rotected|rotocol|ublic)|r(aise|e(adonly|do|f|gister|peat|quire(_once)?|scue|strict|try|turn))|s(byte|ealed|elf|hort|igned|izeof|tatic|tring|truct|ubscript|uper|ynchronized|witch)|t(emplate|hen|his|hrows?|ransient|rue|ry|ype(alias|def|id|name|of))|u(n(checked|def(ined)?|ion|less|signed|til)|se|sing)|v(ar|irtual|oid|olatile)|w(char_t|hen|here|hile|ith)|xor|yields)$/.test(f) : 0]), a.appendChild(t.createTextNode(f))), o = p && p < 7 ? p : o, f = "", p = 11; ![1, /[\/{}[(\-+*=<>:;|\\.,?!&@~]/.test(c), /[\])]/.test(c), /[$\w]/.test(c), "/" == c && o < 2 && "<" != n, '"' == c, "'" == c, c + l + u[s + 1] + u[s + 2] == "\x3c!--", c + l == "/*", c + l == "//", "#" == c][--p];);
                         f += c
                     }
                 }(e)
@@ -13995,7 +13995,7 @@
                                                                     a.next = 26;
                                                                     break
                                                                 }
-                                                                return i.allowMetaPatches && O && (c[O] = !0), a.delegateYield(r(C, k, p), "t0", 26);
+                                                                return i.allowMetaPatches && O && (c[O] = !0), a.delegateYields(r(C, k, p), "t0", 26);
                                                             case 26:
                                                                 if (g || S !== e.key) {
                                                                     a.next = 31;
@@ -14040,7 +14040,7 @@
                                                     r.next = 14;
                                                     break
                                                 }
-                                                return g = m.value, r.delegateYield(y(g.value, g.path, g), "t0", 11);
+                                                return g = m.value, r.delegateYields(y(g.value, g.path, g), "t0", 11);
                                             case 11:
                                                 f = !0, r.next = 8;
                                                 break;
@@ -26172,7 +26172,7 @@
             else {
                 (c = t.regeneratorRuntime = l ? e.exports : {}).wrap = _;
                 var f = "suspendedStart",
-                    p = "suspendedYield",
+                    p = "suspendedYields",
                     d = "executing",
                     h = "completed",
                     v = {},
@@ -26289,7 +26289,7 @@
                         }
                         throw new Error("illegal catch attempt")
                     },
-                    delegateYield: function(e, t, r) {
+                    delegateYields: function(e, t, r) {
                         return this.delegate = {
                             iterator: M(e),
                             resultName: t,

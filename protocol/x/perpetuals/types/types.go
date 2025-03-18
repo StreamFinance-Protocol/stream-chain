@@ -73,7 +73,7 @@ type PerpetualsKeeper interface {
 		liquidityTier uint32,
 		dangerIndexPpm uint32,
 		collateralPoolId uint32,
-		yieldIndex string,
+		yieldsIndex string,
 	) (Perpetual, error)
 	ModifyPerpetual(
 		ctx sdk.Context,

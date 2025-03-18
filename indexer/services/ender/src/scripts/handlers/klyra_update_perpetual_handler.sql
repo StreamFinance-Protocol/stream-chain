@@ -18,7 +18,7 @@ BEGIN
     perpetual_market_record."atomicResolution" = (event_data->'atomicResolution')::integer;
     perpetual_market_record."liquidityTierId" = (event_data->'liquidityTier')::integer;
     perpetual_market_record."dangerIndexPpm" = (event_data->'dangerIndexPpm')::integer;
-    perpetual_market_record."perpYieldIndex" = jsonb_extract_path_text(event_data, 'perpYieldIndex');
+    perpetual_market_record."perpYieldsIndex" = jsonb_extract_path_text(event_data, 'perpYieldsIndex');
 
 
     UPDATE perpetual_markets
@@ -28,7 +28,7 @@ BEGIN
         "atomicResolution" = perpetual_market_record."atomicResolution",
         "liquidityTierId" = perpetual_market_record."liquidityTierId",
         "dangerIndexPpm" = perpetual_market_record."dangerIndexPpm",
-        "perpYieldIndex" = perpetual_market_record."perpYieldIndex"
+        "perpYieldsIndex" = perpetual_market_record."perpYieldsIndex"
     WHERE "id" = perpetual_market_id
     RETURNING * INTO perpetual_market_record;
 

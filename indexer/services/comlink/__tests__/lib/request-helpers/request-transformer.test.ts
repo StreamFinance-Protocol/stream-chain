@@ -14,8 +14,8 @@ import {
   BestEffortOpenedStatus,
   LiquidityTiersFromDatabase,
   helpers,
-  YieldParamsFromDatabase,
-  YieldParamsTable,
+  YieldsParamsFromDatabase,
+  YieldsParamsTable,
 } from '@klyraprotocol-indexer/postgres';
 import {
   OrderbookLevels,
@@ -32,11 +32,11 @@ import {
   postgresAndRedisOrderToResponseObject,
   postgresOrderToResponseObject,
   redisOrderToResponseObject,
-  yieldParamsToResponseObject,
+  yieldsParamsToResponseObject,
 } from '../../../src/request-helpers/request-transformer';
 import {
   OrderResponseObject,
-  YieldParamsResponseObject,
+  YieldsParamsResponseObject,
 } from '../../../src/types';
 
 describe('request-transformer', () => {
@@ -95,7 +95,7 @@ describe('request-transformer', () => {
         openInterestLowerCap: liquidityTier.openInterestLowerCap,
         openInterestUpperCap: liquidityTier.openInterestUpperCap,
         baseOpenInterest: perpetualMarket.baseOpenInterest,
-        perpYieldIndex: perpetualMarket.perpYieldIndex,
+        perpYieldsIndex: perpetualMarket.perpYieldsIndex,
       });
     });
   });
@@ -295,28 +295,28 @@ describe('request-transformer', () => {
     });
   });
 
-  describe('yieldParamsToResponseObject', () => {
-    it('successfully converts yield params from DB to response object', () => {
-      const yieldParamsFromDatabase: YieldParamsFromDatabase = {
-        id: YieldParamsTable.uuid(
-          testConstants.defaultYieldParams1.createdAtHeight,
+  describe('yieldsParamsToResponseObject', () => {
+    it('successfully converts yields params from DB to response object', () => {
+      const yieldsParamsFromDatabase: YieldsParamsFromDatabase = {
+        id: YieldsParamsTable.uuid(
+          testConstants.defaultYieldsParams1.createdAtHeight,
         ),
-        sDAIPrice: testConstants.defaultYieldParams1.sDAIPrice,
-        assetYieldIndex: testConstants.defaultYieldParams1.assetYieldIndex,
-        createdAt: testConstants.defaultYieldParams1.createdAt,
-        createdAtHeight: testConstants.defaultYieldParams1.createdAtHeight,
+        sDAIPrice: testConstants.defaultYieldsParams1.sDAIPrice,
+        assetYieldsIndex: testConstants.defaultYieldsParams1.assetYieldsIndex,
+        createdAt: testConstants.defaultYieldsParams1.createdAt,
+        createdAtHeight: testConstants.defaultYieldsParams1.createdAtHeight,
       };
 
-      const responseObject: YieldParamsResponseObject = yieldParamsToResponseObject(
-        yieldParamsFromDatabase,
+      const responseObject: YieldsParamsResponseObject = yieldsParamsToResponseObject(
+        yieldsParamsFromDatabase,
       );
 
       expect(responseObject).toEqual({
-        id: yieldParamsFromDatabase.id,
-        sDAIPrice: yieldParamsFromDatabase.sDAIPrice,
-        assetYieldIndex: yieldParamsFromDatabase.assetYieldIndex,
-        createdAt: yieldParamsFromDatabase.createdAt,
-        createdAtHeight: yieldParamsFromDatabase.createdAtHeight,
+        id: yieldsParamsFromDatabase.id,
+        sDAIPrice: yieldsParamsFromDatabase.sDAIPrice,
+        assetYieldsIndex: yieldsParamsFromDatabase.assetYieldsIndex,
+        createdAt: yieldsParamsFromDatabase.createdAt,
+        createdAtHeight: yieldsParamsFromDatabase.createdAtHeight,
       });
     });
   });

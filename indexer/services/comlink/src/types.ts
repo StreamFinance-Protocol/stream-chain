@@ -51,7 +51,7 @@ export interface SubaccountResponseObject {
   openPerpetualPositions: PerpetualPositionsMap;
   assetPositions: AssetPositionsMap;
   marginEnabled: boolean;
-  assetYieldIndex: string;
+  assetYieldsIndex: string;
 }
 
 export interface ParentSubaccountResponse {
@@ -96,7 +96,7 @@ export interface PerpetualPositionResponseObject {
   sumClose: string;
   netFunding: string;
   unrealizedPnl: string;
-  perpYieldIndex: string;
+  perpYieldsIndex: string;
   closedAt?: IsoString | null;
   exitPrice?: string | null;
 }
@@ -265,7 +265,7 @@ export interface PerpetualMarketResponseObject {
   openInterestLowerCap?: string;
   openInterestUpperCap?: string;
   baseOpenInterest: string;
-  perpYieldIndex: string;
+  perpYieldsIndex: string;
 }
 
 /* ------- ORDERBOOK TYPES ------- */
@@ -335,16 +335,16 @@ export interface HistoricalFundingResponseObject {
   effectiveAtHeight: string;
 }
 
-/* ------- YIELD PARAMS TYPES ------- */
+/* ------- YIELDS PARAMS TYPES ------- */
 
-export interface YieldParamsResponse {
-  allYieldParams: YieldParamsResponseObject[];
+export interface YieldsParamsResponse {
+  allYieldsParams: YieldsParamsResponseObject[];
 }
 
-export interface YieldParamsResponseObject {
+export interface YieldsParamsResponseObject {
   id: string;
   sDAIPrice: string;
-  assetYieldIndex: string;
+  assetYieldsIndex: string;
   createdAt: IsoString;
   createdAtHeight: string;
 }
@@ -384,7 +384,7 @@ export interface TickerRequest {
   ticker?: string;
 }
 
-export interface YieldParamsRequest {
+export interface YieldsParamsRequest {
   createdBeforeOrAtHeight?: string;
 }
 

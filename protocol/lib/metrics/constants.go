@@ -384,7 +384,7 @@ const (
 	ValidatorNumMatchedTakerOrders = "validator_num_matched_taker_orders"
 	ValidatorVolumeQuoteQuantums   = "validator_volume_quote_quantums"
 
-	// x/ratelimit
+	// x/yields
 	Capacity           = "capacity"
 	RateLimitDenom     = "rate_limit_denom"
 	LimiterIndex       = "limiter_index"

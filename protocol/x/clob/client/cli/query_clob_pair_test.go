@@ -52,7 +52,7 @@ func networkWithClobPairObjects(t *testing.T, n int) (*network.Network, []types.
 					LiquidityTier: 0,
 				},
 				FundingIndex: dtypes.ZeroInt(),
-				YieldIndex:   big.NewRat(0, 1).String(),
+				YieldsIndex:  big.NewRat(0, 1).String(),
 			},
 		)
 	}

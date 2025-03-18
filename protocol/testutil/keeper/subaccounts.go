@@ -20,9 +20,9 @@ import (
 	blocktimekeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/blocktime/keeper"
 	perpskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/keeper"
 	priceskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/keeper"
-	ratelimitkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
+	yieldskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/keeper"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -41,7 +41,7 @@ func SubaccountsKeepers(
 	accountKeeper *authkeeper.AccountKeeper,
 	bankKeeper *bankkeeper.BaseKeeper,
 	assetsKeeper *asskeeper.Keeper,
-	ratelimitKeeper *ratelimitkeeper.Keeper,
+	yieldsKeeper *yieldskeeper.Keeper,
 	blocktimeKeeper *blocktimekeeper.Keeper,
 	storeKey storetypes.StoreKey,
 ) {
@@ -63,7 +63,7 @@ func SubaccountsKeepers(
 		blocktimeKeeper, _ = createBlockTimeKeeper(stateStore, db, cdc)
 
 		bankKeeper, _ = createBankKeeper(stateStore, db, cdc, accountKeeper)
-		ratelimitKeeper, _ = createRatelimitKeeper(stateStore, db, cdc, blocktimeKeeper, bankKeeper, perpetualsKeeper, assetsKeeper, transientStoreKey, msgSenderEnabled)
+		yieldsKeeper, _ = createYieldsKeeper(stateStore, db, cdc, bankKeeper, perpetualsKeeper, transientStoreKey, msgSenderEnabled)
 
 		keeper, storeKey = createSubaccountsKeeper(
 			stateStore,
@@ -72,7 +72,7 @@ func SubaccountsKeepers(
 			assetsKeeper,
 			bankKeeper,
 			perpetualsKeeper,
-			ratelimitKeeper,
+			yieldsKeeper,
 			blocktimeKeeper,
 			transientStoreKey,
 			msgSenderEnabled,
@@ -84,7 +84,7 @@ func SubaccountsKeepers(
 	// Mock time provider response for market creation.
 	mockTimeProvider.On("Now").Return(constants.TimeT)
 
-	return ctx, keeper, pricesKeeper, perpetualsKeeper, accountKeeper, bankKeeper, assetsKeeper, ratelimitKeeper, blocktimeKeeper, storeKey
+	return ctx, keeper, pricesKeeper, perpetualsKeeper, accountKeeper, bankKeeper, assetsKeeper, yieldsKeeper, blocktimeKeeper, storeKey
 }
 
 func createSubaccountsKeeper(
@@ -94,7 +94,7 @@ func createSubaccountsKeeper(
 	ak *asskeeper.Keeper,
 	bk types.BankKeeper,
 	pk *perpskeeper.Keeper,
-	rlk *ratelimitkeeper.Keeper,
+	rlk *yieldskeeper.Keeper,
 	btk *blocktimekeeper.Keeper,
 	transientStoreKey storetypes.StoreKey,
 	msgSenderEnabled bool,

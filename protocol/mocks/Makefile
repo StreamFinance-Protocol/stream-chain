@@ -42,10 +42,10 @@ mock-gen:
 	@go run github.com/vektra/mockery/v2 --name=ExtendVoteClobKeeper --dir=./app/ve --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=ValidatorStore --dir=./app/ve/math --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=VEApplierPricesKeeper --dir=./app/ve/applier --recursive --output=./mocks
-	@go run github.com/vektra/mockery/v2 --name=VEApplierRatelimitKeeper --dir=./app/ve/applier --recursive --output=./mocks
+	@go run github.com/vektra/mockery/v2 --name=VEApplierYieldsKeeper --dir=./app/ve/applier --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=VoteAggregator --dir=./app/ve/aggregator --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=VEApplierInterface --dir=./app/ve --recursive --output=./mocks
-	@go run github.com/vektra/mockery/v2 --name=VoteExtensionRateLimitKeeper --dir=./app/ve --recursive --output=./mocks
+	@go run github.com/vektra/mockery/v2 --name=VoteExtensionYieldsKeeper --dir=./app/ve --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=MemClob --dir=./x/clob/types --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=BridgeKeeper --dir=./x/bridge/types --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=DelayMsgKeeper --dir=./x/delaymsg/types --recursive --output=./mocks
@@ -78,4 +78,3 @@ mock-gen:
 	@go run github.com/vektra/mockery/v2 --name=BridgeServiceClient --dir=./daemons/bridge/api --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=SDAIServiceClient --dir=./daemons/sdaioracle/api --recursive --output=./mocks
 	@go run github.com/vektra/mockery/v2 --name=SDAIEventManager --dir=./daemons/server/types/sdaioracle --recursive --output=./mocks
-	@go run github.com/vektra/mockery/v2 --name=ICS4Wrapper --dir=x/ratelimit/types --recursive --output=./mocks --replace-type github.com/cosmos/ibc-go/v8/modules/core/02-client/types=clienttypes:github.com/cosmos/ibc-go/v8/modules/core/02-client/types

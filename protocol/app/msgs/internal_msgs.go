@@ -3,16 +3,13 @@ package msgs
 import (
 	upgrade "cosmossdk.io/x/upgrade/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib"
-	blocktime "github.com/StreamFinance-Protocol/stream-chain/protocol/x/blocktime/types"
 	bridge "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
 	clob "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	delaymsg "github.com/StreamFinance-Protocol/stream-chain/protocol/x/delaymsg/types"
 	feetiers "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers/types"
 	govplus "github.com/StreamFinance-Protocol/stream-chain/protocol/x/govplus/types"
 	perpetuals "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
-
 	prices "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
-	ratelimit "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
 	sending "github.com/StreamFinance-Protocol/stream-chain/protocol/x/sending/types"
 	stats "github.com/StreamFinance-Protocol/stream-chain/protocol/x/stats/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -24,10 +21,6 @@ import (
 	gov "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	slashing "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	staking "github.com/cosmos/cosmos-sdk/x/staking/types"
-	icahosttypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/host/types"
-	ibctransfer "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
-	ibcclient "github.com/cosmos/ibc-go/v8/modules/core/02-client/types" //nolint:staticcheck
-	ibcconn "github.com/cosmos/ibc-go/v8/modules/core/03-connection/types"
 )
 
 var (
@@ -87,25 +80,10 @@ var (
 		"/cosmos.upgrade.v1beta1.MsgCancelUpgradeResponse":   nil,
 		"/cosmos.upgrade.v1beta1.MsgSoftwareUpgrade":         &upgrade.MsgSoftwareUpgrade{},
 		"/cosmos.upgrade.v1beta1.MsgSoftwareUpgradeResponse": nil,
-
-		// ibc
-		"/ibc.applications.interchain_accounts.host.v1.MsgUpdateParams":            &icahosttypes.MsgUpdateParams{},
-		"/ibc.applications.interchain_accounts.host.v1.MsgUpdateParamsResponse":    nil,
-		"/ibc.applications.interchain_accounts.host.v1.MsgModuleQuerySafe":         &icahosttypes.MsgModuleQuerySafe{},
-		"/ibc.applications.interchain_accounts.host.v1.MsgModuleQuerySafeResponse": nil,
-		"/ibc.applications.transfer.v1.MsgUpdateParams":                            &ibctransfer.MsgUpdateParams{},
-		"/ibc.applications.transfer.v1.MsgUpdateParamsResponse":                    nil,
-		"/ibc.core.client.v1.MsgUpdateParams":                                      &ibcclient.MsgUpdateParams{},
-		"/ibc.core.client.v1.MsgUpdateParamsResponse":                              nil,
-		"/ibc.core.connection.v1.MsgUpdateParams":                                  &ibcconn.MsgUpdateParams{},
-		"/ibc.core.connection.v1.MsgUpdateParamsResponse":                          nil,
 	}
 
 	// Custom modules
 	InternalMsgSamplesKlyraCustom = map[string]sdk.Msg{
-		// blocktime
-		"/klyraprotocol.blocktime.MsgUpdateDowntimeParams":         &blocktime.MsgUpdateDowntimeParams{},
-		"/klyraprotocol.blocktime.MsgUpdateDowntimeParamsResponse": nil,
 
 		// clob
 		"/klyraprotocol.clob.MsgCreateClobPair":                             &clob.MsgCreateClobPair{},
@@ -159,11 +137,7 @@ var (
 		"/klyraprotocol.prices.MsgUpdateMarketParam":          &prices.MsgUpdateMarketParam{},
 		"/klyraprotocol.prices.MsgUpdateMarketParamResponse":  nil,
 
-		// ratelimit
-		"/klyraprotocol.ratelimit.MsgSetLimitParams":         &ratelimit.MsgSetLimitParams{},
-		"/klyraprotocol.ratelimit.MsgSetLimitParamsResponse": nil,
-
-		// sending
+		// sending ddd
 		"/klyraprotocol.sending.MsgSendFromModuleToAccount":         &sending.MsgSendFromModuleToAccount{},
 		"/klyraprotocol.sending.MsgSendFromModuleToAccountResponse": nil,
 

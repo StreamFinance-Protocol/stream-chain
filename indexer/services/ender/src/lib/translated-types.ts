@@ -13,7 +13,7 @@ export interface SubaccountUpdate {
   subaccountId?: IndexerSubaccountId;
   updatedPerpetualPositions: IndexerPerpetualPosition[];
   updatedAssetPositions: IndexerAssetPosition[];
-  assetYieldIndex: string;
+  assetYieldsIndex: string;
 }
 
 export interface OrderFillWithLiquidity {

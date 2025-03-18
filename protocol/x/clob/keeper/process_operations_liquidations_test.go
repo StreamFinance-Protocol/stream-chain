@@ -19,8 +19,8 @@ import (
 	keepertest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/keeper"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
-	ratelimittypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
+	yieldstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/stretchr/testify/mock"
@@ -51,12 +51,12 @@ func TestProcessProposerMatches_Liquidation_Undercollateralized_Determinism(t *t
 					{
 						PerpetualId: 0,
 						Quantums:    dtypes.NewInt(100_000_000), // 1 BTC
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 					{
 						PerpetualId: 1,
 						Quantums:    dtypes.NewInt(1000),
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 				},
 			},
@@ -229,7 +229,7 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 				bk.On(
 					"GetBalance",
 					mock.Anything,
-					authtypes.NewModuleAddress(ratelimittypes.TDaiPoolAccount),
+					authtypes.NewModuleAddress(yieldstypes.TDaiPoolAccount),
 					constants.TDai.Denom,
 				).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 			},
@@ -312,7 +312,7 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 				bk.On(
 					"GetBalance",
 					mock.Anything,
-					authtypes.NewModuleAddress(ratelimittypes.TDaiPoolAccount),
+					authtypes.NewModuleAddress(yieldstypes.TDaiPoolAccount),
 					constants.TDai.Denom,
 				).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 				bk.On(
@@ -406,7 +406,7 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 				bk.On(
 					"GetBalance",
 					mock.Anything,
-					authtypes.NewModuleAddress(ratelimittypes.TDaiPoolAccount),
+					authtypes.NewModuleAddress(yieldstypes.TDaiPoolAccount),
 					constants.TDai.Denom,
 				).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 				bk.On(
@@ -461,7 +461,7 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 						PerpetualId:  0,
 						Quantums:     dtypes.NewInt(-50_000_000), // .5 BTC
 						FundingIndex: dtypes.ZeroInt(),
-						YieldIndex:   big.NewRat(0, 1).String(),
+						YieldsIndex:  big.NewRat(0, 1).String(),
 					},
 				},
 				constants.Dave_Num0: {
@@ -469,7 +469,7 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 						PerpetualId:  0,
 						Quantums:     dtypes.NewInt(50_000_000), // .5 BTC
 						FundingIndex: dtypes.ZeroInt(),
-						YieldIndex:   big.NewRat(0, 1).String(),
+						YieldsIndex:  big.NewRat(0, 1).String(),
 					},
 				},
 			},
@@ -513,7 +513,7 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 				bk.On(
 					"GetBalance",
 					mock.Anything,
-					authtypes.NewModuleAddress(ratelimittypes.TDaiPoolAccount),
+					authtypes.NewModuleAddress(yieldstypes.TDaiPoolAccount),
 					constants.TDai.Denom,
 				).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 				bk.On(
@@ -575,7 +575,7 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 						PerpetualId:  0,
 						Quantums:     dtypes.NewInt(-50_000_000), // .5 BTC
 						FundingIndex: dtypes.ZeroInt(),
-						YieldIndex:   big.NewRat(0, 1).String(),
+						YieldsIndex:  big.NewRat(0, 1).String(),
 					},
 				},
 				constants.Dave_Num0: {
@@ -583,7 +583,7 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 						PerpetualId:  0,
 						Quantums:     dtypes.NewInt(50_000_000), // .5 BTC
 						FundingIndex: dtypes.ZeroInt(),
-						YieldIndex:   big.NewRat(0, 1).String(),
+						YieldsIndex:  big.NewRat(0, 1).String(),
 					},
 				},
 			},
@@ -627,7 +627,7 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 				bk.On(
 					"GetBalance",
 					mock.Anything,
-					authtypes.NewModuleAddress(ratelimittypes.TDaiPoolAccount),
+					authtypes.NewModuleAddress(yieldstypes.TDaiPoolAccount),
 					constants.TDai.Denom,
 				).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 				bk.On(
@@ -745,7 +745,7 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 				bk.On(
 					"GetBalance",
 					mock.Anything,
-					authtypes.NewModuleAddress(ratelimittypes.TDaiPoolAccount),
+					authtypes.NewModuleAddress(yieldstypes.TDaiPoolAccount),
 					constants.TDai.Denom,
 				).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 				bk.On(
@@ -872,7 +872,7 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 				bk.On(
 					"GetBalance",
 					mock.Anything,
-					authtypes.NewModuleAddress(ratelimittypes.TDaiPoolAccount),
+					authtypes.NewModuleAddress(yieldstypes.TDaiPoolAccount),
 					constants.TDai.Denom,
 				).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 				bk.On(
@@ -929,7 +929,7 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 						PerpetualId:  0,
 						Quantums:     dtypes.NewInt(-50_000_000), // .5 BTC
 						FundingIndex: dtypes.ZeroInt(),
-						YieldIndex:   big.NewRat(0, 1).String(),
+						YieldsIndex:  big.NewRat(0, 1).String(),
 					},
 				},
 				constants.Dave_Num0: {
@@ -937,7 +937,7 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 						PerpetualId:  0,
 						Quantums:     dtypes.NewInt(50_000_000), // .5 BTC
 						FundingIndex: dtypes.ZeroInt(),
-						YieldIndex:   big.NewRat(0, 1).String(),
+						YieldsIndex:  big.NewRat(0, 1).String(),
 					},
 				},
 			},
@@ -978,7 +978,7 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(-10), // Liquidatable position is smaller than StepBaseQuantums
-							YieldIndex:  big.NewRat(0, 1).String(),
+							YieldsIndex: big.NewRat(0, 1).String(),
 						},
 					},
 				},
@@ -995,7 +995,7 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 				bk.On(
 					"GetBalance",
 					mock.Anything,
-					authtypes.NewModuleAddress(ratelimittypes.TDaiPoolAccount),
+					authtypes.NewModuleAddress(yieldstypes.TDaiPoolAccount),
 					constants.TDai.Denom,
 				).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 				bk.On(
@@ -1139,7 +1139,7 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 		// 				PerpetualId:  0,
 		// 				Quantums:     dtypes.NewInt(-50_000_000), // .5 BTC
 		// 				FundingIndex: dtypes.ZeroInt(),
-		// 				YieldIndex:   big.NewRat(0, 1).String(),
+		// 				YieldsIndex:   big.NewRat(0, 1).String(),
 		// 			},
 		// 		},
 		// 		constants.Dave_Num0: {
@@ -1147,7 +1147,7 @@ func TestProcessProposerMatches_Liquidation_Success(t *testing.T) {
 		// 				PerpetualId:  0,
 		// 				Quantums:     dtypes.NewInt(50_000_000), // .5 BTC
 		// 				FundingIndex: dtypes.ZeroInt(),
-		// 				YieldIndex:   big.NewRat(0, 1).String(),
+		// 				YieldsIndex:   big.NewRat(0, 1).String(),
 		// 			},
 		// 		},
 		// 	},
@@ -1382,7 +1382,7 @@ func TestProcessProposerMatches_Liquidation_Failure(t *testing.T) {
 				bk.On(
 					"GetBalance",
 					mock.Anything,
-					authtypes.NewModuleAddress(ratelimittypes.TDaiPoolAccount),
+					authtypes.NewModuleAddress(yieldstypes.TDaiPoolAccount),
 					constants.TDai.Denom,
 				).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 				bk.On(
@@ -1445,7 +1445,7 @@ func TestProcessProposerMatches_Liquidation_Failure(t *testing.T) {
 		// 				{
 		// 					PerpetualId: 0,
 		// 					Quantums:    dtypes.NewInt(-100_000_000), // 1 BTC
-		// 					YieldIndex:  big.NewRat(0, 1).String(),
+		// 					YieldsIndex:  big.NewRat(0, 1).String(),
 		// 				},
 		// 			},
 		// 		},
@@ -1491,7 +1491,7 @@ func TestProcessProposerMatches_Liquidation_Failure(t *testing.T) {
 		// 				{
 		// 					PerpetualId: 0,
 		// 					Quantums:    dtypes.NewInt(99_000_000), // 0.99 BTC
-		// 					YieldIndex:  big.NewRat(0, 1).String(),
+		// 					YieldsIndex:  big.NewRat(0, 1).String(),
 		// 				},
 		// 			},
 		// 		},

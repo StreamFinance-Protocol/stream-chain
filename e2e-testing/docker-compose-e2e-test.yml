@@ -157,7 +157,7 @@ services:
       - /klyraprotocol/chain/.alice
       - --p2p.persistent_peers 
       - "17e5e45691f0d01449c84fd4ae87279578cdd7ec@klyraprotocold0:26656,47539956aaa8e624e0f1d926040e54908ad0eb44@klyraprotocold2:26656,5882428984d83b03d0c907c1f0af343534987052@klyraprotocold3:26656"
-      - --sDAI-daemon-mock-no-yield
+      - --sDAI-daemon-mock-no-yields
       - "true"
       - --sDai-daemon-enabled
       - "true"
@@ -192,7 +192,7 @@ services:
        - --non-validating-full-node=true
        - --indexer-kafka-conn-str
        - "kafka:9092"
-       - --sDAI-daemon-mock-no-yield
+       - --sDAI-daemon-mock-no-yields
        - "true"
     environment:
       - DAEMON_HOME=/klyraprotocol/chain/.bob
@@ -216,7 +216,7 @@ services:
        - /klyraprotocol/chain/.carl
        - --p2p.persistent_peers
        - "17e5e45691f0d01449c84fd4ae87279578cdd7ec@klyraprotocold0:26656,47539956aaa8e624e0f1d926040e54908ad0eb44@klyraprotocold2:26656,5882428984d83b03d0c907c1f0af343534987052@klyraprotocold3:26656"
-       - --sDAI-daemon-mock-no-yield
+       - --sDAI-daemon-mock-no-yields
        - "true"
        - --sDai-daemon-enabled
        - "true"
@@ -242,7 +242,7 @@ services:
        - /klyraprotocol/chain/.dave
        - --p2p.persistent_peers 
        - "17e5e45691f0d01449c84fd4ae87279578cdd7ec@klyraprotocold0:26656,47539956aaa8e624e0f1d926040e54908ad0eb44@klyraprotocold2:26656,5882428984d83b03d0c907c1f0af343534987052@klyraprotocold3:26656"
-       - --sDAI-daemon-mock-no-yield
+       - --sDAI-daemon-mock-no-yields
        - "true"
        - --sDai-daemon-enabled
        - "true"

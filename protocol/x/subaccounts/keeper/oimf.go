@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"fmt"
 	"math/big"
 
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
@@ -9,6 +8,15 @@ import (
 )
 
 // Helper function to compute the delta long for a single settled update on a perpetual.
+// OI is defined as the sum of all positive long positions. So what we are calculating is
+// how many new long positions were there. -100 -> -50 would be 0 new long positions
+// -100 -> 50 would be 50 new long positions
+// -100 -> 0 would be 0 new long positions
+// 0 -> 100 would be 100 new long positions
+// 100 -> 50 would be -50 new long positions
+// 100 -> -50 would be -100 new long positions
+// 100 -> 0 would be -100 new long positions
+
 func getDeltaLongFromSettledUpdate(
 	u SettledUpdate,
 	updatedPerpId uint32,
@@ -20,6 +28,7 @@ func getDeltaLongFromSettledUpdate(
 		// TODO use a pre-populated map
 		if p.PerpetualId == updatedPerpId {
 			perpPosition = p
+			break
 		}
 	}
 
@@ -33,6 +42,7 @@ func getDeltaLongFromSettledUpdate(
 	if prevLong.Sign() < 0 {
 		prevLong.SetUint64(0)
 	}
+
 	afterLong := afterQuantums // re-use pointer for efficiency
 	if afterLong.Sign() < 0 {
 		afterLong.SetUint64(0)
@@ -57,69 +67,10 @@ func GetDeltaOpenInterestFromUpdates(
 	if updateType != types.Match {
 		return nil
 	}
-	if len(settledUpdates) != 2 {
-		panic(
-			fmt.Sprintf(
-				types.ErrMatchUpdatesMustHaveTwoUpdates,
-				settledUpdates,
-			),
-		)
-	}
-
-	allUpdatesWithPerpUpdates := []SettledUpdate{}
-	for _, update := range settledUpdates {
-		if len(update.PerpetualUpdates) > 0 {
-			allUpdatesWithPerpUpdates = append(allUpdatesWithPerpUpdates, update)
-		}
-	}
-
-	if len(allUpdatesWithPerpUpdates) != 2 {
-		panic(
-			fmt.Sprintf(
-				types.ErrMatchUpdatesMustHaveTwoPerpetualUpdates,
-				settledUpdates,
-			),
-		)
-	}
-
-	for _, update := range allUpdatesWithPerpUpdates {
-		if len(update.PerpetualUpdates) != 1 {
-			panic(
-				fmt.Sprintf(
-					types.ErrMatchUpdatesMustUpdateOnePerp,
-					settledUpdates,
-				),
-			)
-		}
-	}
-
-	perpUpdate0 := allUpdatesWithPerpUpdates[0].PerpetualUpdates[0]
-	perpUpdate1 := allUpdatesWithPerpUpdates[1].PerpetualUpdates[0]
-
-	if perpUpdate0.PerpetualId != perpUpdate1.PerpetualId {
-		panic(
-			fmt.Sprintf(
-				types.ErrMatchUpdatesMustBeSamePerpId,
-				settledUpdates,
-			),
-		)
-	}
-
-	updatedPerpId := perpUpdate0.PerpetualId
-
-	if areBothPerpUpdatesOnSameSide(perpUpdate0, perpUpdate1) ||
-		arePerpUpdatesDifferentSize(perpUpdate0, perpUpdate1) {
-		panic(
-			fmt.Sprintf(
-				types.ErrMatchUpdatesInvalidSize,
-				settledUpdates,
-			),
-		)
-	}
 
 	baseQuantumsDelta := big.NewInt(0)
-	for _, perpUpdate := range allUpdatesWithPerpUpdates {
-		deltaLong := getDeltaLongFromSettledUpdate(perpUpdate, updatedPerpId)
+	for _, update := range settledUpdates {
+		deltaLong := getDeltaLongFromSettledUpdate(update, update.PerpetualUpdates[0].PerpetualId)
 		baseQuantumsDelta.Add(
 			baseQuantumsDelta,
 			deltaLong,
@@ -131,21 +82,7 @@ func GetDeltaOpenInterestFromUpdates(
 	}
 
 	return &perptypes.OpenInterestDelta{
-		PerpetualId:  updatedPerpId,
+		PerpetualId:  settledUpdates[0].PerpetualUpdates[0].PerpetualId,
 		BaseQuantums: baseQuantumsDelta,
 	}
-}
-
-func areBothPerpUpdatesOnSameSide(
-	perpUpdate0 types.PerpetualUpdate,
-	perpUpdate1 types.PerpetualUpdate,
-) bool {
-	return perpUpdate0.BigQuantumsDelta.Sign()*perpUpdate1.BigQuantumsDelta.Sign() > 0
-}
-
-func arePerpUpdatesDifferentSize(
-	perpUpdate0 types.PerpetualUpdate,
-	perpUpdate1 types.PerpetualUpdate,
-) bool {
-	return perpUpdate0.BigQuantumsDelta.CmpAbs(perpUpdate1.BigQuantumsDelta) != 0
 }

@@ -19,7 +19,7 @@ import (
 	clobtest "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/clob"
 	vetesting "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/ve"
 	prices "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
-	ratelimittypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
+	yieldstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/types"
 	tmtypes "github.com/cometbft/cometbft/types"
 
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib"
@@ -33,8 +33,8 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/memclob"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
-	ratelimitkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/keeper"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
+	yieldskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/keeper"
 	cometabci "github.com/cometbft/cometbft/abci/types"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -123,10 +123,10 @@ func TestEndBlocker_Failure(t *testing.T) {
 			ctx := ks.Ctx.WithBlockHeight(int64(blockHeight)).WithBlockTime(tc.blockTime)
 
 			rateString := sdaiservertypes.TestSDAIEventRequest.ConversionRate
-			rate, conversionErr := ratelimitkeeper.ConvertStringToBigInt(rateString)
+			rate, conversionErr := yieldskeeper.ConvertStringToBigInt(rateString)
 			require.NoError(t, conversionErr)
-			ks.RatelimitKeeper.SetSDAIPrice(ctx, rate)
-			ks.RatelimitKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+			ks.YieldsKeeper.SetSDAIPrice(ctx, rate)
+			ks.YieldsKeeper.SetAssetYieldsIndex(ks.Ctx, big.NewRat(1, 1))
 
 			for _, orderId := range tc.expiredStatefulOrderIds {
 				mockIndexerEventManager.On("AddBlockEvent",
@@ -680,7 +680,7 @@ func TestEndBlocker_Success(t *testing.T) {
 					p.Params.LiquidityTier,
 					p.Params.DangerIndexPpm,
 					p.Params.CollateralPoolId,
-					p.YieldIndex,
+					p.YieldsIndex,
 				)
 				require.NoError(t, err)
 			}
@@ -1052,21 +1052,21 @@ func TestLiquidateSubaccounts(t *testing.T) {
 			}).Build()
 
 			rateString := sdaiservertypes.TestSDAIEventRequest.ConversionRate
-			rate, conversionErr := ratelimitkeeper.ConvertStringToBigInt(rateString)
+			rate, conversionErr := yieldskeeper.ConvertStringToBigInt(rateString)
 
 			require.NoError(t, conversionErr)
 
-			tApp.App.RatelimitKeeper.SetSDAIPrice(tApp.App.NewUncachedContext(false, tmproto.Header{}), rate)
-			tApp.App.RatelimitKeeper.SetAssetYieldIndex(tApp.App.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+			tApp.App.YieldsKeeper.SetSDAIPrice(tApp.App.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.App.YieldsKeeper.SetAssetYieldsIndex(tApp.App.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
-			tApp.CrashingApp.RatelimitKeeper.SetSDAIPrice(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), rate)
-			tApp.CrashingApp.RatelimitKeeper.SetAssetYieldIndex(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+			tApp.CrashingApp.YieldsKeeper.SetSDAIPrice(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.CrashingApp.YieldsKeeper.SetAssetYieldsIndex(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
-			tApp.NoCheckTxApp.RatelimitKeeper.SetSDAIPrice(tApp.NoCheckTxApp.NewUncachedContext(false, tmproto.Header{}), rate)
-			tApp.NoCheckTxApp.RatelimitKeeper.SetAssetYieldIndex(tApp.NoCheckTxApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+			tApp.NoCheckTxApp.YieldsKeeper.SetSDAIPrice(tApp.NoCheckTxApp.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.NoCheckTxApp.YieldsKeeper.SetAssetYieldsIndex(tApp.NoCheckTxApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
-			tApp.ParallelApp.RatelimitKeeper.SetSDAIPrice(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), rate)
-			tApp.ParallelApp.RatelimitKeeper.SetAssetYieldIndex(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+			tApp.ParallelApp.YieldsKeeper.SetSDAIPrice(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.ParallelApp.YieldsKeeper.SetAssetYieldsIndex(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
 			ctx := tApp.AdvanceToBlock(2, testapp.AdvanceToBlockOptions{})
 
@@ -1394,7 +1394,7 @@ func TestPrepareCheckState(t *testing.T) {
 			mockBankKeeper.On(
 				"GetBalance",
 				mock.Anything,
-				authtypes.NewModuleAddress(ratelimittypes.TDaiPoolAccount),
+				authtypes.NewModuleAddress(yieldstypes.TDaiPoolAccount),
 				constants.TDai.Denom,
 			).Return(sdk.NewCoin(constants.TDai.Denom, sdkmath.NewIntFromBigInt(new(big.Int).SetUint64(1_000_000_000_000))))
 
@@ -1403,22 +1403,22 @@ func TestPrepareCheckState(t *testing.T) {
 				mockBankKeeper.On(
 					"GetSupply",
 					mock.Anything,
-					ratelimittypes.SDaiDenom,
+					yieldstypes.SDaiDenom,
 				).Return(
-					sdk.NewCoin(ratelimittypes.SDaiDenom, sdkmath.NewInt(0)),
+					sdk.NewCoin(yieldstypes.SDaiDenom, sdkmath.NewInt(0)),
 				).Once()
 				mockBankKeeper.On(
 					"GetSupply",
 					mock.Anything,
-					ratelimittypes.TDaiDenom,
+					yieldstypes.TDaiDenom,
 				).Return(
-					sdk.NewCoin(ratelimittypes.TDaiDenom, sdkmath.NewInt(0)),
+					sdk.NewCoin(yieldstypes.TDaiDenom, sdkmath.NewInt(0)),
 				).Once()
 
 				prices := map[string]voteweighted.AggregatorPricePair{
 					"BTC-USD": {SpotPrice: constants.Price5Big, PnlPrice: constants.Price5Big},
 				}
-				conversionRate := ratelimitkeeper.ConvertStringToBigIntWithPanicOnErr("2006681181716810314385961731")
+				conversionRate := yieldskeeper.ConvertStringToBigIntWithPanicOnErr("2006681181716810314385961731")
 				voteAggregator.On("AggregateDaemonVEIntoFinalPricesAndConversionRate", mock.Anything, mock.Anything).
 					Return(prices, conversionRate, nil).Once()
 			}
@@ -1427,10 +1427,10 @@ func TestPrepareCheckState(t *testing.T) {
 
 			ctx := ks.Ctx.WithIsCheckTx(true).WithBlockHeight(int64(tc.processProposerMatchesEvents.BlockHeight))
 			rateString := sdaiservertypes.TestSDAIEventRequest.ConversionRate
-			rate, conversionErr := ratelimitkeeper.ConvertStringToBigInt(rateString)
+			rate, conversionErr := yieldskeeper.ConvertStringToBigInt(rateString)
 			require.NoError(t, conversionErr)
-			ks.RatelimitKeeper.SetSDAIPrice(ctx, rate)
-			ks.RatelimitKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+			ks.YieldsKeeper.SetSDAIPrice(ctx, rate)
+			ks.YieldsKeeper.SetAssetYieldsIndex(ks.Ctx, big.NewRat(1, 1))
 
 			// Create liquidity tiers.
 			keepertest.CreateTestLiquidityTiers(t, ctx, ks.PerpetualsKeeper)
@@ -1450,7 +1450,7 @@ func TestPrepareCheckState(t *testing.T) {
 					p.Params.LiquidityTier,
 					p.Params.DangerIndexPpm,
 					p.Params.CollateralPoolId,
-					p.YieldIndex,
+					p.YieldsIndex,
 				)
 				require.NoError(t, err)
 			}
@@ -1594,9 +1594,9 @@ func TestPrepareCheckState(t *testing.T) {
 			)
 
 			if tc.useDefaultExtendCommitInfo {
-				actualSDaiPrice, found := ks.RatelimitKeeper.GetSDAIPrice(ctx)
+				actualSDaiPrice, found := ks.YieldsKeeper.GetSDAIPrice(ctx)
 				require.True(t, found)
-				require.Equal(t, ratelimitkeeper.ConvertStringToBigIntWithPanicOnErr("2006681181716810314385961731"), actualSDaiPrice)
+				require.Equal(t, yieldskeeper.ConvertStringToBigIntWithPanicOnErr("2006681181716810314385961731"), actualSDaiPrice)
 
 				marketPrice, err := ks.PricesKeeper.GetMarketPrice(ctx, constants.MarketId0)
 				require.NoError(t, err)
@@ -1607,7 +1607,7 @@ func TestPrepareCheckState(t *testing.T) {
 				_, ok := consAddresses[alice]
 				require.True(t, ok)
 
-				mockBankKeeper.AssertCalled(t, "GetSupply", mock.Anything, ratelimittypes.SDaiDenom)
+				mockBankKeeper.AssertCalled(t, "GetSupply", mock.Anything, yieldstypes.SDaiDenom)
 				voteAggregator.AssertCalled(t, "AggregateDaemonVEIntoFinalPricesAndConversionRate", mock.Anything, mock.Anything)
 			}
 		})

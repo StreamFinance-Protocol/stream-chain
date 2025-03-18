@@ -5,7 +5,7 @@ import (
 
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib/metrics"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
-	ratelimittypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
+	yieldstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/types"
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -40,10 +40,10 @@ func (k Keeper) CompleteBridge(
 		return nil
 	}
 
-	// Do not complete bridge if bridging is disabled.
+	// Complete bridge if bridging is disabled.
 	safetyParams := k.GetSafetyParams(ctx)
 	if safetyParams.IsDisabled {
-		return types.ErrBridgingDisabled
+		k.Logger(ctx).Warn("Bridge is disabled, but complete bridge was called. Completing bridge now.")
 	}
 
 	// Convert bridge address string to sdk.AccAddress.
@@ -68,8 +68,8 @@ func (k Keeper) CompleteBridge(
 		return err
 	}
 
-	if bridge.Coin.Denom == ratelimittypes.SDaiDenom {
-		err = k.ratelimitKeeper.MintTradingDAIToUserAccount(
+	if bridge.Coin.Denom == yieldstypes.SDaiDenom {
+		err = k.yieldsKeeper.MintTradingDAIToUserAccount(
 			ctx,
 			bridgeAccAddress,
 			bridgedCoins[0].Amount.BigInt(),

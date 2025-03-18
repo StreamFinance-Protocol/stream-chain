@@ -98,27 +98,28 @@ func TestQueryWithdrawalAndTransfersBlockedInfo(t *testing.T) {
 			},
 		},
 		`Chain outage seen in state returns withdrawals and transfers unblocked after the delay`: {
-			setup: func(ctx sdktypes.Context, k sakeeper.Keeper, bk btkeeper.Keeper) error {
-				bk.SetAllDowntimeInfo(
+			setup: func(ctx sdktypes.Context, sk sakeeper.Keeper, bk btkeeper.Keeper) error {
+
+				bk.SetPreviousBlockInfo(
 					ctx,
-					&blocktimetypes.AllDowntimeInfo{
-						Infos: []*blocktimetypes.AllDowntimeInfo_DowntimeInfo{
-							{
-								Duration: 10 * time.Second,
-								BlockInfo: blocktimetypes.BlockInfo{
-									Height:    30,
-									Timestamp: time.Unix(300, 0).UTC(),
-								},
-							},
-							{
-								Duration: 5 * time.Minute,
-								BlockInfo: blocktimetypes.BlockInfo{
-									Height:    25,
-									Timestamp: time.Unix(300, 0).UTC(),
-								},
-							},
-						},
-					})
+					&blocktimetypes.BlockInfo{
+						Height:    25,
+						Timestamp: time.Now(),
+					},
+				)
+
+				bk.SetPreviousBlockInfo(
+					ctx,
+					&blocktimetypes.BlockInfo{
+						Height:    25,
+						Timestamp: time.Now(),
+					},
+				)
+
+				bk.SetOutageHeight(
+					ctx,
+					25,
+				)
 				return nil
 			},
 
@@ -144,26 +145,17 @@ func TestQueryWithdrawalAndTransfersBlockedInfo(t *testing.T) {
 				if err != nil {
 					return nil
 				}
-				bk.SetAllDowntimeInfo(
+				bk.SetPreviousBlockInfo(
 					ctx,
-					&blocktimetypes.AllDowntimeInfo{
-						Infos: []*blocktimetypes.AllDowntimeInfo_DowntimeInfo{
-							{
-								Duration: 10 * time.Second,
-								BlockInfo: blocktimetypes.BlockInfo{
-									Height:    30,
-									Timestamp: time.Unix(300, 0).UTC(),
-								},
-							},
-							{
-								Duration: 5 * time.Minute,
-								BlockInfo: blocktimetypes.BlockInfo{
-									Height:    25,
-									Timestamp: time.Unix(300, 0).UTC(),
-								},
-							},
-						},
-					})
+					&blocktimetypes.BlockInfo{
+						Height:    25,
+						Timestamp: time.Now(),
+					},
+				)
+				bk.SetOutageHeight(
+					ctx,
+					25,
+				)
 				return nil
 			},
 
@@ -189,26 +181,17 @@ func TestQueryWithdrawalAndTransfersBlockedInfo(t *testing.T) {
 				if err != nil {
 					return err
 				}
-				bk.SetAllDowntimeInfo(
+				bk.SetPreviousBlockInfo(
 					ctx,
-					&blocktimetypes.AllDowntimeInfo{
-						Infos: []*blocktimetypes.AllDowntimeInfo_DowntimeInfo{
-							{
-								Duration: 10 * time.Second,
-								BlockInfo: blocktimetypes.BlockInfo{
-									Height:    50,
-									Timestamp: time.Unix(300, 0).UTC(),
-								},
-							},
-							{
-								Duration: 5 * time.Minute,
-								BlockInfo: blocktimetypes.BlockInfo{
-									Height:    47,
-									Timestamp: time.Unix(300, 0).UTC(),
-								},
-							},
-						},
-					})
+					&blocktimetypes.BlockInfo{
+						Height:    47,
+						Timestamp: time.Now(),
+					},
+				)
+				bk.SetOutageHeight(
+					ctx,
+					47,
+				)
 				return nil
 			},
 
@@ -234,26 +217,17 @@ func TestQueryWithdrawalAndTransfersBlockedInfo(t *testing.T) {
 				if err != nil {
 					return err
 				}
-				bk.SetAllDowntimeInfo(
+				bk.SetPreviousBlockInfo(
 					ctx,
-					&blocktimetypes.AllDowntimeInfo{
-						Infos: []*blocktimetypes.AllDowntimeInfo_DowntimeInfo{
-							{
-								Duration: 10 * time.Second,
-								BlockInfo: blocktimetypes.BlockInfo{
-									Height:    50,
-									Timestamp: time.Unix(300, 0).UTC(),
-								},
-							},
-							{
-								Duration: 5 * time.Minute,
-								BlockInfo: blocktimetypes.BlockInfo{
-									Height:    3,
-									Timestamp: time.Unix(300, 0).UTC(),
-								},
-							},
-						},
-					})
+					&blocktimetypes.BlockInfo{
+						Height:    3,
+						Timestamp: time.Now(),
+					},
+				)
+				bk.SetOutageHeight(
+					ctx,
+					3,
+				)
 				return nil
 			},
 

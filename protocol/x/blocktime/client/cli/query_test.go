@@ -42,27 +42,6 @@ func setupNetwork(
 	return net, ctx
 }
 
-func TestQueryDowntimeParams(t *testing.T) {
-	net, ctx := setupNetwork(t)
-
-	out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdQueryDowntimeParams(), []string{})
-
-	require.NoError(t, err)
-	var resp types.QueryDowntimeParamsResponse
-	require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
-	require.Equal(t, types.DefaultGenesis().Params, resp.Params)
-}
-
-func TestQueryAllDowntimeInfo(t *testing.T) {
-	net, ctx := setupNetwork(t)
-
-	out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdQueryAllDowntimeInfo(), []string{})
-
-	require.NoError(t, err)
-	var resp types.QueryAllDowntimeInfoResponse
-	require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
-}
-
 func TestQueryPreviousBlockInfo(t *testing.T) {
 	net, ctx := setupNetwork(t)
 

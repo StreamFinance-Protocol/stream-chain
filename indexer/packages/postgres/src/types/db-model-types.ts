@@ -18,7 +18,7 @@ export interface IdBasedModelFromDatabase {
 
 export interface SubaccountFromDatabase extends IdBasedModelFromDatabase {
   address: string;
-  assetYieldIndex: string;
+  assetYieldsIndex: string;
   subaccountNumber: number;
   updatedAt: IsoString;
   updatedAtHeight: string;
@@ -45,7 +45,7 @@ export interface PerpetualPositionFromDatabase
   closeEventId?: Buffer;
   lastEventId: Buffer;
   settledFunding: string;
-  perpYieldIndex: string;
+  perpYieldsIndex: string;
 }
 
 export interface OrderFromDatabase extends IdBasedModelFromDatabase {
@@ -92,7 +92,7 @@ export interface PerpetualMarketFromDatabase {
   stepBaseQuantums: number;
   liquidityTierId: number;
   baseOpenInterest: string;
-  perpYieldIndex: string;
+  perpYieldsIndex: string;
 }
 
 export interface CollateralPoolFromDatabase {
@@ -238,9 +238,9 @@ export interface ComplianceDataFromDatabase {
   updatedAt: string;
 }
 
-export interface YieldParamsFromDatabase extends IdBasedModelFromDatabase {
+export interface YieldsParamsFromDatabase extends IdBasedModelFromDatabase {
   sDAIPrice: string;
-  assetYieldIndex: string;
+  assetYieldsIndex: string;
   createdAt: IsoString;
   createdAtHeight: string;
 }

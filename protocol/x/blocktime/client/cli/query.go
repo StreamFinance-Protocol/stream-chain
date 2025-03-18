@@ -21,55 +21,7 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	cmd.AddCommand(CmdQueryDowntimeParams())
-	cmd.AddCommand(CmdQueryAllDowntimeInfo())
 	cmd.AddCommand(CmdQueryPreviousBlockInfo())
-
-	return cmd
-}
-
-func CmdQueryDowntimeParams() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "get-downtime-params",
-		Short: "get the DowntimeParams",
-		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			queryClient := types.NewQueryClient(clientCtx)
-			res, err := queryClient.DowntimeParams(
-				context.Background(),
-				&types.QueryDowntimeParamsRequest{},
-			)
-			if err != nil {
-				return err
-			}
-			return clientCtx.PrintProto(res)
-		},
-	}
-
-	flags.AddQueryFlagsToCmd(cmd)
-
-	return cmd
-}
-
-func CmdQueryAllDowntimeInfo() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "get-all-downtime-info",
-		Short: "get all downtime info",
-		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			queryClient := types.NewQueryClient(clientCtx)
-			res, err := queryClient.AllDowntimeInfo(
-				context.Background(),
-				&types.QueryAllDowntimeInfoRequest{},
-			)
-			if err != nil {
-				return err
-			}
-			return clientCtx.PrintProto(res)
-		},
-	}
-
-	flags.AddQueryFlagsToCmd(cmd)
 
 	return cmd
 }

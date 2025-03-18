@@ -47,20 +47,20 @@ func TestCleanAndValidateExtCommitInfoInPrepareProposal(t *testing.T) {
 	prunedVote.VoteExtension = nil
 
 	tests := map[string]struct {
-		setupMocks    func(*mocks.PreBlockExecPricesKeeper, *mocks.VoteExtensionRateLimitKeeper)
+		setupMocks    func(*mocks.PreBlockExecPricesKeeper, *mocks.VoteExtensionYieldsKeeper)
 		extCommitInfo cometabci.ExtendedCommitInfo
 		expectedInfo  cometabci.ExtendedCommitInfo
 		expectedError error
 		blockHeight   int64
 	}{
 		"Valid ExtCommitInfo": {
-			setupMocks: func(pricesKeeper *mocks.PreBlockExecPricesKeeper, ratelimitKeeper *mocks.VoteExtensionRateLimitKeeper) {
+			setupMocks: func(pricesKeeper *mocks.PreBlockExecPricesKeeper, yieldsKeeper *mocks.VoteExtensionYieldsKeeper) {
 				pricesKeeper.On("GetAllMarketParams", mock.Anything).Return([]types.MarketParam{
 					{Id: 0, Pair: constants.BtcUsdPair},
 					{Id: 1, Pair: constants.EthUsdPair},
 				})
-				ratelimitKeeper.On("GetSDAIPrice", mock.Anything).Return(big.NewInt(0), false)
-				ratelimitKeeper.On("GetSDAILastBlockUpdated", mock.Anything).Return(big.NewInt(1), false)
+				yieldsKeeper.On("GetSDAIPrice", mock.Anything).Return(big.NewInt(0), false)
+				yieldsKeeper.On("GetSDAILastBlockUpdated", mock.Anything).Return(big.NewInt(1), false)
 			},
 			extCommitInfo: cometabci.ExtendedCommitInfo{
 				Round: 1,
@@ -74,7 +74,7 @@ func TestCleanAndValidateExtCommitInfoInPrepareProposal(t *testing.T) {
 			blockHeight:   100,
 		},
 		"Invalid market in VE": {
-			setupMocks: func(pricesKeeper *mocks.PreBlockExecPricesKeeper, ratelimitKeeper *mocks.VoteExtensionRateLimitKeeper) {
+			setupMocks: func(pricesKeeper *mocks.PreBlockExecPricesKeeper, yieldsKeeper *mocks.VoteExtensionYieldsKeeper) {
 				pricesKeeper.On("GetAllMarketParams", mock.Anything).Return([]types.MarketParam{
 					{Id: 0, Pair: constants.BtcUsdPair},
 					{Id: 1, Pair: constants.EthUsdPair},
@@ -92,12 +92,12 @@ func TestCleanAndValidateExtCommitInfoInPrepareProposal(t *testing.T) {
 			blockHeight:   100,
 		},
 		"Invalid sDai conversion rate height": {
-			setupMocks: func(pricesKeeper *mocks.PreBlockExecPricesKeeper, ratelimitKeeper *mocks.VoteExtensionRateLimitKeeper) {
+			setupMocks: func(pricesKeeper *mocks.PreBlockExecPricesKeeper, yieldsKeeper *mocks.VoteExtensionYieldsKeeper) {
 				pricesKeeper.On("GetAllMarketParams", mock.Anything).Return([]types.MarketParam{
 					{Id: 0, Pair: constants.BtcUsdPair},
 					{Id: 1, Pair: constants.EthUsdPair},
 				})
-				ratelimitKeeper.On("GetSDAILastBlockUpdated", mock.Anything).Return(big.NewInt(200), true)
+				yieldsKeeper.On("GetSDAILastBlockUpdated", mock.Anything).Return(big.NewInt(200), true)
 			},
 			extCommitInfo: cometabci.ExtendedCommitInfo{
 				Round: 1,
@@ -111,7 +111,7 @@ func TestCleanAndValidateExtCommitInfoInPrepareProposal(t *testing.T) {
 			blockHeight:   100,
 		},
 		"Nil vote extension": {
-			setupMocks: func(pricesKeeper *mocks.PreBlockExecPricesKeeper, ratelimitKeeper *mocks.VoteExtensionRateLimitKeeper) {
+			setupMocks: func(pricesKeeper *mocks.PreBlockExecPricesKeeper, yieldsKeeper *mocks.VoteExtensionYieldsKeeper) {
 			},
 			extCommitInfo: cometabci.ExtendedCommitInfo{
 				Round: 1,
@@ -133,10 +133,10 @@ func TestCleanAndValidateExtCommitInfoInPrepareProposal(t *testing.T) {
 			voteCodec := vecodec.NewDefaultVoteExtensionCodec()
 
 			pricesKeeper := &mocks.PreBlockExecPricesKeeper{}
-			ratelimitKeeper := &mocks.VoteExtensionRateLimitKeeper{}
+			yieldsKeeper := &mocks.VoteExtensionYieldsKeeper{}
 
 			if tc.setupMocks != nil {
-				tc.setupMocks(pricesKeeper, ratelimitKeeper)
+				tc.setupMocks(pricesKeeper, yieldsKeeper)
 			}
 			veCache := vecache.NewVECache()
 
@@ -145,7 +145,7 @@ func TestCleanAndValidateExtCommitInfoInPrepareProposal(t *testing.T) {
 				tc.extCommitInfo,
 				voteCodec,
 				pricesKeeper,
-				ratelimitKeeper,
+				yieldsKeeper,
 				veCache,
 			)
 
@@ -159,7 +159,7 @@ func TestCleanAndValidateExtCommitInfoInPrepareProposal(t *testing.T) {
 			assert.Equal(t, tc.expectedInfo, result)
 
 			pricesKeeper.AssertExpectations(t)
-			ratelimitKeeper.AssertExpectations(t)
+			yieldsKeeper.AssertExpectations(t)
 		})
 	}
 }

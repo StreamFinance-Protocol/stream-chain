@@ -106,7 +106,7 @@ type SubaccountsKeeper interface {
 	) (
 		settledSubaccount satypes.Subaccount,
 		fundingPayments map[uint32]dtypes.SerializableInt,
-		yieldForSubaccount *big.Int,
+		yieldsForSubaccount *big.Int,
 		err error,
 	)
 }
@@ -118,7 +118,7 @@ type AssetsKeeper interface {
 }
 
 type BlockTimeKeeper interface {
-	GetPreviousBlockInfo(ctx sdk.Context) blocktimetypes.BlockInfo
+	GetPreviousBlockInfo(ctx sdk.Context) (blocktimetypes.BlockInfo, bool)
 }
 
 type FeeTiersKeeper interface {

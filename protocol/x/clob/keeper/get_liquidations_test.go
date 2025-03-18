@@ -29,8 +29,8 @@ import (
 	feetiertypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	prices "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
-	ratelimitkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/keeper"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
+	yieldskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/keeper"
 	"github.com/cometbft/cometbft/types"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -158,21 +158,21 @@ func TestChangePriceVE_CauseNegativeTNC(t *testing.T) {
 			}).Build()
 
 			rateString := sdaiservertypes.TestSDAIEventRequest.ConversionRate
-			rate, conversionErr := ratelimitkeeper.ConvertStringToBigInt(rateString)
+			rate, conversionErr := yieldskeeper.ConvertStringToBigInt(rateString)
 
 			require.NoError(t, conversionErr)
 
-			tApp.App.RatelimitKeeper.SetSDAIPrice(tApp.App.NewUncachedContext(false, tmproto.Header{}), rate)
-			tApp.App.RatelimitKeeper.SetAssetYieldIndex(tApp.App.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+			tApp.App.YieldsKeeper.SetSDAIPrice(tApp.App.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.App.YieldsKeeper.SetAssetYieldsIndex(tApp.App.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
-			tApp.CrashingApp.RatelimitKeeper.SetSDAIPrice(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), rate)
-			tApp.CrashingApp.RatelimitKeeper.SetAssetYieldIndex(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+			tApp.CrashingApp.YieldsKeeper.SetSDAIPrice(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.CrashingApp.YieldsKeeper.SetAssetYieldsIndex(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
-			tApp.NoCheckTxApp.RatelimitKeeper.SetSDAIPrice(tApp.NoCheckTxApp.NewUncachedContext(false, tmproto.Header{}), rate)
-			tApp.NoCheckTxApp.RatelimitKeeper.SetAssetYieldIndex(tApp.NoCheckTxApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+			tApp.NoCheckTxApp.YieldsKeeper.SetSDAIPrice(tApp.NoCheckTxApp.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.NoCheckTxApp.YieldsKeeper.SetAssetYieldsIndex(tApp.NoCheckTxApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
-			tApp.ParallelApp.RatelimitKeeper.SetSDAIPrice(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), rate)
-			tApp.ParallelApp.RatelimitKeeper.SetAssetYieldIndex(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+			tApp.ParallelApp.YieldsKeeper.SetSDAIPrice(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.ParallelApp.YieldsKeeper.SetAssetYieldsIndex(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
 			ctx := tApp.AdvanceToBlock(2, testapp.AdvanceToBlockOptions{})
 
@@ -259,10 +259,10 @@ func TestGetSubaccountCollateralizationInfo(t *testing.T) {
 					{
 						PerpetualId: 0,
 						Quantums:    dtypes.NewInt(-100_000_000), // -1 BTC
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 				},
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 			perpetuals:                  []perptypes.Perpetual{constants.BtcUsd_100PercentMarginRequirement_Danger_Index},
 			feeParams:                   constants.PerpetualFeeParams,
@@ -284,15 +284,15 @@ func TestGetSubaccountCollateralizationInfo(t *testing.T) {
 					{
 						PerpetualId: 0,
 						Quantums:    dtypes.NewInt(-100_000_000), // -1 BTC
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 					{
 						PerpetualId: 1,
 						Quantums:    dtypes.NewInt(-1_000_000_000), // -1 ETH
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 				},
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 			perpetuals:                  []perptypes.Perpetual{constants.BtcUsd_100PercentMarginRequirement_Danger_Index, constants.EthUsd_100PercentMarginRequirement_DangerIndex},
 			feeParams:                   constants.PerpetualFeeParams,
@@ -314,10 +314,10 @@ func TestGetSubaccountCollateralizationInfo(t *testing.T) {
 					{
 						PerpetualId: 10,
 						Quantums:    dtypes.NewInt(-100_000_000),
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 				},
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 			perpetuals:                  []perptypes.Perpetual{constants.BtcBtc_10_20MarginRequirement_CollatPool1_Id10_DangerIndex1},
 			feeParams:                   constants.PerpetualFeeParams,
@@ -339,10 +339,10 @@ func TestGetSubaccountCollateralizationInfo(t *testing.T) {
 					{
 						PerpetualId: 8,
 						Quantums:    dtypes.NewInt(-100_000_000),
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 				},
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 			perpetuals:                  []perptypes.Perpetual{constants.BtcBtc_100PercentMarginRequirement_CollatPool1_Id8_DangerIndex1},
 			feeParams:                   constants.PerpetualFeeParams,
@@ -364,10 +364,10 @@ func TestGetSubaccountCollateralizationInfo(t *testing.T) {
 					{
 						PerpetualId: 8,
 						Quantums:    dtypes.NewInt(-100_000_000),
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 				},
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 			perpetuals:                  []perptypes.Perpetual{constants.BtcBtc_100PercentMarginRequirement_CollatPool1_Id8_DangerIndex1},
 			feeParams:                   constants.PerpetualFeeParams,
@@ -389,10 +389,10 @@ func TestGetSubaccountCollateralizationInfo(t *testing.T) {
 					{
 						PerpetualId: 8,
 						Quantums:    dtypes.NewInt(-100_000_000),
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 				},
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 			perpetuals:                  []perptypes.Perpetual{constants.BtcBtc_100PercentMarginRequirement_CollatPool1_Id8_DangerIndex1},
 			feeParams:                   constants.PerpetualFeeParams,
@@ -414,15 +414,15 @@ func TestGetSubaccountCollateralizationInfo(t *testing.T) {
 					{
 						PerpetualId: 8,
 						Quantums:    dtypes.NewInt(-100_000_000),
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 					{
 						PerpetualId: 10,
 						Quantums:    dtypes.NewInt(-100_000_000),
-						YieldIndex:  big.NewRat(0, 1).String(),
+						YieldsIndex: big.NewRat(0, 1).String(),
 					},
 				},
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 			perpetuals:                  []perptypes.Perpetual{constants.BtcBtc_100PercentMarginRequirement_CollatPool1_Id8_DangerIndex1, constants.BtcBtc_10_20MarginRequirement_CollatPool1_Id10_DangerIndex1},
 			feeParams:                   constants.PerpetualFeeParams,
@@ -455,7 +455,7 @@ func TestGetSubaccountCollateralizationInfo(t *testing.T) {
 			)
 
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, mockBankKeeper, indexer_manager.NewIndexerEventManagerNoop(), nil)
-			ks.RatelimitKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+			ks.YieldsKeeper.SetAssetYieldsIndex(ks.Ctx, big.NewRat(1, 1))
 
 			ctx := ks.Ctx.WithIsCheckTx(true)
 
@@ -477,7 +477,7 @@ func TestGetSubaccountCollateralizationInfo(t *testing.T) {
 					p.Params.LiquidityTier,
 					p.Params.DangerIndexPpm,
 					p.Params.CollateralPoolId,
-					p.YieldIndex,
+					p.YieldsIndex,
 				)
 				require.NoError(t, err)
 			}
@@ -626,7 +626,7 @@ func TestUpdateCollateralizationInfoGivenAssets(t *testing.T) {
 						PerpetualId:  0,
 						Quantums:     dtypes.NewInt(-100_000_000),
 						FundingIndex: dtypes.NewInt(0),
-						YieldIndex:   big.NewRat(0, 1).String(),
+						YieldsIndex:  big.NewRat(0, 1).String(),
 					},
 				},
 			},
@@ -652,7 +652,7 @@ func TestUpdateCollateralizationInfoGivenAssets(t *testing.T) {
 			)
 
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, mockBankKeeper, indexer_manager.NewIndexerEventManagerNoop(), nil)
-			ks.RatelimitKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+			ks.YieldsKeeper.SetAssetYieldsIndex(ks.Ctx, big.NewRat(1, 1))
 
 			ctx := ks.Ctx.WithIsCheckTx(true)
 
@@ -672,7 +672,7 @@ func TestUpdateCollateralizationInfoGivenAssets(t *testing.T) {
 					p.Params.LiquidityTier,
 					p.Params.DangerIndexPpm,
 					p.Params.CollateralPoolId,
-					p.YieldIndex,
+					p.YieldsIndex,
 				)
 				require.NoError(t, err)
 			}
@@ -744,10 +744,10 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(-100_000_000), // -1 BTC
-							YieldIndex:  big.NewRat(0, 1).String(),
+							YieldsIndex: big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 			},
 			perpetuals: []perptypes.Perpetual{constants.BtcUsd_100PercentMarginRequirement_Danger_Index},
@@ -777,10 +777,10 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 						{
 							PerpetualId: 8,
 							Quantums:    dtypes.NewInt(-100_000_000),
-							YieldIndex:  big.NewRat(0, 1).String(),
+							YieldsIndex: big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 			},
 			perpetuals: []perptypes.Perpetual{constants.BtcBtc_100PercentMarginRequirement_CollatPool1_Id8_DangerIndex1},
@@ -808,10 +808,10 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 						{
 							PerpetualId: 8,
 							Quantums:    dtypes.NewInt(-100_000_000),
-							YieldIndex:  big.NewRat(0, 1).String(),
+							YieldsIndex: big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 			},
 			perpetuals: []perptypes.Perpetual{constants.BtcBtc_100PercentMarginRequirement_CollatPool1_Id8_DangerIndex1},
@@ -841,10 +841,10 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 						{
 							PerpetualId: 8,
 							Quantums:    dtypes.NewInt(-100_000_000),
-							YieldIndex:  big.NewRat(0, 1).String(),
+							YieldsIndex: big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Dave_Num1,
@@ -858,10 +858,10 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 						{
 							PerpetualId: 8,
 							Quantums:    dtypes.NewInt(-100_000_000),
-							YieldIndex:  big.NewRat(0, 1).String(),
+							YieldsIndex: big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 			},
 			perpetuals: []perptypes.Perpetual{constants.BtcBtc_100PercentMarginRequirement_CollatPool1_Id8_DangerIndex1},
@@ -896,10 +896,10 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(-100_000_000), // -1 BTC
-							YieldIndex:  big.NewRat(0, 1).String(),
+							YieldsIndex: big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 			},
 			perpetuals: []perptypes.Perpetual{constants.BtcUsd_100PercentMarginRequirement_Danger_Index},
@@ -934,10 +934,10 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(-100_000_000), // -1 BTC
-							YieldIndex:  big.NewRat(0, 1).String(),
+							YieldsIndex: big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Alice_Num0,
@@ -951,10 +951,10 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 						{
 							PerpetualId: 8,
 							Quantums:    dtypes.NewInt(-100_000_000),
-							YieldIndex:  big.NewRat(0, 1).String(),
+							YieldsIndex: big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Bob_Num0,
@@ -968,10 +968,10 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 						{
 							PerpetualId: 8,
 							Quantums:    dtypes.NewInt(-100_000_000),
-							YieldIndex:  big.NewRat(0, 1).String(),
+							YieldsIndex: big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 			},
 			perpetuals: []perptypes.Perpetual{constants.BtcUsd_100PercentMarginRequirement_Danger_Index, constants.BtcBtc_100PercentMarginRequirement_CollatPool1_Id8_DangerIndex1},
@@ -1024,7 +1024,7 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 			)
 
 			ks := keepertest.NewClobKeepersTestContext(t, memClob, mockBankKeeper, indexer_manager.NewIndexerEventManagerNoop(), nil)
-			ks.RatelimitKeeper.SetAssetYieldIndex(ks.Ctx, big.NewRat(1, 1))
+			ks.YieldsKeeper.SetAssetYieldsIndex(ks.Ctx, big.NewRat(1, 1))
 
 			ctx := ks.Ctx.WithIsCheckTx(true)
 
@@ -1046,7 +1046,7 @@ func TestGetLiquidatableAndNegativeTncSubaccountIds(t *testing.T) {
 					p.Params.LiquidityTier,
 					p.Params.DangerIndexPpm,
 					p.Params.CollateralPoolId,
-					p.YieldIndex,
+					p.YieldsIndex,
 				)
 				require.NoError(t, err)
 			}

@@ -79,7 +79,7 @@ export default class PerpetualPositionModel extends Model {
         'openEventId',
         'lastEventId',
         'settledFunding',
-        'perpYieldIndex',
+        'perpYieldsIndex',
       ],
       properties: {
         id: { type: 'string', format: 'uuid' },
@@ -98,7 +98,7 @@ export default class PerpetualPositionModel extends Model {
         createdAtHeight: { type: 'string', pattern: IntegerPattern },
         closedAtHeight: { type: ['string', 'null'], default: null, pattern: IntegerPattern },
         settledFunding: { type: 'string', pattern: NumericPattern },
-        perpYieldIndex: { type: 'string' },
+        perpYieldsIndex: { type: 'string' },
       },
     };
   }
@@ -130,7 +130,7 @@ export default class PerpetualPositionModel extends Model {
       closeEventId: 'hex-string',
       lastEventId: 'hex-string',
       settledFunding: 'string',
-      perpYieldIndex: 'string',
+      perpYieldsIndex: 'string',
     };
   }
 
@@ -172,5 +172,5 @@ export default class PerpetualPositionModel extends Model {
 
   settledFunding!: string;
 
-  perpYieldIndex!: string;
+  perpYieldsIndex!: string;
 }

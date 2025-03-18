@@ -63,22 +63,6 @@ func TestInternalMsgSamples_Gov_Key(t *testing.T) {
 		"/cosmos.upgrade.v1beta1.MsgSoftwareUpgrade",
 		"/cosmos.upgrade.v1beta1.MsgSoftwareUpgradeResponse",
 
-		// ibc
-		"/ibc.applications.interchain_accounts.host.v1.MsgModuleQuerySafe",
-		"/ibc.applications.interchain_accounts.host.v1.MsgModuleQuerySafeResponse",
-		"/ibc.applications.interchain_accounts.host.v1.MsgUpdateParams",
-		"/ibc.applications.interchain_accounts.host.v1.MsgUpdateParamsResponse",
-		"/ibc.applications.transfer.v1.MsgUpdateParams",
-		"/ibc.applications.transfer.v1.MsgUpdateParamsResponse",
-		"/ibc.core.client.v1.MsgUpdateParams",
-		"/ibc.core.client.v1.MsgUpdateParamsResponse",
-		"/ibc.core.connection.v1.MsgUpdateParams",
-		"/ibc.core.connection.v1.MsgUpdateParamsResponse",
-
-		// blocktime
-		"/klyraprotocol.blocktime.MsgUpdateDowntimeParams",
-		"/klyraprotocol.blocktime.MsgUpdateDowntimeParamsResponse",
-
 		// bridge
 		"/klyraprotocol.bridge.MsgCompleteBridge",
 		"/klyraprotocol.bridge.MsgCompleteBridgeResponse",
@@ -130,10 +114,6 @@ func TestInternalMsgSamples_Gov_Key(t *testing.T) {
 		"/klyraprotocol.prices.MsgCreateOracleMarketResponse",
 		"/klyraprotocol.prices.MsgUpdateMarketParam",
 		"/klyraprotocol.prices.MsgUpdateMarketParamResponse",
-
-		// ratelimit
-		"/klyraprotocol.ratelimit.MsgSetLimitParams",
-		"/klyraprotocol.ratelimit.MsgSetLimitParamsResponse",
 
 		// sending
 		"/klyraprotocol.sending.MsgSendFromModuleToAccount",

@@ -70,7 +70,7 @@ func assertPerpetualtUpdateEventsInIndexerBlock(
 			perp.Params.GetAtomicResolution(),
 			perp.Params.GetLiquidityTier(),
 			perp.Params.GetDangerIndexPpm(),
-			perp.YieldIndex,
+			perp.YieldsIndex,
 		)
 
 		for _, event := range perpetualEvents {
@@ -114,7 +114,7 @@ func TestModifyPerpetual_Success(t *testing.T) {
 			AtomicResolution: item.Params.AtomicResolution,
 			LiquidityTier:    liquidityTier,
 			DangerIndexPpm:   uint32(0),
-			PerpYieldIndex:   "0/1",
+			PerpYieldsIndex:  "0/1",
 		}
 
 		// Verify updatedp perpetual in store.
@@ -202,7 +202,7 @@ func TestCreatePerpetual_Failure(t *testing.T) {
 		dangerIndexPpm    uint32
 		collateralPoolId  uint32
 		expectedError     error
-		yieldIndex        string
+		yieldsIndex       string
 	}{
 		"Price doesn't exist": {
 			id:                0,
@@ -213,7 +213,7 @@ func TestCreatePerpetual_Failure(t *testing.T) {
 			liquidityTier:     0,
 			dangerIndexPpm:    0,
 			expectedError:     errorsmod.Wrap(pricestypes.ErrMarketPriceDoesNotExist, fmt.Sprint(999)),
-			yieldIndex:        "0/1",
+			yieldsIndex:       "0/1",
 		},
 		"Positive default funding magnitude exceeds maximum": {
 			id:                0,
@@ -222,7 +222,7 @@ func TestCreatePerpetual_Failure(t *testing.T) {
 			atomicResolution:  -10,
 			defaultFundingPpm: int32(lib.OneMillion + 1),
 			liquidityTier:     0,
-			yieldIndex:        "0/1",
+			yieldsIndex:       "0/1",
 			dangerIndexPpm:    0,
 			expectedError: errorsmod.Wrap(
 				types.ErrDefaultFundingPpmMagnitudeExceedsMax,
@@ -236,7 +236,7 @@ func TestCreatePerpetual_Failure(t *testing.T) {
 			atomicResolution:  -10,
 			defaultFundingPpm: 0 - int32(lib.OneMillion) - 1,
 			liquidityTier:     0,
-			yieldIndex:        "0/1",
+			yieldsIndex:       "0/1",
 			dangerIndexPpm:    0,
 			expectedError: errorsmod.Wrap(
 				types.ErrDefaultFundingPpmMagnitudeExceedsMax,
@@ -250,7 +250,7 @@ func TestCreatePerpetual_Failure(t *testing.T) {
 			atomicResolution:  -10,
 			defaultFundingPpm: math.MinInt32,
 			liquidityTier:     0,
-			yieldIndex:        "0/1",
+			yieldsIndex:       "0/1",
 			dangerIndexPpm:    0,
 			expectedError:     errorsmod.Wrap(types.ErrDefaultFundingPpmMagnitudeExceedsMax, fmt.Sprint(math.MinInt32)),
 		},
@@ -261,7 +261,7 @@ func TestCreatePerpetual_Failure(t *testing.T) {
 			atomicResolution:  -10,
 			defaultFundingPpm: 0,
 			liquidityTier:     0,
-			yieldIndex:        "0/1",
+			yieldsIndex:       "0/1",
 			dangerIndexPpm:    0,
 			expectedError:     types.ErrTickerEmptyString,
 		},
@@ -272,7 +272,7 @@ func TestCreatePerpetual_Failure(t *testing.T) {
 			atomicResolution:  -10,
 			defaultFundingPpm: 0,
 			liquidityTier:     0,
-			yieldIndex:        "0/1",
+			yieldsIndex:       "0/1",
 			dangerIndexPpm:    0,
 			collateralPoolId:  9999,
 			expectedError:     errorsmod.Wrap(types.ErrCollateralPoolDoesNotExist, fmt.Sprint(9999)),
@@ -298,7 +298,7 @@ func TestCreatePerpetual_Failure(t *testing.T) {
 				tc.liquidityTier,
 				tc.dangerIndexPpm,
 				tc.collateralPoolId,
-				tc.yieldIndex,
+				tc.yieldsIndex,
 			)
 
 			require.Error(t, err)
@@ -422,7 +422,7 @@ func TestHasPerpetual(t *testing.T) {
 			perps[perp].Params.LiquidityTier,
 			perps[perp].Params.DangerIndexPpm,
 			perps[perp].Params.CollateralPoolId,
-			perps[perp].YieldIndex,
+			perps[perp].YieldsIndex,
 		)
 		require.NoError(t, err)
 	}
@@ -485,7 +485,7 @@ func TestGetAllPerpetuals_Sorted(t *testing.T) {
 			perps[perp].Params.LiquidityTier,
 			perps[perp].Params.DangerIndexPpm,
 			perps[perp].Params.CollateralPoolId,
-			perps[perp].YieldIndex,
+			perps[perp].YieldsIndex,
 		)
 		require.NoError(t, err)
 	}
@@ -2046,7 +2046,7 @@ func TestMaybeProcessNewFundingTickEpoch_ProcessNewEpoch(t *testing.T) {
 					p.Params.LiquidityTier,
 					p.Params.DangerIndexPpm,
 					p.Params.CollateralPoolId,
-					p.YieldIndex,
+					p.YieldsIndex,
 				)
 				require.NoError(t, err)
 				oldPerps[i] = perp
@@ -3718,14 +3718,14 @@ func TestModifyOpenInterest_store(t *testing.T) {
 	}
 }
 
-func TestCalculateYieldIndexForEpoch(t *testing.T) {
+func TestCalculateYieldsIndexForEpoch(t *testing.T) {
 	testCases := map[string]struct {
-		totalTDaiPreMint   *big.Int
-		totalTDaiMinted    *big.Int
-		marketPrice        pricestypes.MarketPrice
-		perpetual          types.Perpetual
-		expectedErr        error
-		expectedYieldIndex *big.Rat
+		totalTDaiPreMint    *big.Int
+		totalTDaiMinted     *big.Int
+		marketPrice         pricestypes.MarketPrice
+		perpetual           types.Perpetual
+		expectedErr         error
+		expectedYieldsIndex *big.Rat
 	}{
 		"Success: price is one": {
 			totalTDaiPreMint: big.NewInt(100_000_000_000_000),
@@ -3736,9 +3736,9 @@ func TestCalculateYieldIndexForEpoch(t *testing.T) {
 				SpotPrice: 100_000,
 				PnlPrice:  100_000,
 			},
-			perpetual:          constants.BtcUsd_0DefaultFunding_6AtomicResolution,
-			expectedErr:        nil,
-			expectedYieldIndex: big.NewRat(1, 20_000),
+			perpetual:           constants.BtcUsd_0DefaultFunding_6AtomicResolution,
+			expectedErr:         nil,
+			expectedYieldsIndex: big.NewRat(1, 20_000),
 		},
 		"Success: price is less than one": {
 			totalTDaiPreMint: big.NewInt(100_000_000_000_000),
@@ -3749,9 +3749,9 @@ func TestCalculateYieldIndexForEpoch(t *testing.T) {
 				SpotPrice: 200,
 				PnlPrice:  200,
 			},
-			perpetual:          constants.BtcUsd_0DefaultFunding_6AtomicResolution,
-			expectedErr:        nil,
-			expectedYieldIndex: big.NewRat(1, 10_000),
+			perpetual:           constants.BtcUsd_0DefaultFunding_6AtomicResolution,
+			expectedErr:         nil,
+			expectedYieldsIndex: big.NewRat(1, 10_000),
 		},
 		"Success: price is greater than one": {
 			totalTDaiPreMint: big.NewInt(10_000_000_000_000),
@@ -3762,9 +3762,9 @@ func TestCalculateYieldIndexForEpoch(t *testing.T) {
 				SpotPrice: 100_000_000,
 				PnlPrice:  100_000_000,
 			},
-			perpetual:          constants.BtcUsd_0DefaultFunding_6AtomicResolution,
-			expectedErr:        nil,
-			expectedYieldIndex: big.NewRat(700, 1),
+			perpetual:           constants.BtcUsd_0DefaultFunding_6AtomicResolution,
+			expectedErr:         nil,
+			expectedYieldsIndex: big.NewRat(700, 1),
 		},
 		"Success: total tDai minted is less than total tDai pre-mint": {
 			totalTDaiPreMint: big.NewInt(100_000_000_000_000),
@@ -3775,9 +3775,9 @@ func TestCalculateYieldIndexForEpoch(t *testing.T) {
 				SpotPrice: 400_000,
 				PnlPrice:  400_000,
 			},
-			perpetual:          constants.BtcUsd_0DefaultFunding_6AtomicResolution,
-			expectedErr:        nil,
-			expectedYieldIndex: big.NewRat(1, 5_000),
+			perpetual:           constants.BtcUsd_0DefaultFunding_6AtomicResolution,
+			expectedErr:         nil,
+			expectedYieldsIndex: big.NewRat(1, 5_000),
 		},
 		"Success: total tDai minted is greater than total tDai pre-mint": {
 			totalTDaiPreMint: big.NewInt(5_000_000_000),
@@ -3788,9 +3788,9 @@ func TestCalculateYieldIndexForEpoch(t *testing.T) {
 				SpotPrice: 400_000,
 				PnlPrice:  400_000,
 			},
-			perpetual:          constants.BtcUsd_0DefaultFunding_6AtomicResolution,
-			expectedErr:        nil,
-			expectedYieldIndex: big.NewRat(80, 1),
+			perpetual:           constants.BtcUsd_0DefaultFunding_6AtomicResolution,
+			expectedErr:         nil,
+			expectedYieldsIndex: big.NewRat(80, 1),
 		},
 		"Success: total tDai minted is equal to total tDai pre-mint": {
 			totalTDaiPreMint: big.NewInt(5_000_000_000),
@@ -3801,9 +3801,9 @@ func TestCalculateYieldIndexForEpoch(t *testing.T) {
 				SpotPrice: 123,
 				PnlPrice:  123,
 			},
-			perpetual:          constants.BtcUsd_0DefaultFunding_6AtomicResolution,
-			expectedErr:        nil,
-			expectedYieldIndex: big.NewRat(1, 1),
+			perpetual:           constants.BtcUsd_0DefaultFunding_6AtomicResolution,
+			expectedErr:         nil,
+			expectedYieldsIndex: big.NewRat(1, 1),
 		},
 		"Success: total tDai minted is 0": {
 			totalTDaiPreMint: big.NewInt(5_000_000_000),
@@ -3814,9 +3814,9 @@ func TestCalculateYieldIndexForEpoch(t *testing.T) {
 				SpotPrice: 123,
 				PnlPrice:  123,
 			},
-			perpetual:          constants.BtcUsd_0DefaultFunding_6AtomicResolution,
-			expectedErr:        nil,
-			expectedYieldIndex: big.NewRat(0, 1),
+			perpetual:           constants.BtcUsd_0DefaultFunding_6AtomicResolution,
+			expectedErr:         nil,
+			expectedYieldsIndex: big.NewRat(0, 1),
 		},
 		"Failure: total tDai pre-mint is 0": {
 			totalTDaiPreMint: big.NewInt(0),
@@ -3827,9 +3827,9 @@ func TestCalculateYieldIndexForEpoch(t *testing.T) {
 				SpotPrice: 12345,
 				PnlPrice:  12345,
 			},
-			perpetual:          constants.BtcUsd_0DefaultFunding_6AtomicResolution,
-			expectedErr:        types.ErrTotalTDaiPreMintIsNil,
-			expectedYieldIndex: big.NewRat(0, 1),
+			perpetual:           constants.BtcUsd_0DefaultFunding_6AtomicResolution,
+			expectedErr:         types.ErrTotalTDaiPreMintIsNil,
+			expectedYieldsIndex: big.NewRat(0, 1),
 		},
 		"Failure: total tDai pre-mint is nil": {
 			totalTDaiPreMint: nil,
@@ -3840,9 +3840,9 @@ func TestCalculateYieldIndexForEpoch(t *testing.T) {
 				SpotPrice: 12345,
 				PnlPrice:  12345,
 			},
-			perpetual:          constants.BtcUsd_0DefaultFunding_6AtomicResolution,
-			expectedErr:        types.ErrTotalTDaiPreMintIsNil,
-			expectedYieldIndex: big.NewRat(0, 1),
+			perpetual:           constants.BtcUsd_0DefaultFunding_6AtomicResolution,
+			expectedErr:         types.ErrTotalTDaiPreMintIsNil,
+			expectedYieldsIndex: big.NewRat(0, 1),
 		},
 		"Failure: total tDai minted is nil": {
 			totalTDaiPreMint: big.NewInt(100_000_000),
@@ -3853,9 +3853,9 @@ func TestCalculateYieldIndexForEpoch(t *testing.T) {
 				SpotPrice: 12345,
 				PnlPrice:  12345,
 			},
-			perpetual:          constants.BtcUsd_0DefaultFunding_6AtomicResolution,
-			expectedErr:        types.ErrTotalTDaiMintedIsNil,
-			expectedYieldIndex: big.NewRat(0, 1),
+			perpetual:           constants.BtcUsd_0DefaultFunding_6AtomicResolution,
+			expectedErr:         types.ErrTotalTDaiMintedIsNil,
+			expectedYieldsIndex: big.NewRat(0, 1),
 		},
 		"Failure: perp market Id does not match market price Id": {
 			totalTDaiPreMint: big.NewInt(100_000_000),
@@ -3866,9 +3866,9 @@ func TestCalculateYieldIndexForEpoch(t *testing.T) {
 				SpotPrice: 12345,
 				PnlPrice:  12345,
 			},
-			perpetual:          constants.BtcUsd_0DefaultFunding_6AtomicResolution,
-			expectedErr:        types.ErrTotalTDaiMintedIsNil,
-			expectedYieldIndex: big.NewRat(0, 1),
+			perpetual:           constants.BtcUsd_0DefaultFunding_6AtomicResolution,
+			expectedErr:         types.ErrTotalTDaiMintedIsNil,
+			expectedYieldsIndex: big.NewRat(0, 1),
 		},
 	}
 
@@ -3878,7 +3878,7 @@ func TestCalculateYieldIndexForEpoch(t *testing.T) {
 			pc.PerpetualsKeeper.SetPerpetualForTest(pc.Ctx, tc.perpetual)
 			keepertest.CreateTestCollateralPools(t, pc.Ctx, pc.PerpetualsKeeper)
 
-			yieldIndex, err := pc.PerpetualsKeeper.CalculateYieldIndexForEpoch(
+			yieldsIndex, err := pc.PerpetualsKeeper.CalculateYieldsIndexForEpoch(
 				pc.Ctx,
 				tc.totalTDaiPreMint,
 				tc.totalTDaiMinted,
@@ -3888,18 +3888,18 @@ func TestCalculateYieldIndexForEpoch(t *testing.T) {
 
 			if tc.expectedErr != nil {
 				require.Error(t, err)
-				require.Nil(t, yieldIndex)
+				require.Nil(t, yieldsIndex)
 			} else {
 				require.NoError(t, err)
-				require.NotNil(t, yieldIndex)
-				require.Equal(t, 0, tc.expectedYieldIndex.Cmp(yieldIndex),
-					"Expected yield index %v. Got %v.", tc.expectedYieldIndex, yieldIndex)
+				require.NotNil(t, yieldsIndex)
+				require.Equal(t, 0, tc.expectedYieldsIndex.Cmp(yieldsIndex),
+					"Expected yields index %v. Got %v.", tc.expectedYieldsIndex, yieldsIndex)
 			}
 		})
 	}
 }
 
-func TestGeneratePerpetualWithUpdatedYieldIndex(t *testing.T) {
+func TestGeneratePerpetualWithUpdatedYieldsIndex(t *testing.T) {
 	testId := uint32(999)
 	testTicker := "TEST-USD"
 	testBasePerpetual := types.Perpetual{
@@ -3915,7 +3915,7 @@ func TestGeneratePerpetualWithUpdatedYieldIndex(t *testing.T) {
 		},
 		FundingIndex: constants.BtcUsd_0DefaultFunding_6AtomicResolution.FundingIndex,
 		OpenInterest: constants.BtcUsd_0DefaultFunding_6AtomicResolution.OpenInterest,
-		YieldIndex:   constants.BtcUsd_0DefaultFunding_6AtomicResolution.YieldIndex,
+		YieldsIndex:  constants.BtcUsd_0DefaultFunding_6AtomicResolution.YieldsIndex,
 	}
 
 	testCases := map[string]struct {
@@ -3926,7 +3926,7 @@ func TestGeneratePerpetualWithUpdatedYieldIndex(t *testing.T) {
 		expectedErr      error
 		expectedPerp     types.Perpetual
 	}{
-		"Success: adds right yield index on top of 0": {
+		"Success: adds right yields index on top of 0": {
 			totalTDaiPreMint: big.NewInt(100_000_000_000_000),
 			totalTDaiMinted:  big.NewInt(5_000_000_000),
 			marketPrice: pricestypes.MarketPrice{
@@ -3941,10 +3941,10 @@ func TestGeneratePerpetualWithUpdatedYieldIndex(t *testing.T) {
 				Params:       testBasePerpetual.Params,
 				FundingIndex: testBasePerpetual.FundingIndex,
 				OpenInterest: testBasePerpetual.OpenInterest,
-				YieldIndex:   big.NewRat(1, 20_000).String(),
+				YieldsIndex:  big.NewRat(1, 20_000).String(),
 			},
 		},
-		"Success: adds yield index on top of non-zero base": {
+		"Success: adds yields index on top of non-zero base": {
 			totalTDaiPreMint: big.NewInt(100_000_000_000_000),
 			totalTDaiMinted:  big.NewInt(5_000_000_000),
 			marketPrice: pricestypes.MarketPrice{
@@ -3957,14 +3957,14 @@ func TestGeneratePerpetualWithUpdatedYieldIndex(t *testing.T) {
 				Params:       testBasePerpetual.Params,
 				FundingIndex: testBasePerpetual.FundingIndex,
 				OpenInterest: testBasePerpetual.OpenInterest,
-				YieldIndex:   big.NewRat(1, 20_000).String(),
+				YieldsIndex:  big.NewRat(1, 20_000).String(),
 			},
 			expectedErr: nil,
 			expectedPerp: types.Perpetual{
 				Params:       testBasePerpetual.Params,
 				FundingIndex: testBasePerpetual.FundingIndex,
 				OpenInterest: testBasePerpetual.OpenInterest,
-				YieldIndex:   big.NewRat(3, 20_000).String(),
+				YieldsIndex:  big.NewRat(3, 20_000).String(),
 			},
 		},
 		"Failure: total tDai pre-mint is 0": {
@@ -4003,7 +4003,7 @@ func TestGeneratePerpetualWithUpdatedYieldIndex(t *testing.T) {
 			perpetual:   testBasePerpetual,
 			expectedErr: types.ErrTotalTDaiMintedIsNil,
 		},
-		"Failure: perp yield index malformed and cannot be parsed": {
+		"Failure: perp yields index malformed and cannot be parsed": {
 			totalTDaiPreMint: big.NewInt(100_000_000),
 			totalTDaiMinted:  nil,
 			marketPrice: pricestypes.MarketPrice{
@@ -4016,7 +4016,7 @@ func TestGeneratePerpetualWithUpdatedYieldIndex(t *testing.T) {
 				Params:       testBasePerpetual.Params,
 				FundingIndex: testBasePerpetual.FundingIndex,
 				OpenInterest: testBasePerpetual.OpenInterest,
-				YieldIndex:   "malformed",
+				YieldsIndex:  "malformed",
 			},
 			expectedErr: types.ErrTotalTDaiMintedIsNil,
 		},
@@ -4059,7 +4059,7 @@ func TestGeneratePerpetualWithUpdatedYieldIndex(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			resultPerp, err := pc.PerpetualsKeeper.GeneratePerpetualWithUpdatedYieldIndex(
+			resultPerp, err := pc.PerpetualsKeeper.GeneratePerpetualWithUpdatedYieldsIndex(
 				pc.Ctx,
 				tc.totalTDaiPreMint,
 				tc.totalTDaiMinted,
@@ -4078,7 +4078,7 @@ func TestGeneratePerpetualWithUpdatedYieldIndex(t *testing.T) {
 	}
 }
 
-func TestUpdateYieldIndexToNewMint(t *testing.T) {
+func TestUpdateYieldsIndexToNewMint(t *testing.T) {
 	testId1 := uint32(999)
 	testTicker1 := "TEST1-USD"
 	testBasePerpetual1 := types.Perpetual{
@@ -4094,7 +4094,7 @@ func TestUpdateYieldIndexToNewMint(t *testing.T) {
 		},
 		FundingIndex: constants.BtcUsd_0DefaultFunding_6AtomicResolution.FundingIndex,
 		OpenInterest: constants.BtcUsd_0DefaultFunding_6AtomicResolution.OpenInterest,
-		YieldIndex:   constants.BtcUsd_0DefaultFunding_6AtomicResolution.YieldIndex,
+		YieldsIndex:  constants.BtcUsd_0DefaultFunding_6AtomicResolution.YieldsIndex,
 	}
 
 	testId2 := uint32(1000)
@@ -4112,7 +4112,7 @@ func TestUpdateYieldIndexToNewMint(t *testing.T) {
 		},
 		FundingIndex: constants.EthUsd_0DefaultFunding_6AtomicResolution.FundingIndex,
 		OpenInterest: constants.EthUsd_0DefaultFunding_6AtomicResolution.OpenInterest,
-		YieldIndex:   constants.EthUsd_0DefaultFunding_6AtomicResolution.YieldIndex,
+		YieldsIndex:  constants.EthUsd_0DefaultFunding_6AtomicResolution.YieldsIndex,
 	}
 
 	testCases := map[string]struct {
@@ -4123,7 +4123,7 @@ func TestUpdateYieldIndexToNewMint(t *testing.T) {
 		expectedErr      error
 		expectedPerps    []types.Perpetual
 	}{
-		"Success: updates yield when one perp present": {
+		"Success: updates yields when one perp present": {
 			totalTDaiPreMint: big.NewInt(100_000_000_000_000),
 			totalTDaiMinted:  big.NewInt(5_000_000_000),
 			markets: []pricestypes.MarketPrice{
@@ -4143,12 +4143,12 @@ func TestUpdateYieldIndexToNewMint(t *testing.T) {
 					FundingIndex:    testBasePerpetual1.FundingIndex,
 					OpenInterest:    testBasePerpetual1.OpenInterest,
 					LastFundingRate: testBasePerpetual1.LastFundingRate,
-					YieldIndex:      big.NewRat(1, 20_000).String(),
+					YieldsIndex:     big.NewRat(1, 20_000).String(),
 				},
 			},
 			expectedErr: nil,
 		},
-		"Success: updates yield when multiple perp markets present": {
+		"Success: updates yields when multiple perp markets present": {
 			totalTDaiPreMint: big.NewInt(100_000_000_000_000),
 			totalTDaiMinted:  big.NewInt(5_000_000_000),
 			markets: []pricestypes.MarketPrice{
@@ -4175,14 +4175,14 @@ func TestUpdateYieldIndexToNewMint(t *testing.T) {
 					FundingIndex:    testBasePerpetual1.FundingIndex,
 					OpenInterest:    testBasePerpetual1.OpenInterest,
 					LastFundingRate: testBasePerpetual1.LastFundingRate,
-					YieldIndex:      big.NewRat(1, 20_000).String(),
+					YieldsIndex:     big.NewRat(1, 20_000).String(),
 				},
 				{
 					Params:          testBasePerpetual2.Params,
 					FundingIndex:    testBasePerpetual2.FundingIndex,
 					OpenInterest:    testBasePerpetual2.OpenInterest,
 					LastFundingRate: testBasePerpetual2.LastFundingRate,
-					YieldIndex:      big.NewRat(1, 10_000).String(),
+					YieldsIndex:     big.NewRat(1, 10_000).String(),
 				},
 			},
 			expectedErr: nil,
@@ -4306,7 +4306,7 @@ func TestUpdateYieldIndexToNewMint(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			err = pc.PerpetualsKeeper.UpdateYieldIndexToNewMint(pc.Ctx, tc.totalTDaiPreMint, tc.totalTDaiMinted)
+			err = pc.PerpetualsKeeper.UpdateYieldsIndexToNewMint(pc.Ctx, tc.totalTDaiPreMint, tc.totalTDaiMinted)
 
 			if tc.expectedErr != nil {
 				require.Error(t, err)
@@ -4318,7 +4318,7 @@ func TestUpdateYieldIndexToNewMint(t *testing.T) {
 					require.Equal(t, expectedPerp.Params, actualPerp.Params)
 					require.Equal(t, expectedPerp.FundingIndex, actualPerp.FundingIndex)
 					require.Equal(t, expectedPerp.OpenInterest, actualPerp.OpenInterest)
-					require.Equal(t, expectedPerp.YieldIndex, actualPerp.YieldIndex)
+					require.Equal(t, expectedPerp.YieldsIndex, actualPerp.YieldsIndex)
 					if expectedPerp.LastFundingRate.BigInt() == nil || expectedPerp.LastFundingRate.BigInt().Cmp(big.NewInt(0)) == 0 {
 						require.True(t, actualPerp.LastFundingRate.BigInt() == nil || actualPerp.LastFundingRate.BigInt().Cmp(big.NewInt(0)) == 0)
 					} else {

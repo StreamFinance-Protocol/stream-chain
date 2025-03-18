@@ -22,24 +22,24 @@ func TestGenesis(t *testing.T) {
 					Owner:  "foo",
 					Number: uint32(0),
 				},
-				AssetPositions:  keepertest.CreateTDaiAssetPosition(big.NewInt(1_000)),
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetPositions:   keepertest.CreateTDaiAssetPosition(big.NewInt(1_000)),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 			{
 				Id: &types.SubaccountId{
 					Owner:  "bar",
 					Number: uint32(99),
 				},
-				AssetPositions:  keepertest.CreateTDaiAssetPosition(big.NewInt(1_000)),
-				AssetYieldIndex: big.NewRat(1, 1).String(),
+				AssetPositions:   keepertest.CreateTDaiAssetPosition(big.NewInt(1_000)),
+				AssetYieldsIndex: big.NewRat(1, 1).String(),
 			},
 			{
 				Id: &types.SubaccountId{
 					Owner:  "bar",
 					Number: uint32(101),
 				},
-				AssetPositions:  keepertest.CreateTDaiAssetPosition(big.NewInt(100)),
-				AssetYieldIndex: big.NewRat(2, 1).String(),
+				AssetPositions:   keepertest.CreateTDaiAssetPosition(big.NewInt(100)),
+				AssetYieldsIndex: big.NewRat(2, 1).String(),
 			},
 		},
 	}

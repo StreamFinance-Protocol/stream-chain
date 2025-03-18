@@ -27,7 +27,7 @@ import (
 	vetesting "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/ve"
 	pk "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/keeper"
 	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
-	ratelimitkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/keeper"
+	yieldskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/keeper"
 	cometabci "github.com/cometbft/cometbft/abci/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/suite"
@@ -40,7 +40,7 @@ type PreBlockTestSuite struct {
 	ctx               sdk.Context
 	marketParamPrices []pricestypes.MarketParamPrice
 	pricesKeeper      *pk.Keeper
-	ratelimitKeeper   *ratelimitkeeper.Keeper
+	yieldsKeeper      *yieldskeeper.Keeper
 	daemonPriceCache  *pricefeedtypes.MarketToExchangePrices
 	veApplier         *veapplier.VEApplier
 	handler           *preblocker.PreBlockHandler
@@ -57,13 +57,13 @@ func TestPreBlockTestSuite(t *testing.T) {
 func (s *PreBlockTestSuite) SetupTest() {
 	s.validator = constants.AliceConsAddress
 
-	ctx, _, pricesKeeper, _, _, _, _, ratelimitKeeper, _, _ := keepertest.SubaccountsKeepers(s.T(), true)
+	ctx, _, pricesKeeper, _, _, _, _, yieldsKeeper, _, _ := keepertest.SubaccountsKeepers(s.T(), true)
 
 	mockTimeProvider := &mocks.TimeProvider{}
 	mockTimeProvider.On("Now").Return(constants.TimeT)
 	s.ctx = ctx
 	s.pricesKeeper = pricesKeeper
-	s.ratelimitKeeper = ratelimitKeeper
+	s.yieldsKeeper = yieldsKeeper
 	s.daemonPriceCache = pricesKeeper.DaemonPriceCache
 
 	s.voteCodec = vecodec.NewDefaultVoteExtensionCodec()
@@ -89,7 +89,7 @@ func (s *PreBlockTestSuite) SetupTest() {
 	aggregator := veaggregator.NewVeAggregator(
 		s.logger,
 		*s.pricesKeeper,
-		*s.ratelimitKeeper,
+		*s.yieldsKeeper,
 		pricesAggregatorFn,
 		conversionRateAggregatorFn,
 	)
@@ -102,7 +102,7 @@ func (s *PreBlockTestSuite) SetupTest() {
 		s.logger,
 		aggregator,
 		*s.pricesKeeper,
-		*s.ratelimitKeeper,
+		*s.yieldsKeeper,
 		s.voteCodec,
 		s.extCodec,
 		&spotPriceUpdateCache,

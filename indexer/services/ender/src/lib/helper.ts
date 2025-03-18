@@ -25,7 +25,7 @@ import {
   SubaccountMessage,
   OpenInterestUpdateEventV1,
   DeleveragingEventV1,
-  UpdateYieldParamsEventV1,
+  UpdateYieldsParamsEventV1,
   CollateralPoolUpsertEvent,
 } from '@klyraprotocol-indexer/v4-protos';
 import Big from 'big.js';
@@ -243,10 +243,10 @@ export function indexerTendermintEventToEventProtoWithType(
         blockEventIndex,
       };
     }
-    case KlyraIndexerSubtypes.YIELD_PARAMS.toString(): {
+    case KlyraIndexerSubtypes.YIELDS_PARAMS.toString(): {
       return {
-        type: KlyraIndexerSubtypes.YIELD_PARAMS,
-        eventProto: UpdateYieldParamsEventV1.decode(eventDataBinary),
+        type: KlyraIndexerSubtypes.YIELDS_PARAMS,
+        eventProto: UpdateYieldsParamsEventV1.decode(eventDataBinary),
         indexerTendermintEvent: event,
         version,
         blockEventIndex,

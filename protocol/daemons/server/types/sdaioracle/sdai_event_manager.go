@@ -18,7 +18,7 @@ var (
 		ConversionRate: "1006681181716810314385961731",
 	}
 
-	TestSDAIEventRequestNoYield = api.AddsDAIEventRequest{
+	TestSDAIEventRequestNoYields = api.AddsDAIEventRequest{
 		ConversionRate: "1000000000000000000000000000",
 	}
 )
@@ -32,13 +32,13 @@ func (m *MockEventFetcher) GetInitialEvent(empty bool) (api.AddsDAIEventRequest,
 	return TestSDAIEventRequest, nil
 }
 
-type MockEventFetcherNoYield struct{}
+type MockEventFetcherNoYields struct{}
 
-func (m *MockEventFetcherNoYield) GetInitialEvent(empty bool) (api.AddsDAIEventRequest, error) {
+func (m *MockEventFetcherNoYields) GetInitialEvent(empty bool) (api.AddsDAIEventRequest, error) {
 	if empty {
 		return api.AddsDAIEventRequest{}, nil
 	}
-	return TestSDAIEventRequestNoYield, nil
+	return TestSDAIEventRequestNoYields, nil
 }
 
 type MockEventFetcherNoEvents struct{}
@@ -98,17 +98,17 @@ func (s *sDAIEventManagerMockImpl) GetSDaiPrice() api.AddsDAIEventRequest {
 	return TestSDAIEventRequest
 }
 
-type sDAIEventManagerMockNoYieldImpl struct {
+type sDAIEventManagerMockNoYieldsImpl struct {
 	sync.Mutex
 	price api.AddsDAIEventRequest
 }
 
-func (s *sDAIEventManagerMockNoYieldImpl) AddsDAIEvent(event *api.AddsDAIEventRequest) error {
+func (s *sDAIEventManagerMockNoYieldsImpl) AddsDAIEvent(event *api.AddsDAIEventRequest) error {
 	return nil
 }
 
-func (s *sDAIEventManagerMockNoYieldImpl) GetSDaiPrice() api.AddsDAIEventRequest {
-	return TestSDAIEventRequestNoYield
+func (s *sDAIEventManagerMockNoYieldsImpl) GetSDaiPrice() api.AddsDAIEventRequest {
+	return TestSDAIEventRequestNoYields
 }
 
 // NewsDAIEventManager creates a new SDAIEventManager.
@@ -142,7 +142,7 @@ func NewsDAIMockEventManager(isEmpty ...bool) SDAIEventManager {
 	}
 }
 
-func NewsDAIMockNoYieldEventManager(isEmpty ...bool) SDAIEventManager {
+func NewsDAIMockNoYieldsEventManager(isEmpty ...bool) SDAIEventManager {
 	empty := false
 	if len(isEmpty) > 0 && isEmpty[0] {
 		empty = true
@@ -152,7 +152,7 @@ func NewsDAIMockNoYieldEventManager(isEmpty ...bool) SDAIEventManager {
 	if err != nil {
 		log.Fatalf("Failed to get initial events: %v", err)
 	}
-	return &sDAIEventManagerMockNoYieldImpl{
+	return &sDAIEventManagerMockNoYieldsImpl{
 		price: event,
 	}
 }
@@ -181,7 +181,7 @@ func SetupMockEventManager(isEmpty ...bool) SDAIEventManager {
 	return NewsDAIEventManager()
 }
 
-func SetupMockFixedYieldEventManager(isEmpty ...bool) SDAIEventManager {
+func SetupMockFixedYieldsEventManager(isEmpty ...bool) SDAIEventManager {
 	SDAIEventFetcher = &MockEventFetcher{}
 
 	if len(isEmpty) > 0 && isEmpty[0] {
@@ -190,13 +190,13 @@ func SetupMockFixedYieldEventManager(isEmpty ...bool) SDAIEventManager {
 	return NewsDAIMockEventManager()
 }
 
-func SetupMockEventManagerNoYield(isEmpty ...bool) SDAIEventManager {
-	SDAIEventFetcher = &MockEventFetcherNoYield{}
+func SetupMockEventManagerNoYields(isEmpty ...bool) SDAIEventManager {
+	SDAIEventFetcher = &MockEventFetcherNoYields{}
 
 	if len(isEmpty) > 0 && isEmpty[0] {
-		return NewsDAIMockNoYieldEventManager(true)
+		return NewsDAIMockNoYieldsEventManager(true)
 	}
-	return NewsDAIMockNoYieldEventManager()
+	return NewsDAIMockNoYieldsEventManager()
 }
 
 func SetupMockEventManagerWithNoEvents() SDAIEventManager {

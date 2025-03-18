@@ -31,7 +31,7 @@ import {
   SubaccountUpdateEventV1,
   Timestamp,
   TransferEventV1,
-  UpdateYieldParamsEventV1,
+  UpdateYieldsParamsEventV1,
 } from '@klyraprotocol-indexer/v4-protos';
 import { createIndexerTendermintBlock, createIndexerTendermintEvent } from '../helpers/indexer-proto-helpers';
 import { onMessage } from '../../src/lib/on-message';
@@ -50,7 +50,7 @@ import {
   defaultPreviousHeight,
   defaultSubaccountMessage,
   defaultPerpetualMarketCreateEventV1,
-  defaultUpdateYieldParamsEvent1,
+  defaultUpdateYieldsParamsEvent1,
 } from '../helpers/constants';
 import { updateBlockCache } from '../../src/caches/block-cache';
 import Long from 'long';
@@ -100,7 +100,7 @@ describe('on-message', () => {
         owner: '',
         number: 0,
       },
-      yieldIndex: '0/1',
+      yieldsIndex: '0/1',
     });
   const defaultSubaccountUpdateEventBinary: Uint8Array = Uint8Array.from(
     SubaccountUpdateEventV1.encode(
@@ -154,9 +154,9 @@ describe('on-message', () => {
     ).finish(),
   );
 
-  const defaultUpdateYieldParamsEventBinary: Uint8Array = Uint8Array.from(
-    UpdateYieldParamsEventV1.encode(
-      defaultUpdateYieldParamsEvent1,
+  const defaultUpdateYieldsParamsEventBinary: Uint8Array = Uint8Array.from(
+    UpdateYieldsParamsEventV1.encode(
+      defaultUpdateYieldsParamsEvent1,
     ).finish(),
   );
 
@@ -241,7 +241,7 @@ describe('on-message', () => {
     const eventIndex: number = 0;
     const eventIndex1: number = 1;
     // NOTE: A transfer event writes to the subaccounts table.
-    // A subaccount row should always have an asset yield index.
+    // A subaccount row should always have an asset yields index.
     // To ensure this, we need at least one subaccount update
     // event before a transfer event.
     const events: IndexerTendermintEvent[] = [
@@ -519,13 +519,13 @@ describe('on-message', () => {
       expect.any(Number), 1, { success: 'true' });
   });
 
-  it('successfully processes block with yield params event', async () => {
+  it('successfully processes block with yields params event', async () => {
     const transactionIndex: number = 0;
     const eventIndex: number = 0;
     const events: IndexerTendermintEvent[] = [
       createIndexerTendermintEvent(
-        KlyraIndexerSubtypes.YIELD_PARAMS,
-        defaultUpdateYieldParamsEventBinary,
+        KlyraIndexerSubtypes.YIELDS_PARAMS,
+        defaultUpdateYieldsParamsEventBinary,
         transactionIndex,
         eventIndex,
       ),

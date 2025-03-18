@@ -1,27 +1,27 @@
 import { Rpc } from "../../helpers";
 import * as _m0 from "protobufjs/minimal";
-import { MsgClaimYieldForSubaccount, MsgClaimYieldForSubaccountResponse } from "./tx";
+import { MsgClaimYieldsForSubaccount, MsgClaimYieldsForSubaccountResponse } from "./tx";
 /** Msg defines the Msg service. */
 
 export interface Msg {
   /**
-   * ClaimYieldForSubaccount claims the yield for the provided subaccount and
+   * ClaimYieldsForSubaccount claims the yields for the provided subaccount and
    * persists it to state.
    */
-  claimYieldForSubaccount(request: MsgClaimYieldForSubaccount): Promise<MsgClaimYieldForSubaccountResponse>;
+  claimYieldsForSubaccount(request: MsgClaimYieldsForSubaccount): Promise<MsgClaimYieldsForSubaccountResponse>;
 }
 export class MsgClientImpl implements Msg {
   private readonly rpc: Rpc;
 
   constructor(rpc: Rpc) {
     this.rpc = rpc;
-    this.claimYieldForSubaccount = this.claimYieldForSubaccount.bind(this);
+    this.claimYieldsForSubaccount = this.claimYieldsForSubaccount.bind(this);
   }
 
-  claimYieldForSubaccount(request: MsgClaimYieldForSubaccount): Promise<MsgClaimYieldForSubaccountResponse> {
-    const data = MsgClaimYieldForSubaccount.encode(request).finish();
-    const promise = this.rpc.request("klyraprotocol.subaccounts.Msg", "ClaimYieldForSubaccount", data);
-    return promise.then(data => MsgClaimYieldForSubaccountResponse.decode(new _m0.Reader(data)));
+  claimYieldsForSubaccount(request: MsgClaimYieldsForSubaccount): Promise<MsgClaimYieldsForSubaccountResponse> {
+    const data = MsgClaimYieldsForSubaccount.encode(request).finish();
+    const promise = this.rpc.request("klyraprotocol.subaccounts.Msg", "ClaimYieldsForSubaccount", data);
+    return promise.then(data => MsgClaimYieldsForSubaccountResponse.decode(new _m0.Reader(data)));
   }
 
 }

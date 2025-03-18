@@ -5,8 +5,8 @@ import (
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib"
 	bridgetypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
 	perpetualstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
-	ratelimittypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
+	yieldstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/types"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/codec"
 	addresscodec "github.com/cosmos/cosmos-sdk/codec/address"
@@ -18,7 +18,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 )
 
 func createAccountKeeper(
@@ -44,8 +43,8 @@ func createAccountKeeper(
 		types.FeeCollectorName:            nil,
 		satypes.ModuleName:                nil,
 		perpetualstypes.InsuranceFundName: nil,
-		ratelimittypes.SDaiPoolAccount:    {types.Minter, types.Burner},
-		ibctransfertypes.ModuleName:       {types.Minter, types.Burner},
+		yieldstypes.SDaiPoolAccount:       {types.Minter, types.Burner},
+		yieldstypes.TDaiPoolAccount:       {types.Minter, types.Burner},
 		satypes.LiquidityFeeModuleAddress: nil,
 	}
 

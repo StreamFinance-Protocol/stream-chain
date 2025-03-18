@@ -24,10 +24,10 @@ import (
 	feetierstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/feetiers/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	pricestypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/prices/types"
-	ratelimitcli "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/client/cli"
-	ratelimittypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
 	sa_testutil "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/client/testutil"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
+	ratelimitcli "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/client/cli"
+	yieldstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 	networktestutil "github.com/cosmos/cosmos-sdk/testutil/network"
@@ -54,14 +54,14 @@ type CancelOrderIntegrationTestSuite struct {
 	network          *network.Network
 }
 
-func GetBalanceAfterYield(clientCtx client.Context, initialBalance *big.Int) (balance int64, err error) {
+func GetBalanceAfterYields(clientCtx client.Context, initialBalance *big.Int) (balance int64, err error) {
 	args := []string{}
 	data, err := clitestutil.ExecTestCLICmd(clientCtx, ratelimitcli.CmdGetSDAIPriceQuery(), args)
 	if err != nil {
 		return 0, err
 	}
 
-	var resp ratelimittypes.GetSDAIPriceQueryResponse
+	var resp yieldstypes.GetSDAIPriceQueryResponse
 	err = json.Unmarshal(data.Bytes(), &resp)
 	if err != nil {
 		return 0, err
@@ -73,8 +73,8 @@ func GetBalanceAfterYield(clientCtx client.Context, initialBalance *big.Int) (ba
 	}
 
 	precision := new(big.Int).Exp(
-		big.NewInt(ratelimittypes.BASE_10),
-		big.NewInt(ratelimittypes.SDAI_DECIMALS),
+		big.NewInt(yieldstypes.BASE_10),
+		big.NewInt(yieldstypes.SDAI_DECIMALS),
 		nil,
 	)
 
@@ -598,7 +598,7 @@ func (s *CancelOrderIntegrationTestSuite) TestCLICancelMatchingOrders() {
 		constants.ClobPair_Btc.QuantumConversionExponent,
 	).Int64()
 
-	// cancelsInitialQuoteBalanceAfterYield, err := GetBalanceAfterYield(ctx, new(big.Int).SetInt64(cancelsInitialQuoteBalance))
+	// cancelsInitialQuoteBalanceAfterYields, err := GetBalanceAfterYields(ctx, new(big.Int).SetInt64(cancelsInitialQuoteBalance))
 	// s.Require().NoError(err)
 
 	// Assert that both Subaccounts have the appropriate state.
@@ -672,7 +672,7 @@ func (s *CancelOrderIntegrationTestSuite) TestCLICancelMatchingOrders() {
 	s.Require().NoError(err)
 	s.Require().Equal(makerFee+takerFee, distrModuleTDaiBalance)
 
-	// test the sdai - we comment this out because we test it above as we include yield in the subaccount calc
+	// test the sdai - we comment this out because we test it above as we include yields in the subaccount calc
 
 	// cfg := network.DefaultConfig(nil)
 
@@ -685,7 +685,7 @@ func (s *CancelOrderIntegrationTestSuite) TestCLICancelMatchingOrders() {
 	// data, _, err = network.QueryCustomNetwork(rateQuery)
 
 	// require.NoError(s.T(), err)
-	// var respSdai ratelimittypes.GetSDAIPriceQueryResponse
+	// var respSdai yieldstypes.GetSDAIPriceQueryResponse
 	// require.NoError(s.T(), cfg.Codec.UnmarshalJSON(data, &respSdai))
 
 	// chiFloat, success := new(big.Float).SetString(chi)

@@ -16,7 +16,7 @@ import (
 	libeth "github.com/StreamFinance-Protocol/stream-chain/protocol/lib/eth"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib/metrics"
 	bridgetypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
-	ratelimittypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/types"
+	yieldstypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/types"
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	eth "github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
@@ -218,7 +218,7 @@ func (s *SubTaskRunnerImpl) GetWithdrawContractCallParams(
 ) ([]BridgeContractWithdrawRequest, error) {
 	requests := make([]BridgeContractWithdrawRequest, len(events.Withdrawals))
 	for i, event := range events.Withdrawals {
-		if event.Coin.Denom != ratelimittypes.SDaiDenom {
+		if event.Coin.Denom != yieldstypes.SDaiDenom {
 			return nil, fmt.Errorf("unsupported denom: %s", event.Coin.Denom)
 		}
 

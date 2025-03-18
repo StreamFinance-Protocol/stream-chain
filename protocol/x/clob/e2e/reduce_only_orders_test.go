@@ -12,8 +12,8 @@ import (
 	vetesting "github.com/StreamFinance-Protocol/stream-chain/protocol/testutil/ve"
 	clobtypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
-	ratelimitkeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/ratelimit/keeper"
 	satypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/subaccounts/types"
+	yieldskeeper "github.com/StreamFinance-Protocol/stream-chain/protocol/x/yields/keeper"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/cometbft/cometbft/types"
 	"github.com/stretchr/testify/require"
@@ -78,10 +78,10 @@ func TestReduceOnlyOrders(t *testing.T) {
 							PerpetualId:  0,
 							Quantums:     dtypes.NewInt(100),
 							FundingIndex: dtypes.NewInt(0),
-							YieldIndex:   big.NewRat(0, 1).String(),
+							YieldsIndex:  big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Alice_Num1,
@@ -96,10 +96,10 @@ func TestReduceOnlyOrders(t *testing.T) {
 							PerpetualId:  0,
 							Quantums:     dtypes.NewInt(99_999_900),
 							FundingIndex: dtypes.NewInt(0),
-							YieldIndex:   big.NewRat(0, 1).String(),
+							YieldsIndex:  big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 			},
 		},
@@ -146,10 +146,10 @@ func TestReduceOnlyOrders(t *testing.T) {
 							PerpetualId:  0,
 							Quantums:     dtypes.NewInt(100),
 							FundingIndex: dtypes.NewInt(0),
-							YieldIndex:   big.NewRat(0, 1).String(),
+							YieldsIndex:  big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Alice_Num1,
@@ -164,10 +164,10 @@ func TestReduceOnlyOrders(t *testing.T) {
 							PerpetualId:  0,
 							Quantums:     dtypes.NewInt(99_999_900),
 							FundingIndex: dtypes.NewInt(0),
-							YieldIndex:   big.NewRat(0, 1).String(),
+							YieldsIndex:  big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 			},
 		},
@@ -214,10 +214,10 @@ func TestReduceOnlyOrders(t *testing.T) {
 							PerpetualId:  0,
 							Quantums:     dtypes.NewInt(150),
 							FundingIndex: dtypes.NewInt(0),
-							YieldIndex:   big.NewRat(0, 1).String(),
+							YieldsIndex:  big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Alice_Num1,
@@ -232,10 +232,10 @@ func TestReduceOnlyOrders(t *testing.T) {
 							PerpetualId:  0,
 							Quantums:     dtypes.NewInt(99_999_850),
 							FundingIndex: dtypes.NewInt(0),
-							YieldIndex:   big.NewRat(0, 1).String(),
+							YieldsIndex:  big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 			},
 		},
@@ -285,10 +285,10 @@ func TestReduceOnlyOrders(t *testing.T) {
 							PerpetualId:  0,
 							Quantums:     dtypes.NewInt(150),
 							FundingIndex: dtypes.NewInt(0),
-							YieldIndex:   big.NewRat(0, 1).String(),
+							YieldsIndex:  big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Alice_Num1,
@@ -303,10 +303,10 @@ func TestReduceOnlyOrders(t *testing.T) {
 							PerpetualId:  0,
 							Quantums:     dtypes.NewInt(99_999_850),
 							FundingIndex: dtypes.NewInt(0),
-							YieldIndex:   big.NewRat(0, 1).String(),
+							YieldsIndex:  big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 			},
 		},
@@ -354,10 +354,10 @@ func TestReduceOnlyOrders(t *testing.T) {
 							PerpetualId:  0,
 							Quantums:     dtypes.NewInt(150),
 							FundingIndex: dtypes.NewInt(0),
-							YieldIndex:   big.NewRat(0, 1).String(),
+							YieldsIndex:  big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Alice_Num1,
@@ -372,10 +372,10 @@ func TestReduceOnlyOrders(t *testing.T) {
 							PerpetualId:  0,
 							Quantums:     dtypes.NewInt(99_999_850),
 							FundingIndex: dtypes.NewInt(0),
-							YieldIndex:   big.NewRat(0, 1).String(),
+							YieldsIndex:  big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 			},
 		},
@@ -429,10 +429,10 @@ func TestReduceOnlyOrders(t *testing.T) {
 							PerpetualId:  0,
 							Quantums:     dtypes.NewInt(50_000_000),
 							FundingIndex: dtypes.NewInt(0),
-							YieldIndex:   big.NewRat(0, 1).String(),
+							YieldsIndex:  big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Alice_Num1,
@@ -447,10 +447,10 @@ func TestReduceOnlyOrders(t *testing.T) {
 							PerpetualId:  0,
 							Quantums:     dtypes.NewInt(50_000_000),
 							FundingIndex: dtypes.NewInt(0),
-							YieldIndex:   big.NewRat(0, 1).String(),
+							YieldsIndex:  big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 			},
 		},
@@ -503,10 +503,10 @@ func TestReduceOnlyOrders(t *testing.T) {
 							PerpetualId:  0,
 							Quantums:     dtypes.NewInt(25_000_000),
 							FundingIndex: dtypes.NewInt(0),
-							YieldIndex:   big.NewRat(0, 1).String(),
+							YieldsIndex:  big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 				{
 					Id: &constants.Alice_Num1,
@@ -521,10 +521,10 @@ func TestReduceOnlyOrders(t *testing.T) {
 							PerpetualId:  0,
 							Quantums:     dtypes.NewInt(75_000_000),
 							FundingIndex: dtypes.NewInt(0),
-							YieldIndex:   big.NewRat(0, 1).String(),
+							YieldsIndex:  big.NewRat(0, 1).String(),
 						},
 					},
-					AssetYieldIndex: big.NewRat(1, 1).String(),
+					AssetYieldsIndex: big.NewRat(1, 1).String(),
 				},
 			},
 		},
@@ -559,21 +559,21 @@ func TestReduceOnlyOrders(t *testing.T) {
 				}).Build()
 
 			rateString := sdaiservertypes.TestSDAIEventRequest.ConversionRate
-			rate, conversionErr := ratelimitkeeper.ConvertStringToBigInt(rateString)
+			rate, conversionErr := yieldskeeper.ConvertStringToBigInt(rateString)
 
 			require.NoError(t, conversionErr)
 
-			tApp.App.RatelimitKeeper.SetSDAIPrice(tApp.App.NewUncachedContext(false, tmproto.Header{}), rate)
-			tApp.App.RatelimitKeeper.SetAssetYieldIndex(tApp.App.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+			tApp.App.YieldsKeeper.SetSDAIPrice(tApp.App.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.App.YieldsKeeper.SetAssetYieldsIndex(tApp.App.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
-			tApp.CrashingApp.RatelimitKeeper.SetSDAIPrice(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), rate)
-			tApp.CrashingApp.RatelimitKeeper.SetAssetYieldIndex(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+			tApp.CrashingApp.YieldsKeeper.SetSDAIPrice(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.CrashingApp.YieldsKeeper.SetAssetYieldsIndex(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
-			tApp.NoCheckTxApp.RatelimitKeeper.SetSDAIPrice(tApp.NoCheckTxApp.NewUncachedContext(false, tmproto.Header{}), rate)
-			tApp.NoCheckTxApp.RatelimitKeeper.SetAssetYieldIndex(tApp.NoCheckTxApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+			tApp.NoCheckTxApp.YieldsKeeper.SetSDAIPrice(tApp.NoCheckTxApp.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.NoCheckTxApp.YieldsKeeper.SetAssetYieldsIndex(tApp.NoCheckTxApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
-			tApp.ParallelApp.RatelimitKeeper.SetSDAIPrice(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), rate)
-			tApp.ParallelApp.RatelimitKeeper.SetAssetYieldIndex(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+			tApp.ParallelApp.YieldsKeeper.SetSDAIPrice(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.ParallelApp.YieldsKeeper.SetAssetYieldsIndex(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
 			ctx := tApp.InitChain()
 
@@ -775,21 +775,21 @@ func TestReduceOnlyOrderFailure(t *testing.T) {
 			}).Build()
 
 			rateString := sdaiservertypes.TestSDAIEventRequest.ConversionRate
-			rate, conversionErr := ratelimitkeeper.ConvertStringToBigInt(rateString)
+			rate, conversionErr := yieldskeeper.ConvertStringToBigInt(rateString)
 
 			require.NoError(t, conversionErr)
 
-			tApp.App.RatelimitKeeper.SetSDAIPrice(tApp.App.NewUncachedContext(false, tmproto.Header{}), rate)
-			tApp.App.RatelimitKeeper.SetAssetYieldIndex(tApp.App.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+			tApp.App.YieldsKeeper.SetSDAIPrice(tApp.App.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.App.YieldsKeeper.SetAssetYieldsIndex(tApp.App.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
-			tApp.CrashingApp.RatelimitKeeper.SetSDAIPrice(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), rate)
-			tApp.CrashingApp.RatelimitKeeper.SetAssetYieldIndex(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+			tApp.CrashingApp.YieldsKeeper.SetSDAIPrice(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.CrashingApp.YieldsKeeper.SetAssetYieldsIndex(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
-			tApp.NoCheckTxApp.RatelimitKeeper.SetSDAIPrice(tApp.NoCheckTxApp.NewUncachedContext(false, tmproto.Header{}), rate)
-			tApp.NoCheckTxApp.RatelimitKeeper.SetAssetYieldIndex(tApp.NoCheckTxApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+			tApp.NoCheckTxApp.YieldsKeeper.SetSDAIPrice(tApp.NoCheckTxApp.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.NoCheckTxApp.YieldsKeeper.SetAssetYieldsIndex(tApp.NoCheckTxApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
-			tApp.ParallelApp.RatelimitKeeper.SetSDAIPrice(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), rate)
-			tApp.ParallelApp.RatelimitKeeper.SetAssetYieldIndex(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+			tApp.ParallelApp.YieldsKeeper.SetSDAIPrice(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.ParallelApp.YieldsKeeper.SetAssetYieldsIndex(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
 			ctx := tApp.InitChain()
 
@@ -837,7 +837,7 @@ func TestReduceOnlyOrderReplacement(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(60), // 60 quantums of BTC long
-							YieldIndex:  big.NewRat(0, 1).String(),
+							YieldsIndex: big.NewRat(0, 1).String(),
 						},
 					},
 				},
@@ -885,7 +885,7 @@ func TestReduceOnlyOrderReplacement(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(60), // 60 quantums of BTC long
-							YieldIndex:  big.NewRat(0, 1).String(),
+							YieldsIndex: big.NewRat(0, 1).String(),
 						},
 					},
 				},
@@ -935,7 +935,7 @@ func TestReduceOnlyOrderReplacement(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(60), // 60 quantums of BTC long
-							YieldIndex:  big.NewRat(0, 1).String(),
+							YieldsIndex: big.NewRat(0, 1).String(),
 						},
 					},
 				},
@@ -984,7 +984,7 @@ func TestReduceOnlyOrderReplacement(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(110), // 110 quantums of BTC long
-							YieldIndex:  big.NewRat(0, 1).String(),
+							YieldsIndex: big.NewRat(0, 1).String(),
 						},
 					},
 				},
@@ -1032,7 +1032,7 @@ func TestReduceOnlyOrderReplacement(t *testing.T) {
 						{
 							PerpetualId: 0,
 							Quantums:    dtypes.NewInt(60), // 60 quantums of BTC long
-							YieldIndex:  big.NewRat(0, 1).String(),
+							YieldsIndex: big.NewRat(0, 1).String(),
 						},
 					},
 				},
@@ -1089,21 +1089,21 @@ func TestReduceOnlyOrderReplacement(t *testing.T) {
 				Build()
 
 			rateString := sdaiservertypes.TestSDAIEventRequest.ConversionRate
-			rate, conversionErr := ratelimitkeeper.ConvertStringToBigInt(rateString)
+			rate, conversionErr := yieldskeeper.ConvertStringToBigInt(rateString)
 
 			require.NoError(t, conversionErr)
 
-			tApp.App.RatelimitKeeper.SetSDAIPrice(tApp.App.NewUncachedContext(false, tmproto.Header{}), rate)
-			tApp.App.RatelimitKeeper.SetAssetYieldIndex(tApp.App.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+			tApp.App.YieldsKeeper.SetSDAIPrice(tApp.App.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.App.YieldsKeeper.SetAssetYieldsIndex(tApp.App.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
-			tApp.CrashingApp.RatelimitKeeper.SetSDAIPrice(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), rate)
-			tApp.CrashingApp.RatelimitKeeper.SetAssetYieldIndex(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+			tApp.CrashingApp.YieldsKeeper.SetSDAIPrice(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.CrashingApp.YieldsKeeper.SetAssetYieldsIndex(tApp.CrashingApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
-			tApp.NoCheckTxApp.RatelimitKeeper.SetSDAIPrice(tApp.NoCheckTxApp.NewUncachedContext(false, tmproto.Header{}), rate)
-			tApp.NoCheckTxApp.RatelimitKeeper.SetAssetYieldIndex(tApp.NoCheckTxApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+			tApp.NoCheckTxApp.YieldsKeeper.SetSDAIPrice(tApp.NoCheckTxApp.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.NoCheckTxApp.YieldsKeeper.SetAssetYieldsIndex(tApp.NoCheckTxApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
-			tApp.ParallelApp.RatelimitKeeper.SetSDAIPrice(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), rate)
-			tApp.ParallelApp.RatelimitKeeper.SetAssetYieldIndex(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
+			tApp.ParallelApp.YieldsKeeper.SetSDAIPrice(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), rate)
+			tApp.ParallelApp.YieldsKeeper.SetAssetYieldsIndex(tApp.ParallelApp.NewUncachedContext(false, tmproto.Header{}), big.NewRat(1, 1))
 
 			ctx := tApp.InitChain()
 

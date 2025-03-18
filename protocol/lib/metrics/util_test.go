@@ -202,6 +202,7 @@ func TestModuleMeasureSinceWithLabels(t *testing.T) {
 	require.NoError(t, err)
 
 	for i := 0; i < 3; i++ {
+		time.Sleep(time.Millisecond) // Ensure non-zero duration
 		metrics.ModuleMeasureSinceWithLabels(
 			"testModule",
 			[]string{"testKey1", "testKey2"},

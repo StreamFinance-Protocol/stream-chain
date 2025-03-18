@@ -179,7 +179,7 @@ func main() {
           "sumClose": "string",
           "netFunding": "string",
           "unrealizedPnl": "string",
-          "perpYieldIndex": "string",
+          "perpYieldsIndex": "string",
           "closedAt": null,
           "exitPrice": "string"
         },
@@ -197,7 +197,7 @@ func main() {
           "sumClose": "string",
           "netFunding": "string",
           "unrealizedPnl": "string",
-          "perpYieldIndex": "string",
+          "perpYieldsIndex": "string",
           "closedAt": null,
           "exitPrice": "string"
         }
@@ -219,7 +219,7 @@ func main() {
         }
       },
       "marginEnabled": true,
-      "assetYieldIndex": "string"
+      "assetYieldsIndex": "string"
     }
   ]
 }
@@ -405,7 +405,7 @@ func main() {
       "sumClose": "string",
       "netFunding": "string",
       "unrealizedPnl": "string",
-      "perpYieldIndex": "string",
+      "perpYieldsIndex": "string",
       "closedAt": "string",
       "exitPrice": "string"
     },
@@ -423,7 +423,7 @@ func main() {
       "sumClose": "string",
       "netFunding": "string",
       "unrealizedPnl": "string",
-      "perpYieldIndex": "string",
+      "perpYieldsIndex": "string",
       "closedAt": "string",
       "exitPrice": "string"
     }
@@ -445,7 +445,7 @@ func main() {
     }
   },
   "marginEnabled": true,
-  "assetYieldIndex": "string"
+  "assetYieldsIndex": "string"
 }
 ```
 
@@ -635,7 +635,7 @@ func main() {
           "sumClose": "string",
           "netFunding": "string",
           "unrealizedPnl": "string",
-          "perpYieldIndex": "string",
+          "perpYieldsIndex": "string",
           "closedAt": null,
           "exitPrice": "string"
         },
@@ -653,7 +653,7 @@ func main() {
           "sumClose": "string",
           "netFunding": "string",
           "unrealizedPnl": "string",
-          "perpYieldIndex": "string",
+          "perpYieldsIndex": "string",
           "closedAt": null,
           "exitPrice": "string"
         }
@@ -675,7 +675,7 @@ func main() {
         }
       },
       "marginEnabled": true,
-      "assetYieldIndex": "string"
+      "assetYieldsIndex": "string"
     }
   ]
 }
@@ -3777,7 +3777,7 @@ func main() {
       "openInterestLowerCap": "string",
       "openInterestUpperCap": "string",
       "baseOpenInterest": "string",
-      "perpYieldIndex": "string"
+      "perpYieldsIndex": "string"
     },
     "property2": {
       "clobPairId": "string",
@@ -3803,7 +3803,7 @@ func main() {
       "openInterestLowerCap": "string",
       "openInterestUpperCap": "string",
       "baseOpenInterest": "string",
-      "perpYieldIndex": "string"
+      "perpYieldsIndex": "string"
     }
   }
 }
@@ -3999,7 +3999,7 @@ func main() {
       "sumClose": "string",
       "netFunding": "string",
       "unrealizedPnl": "string",
-      "perpYieldIndex": "string",
+      "perpYieldsIndex": "string",
       "closedAt": "string",
       "exitPrice": "string"
     }
@@ -4906,21 +4906,21 @@ func main() {
 This operation does not require authentication
 </aside>
 
-## GetYieldParams
+## GetYieldsParams
 
-<a id="opIdGetYieldParams"></a>
+<a id="opIdGetYieldsParams"></a>
 
 > Code samples
 
 ```shell
 # You can also use wget
-curl -X GET https://klyra-testnet.imperator.co/v4/yieldParams \
+curl -X GET https://klyra-testnet.imperator.co/v4/yieldsParams \
   -H 'Accept: application/json'
 
 ```
 
 ```http
-GET https://klyra-testnet.imperator.co/v4/yieldParams HTTP/1.1
+GET https://klyra-testnet.imperator.co/v4/yieldsParams HTTP/1.1
 Host: klyra-testnet.imperator.co
 Accept: application/json
 
@@ -4931,7 +4931,7 @@ const headers = {
   'Accept':'application/json'
 };
 const baseURL = 'https://klyra-testnet.imperator.co/v4';
-fetch(`${baseURL}/yieldParams`,
+fetch(`${baseURL}/yieldsParams`,
 {
   method: 'GET',
   headers: headers
@@ -4951,7 +4951,7 @@ headers = {
   'Accept' => 'application/json'
 }
 
-result = RestClient.get 'https://klyra-testnet.imperator.co/v4/yieldParams',
+result = RestClient.get 'https://klyra-testnet.imperator.co/v4/yieldsParams',
   params: {
   }, headers: headers
 
@@ -4965,7 +4965,7 @@ headers = {
   'Accept': 'application/json'
 }
 baseURL = 'https://klyra-testnet.imperator.co/v4'
-r = requests.get(f'{baseURL}/yieldParams', headers = headers)
+r = requests.get(f'{baseURL}/yieldsParams', headers = headers)
 print(r.json())
 ```
 
@@ -4984,7 +4984,7 @@ $client = new \GuzzleHttp\Client();
 $request_body = array();
 
 try {
-    $response = $client->request('GET','https://klyra-testnet.imperator.co/v4/yieldParams', array(
+    $response = $client->request('GET','https://klyra-testnet.imperator.co/v4/yieldsParams', array(
         'headers' => $headers,
         'json' => $request_body,
        )
@@ -5001,7 +5001,7 @@ try {
 ```
 
 ```java
-URL obj = new URL("https://klyra-testnet.imperator.co/v4/yieldParams");
+URL obj = new URL("https://klyra-testnet.imperator.co/v4/yieldsParams");
 HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 con.setRequestMethod("GET");
 int responseCode = con.getResponseCode();
@@ -5032,7 +5032,7 @@ func main() {
     }
 
     data := bytes.NewBuffer([]byte{jsonReq})
-    req, err := http.NewRequest("GET", "https://klyra-testnet.imperator.co/v4/yieldParams", data)
+    req, err := http.NewRequest("GET", "https://klyra-testnet.imperator.co/v4/yieldsParams", data)
     req.Header = headers
 
     client := &http.Client{}
@@ -5042,7 +5042,7 @@ func main() {
 
 ```
 
-`GET /yieldParams`
+`GET /yieldsParams`
 
 ### Parameters
 
@@ -5056,11 +5056,11 @@ func main() {
 
 ```json
 {
-  "allYieldParams": [
+  "allYieldsParams": [
     {
       "id": "string",
       "sDAIPrice": "string",
-      "assetYieldIndex": "string",
+      "assetYieldsIndex": "string",
       "createdAt": "string",
       "createdAtHeight": "string"
     }
@@ -5072,27 +5072,27 @@ func main() {
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Ok|[YieldParamsResponse](#schemayieldparamsresponse)|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Ok|[YieldsParamsResponse](#schemayieldsparamsresponse)|
 
 <aside class="success">
 This operation does not require authentication
 </aside>
 
-## GetLatestYieldParams
+## GetLatestYieldsParams
 
-<a id="opIdGetLatestYieldParams"></a>
+<a id="opIdGetLatestYieldsParams"></a>
 
 > Code samples
 
 ```shell
 # You can also use wget
-curl -X GET https://klyra-testnet.imperator.co/v4/yieldParams/latestYieldParams \
+curl -X GET https://klyra-testnet.imperator.co/v4/yieldsParams/latestYieldsParams \
   -H 'Accept: application/json'
 
 ```
 
 ```http
-GET https://klyra-testnet.imperator.co/v4/yieldParams/latestYieldParams HTTP/1.1
+GET https://klyra-testnet.imperator.co/v4/yieldsParams/latestYieldsParams HTTP/1.1
 Host: klyra-testnet.imperator.co
 Accept: application/json
 
@@ -5103,7 +5103,7 @@ const headers = {
   'Accept':'application/json'
 };
 const baseURL = 'https://klyra-testnet.imperator.co/v4';
-fetch(`${baseURL}/yieldParams/latestYieldParams`,
+fetch(`${baseURL}/yieldsParams/latestYieldsParams`,
 {
   method: 'GET',
   headers: headers
@@ -5123,7 +5123,7 @@ headers = {
   'Accept' => 'application/json'
 }
 
-result = RestClient.get 'https://klyra-testnet.imperator.co/v4/yieldParams/latestYieldParams',
+result = RestClient.get 'https://klyra-testnet.imperator.co/v4/yieldsParams/latestYieldsParams',
   params: {
   }, headers: headers
 
@@ -5137,7 +5137,7 @@ headers = {
   'Accept': 'application/json'
 }
 baseURL = 'https://klyra-testnet.imperator.co/v4'
-r = requests.get(f'{baseURL}/yieldParams/latestYieldParams', headers = headers)
+r = requests.get(f'{baseURL}/yieldsParams/latestYieldsParams', headers = headers)
 print(r.json())
 ```
 
@@ -5156,7 +5156,7 @@ $client = new \GuzzleHttp\Client();
 $request_body = array();
 
 try {
-    $response = $client->request('GET','https://klyra-testnet.imperator.co/v4/yieldParams/latestYieldParams', array(
+    $response = $client->request('GET','https://klyra-testnet.imperator.co/v4/yieldsParams/latestYieldsParams', array(
         'headers' => $headers,
         'json' => $request_body,
        )
@@ -5173,7 +5173,7 @@ try {
 ```
 
 ```java
-URL obj = new URL("https://klyra-testnet.imperator.co/v4/yieldParams/latestYieldParams");
+URL obj = new URL("https://klyra-testnet.imperator.co/v4/yieldsParams/latestYieldsParams");
 HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 con.setRequestMethod("GET");
 int responseCode = con.getResponseCode();
@@ -5204,7 +5204,7 @@ func main() {
     }
 
     data := bytes.NewBuffer([]byte{jsonReq})
-    req, err := http.NewRequest("GET", "https://klyra-testnet.imperator.co/v4/yieldParams/latestYieldParams", data)
+    req, err := http.NewRequest("GET", "https://klyra-testnet.imperator.co/v4/yieldsParams/latestYieldsParams", data)
     req.Header = headers
 
     client := &http.Client{}
@@ -5214,7 +5214,7 @@ func main() {
 
 ```
 
-`GET /yieldParams/latestYieldParams`
+`GET /yieldsParams/latestYieldsParams`
 
 > Example responses
 
@@ -5222,11 +5222,11 @@ func main() {
 
 ```json
 {
-  "allYieldParams": [
+  "allYieldsParams": [
     {
       "id": "string",
       "sDAIPrice": "string",
-      "assetYieldIndex": "string",
+      "assetYieldsIndex": "string",
       "createdAt": "string",
       "createdAtHeight": "string"
     }
@@ -5238,7 +5238,7 @@ func main() {
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Ok|[YieldParamsResponse](#schemayieldparamsresponse)|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Ok|[YieldsParamsResponse](#schemayieldsparamsresponse)|
 
 <aside class="success">
 This operation does not require authentication
@@ -5337,7 +5337,7 @@ This operation does not require authentication
   "sumClose": "string",
   "netFunding": "string",
   "unrealizedPnl": "string",
-  "perpYieldIndex": "string",
+  "perpYieldsIndex": "string",
   "closedAt": "string",
   "exitPrice": "string"
 }
@@ -5361,7 +5361,7 @@ This operation does not require authentication
 |sumClose|string|true|none|none|
 |netFunding|string|true|none|none|
 |unrealizedPnl|string|true|none|none|
-|perpYieldIndex|string|true|none|none|
+|perpYieldsIndex|string|true|none|none|
 |closedAt|[IsoString](#schemaisostring)¦null|false|none|none|
 |exitPrice|string¦null|false|none|none|
 
@@ -5388,7 +5388,7 @@ This operation does not require authentication
     "sumClose": "string",
     "netFunding": "string",
     "unrealizedPnl": "string",
-    "perpYieldIndex": "string",
+    "perpYieldsIndex": "string",
     "closedAt": "string",
     "exitPrice": "string"
   },
@@ -5406,7 +5406,7 @@ This operation does not require authentication
     "sumClose": "string",
     "netFunding": "string",
     "unrealizedPnl": "string",
-    "perpYieldIndex": "string",
+    "perpYieldsIndex": "string",
     "closedAt": "string",
     "exitPrice": "string"
   }
@@ -5509,7 +5509,7 @@ This operation does not require authentication
       "sumClose": "string",
       "netFunding": "string",
       "unrealizedPnl": "string",
-      "perpYieldIndex": "string",
+      "perpYieldsIndex": "string",
       "closedAt": "string",
       "exitPrice": "string"
     },
@@ -5527,7 +5527,7 @@ This operation does not require authentication
       "sumClose": "string",
       "netFunding": "string",
       "unrealizedPnl": "string",
-      "perpYieldIndex": "string",
+      "perpYieldsIndex": "string",
       "closedAt": "string",
       "exitPrice": "string"
     }
@@ -5549,7 +5549,7 @@ This operation does not require authentication
     }
   },
   "marginEnabled": true,
-  "assetYieldIndex": "string"
+  "assetYieldsIndex": "string"
 }
 
 ```
@@ -5565,7 +5565,7 @@ This operation does not require authentication
 |openPerpetualPositions|[PerpetualPositionsMap](#schemaperpetualpositionsmap)|true|none|none|
 |assetPositions|[AssetPositionsMap](#schemaassetpositionsmap)|true|none|none|
 |marginEnabled|boolean|true|none|none|
-|assetYieldIndex|string|true|none|none|
+|assetYieldsIndex|string|true|none|none|
 
 ## AddressResponse
 
@@ -5597,7 +5597,7 @@ This operation does not require authentication
           "sumClose": "string",
           "netFunding": "string",
           "unrealizedPnl": "string",
-          "perpYieldIndex": "string",
+          "perpYieldsIndex": "string",
           "closedAt": null,
           "exitPrice": "string"
         },
@@ -5615,7 +5615,7 @@ This operation does not require authentication
           "sumClose": "string",
           "netFunding": "string",
           "unrealizedPnl": "string",
-          "perpYieldIndex": "string",
+          "perpYieldsIndex": "string",
           "closedAt": null,
           "exitPrice": "string"
         }
@@ -5637,7 +5637,7 @@ This operation does not require authentication
         }
       },
       "marginEnabled": true,
-      "assetYieldIndex": "string"
+      "assetYieldsIndex": "string"
     }
   ]
 }
@@ -5684,7 +5684,7 @@ This operation does not require authentication
           "sumClose": "string",
           "netFunding": "string",
           "unrealizedPnl": "string",
-          "perpYieldIndex": "string",
+          "perpYieldsIndex": "string",
           "closedAt": null,
           "exitPrice": "string"
         },
@@ -5702,7 +5702,7 @@ This operation does not require authentication
           "sumClose": "string",
           "netFunding": "string",
           "unrealizedPnl": "string",
-          "perpYieldIndex": "string",
+          "perpYieldsIndex": "string",
           "closedAt": null,
           "exitPrice": "string"
         }
@@ -5724,7 +5724,7 @@ This operation does not require authentication
         }
       },
       "marginEnabled": true,
-      "assetYieldIndex": "string"
+      "assetYieldsIndex": "string"
     }
   ]
 }
@@ -6576,7 +6576,7 @@ or
   "openInterestLowerCap": "string",
   "openInterestUpperCap": "string",
   "baseOpenInterest": "string",
-  "perpYieldIndex": "string"
+  "perpYieldsIndex": "string"
 }
 
 ```
@@ -6608,7 +6608,7 @@ or
 |openInterestLowerCap|string|false|none|none|
 |openInterestUpperCap|string|false|none|none|
 |baseOpenInterest|string|true|none|none|
-|perpYieldIndex|string|true|none|none|
+|perpYieldsIndex|string|true|none|none|
 
 ## PerpetualMarketResponse
 
@@ -6644,7 +6644,7 @@ or
       "openInterestLowerCap": "string",
       "openInterestUpperCap": "string",
       "baseOpenInterest": "string",
-      "perpYieldIndex": "string"
+      "perpYieldsIndex": "string"
     },
     "property2": {
       "clobPairId": "string",
@@ -6670,7 +6670,7 @@ or
       "openInterestLowerCap": "string",
       "openInterestUpperCap": "string",
       "baseOpenInterest": "string",
-      "perpYieldIndex": "string"
+      "perpYieldsIndex": "string"
     }
   }
 }
@@ -6708,7 +6708,7 @@ or
       "sumClose": "string",
       "netFunding": "string",
       "unrealizedPnl": "string",
-      "perpYieldIndex": "string",
+      "perpYieldsIndex": "string",
       "closedAt": "string",
       "exitPrice": "string"
     }
@@ -7032,18 +7032,18 @@ or
 |---|---|---|---|---|
 |transfers|[[TransferResponseObject](#schematransferresponseobject)]|true|none|none|
 
-## YieldParamsResponseObject
+## YieldsParamsResponseObject
 
-<a id="schemayieldparamsresponseobject"></a>
-<a id="schema_YieldParamsResponseObject"></a>
-<a id="tocSyieldparamsresponseobject"></a>
-<a id="tocsyieldparamsresponseobject"></a>
+<a id="schemayieldsparamsresponseobject"></a>
+<a id="schema_YieldsParamsResponseObject"></a>
+<a id="tocSyieldsparamsresponseobject"></a>
+<a id="tocsyieldsparamsresponseobject"></a>
 
 ```json
 {
   "id": "string",
   "sDAIPrice": "string",
-  "assetYieldIndex": "string",
+  "assetYieldsIndex": "string",
   "createdAt": "string",
   "createdAtHeight": "string"
 }
@@ -7056,24 +7056,24 @@ or
 |---|---|---|---|---|
 |id|string|true|none|none|
 |sDAIPrice|string|true|none|none|
-|assetYieldIndex|string|true|none|none|
+|assetYieldsIndex|string|true|none|none|
 |createdAt|[IsoString](#schemaisostring)|true|none|none|
 |createdAtHeight|string|true|none|none|
 
-## YieldParamsResponse
+## YieldsParamsResponse
 
-<a id="schemayieldparamsresponse"></a>
-<a id="schema_YieldParamsResponse"></a>
-<a id="tocSyieldparamsresponse"></a>
-<a id="tocsyieldparamsresponse"></a>
+<a id="schemayieldsparamsresponse"></a>
+<a id="schema_YieldsParamsResponse"></a>
+<a id="tocSyieldsparamsresponse"></a>
+<a id="tocsyieldsparamsresponse"></a>
 
 ```json
 {
-  "allYieldParams": [
+  "allYieldsParams": [
     {
       "id": "string",
       "sDAIPrice": "string",
-      "assetYieldIndex": "string",
+      "assetYieldsIndex": "string",
       "createdAt": "string",
       "createdAtHeight": "string"
     }
@@ -7086,5 +7086,5 @@ or
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|allYieldParams|[[YieldParamsResponseObject](#schemayieldparamsresponseobject)]|true|none|none|
+|allYieldsParams|[[YieldsParamsResponseObject](#schemayieldsparamsresponseobject)]|true|none|none|
 

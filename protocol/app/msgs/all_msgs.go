@@ -148,10 +148,6 @@ var (
 		"/cosmos.upgrade.v1beta1.MsgSoftwareUpgradeResponse":    {},
 		"/cosmos.upgrade.v1beta1.SoftwareUpgradeProposal":       {},
 
-		// blocktime
-		"/klyraprotocol.blocktime.MsgUpdateDowntimeParams":         {},
-		"/klyraprotocol.blocktime.MsgUpdateDowntimeParamsResponse": {},
-
 		// bridge
 		"/klyraprotocol.bridge.MsgAcknowledgeBridges":          {},
 		"/klyraprotocol.bridge.MsgAcknowledgeBridgesResponse":  {},

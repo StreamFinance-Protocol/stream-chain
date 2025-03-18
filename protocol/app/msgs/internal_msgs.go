@@ -3,7 +3,6 @@ package msgs
 import (
 	upgrade "cosmossdk.io/x/upgrade/types"
 	"github.com/StreamFinance-Protocol/stream-chain/protocol/lib"
-	blocktime "github.com/StreamFinance-Protocol/stream-chain/protocol/x/blocktime/types"
 	bridge "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
 	clob "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	delaymsg "github.com/StreamFinance-Protocol/stream-chain/protocol/x/delaymsg/types"
@@ -85,9 +84,6 @@ var (
 
 	// Custom modules
 	InternalMsgSamplesKlyraCustom = map[string]sdk.Msg{
-		// blocktime
-		"/klyraprotocol.blocktime.MsgUpdateDowntimeParams":         &blocktime.MsgUpdateDowntimeParams{},
-		"/klyraprotocol.blocktime.MsgUpdateDowntimeParamsResponse": nil,
 
 		// clob
 		"/klyraprotocol.clob.MsgCreateClobPair":                             &clob.MsgCreateClobPair{},

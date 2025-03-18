@@ -195,14 +195,7 @@
       ],
       "send_enabled": []
     },
-    "blocktime": {
-      "params": {
-        "durations": [
-          "300s",
-          "1800s"
-        ]
-      }
-    },
+    "blocktime": {},
     "clob": {
       "block_rate_limit_config": {
         "max_short_term_order_cancellations_per_n_blocks": [

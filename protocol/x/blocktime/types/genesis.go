@@ -1,25 +1,16 @@
 package types
 
-import "time"
+import time "time"
 
-// DefaultGenesis returns the default blocktime genesis state.
+const WITHDRAWAL_AND_TRANSFERS_BLOCKED_AFTER_CHAIN_OUTAGE_DURATION = 5 * time.Minute
+
+// DefaultGenesis returns the default genesis state
 func DefaultGenesis() *GenesisState {
-	return &GenesisState{
-		Params: DowntimeParams{
-			Durations: []time.Duration{
-				5 * time.Minute,
-				30 * time.Minute,
-			},
-		},
-	}
+	return &GenesisState{}
 }
 
 // Validate performs basic genesis state validation returning an error upon any
 // failure.
 func (gs GenesisState) Validate() error {
-	if err := gs.Params.Validate(); err != nil {
-		return err
-	}
-
 	return nil
 }

@@ -2,7 +2,6 @@ package ante
 
 import (
 	upgrade "cosmossdk.io/x/upgrade/types"
-	blocktime "github.com/StreamFinance-Protocol/stream-chain/protocol/x/blocktime/types"
 	bridge "github.com/StreamFinance-Protocol/stream-chain/protocol/x/bridge/types"
 	clob "github.com/StreamFinance-Protocol/stream-chain/protocol/x/clob/types"
 	delaymsg "github.com/StreamFinance-Protocol/stream-chain/protocol/x/delaymsg/types"
@@ -61,8 +60,6 @@ func IsInternalMsg(msg sdk.Msg) bool {
 		*upgrade.MsgSoftwareUpgrade,
 
 		// ------- Custom modules
-		// blocktime
-		*blocktime.MsgUpdateDowntimeParams,
 
 		// bridge
 		*bridge.MsgCompleteBridge,

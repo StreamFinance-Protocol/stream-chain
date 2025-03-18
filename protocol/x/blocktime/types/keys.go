@@ -7,16 +7,14 @@ const (
 
 	// StoreKey defines the primary module store key
 	StoreKey = ModuleName
+
+	// OutageHeightKey is the key for the store key that
+	// stores the last block a chain outage was seen.
+	OutageHeightKey = "Outage:"
 )
 
 // State
 const (
-	// DowntimeParamsKey defines the key for the DowntimeParams
-	DowntimeParamsKey = "DowntimeParams"
-
-	// AllDowntimeInfoKey defines the key for AllDowntimeInfo
-	AllDowntimeInfoKey = "AllDowntimeInfo"
-
 	// PreviousBlockInfoKey defines the key for PreviousBlockInfo
 	PreviousBlockInfoKey = "PreviousBlockInfo"
 )

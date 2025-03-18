@@ -736,15 +736,10 @@ func (k Keeper) DeleverageSubaccounts(
 		metrics.Latency,
 	)
 
-	fmt.Println("DeleverageSubaccounts")
-
 	// For each unfilled liquidation, attempt to deleverage the subaccount.
 	for i := 0; i < int(k.Flags.MaxDeleveragingAttemptsPerBlock) && i < len(subaccountsToDeleverage); i++ {
 		subaccountId := subaccountsToDeleverage[i].SubaccountId
 		perpetualId := subaccountsToDeleverage[i].PerpetualId
-
-		fmt.Println("subaccountId", subaccountId)
-		fmt.Println("perpetualId", perpetualId)
 
 		_, err := k.MaybeDeleverageSubaccount(ctx, subaccountId, perpetualId)
 		if err != nil {

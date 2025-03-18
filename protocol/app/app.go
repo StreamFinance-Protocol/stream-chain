@@ -555,11 +555,6 @@ func New(
 	app.BlockTimeKeeper = *blocktimemodulekeeper.NewKeeper(
 		appCodec,
 		keys[blocktimemoduletypes.StoreKey],
-		// set the governance and delaymsg module accounts as the authority for conducting upgrades
-		[]string{
-			lib.GovModuleAddress.String(),
-			delaymsgmoduletypes.ModuleAddress.String(),
-		},
 	)
 	blockTimeModule := blocktimemodule.NewAppModule(appCodec, app.BlockTimeKeeper)
 
@@ -1070,14 +1065,12 @@ func New(
 	// CanWithdrawInvariant invariant.
 	// NOTE: staking module is required if HistoricalEntries param > 0
 	app.ModuleManager.SetOrderBeginBlockers(
-		blocktimemoduletypes.ModuleName, // Must be first
-		authz.ModuleName,                // Delete expired grants.
+		authz.ModuleName, // Delete expired grants.
 		epochsmoduletypes.ModuleName,
 		distrtypes.ModuleName,
 		slashingtypes.ModuleName,
 		evidencetypes.ModuleName,
 		stakingtypes.ModuleName,
-		yieldstypes.ModuleName,
 		authtypes.ModuleName,
 		banktypes.ModuleName,
 		govtypes.ModuleName,
@@ -1092,7 +1085,7 @@ func New(
 		feetiersmoduletypes.ModuleName,
 		perpetualsmoduletypes.ModuleName,
 		statsmoduletypes.ModuleName,
-		satypes.ModuleName,
+		blocktimemoduletypes.ModuleName,
 		clobmoduletypes.ModuleName,
 		sendingmoduletypes.ModuleName,
 		govplusmoduletypes.ModuleName,
@@ -1116,7 +1109,6 @@ func New(
 		feegrant.ModuleName,
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
-		yieldstypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		pricesmoduletypes.ModuleName,
 		assetsmoduletypes.ModuleName,

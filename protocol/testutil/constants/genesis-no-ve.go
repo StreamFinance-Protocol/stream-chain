@@ -235,14 +235,7 @@ const GenesisStateNoVe = `{
       "denom_metadata": [],
       "send_enabled": []
     },
-    "blocktime": {
-      "params": {
-        "durations": [
-          "300s",
-          "1800s"
-        ]
-      }
-    },
+    "blocktime": {},
     "clob": {
       "block_rate_limit_config": {
         "max_short_term_orders_and_cancels_per_n_blocks": [

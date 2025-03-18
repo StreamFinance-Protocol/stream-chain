@@ -106,43 +106,6 @@ func (_m *QueryClient) AllCollateralPools(ctx context.Context, in *types.QueryAl
 	return r0, r1
 }
 
-// AllDowntimeInfo provides a mock function with given fields: ctx, in, opts
-func (_m *QueryClient) AllDowntimeInfo(ctx context.Context, in *blocktimetypes.QueryAllDowntimeInfoRequest, opts ...grpc.CallOption) (*blocktimetypes.QueryAllDowntimeInfoResponse, error) {
-	_va := make([]interface{}, len(opts))
-	for _i := range opts {
-		_va[_i] = opts[_i]
-	}
-	var _ca []interface{}
-	_ca = append(_ca, ctx, in)
-	_ca = append(_ca, _va...)
-	ret := _m.Called(_ca...)
-
-	if len(ret) == 0 {
-		panic("no return value specified for AllDowntimeInfo")
-	}
-
-	var r0 *blocktimetypes.QueryAllDowntimeInfoResponse
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *blocktimetypes.QueryAllDowntimeInfoRequest, ...grpc.CallOption) (*blocktimetypes.QueryAllDowntimeInfoResponse, error)); ok {
-		return rf(ctx, in, opts...)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, *blocktimetypes.QueryAllDowntimeInfoRequest, ...grpc.CallOption) *blocktimetypes.QueryAllDowntimeInfoResponse); ok {
-		r0 = rf(ctx, in, opts...)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*blocktimetypes.QueryAllDowntimeInfoResponse)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context, *blocktimetypes.QueryAllDowntimeInfoRequest, ...grpc.CallOption) error); ok {
-		r1 = rf(ctx, in, opts...)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
 // AllLiquidityTiers provides a mock function with given fields: ctx, in, opts
 func (_m *QueryClient) AllLiquidityTiers(ctx context.Context, in *types.QueryAllLiquidityTiersRequest, opts ...grpc.CallOption) (*types.QueryAllLiquidityTiersResponse, error) {
 	_va := make([]interface{}, len(opts))
@@ -431,43 +394,6 @@ func (_m *QueryClient) CollateralPoolAddress(ctx context.Context, in *subaccount
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, *subaccountstypes.QueryCollateralPoolAddressRequest, ...grpc.CallOption) error); ok {
-		r1 = rf(ctx, in, opts...)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// DowntimeParams provides a mock function with given fields: ctx, in, opts
-func (_m *QueryClient) DowntimeParams(ctx context.Context, in *blocktimetypes.QueryDowntimeParamsRequest, opts ...grpc.CallOption) (*blocktimetypes.QueryDowntimeParamsResponse, error) {
-	_va := make([]interface{}, len(opts))
-	for _i := range opts {
-		_va[_i] = opts[_i]
-	}
-	var _ca []interface{}
-	_ca = append(_ca, ctx, in)
-	_ca = append(_ca, _va...)
-	ret := _m.Called(_ca...)
-
-	if len(ret) == 0 {
-		panic("no return value specified for DowntimeParams")
-	}
-
-	var r0 *blocktimetypes.QueryDowntimeParamsResponse
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *blocktimetypes.QueryDowntimeParamsRequest, ...grpc.CallOption) (*blocktimetypes.QueryDowntimeParamsResponse, error)); ok {
-		return rf(ctx, in, opts...)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, *blocktimetypes.QueryDowntimeParamsRequest, ...grpc.CallOption) *blocktimetypes.QueryDowntimeParamsResponse); ok {
-		r0 = rf(ctx, in, opts...)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*blocktimetypes.QueryDowntimeParamsResponse)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context, *blocktimetypes.QueryDowntimeParamsRequest, ...grpc.CallOption) error); ok {
 		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)

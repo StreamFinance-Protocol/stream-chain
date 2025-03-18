@@ -118,7 +118,7 @@ type AssetsKeeper interface {
 }
 
 type BlockTimeKeeper interface {
-	GetPreviousBlockInfo(ctx sdk.Context) blocktimetypes.BlockInfo
+	GetPreviousBlockInfo(ctx sdk.Context) (blocktimetypes.BlockInfo, bool)
 }
 
 type FeeTiersKeeper interface {

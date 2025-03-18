@@ -11,24 +11,6 @@ import (
 
 var _ types.QueryServer = Keeper{}
 
-func (k Keeper) DowntimeParams(
-	c context.Context,
-	req *types.QueryDowntimeParamsRequest,
-) (
-	*types.QueryDowntimeParamsResponse,
-	error,
-) {
-	if req == nil {
-		return nil, status.Error(codes.InvalidArgument, "invalid request")
-	}
-
-	ctx := lib.UnwrapSDKContext(c, types.ModuleName)
-	params := k.GetDowntimeParams(ctx)
-	return &types.QueryDowntimeParamsResponse{
-		Params: params,
-	}, nil
-}
-
 func (k Keeper) PreviousBlockInfo(
 	c context.Context,
 	req *types.QueryPreviousBlockInfoRequest,
@@ -41,26 +23,11 @@ func (k Keeper) PreviousBlockInfo(
 	}
 
 	ctx := lib.UnwrapSDKContext(c, types.ModuleName)
-	info := k.GetPreviousBlockInfo(ctx)
+	info, exists := k.GetPreviousBlockInfo(ctx)
+	if !exists {
+		return nil, status.Error(codes.NotFound, "previous block info not found")
+	}
 	return &types.QueryPreviousBlockInfoResponse{
 		Info: &info,
-	}, nil
-}
-
-func (k Keeper) AllDowntimeInfo(
-	c context.Context,
-	req *types.QueryAllDowntimeInfoRequest,
-) (
-	*types.QueryAllDowntimeInfoResponse,
-	error,
-) {
-	if req == nil {
-		return nil, status.Error(codes.InvalidArgument, "invalid request")
-	}
-
-	ctx := lib.UnwrapSDKContext(c, types.ModuleName)
-	info := k.GetAllDowntimeInfo(ctx)
-	return &types.QueryAllDowntimeInfoResponse{
-		Info: info,
 	}, nil
 }

@@ -3,9 +3,7 @@ package types
 import (
 	"context"
 	"math/big"
-	"time"
 
-	blocktimetypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/blocktime/types"
 	perptypes "github.com/StreamFinance-Protocol/stream-chain/protocol/x/perpetuals/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -117,7 +115,7 @@ type BankKeeper interface {
 }
 
 type BlocktimeKeeper interface {
-	GetDowntimeInfoFor(ctx sdk.Context, duration time.Duration) blocktimetypes.AllDowntimeInfo_DowntimeInfo
+	GetOutageHeight(ctx sdk.Context) (bool, uint32)
 }
 
 type YieldsKeeper interface {
